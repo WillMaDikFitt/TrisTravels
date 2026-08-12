@@ -1,7 +1,7 @@
 import { Montserrat, Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
 import type { Metadata, Viewport } from "next";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | TRIS Travels",
   },
   description:
-    "Community-rooted, authentic journeys in Meghalaya. Discover experiences, curated journeys, and local crafts with TRIS.",
+    "Community-rooted authentic journeys in Meghalaya. Discover experiences and curated journeys with TRIS.",
   icons: {
     icon: [
       { url: "/favicon.ico?v=4" },
@@ -47,22 +47,22 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2a3124",
-  colorScheme: "dark",
+  themeColor: "#f7f4ee",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${jakarta.variable} ${instrument.variable} h-full dark`}
+      className={`${montserrat.variable} ${jakarta.variable} ${instrument.variable} h-full`}
       data-scroll-behavior="smooth"
     >
       <body className="relative flex min-h-full flex-col antialiased">
         <div className="pointer-events-none fixed inset-0 z-[60] texture-noise" aria-hidden />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </AuthProvider>
       </body>
     </html>
   );

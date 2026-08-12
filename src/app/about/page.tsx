@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { FadeIn, Marquee } from "@/components/motion/Motion";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
+import { FadeIn } from "@/components/motion/Motion";
+import { PageHero } from "@/components/motion/FullBleedParallax";
 import { BreathSection } from "@/components/ui/BreathSection";
 import { Button } from "@/components/ui/Button";
+import { CtaBand } from "@/components/ui/CtaBand";
 import { RecognitionLogos } from "@/components/brand/BrandLogo";
 import { media } from "@/data/media";
 
@@ -21,18 +22,6 @@ export default function AboutPage() {
         primaryCta={{ href: "/experiences", label: "Explore experiences" }}
         secondaryCta={{ href: "/partner", label: "Partner with us" }}
       />
-
-      <Marquee
-        duration={38}
-        className="border-y border-outline-variant/20 bg-primary-container py-4 text-primary-fixed"
-      >
-        <span className="font-display text-3xl tracking-tight md:text-5xl">
-          THE HEART BEHIND TRIS
-        </span>
-        <span className="font-display text-3xl tracking-tight md:text-5xl" aria-hidden>
-          THE HEART BEHIND TRIS
-        </span>
-      </Marquee>
 
       <BreathSection
         size="md"
@@ -80,28 +69,37 @@ export default function AboutPage() {
       <section className="mx-auto grid max-w-container-max gap-5 px-margin-mobile pb-16 md:grid-cols-3 md:gap-6 md:px-margin-desktop md:pb-20">
         {[
           {
+            n: "01",
             t: "Authentic Encounters",
             d: "Real people and places — traditional food, local hosts, immersive village life. No filters, no rush.",
             img: media.valueAuthentic,
           },
           {
+            n: "02",
             t: "Community first",
             d: "90% of our services are powered by local partners. Collaboration and shared growth in everything we do.",
             img: media.valueCommunity,
           },
           {
+            n: "03",
             t: "Gives back",
             d: "Each booking is a contribution. A majority of value flows back to sustain crafts, traditions, and families.",
             img: media.valueGivesBack,
           },
         ].map((v) => (
-          <div key={v.t} className="overflow-hidden rounded-3xl bg-surface-container-low">
-            <div className="relative aspect-[4/3]">
-              <Image src={v.img} alt={v.t} fill className="object-cover" sizes="33vw" />
-            </div>
-            <div className="p-6">
-              <h3 className="font-display text-xl text-primary">{v.t}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{v.d}</p>
+          <div key={v.t} className="group relative min-h-[320px] overflow-hidden rounded-[1.75rem] md:min-h-[380px]">
+            <Image
+              src={v.img}
+              alt={v.t}
+              fill
+              className="object-cover transition duration-700 group-hover:scale-105"
+              sizes="33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+              <span className="font-serif text-3xl text-accent">{v.n}</span>
+              <h3 className="mt-2 font-display text-2xl">{v.t}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/75">{v.d}</p>
             </div>
           </div>
         ))}
@@ -121,23 +119,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <FullBleedParallax
-        src={media.heroMist}
-        alt="Hills of Meghalaya"
+      <CtaBand
         eyebrow="Travel with us"
         title="Experience the unseen"
-        cta={{ href: "/experiences", label: "Explore experiences" }}
-        height="md"
-        align="center"
-        overlay="soft"
-      />
-
-      <BreathSection
-        size="md"
-        eyebrow="Collaborate"
-        title="Partner with TRIS"
-        body="Guides, homestays, transport, hosts, and artisans — express interest in working together."
-        cta={{ href: "/partner", label: "Partner with us" }}
+        body="Book a day in the hills — or partner with TRIS if you host, guide, or run a stay."
+        primary={{ href: "/experiences", label: "Explore experiences" }}
+        secondary={{ href: "/partner", label: "Partner with us" }}
       />
     </div>
   );

@@ -10,6 +10,8 @@ export type ExperienceCategory =
 
 export type Difficulty = "Easy" | "Moderate" | "Challenging";
 
+export type ExperienceStatus = "draft" | "active" | "hidden" | "seasonal" | "soldOut";
+
 export type Experience = {
   slug: string;
   name: string;
@@ -24,7 +26,20 @@ export type Experience = {
   suitableFor: string[];
   bestSeason: string;
   priceFrom: number;
+  priceAdult?: number;
+  priceChild?: number;
+  minGuests?: number;
   maxGuests: number;
+  slots?: string[];
+  status?: ExperienceStatus;
+  staffRules?: {
+    minGuests: number;
+    maxGuests: number;
+    staffType: string;
+    quantity: number;
+    costPerStaff: number;
+  }[];
+  seo?: { title?: string; description?: string };
   image: string;
   gallery: string[];
   communityLed?: boolean;

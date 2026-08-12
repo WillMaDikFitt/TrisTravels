@@ -2,9 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, MapPin } from "lucide-react";
-import { getDestination, destinations } from "@/data/destinations";
-import { getExperience } from "@/data/experiences";
-import { getJourney } from "@/data/journeys";
+import { destinations } from "@/data/destinations";
+import { findDestination, findExperience, findJourney } from "@/lib/data/repo";
 import { media } from "@/data/media";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
@@ -20,21 +19,21 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const dest = getDestination(slug);
+  const dest = await findDestination(slug);
   return { title: dest ? `${dest.name} · Destinations` : "Destination" };
 }
 
 export default async function DestinationDetailPage({ params }: Props) {
   const { slug } = await params;
-  const dest = getDestination(slug);
+  const dest = await findDestination(slug);
   if (!dest) notFound();
 
-  const relatedExperiences = (dest.relatedExperienceSlugs ?? [])
-    .map((s) => getExperience(s))
-    .filter(Boolean);
-  const relatedJourneys = (dest.relatedJourneySlugs ?? [])
-    .map((s) => getJourney(s))
-    .filter(Boolean);
+  const relatedExperiences = (
+    await Promise.all((dest.relatedExperienceSlugs ?? []).map((s) => findExperience(s)))
+  ).filter((e): e is NonNullable<typeof e> => Boolean(e));
+  const relatedJourneys = (
+    await Promise.all((dest.relatedJourneySlugs ?? []).map((s) => findJourney(s)))
+  ).filter((j): j is NonNullable<typeof j> => Boolean(j));
 
   return (
     <div className="bg-background">
@@ -104,7 +103,7 @@ export default async function DestinationDetailPage({ params }: Props) {
           {relatedExperiences.length > 0 && (
             <FadeIn>
               <h2 className="font-display text-2xl text-primary">Experiences nearby</h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-2">
                 {relatedExperiences.map(
                   (exp) => exp && <ExperienceCard key={exp.slug} experience={exp} />,
                 )}
@@ -170,11 +169,11 @@ export default async function DestinationDetailPage({ params }: Props) {
       </div>
 
       <FullBleedParallax
-        src={media.ride}
-        alt="Road through Meghalaya"
-        eyebrow="Getting there"
-        title="Add a Trusted Local Ride when you book"
-        body="Verified drivers from the TRIS partner network — optional at checkout."
+        src={media.heroMist}
+        alt="Meghalaya hills"
+        eyebrow="Keep exploring"
+        title="Turn this place into a day"
+        body="Book a nearby experience — or craft a multi-day route around it."
         height="md"
         align="center"
       />

@@ -20,7 +20,18 @@ export type Journey = {
   stays: string[];
   inclusions: string[];
   nextDeparture?: string;
+  /** Legacy free-text departure list */
+  departures?: string[];
+  /** Structured seat inventory for small-group journeys */
+  departureSeats?: {
+    date: string;
+    seats: number;
+    held: number;
+    booked: number;
+    note?: string;
+  }[];
   groupSize?: string;
+  status?: "draft" | "active" | "hidden";
   sourceUrl: string;
 };
 
@@ -455,6 +466,11 @@ export const journeys: Journey[] = [
     inclusions: fixedInclusions,
     nextDeparture: "Multiple dates — seats limited",
     groupSize: "4–10 persons",
+    departureSeats: [
+      { date: "2026-09-12", seats: 10, held: 1, booked: 4, note: "Guwahati start" },
+      { date: "2026-10-17", seats: 10, held: 0, booked: 2, note: "" },
+      { date: "2026-11-14", seats: 10, held: 2, booked: 0, note: "" },
+    ],
     sourceUrl: "https://www.trismeghalaya.com/fixed-departures",
   },
   {
@@ -474,7 +490,7 @@ export const journeys: Journey[] = [
     highlights: [
       "Laitlum Canyons, Krangshuri Falls & Dawki",
       "Overnight village homestay at Mawlynnong (double-sharing)",
-      "Moderate trek (3–4 hrs) — up to 6 offbeat living root bridges",
+      "Moderate trek (3–4 hrs) — up to six offbeat living root bridges",
       "Guided village walk + heritage house visit",
       "Pack-your-own-lunch village style",
       "Direct community-supporting experience",
@@ -498,6 +514,11 @@ export const journeys: Journey[] = [
     inclusions: fixedInclusions,
     nextDeparture: "Every Monday · register with no upfront payment",
     groupSize: "4–10 persons",
+    departureSeats: [
+      { date: "2026-08-17", seats: 10, held: 0, booked: 6, note: "Monday departure" },
+      { date: "2026-08-24", seats: 10, held: 1, booked: 3, note: "Monday departure" },
+      { date: "2026-08-31", seats: 10, held: 0, booked: 1, note: "Monday departure" },
+    ],
     sourceUrl:
       "https://www.trismeghalaya.com/fixed-departures/rooted-trails%3A-the-offbeat-living-root-bridge-experience",
   },

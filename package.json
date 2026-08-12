@@ -6,10 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "npx tsx scripts/seed-firestore.ts"
   },
   "dependencies": {
+    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
+    "firebase": "^12.17.1",
+    "firebase-admin": "^14.2.0",
     "framer-motion": "^13.0.0",
     "lucide-react": "^1.29.0",
     "next": "16.3.0",

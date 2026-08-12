@@ -1,332 +1,255 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { BreathSection } from "@/components/ui/BreathSection";
-import {
-  FadeIn,
-  SlideIn,
-  StaggerChildren,
-  StaggerItem,
-  Marquee,
-} from "@/components/motion/Motion";
-import { FullBleedParallax, PageHero } from "@/components/motion/FullBleedParallax";
+import { FadeIn, SlideIn, StaggerChildren, StaggerItem } from "@/components/motion/Motion";
+import { HomeHero } from "@/components/home/HomeHero";
+import { HomeFaq } from "@/components/home/HomeFaq";
+import { CtaBand } from "@/components/ui/CtaBand";
 import { experiences } from "@/data/experiences";
 import { stories } from "@/data/stories";
 import { media } from "@/data/media";
 import { RecognitionLogos } from "@/components/brand/BrandLogo";
 import { ExperienceCard } from "@/components/listings/ExperienceCard";
 import { StoryCard } from "@/components/listings/StoryCard";
+import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
+import { listExperiences, listStories } from "@/lib/data/repo";
 
-const services = [
-  {
-    title: "Craft My Journey",
-    href: "/craft-my-journey",
-    cta: "Plan my trip",
-    image: media.craft,
-  },
-  {
-    title: "Trusted Local Ride",
-    href: "/experiences",
-    cta: "Reserve rides",
-    image: media.ride,
-  },
-  {
-    title: "Custom Packages",
-    href: "/journeys",
-    cta: "Explore packages",
-    image: media.packages,
-  },
-  {
-    title: "Fixed Departures",
-    href: "/journeys?type=small-group",
-    cta: "Explore departures",
-    image: media.departures,
-  },
-];
+const typeVisuals: Record<string, string> = {
+  adventure: media.heroRoots,
+  "nature-wildlife": media.familyWaterfall,
+  "culture-heritage": media.valueCommunity,
+  "food-local-life": media.kitchen,
+  wellness: media.heroMist,
+  creative: media.craft,
+};
 
-const values = [
-  {
-    title: "Authentic Encounters",
-    body: "Real people and places — traditional food, local hosts, immersive village life.",
-    image: media.valueAuthentic,
-  },
-  {
-    title: "Community First",
-    body: "90% of services powered by local partners. Shared growth in everything we do.",
-    image: media.valueCommunity,
-  },
-  {
-    title: "Travel That Gives Back",
-    body: "Each booking contributes. Value flows back to crafts, traditions, and families.",
-    image: media.valueGivesBack,
-  },
-];
-
-export default function HomePage() {
-  const featured = experiences.slice(0, 3);
+export default async function HomePage() {
+  const allExperiences = await listExperiences().catch(() => experiences);
+  const allStories = await listStories().catch(() => stories);
+  const [lead, ...rest] = allExperiences;
+  const featuredRest = rest.slice(0, 2);
 
   return (
     <>
-      <PageHero
-        src={media.heroForest}
-        alt="Misty Meghalaya forest"
-        eyebrow="TRIS Travels · Meghalaya"
-        title={
-          <>
-            Experience the unseen.
-            <br />
-            <span className="font-serif font-normal italic text-primary-fixed-dim">
-              Travel your way, with us.
-            </span>
-          </>
-        }
-        body="Community-rooted journeys that feel like coming home — and leave communities stronger."
-        primaryCta={{ href: "/experiences", label: "Explore experiences" }}
-        secondaryCta={{ href: "/craft-my-journey", label: "Craft my journey" }}
-      />
+      <HomeHero />
 
-      {/* Breathe after hero */}
-      <BreathSection
-        size="md"
-        eyebrow="Travel with us"
-        title="Four ways to begin"
-        body="Whether you want a single day with a local host, a scheduled small-group departure, or a journey built around you — start wherever feels right."
-      />
-
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {services.map((s) => (
-          <Link
-            key={s.title}
-            href={s.href}
-            className="group relative block aspect-[4/5] overflow-hidden lg:aspect-[3/4]"
-          >
-            <Image
-              src={s.image}
-              alt={s.title}
-              fill
-              className="object-cover transition duration-[1.2s] ease-out group-hover:scale-110"
-              sizes="(max-width:1024px) 50vw, 25vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-              <h3 className="font-display text-2xl leading-tight">{s.title}</h3>
-              <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold tracking-widest uppercase text-primary-fixed-dim transition group-hover:gap-2">
-                {s.cta} <ArrowRight size={14} />
-              </span>
-            </div>
-          </Link>
-        ))}
-      </section>
-
-      <BreathSection
-        size="lg"
-        eyebrow="Featured journey"
-        title="Root Trails"
-        body="An offbeat living-root-bridge journey for travellers who want Meghalaya beyond the postcard route — village stays, quiet paths, groups of 4–10."
-        cta={{ href: "/journeys/offbeat-living-root-bridge", label: "Discover Root Trails" }}
-      />
-
-      <FullBleedParallax
-        src={media.heroRoots}
-        alt="Living root bridge trail"
-        title="Walk with the forest, not against it."
-        height="md"
-        align="center"
-        overlay="soft"
-        speed={0.3}
-      />
-
-      {/* Experiences with breathing header + gaps */}
-      <section className="bg-surface py-16 md:py-24">
-        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <FadeIn className="mx-auto max-w-2xl text-center">
-            <p className="label-caps text-accent">Travel deeper</p>
-            <h2 className="mt-3 font-display text-3xl text-primary md:text-4xl">
-              Featured Experiences
+      <section className="relative overflow-hidden bg-surface pt-12 pb-16 md:pt-16 md:pb-24">
+        <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <p className="watermark pointer-events-none absolute top-0 left-0 text-[18vw] leading-none md:text-[8.5rem]">
+            MEGHALAYA
+          </p>
+          <FadeIn className="relative">
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">How you travel</p>
+            <h2 className="mt-3 font-display text-3xl text-secondary md:text-5xl">
+              Three ways to travel with us
             </h2>
-            <p className="mt-4 text-on-surface-variant">
-              Immersive days led by local custodians — bookable online with clear pricing.
-            </p>
           </FadeIn>
-          <StaggerChildren className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
-            {featured.map((exp) => (
-              <StaggerItem key={exp.slug}>
-                <ExperienceCard experience={exp} />
-              </StaggerItem>
-            ))}
-          </StaggerChildren>
-          <div className="mt-10 text-center">
+
+          <div className="relative mt-12 grid items-stretch gap-5 lg:grid-cols-12">
             <Link
               href="/experiences"
-              className="inline-flex items-center gap-2 label-caps text-primary hover:text-accent"
+              className="group relative min-h-[380px] overflow-hidden rounded-[2rem] lg:col-span-7 lg:min-h-[520px]"
             >
-              View all experiences <ArrowRight size={16} />
+              <Image
+                src={media.heroRoots}
+                alt="Living root bridge experience in Meghalaya"
+                fill
+                className="object-cover transition duration-700 group-hover:scale-105"
+                sizes="(max-width:1024px) 100vw, 58vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <div className="absolute top-6 left-6 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
+                01 · Book online
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-10">
+                <h3 className="font-display text-4xl md:text-5xl">Experiences</h3>
+                <p className="mt-3 max-w-md text-white/80">
+                  A few hours to a full day — six types, a clear price, a real date.
+                </p>
+                <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase">
+                  Browse types <ArrowRight size={14} />
+                </span>
+              </div>
             </Link>
+            <div className="flex min-h-0 flex-col gap-5 lg:col-span-5">
+              <Link
+                href="/journeys?type=curated"
+                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[2rem]"
+              >
+                <Image
+                  src={media.packages}
+                  alt="Curated journeys through Meghalaya"
+                  fill
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                  sizes="40vw"
+                />
+                <div className="absolute inset-0 bg-black/50 transition group-hover:bg-black/40" />
+                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white md:p-8">
+                  <p className="text-[10px] font-bold tracking-[0.16em] text-accent uppercase">02 · Enquire</p>
+                  <h3 className="mt-2 font-display text-3xl">Curated journeys</h3>
+                  <p className="mt-2 text-sm text-white/80">Shape dates, stays, and pace with a planner.</p>
+                </div>
+              </Link>
+              <Link
+                href="/journeys?type=small-group"
+                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[2rem]"
+              >
+                <Image
+                  src={media.departures}
+                  alt="Small group departure in Meghalaya"
+                  fill
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                  sizes="40vw"
+                />
+                <div className="absolute inset-0 bg-black/50 transition group-hover:bg-black/40" />
+                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white md:p-8">
+                  <p className="text-[10px] font-bold tracking-[0.16em] text-accent uppercase">03 · Join a date</p>
+                  <h3 className="mt-2 font-display text-3xl">Small group</h3>
+                  <p className="mt-2 text-sm text-white/80">Fixed departures. Show up with curiosity.</p>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Soft quote on white — not another full-bleed pile-up */}
-      <section className="bg-surface-container-low py-20 md:py-28">
-        <FadeIn className="mx-auto max-w-3xl px-margin-mobile text-center md:px-margin-desktop">
-          <p className="label-caps text-accent">Guest highlight</p>
-          <blockquote className="mt-6 font-serif text-2xl leading-snug text-primary italic md:text-3xl">
-            “Wholesome service from planning to the end of the trip. Recommend TRIS to anyone new to
-            the North East.”
-          </blockquote>
-          <p className="mt-6 text-on-surface-variant">Dr. Suresh Kumar · Chennai</p>
-        </FadeIn>
+      <section className="bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
+        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <div className="ink-rule" />
+          <p className="label-caps mt-4 text-accent">Experience types</p>
+          <h2 className="mt-3 font-display text-3xl md:text-5xl">Pick how a day should feel</h2>
+          <div className="mt-10 grid gap-px overflow-hidden rounded-[1.75rem] bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+            {EXPERIENCE_CATEGORIES.map((c, i) => (
+              <Link
+                key={c.id}
+                href={`/experiences?type=${c.slug}`}
+                className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden bg-[#323628] p-6 transition hover:bg-[#3a4030]"
+              >
+                <Image
+                  src={typeVisuals[c.slug] ?? media.forest}
+                  alt=""
+                  fill
+                  className="object-cover opacity-0 transition duration-500 group-hover:opacity-35"
+                  sizes="33vw"
+                />
+                <span className="relative z-10 font-serif text-3xl text-accent/90">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="relative z-10 mt-8">
+                  <h3 className="font-display text-2xl">{c.id}</h3>
+                  <p className="mt-2 text-sm text-primary-fixed/70">{c.blurb}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <FullBleedParallax
-        src={media.familyWaterfall}
-        alt="Travellers at a Meghalaya waterfall"
-        title="Travel that feels like coming home."
-        height="md"
-        align="center"
-        overlay="soft"
-        speed={0.28}
-      />
-
-      {/* About with breathing room in text column */}
-      <section className="bg-surface">
-        <Marquee duration={40} className="border-b border-outline-variant/15 py-4 opacity-40">
-          <span className="font-display text-3xl tracking-tight text-primary md:text-5xl">
-            THE HEART BEHIND TRIS
-          </span>
-          <span className="font-display text-3xl tracking-tight text-primary md:text-5xl" aria-hidden>
-            THE HEART BEHIND TRIS
-          </span>
-        </Marquee>
-        <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile py-16 md:grid-cols-2 md:gap-16 md:px-margin-desktop md:py-24">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-            <Image
-              src={media.aboutPortrait}
-              alt="The heart behind TRIS"
-              fill
-              className="object-cover"
-              sizes="50vw"
-            />
+      {lead && (
+        <section className="bg-surface py-16 md:py-24">
+          <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+            <FadeIn>
+              <div className="ink-rule" />
+              <p className="label-caps mt-4 text-accent">Bookable now</p>
+              <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+                <h2 className="font-display text-3xl text-primary md:text-5xl">Featured days</h2>
+                <Link href="/experiences" className="label-caps mb-1 inline-flex items-center gap-2 text-primary">
+                  All experiences <ArrowRight size={16} />
+                </Link>
+              </div>
+            </FadeIn>
+            <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-2">
+              <ExperienceCard experience={lead} variant="feature" className="h-full" />
+              <div className="flex min-h-0 flex-col gap-5">
+                {featuredRest.map((exp) => (
+                  <ExperienceCard key={exp.slug} experience={exp} variant="row" className="min-h-[14rem] flex-1" />
+                ))}
+              </div>
+            </div>
           </div>
-          <SlideIn from="right">
-            <p className="label-caps text-accent">Our story</p>
-            <h2 className="mt-3 font-display text-3xl text-primary md:text-4xl">
+        </section>
+      )}
+
+      <section className="relative overflow-hidden bg-primary-container py-24 text-primary-fixed md:py-32">
+        <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <span className="pointer-events-none absolute -top-6 left-0 font-serif text-[7rem] leading-none text-accent/35 md:-top-10 md:text-[10rem]">
+            “
+          </span>
+          <FadeIn className="relative max-w-3xl pt-10 md:pt-14">
+            <p className="label-caps text-accent">Guest highlight</p>
+            <blockquote className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
+              Wholesome service from planning to the end of the trip. Recommend TRIS to anyone new to
+              the North East.
+            </blockquote>
+            <p className="mt-8 text-sm tracking-wide text-primary-fixed/70">Dr. Suresh Kumar · Chennai</p>
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="relative bg-surface py-16 md:py-24">
+        <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile md:grid-cols-12 md:gap-10 md:px-margin-desktop">
+          <div className="relative md:col-span-6 md:pb-8">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
+              <Image src={media.aboutPortrait} alt="The heart behind TRIS" fill className="object-cover" sizes="50vw" />
+            </div>
+            <div className="absolute right-5 bottom-2 hidden h-40 w-32 overflow-hidden rounded-2xl border-4 border-[#f7f4ee] shadow-ambient md:block">
+              <Image src={media.heroMist} alt="" fill className="object-cover" sizes="160px" />
+            </div>
+          </div>
+          <SlideIn from="right" className="md:col-span-6">
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">Our story</p>
+            <h2 className="mt-3 font-display text-3xl text-primary md:text-5xl">Named for Mei-ieid</h2>
+            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
+              Grandmother. Born in Mairang. Generous, hard-working, unconditionally caring. Every
+              homestay, meal, and guide still carries that promise.
+            </p>
+            <Button href="/about" className="mt-8">
               The heart behind TRIS
-            </h2>
-            <p className="mt-6 leading-relaxed text-on-surface-variant">
-              At the soul of TRIS is Mei-ieid — grandmother. Born in Mairang, she embodied true Khasi
-              hospitality: generous, hard-working, and unconditionally caring.
-            </p>
-            <p className="mt-4 leading-relaxed text-on-surface-variant">
-              TRIS is a promise to carry her spirit forward through every homestay, meal, guide, and
-              journey.
-            </p>
-            <Button href="/about" variant="ghost" className="mt-8">
-              Learn more
             </Button>
           </SlideIn>
         </div>
       </section>
 
-      <BreathSection
-        size="md"
-        eyebrow="Our values"
-        title="What we stand for"
-        body="Authenticity, community, and travel that gives back — the principles behind every TRIS journey."
-      />
-
-      <section className="bg-surface pb-20 md:pb-28">
-        <div className="mx-auto grid max-w-container-max gap-6 px-margin-mobile md:grid-cols-3 md:gap-8 md:px-margin-desktop">
-          {values.map((v) => (
-            <FadeIn key={v.title}>
-              <div className="overflow-hidden rounded-2xl bg-surface-container-low">
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={v.image}
-                    alt={v.title}
-                    fill
-                    className="object-cover"
-                    sizes="33vw"
-                  />
-                </div>
-                <div className="p-6 md:p-7">
-                  <h3 className="font-display text-xl text-primary">{v.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{v.body}</p>
-                </div>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-      </section>
-
-      <FullBleedParallax
-        src={media.craft}
-        alt="Local Meghalaya craft and handmade work"
-        eyebrow="Artisan's Hub"
-        title="Hard-to-find crafts, within reach"
-        body="Local crafts can be hard to find and stock isn’t always certain — we connect you with suppliers who have them."
-        cta={{ href: "/artisans", label: "Browse crafts" }}
-        height="lg"
-        align="left"
-        overlay="left"
-        speed={0.42}
-        contentClassName="max-w-4xl"
-        titleClassName="whitespace-nowrap text-[1.65rem] sm:text-3xl md:text-5xl"
-      />
-
-      <section className="bg-surface py-16 md:py-24">
+      <section className="bg-surface-container-low py-16 md:py-24">
         <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <FadeIn className="flex items-end justify-between gap-4">
-            <div>
-              <p className="label-caps text-accent">Journal</p>
-              <h2 className="mt-2 font-display text-3xl text-primary md:text-4xl">Your Stories</h2>
-              <p className="mt-2 text-on-surface-variant">From the misty hills.</p>
+          <FadeIn>
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">Journal</p>
+            <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+              <h2 className="font-display text-3xl text-primary md:text-5xl">Stories from the hills</h2>
+              <Link href="/stories" className="label-caps mb-1 hidden items-center gap-2 text-primary md:inline-flex">
+                Read all <ArrowRight size={16} />
+              </Link>
             </div>
-            <Link
-              href="/stories"
-              className="hidden items-center gap-2 label-caps text-primary hover:text-accent md:flex"
-            >
-              Read all <ArrowRight size={16} />
-            </Link>
           </FadeIn>
-          <div className="mt-12 grid gap-5 md:grid-cols-3 md:gap-6">
-            {stories.slice(0, 3).map((s) => (
-              <StoryCard key={s.slug} story={s} />
+          <StaggerChildren className="mt-12 grid items-stretch gap-5 md:grid-cols-3">
+            {allStories.slice(0, 3).map((s) => (
+              <StaggerItem key={s.slug} className="h-full">
+                <StoryCard story={s} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerChildren>
         </div>
       </section>
 
-      <BreathSection
-        size="lg"
-        eyebrow="Travel your way"
-        title="Craft a journey around you"
-        body="Share your dates, pace, and curiosities — we design a personalised Meghalaya itinerary with local hosts and trusted partners."
-        cta={{ href: "/craft-my-journey", label: "Start planning" }}
+      <HomeFaq />
+
+      <CtaBand
+        eyebrow="Ready when you are"
+        title="Start with a day, or a full journey"
+        body="Book an experience online, join a small-group date, or send a brief and we’ll shape the week."
+        primary={{ href: "/experiences", label: "Browse experiences" }}
+        secondary={{ href: "/craft-my-journey", label: "Craft my journey" }}
       />
 
-      <FullBleedParallax
-        src={media.heroMist}
-        alt="Cloud-covered hills"
-        title="The hills are waiting."
-        height="md"
-        align="center"
-        overlay="soft"
-        speed={0.32}
-      />
-
-      <FadeIn>
-        <section className="bg-surface px-margin-mobile py-16 text-center md:px-margin-desktop md:py-20">
-          <p className="label-caps text-accent">Recognitions</p>
-          <p className="mt-3 font-display text-2xl text-primary md:text-3xl">
-            Recognized by Meghalaya Tourism & NIDHI
-          </p>
-          <RecognitionLogos className="mt-10" />
-        </section>
-      </FadeIn>
+      <section className="bg-surface px-margin-mobile py-14 text-center md:px-margin-desktop md:py-16">
+        <p className="label-caps text-accent">Recognitions</p>
+        <p className="mt-3 font-display text-2xl text-primary md:text-3xl">Meghalaya Tourism & NIDHI</p>
+        <RecognitionLogos className="mt-10" />
+      </section>
     </>
   );
 }

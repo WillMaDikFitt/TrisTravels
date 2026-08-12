@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getJourney, journeys } from "@/data/journeys";
+import { journeys } from "@/data/journeys";
+import { findJourney } from "@/lib/data/repo";
 import { media } from "@/data/media";
 import { formatINR } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
 import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
 import { BreathSection } from "@/components/ui/BreathSection";
 import { Check } from "lucide-react";
+import { JourneyEnquire } from "@/components/enquiries/JourneyEnquire";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -17,13 +18,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const journey = getJourney(slug);
+  const journey = await findJourney(slug);
   return { title: journey?.name ?? "Journey" };
 }
 
 export default async function JourneyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const journey = getJourney(slug);
+  const journey = await findJourney(slug);
   if (!journey) notFound();
 
   return (
@@ -35,8 +36,8 @@ export default async function JourneyDetailPage({ params }: Props) {
         eyebrow={journey.type === "small-group" ? "Small Group Journey" : "Curated Journey"}
         title={journey.name}
         body={journey.tagline}
-        primaryCta={{ href: "/craft-my-journey", label: "Enquire" }}
-        secondaryCta={{ href: "/journeys", label: "All journeys" }}
+        primaryCta={{ href: "#enquire", label: "Enquire" }}
+        secondaryCta={{ href: "/craft-my-journey", label: "Craft My Journey" }}
       />
 
       <div className="border-b border-outline-variant/20 bg-surface-container-low">
@@ -143,11 +144,9 @@ export default async function JourneyDetailPage({ params }: Props) {
               Next departure: {journey.nextDeparture}
             </p>
           )}
-          <Button href="/craft-my-journey" className="mt-6 w-full">
-            Enquire about this journey
-          </Button>
+          <JourneyEnquire journeyName={journey.name} journeySlug={journey.slug} />
           <p className="mt-3 text-center text-xs text-on-surface-variant">
-            Journeys use enquiry flow in Phase 1 — not instant checkout.
+            Journeys are enquiry-led — not instant checkout.
           </p>
         </aside>
       </div>

@@ -1,7 +1,5 @@
-import { ArtisansPageClient } from "./ArtisansPageClient";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Artisan's Hub" };
-
-export default function ArtisansPage() {
-  return <ArtisansPageClient />;
+export default function ArtisansRedirect() {
+  redirect("/");
 }

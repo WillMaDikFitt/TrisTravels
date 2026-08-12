@@ -20,8 +20,12 @@ npm start
 
 ## What’s included
 
-- Home, Experiences (+ booking demo), Journeys, Destinations, Craft My Journey
-- Artisan’s Hub (connect with makers — no checkout)
-- Stories, About, Contact, Partner
+- Experiences (typed by PRD category) + booking / request flow
+- Journeys (curated vs small-group) + Craft My Journey
+- Destinations, Stories, About, Contact, Partner
+- Traveller accounts (Firebase Auth) + wishlist
+- Admin CMS (`/admin`) for content, availability, bookings, enquiries
 
-Content lives in `src/data/`. Payments are simulated (Razorpay demo mode). Spec reference: project `Docs/` folder locally.
+Copy `.env.example` to `.env.local` and add Firebase + Cloudinary keys. Seed Firestore with `npm run seed`. Without env keys the site still runs on static data; bookings/enquiries use in-memory store until restart.
+
+Payments are simulated. Spec: project `Docs/` folder.

@@ -13,16 +13,16 @@ type ButtonProps = {
 };
 
 const variants = {
-  primary: "bg-primary text-on-primary hover:brightness-110 shadow-sm",
+  primary: "bg-accent text-on-accent hover:brightness-110 shadow-sm",
   secondary: "bg-secondary text-on-secondary hover:brightness-95",
   ghost: "border border-secondary/30 text-secondary hover:bg-secondary/10",
   light: "bg-secondary text-on-secondary hover:brightness-95",
 };
 
 const sizes = {
-  sm: "px-4 py-2 text-xs",
-  md: "px-6 py-2.5 text-xs",
-  lg: "px-8 py-4 text-sm",
+  sm: "h-9 px-4 text-xs",
+  md: "h-10 px-6 text-xs",
+  lg: "h-12 px-8 text-sm",
 };
 
 export function Button({
@@ -36,7 +36,7 @@ export function Button({
   disabled,
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-bold uppercase tracking-[0.12em] transition active:scale-[0.98] disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full font-bold uppercase tracking-[0.12em] transition active:scale-[0.98] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
     variants[variant],
     sizes[size],
     className,

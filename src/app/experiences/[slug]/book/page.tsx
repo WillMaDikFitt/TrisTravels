@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { getExperience, experiences } from "@/data/experiences";
+import { experiences } from "@/data/experiences";
+import { findExperience } from "@/lib/data/repo";
 import { BookingFlow } from "@/components/booking/BookingFlow";
 import { BreathSection } from "@/components/ui/BreathSection";
 
@@ -13,13 +14,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const exp = getExperience(slug);
+  const exp = await findExperience(slug);
   return { title: exp ? `Book · ${exp.name}` : "Book" };
 }
 
 export default async function BookExperiencePage({ params }: Props) {
   const { slug } = await params;
-  const exp = getExperience(slug);
+  const exp = await findExperience(slug);
   if (!exp) notFound();
 
   return (

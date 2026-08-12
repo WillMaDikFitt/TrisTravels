@@ -3,28 +3,29 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import {
-  destinations,
   destinationRegions,
+  type Destination,
   type DestinationRegion,
 } from "@/data/destinations";
 import { media } from "@/data/media";
 import { cn } from "@/lib/utils";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
-import { BreathSection } from "@/components/ui/BreathSection";
+import { PageHero } from "@/components/motion/FullBleedParallax";
+import { CtaBand } from "@/components/ui/CtaBand";
 import { DestinationCard } from "@/components/listings/DestinationCard";
 import { StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 
-const filters: Array<"All" | DestinationRegion> = ["All", ...destinationRegions.filter((r) =>
-  destinations.some((d) => d.region === r),
-)];
-
-export function DestinationsPageClient() {
+export function DestinationsPageClient({ items }: { items: Destination[] }) {
   const [region, setRegion] = useState<"All" | DestinationRegion>("All");
   const [query, setQuery] = useState("");
 
+  const filters: Array<"All" | DestinationRegion> = [
+    "All",
+    ...destinationRegions.filter((r) => items.some((d) => d.region === r)),
+  ];
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return destinations.filter((d) => {
+    return items.filter((d) => {
       if (region !== "All" && d.region !== region) return false;
       if (!q) return true;
       return (
@@ -34,7 +35,7 @@ export function DestinationsPageClient() {
         d.highlights.some((h) => h.toLowerCase().includes(q))
       );
     });
-  }, [region, query]);
+  }, [items, region, query]);
 
   return (
     <div className="bg-background">
@@ -56,7 +57,7 @@ export function DestinationsPageClient() {
         <div className="mx-auto max-w-container-max px-margin-mobile py-8 md:px-margin-desktop md:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="label-caps text-primary">Browse</p>
+              <p className="label-caps text-accent">Browse</p>
               <h2 className="mt-2 font-display text-2xl text-secondary md:text-3xl">
                 {filtered.length} {filtered.length === 1 ? "place" : "places"}
                 {region !== "All" ? ` in ${region}` : ""}
@@ -86,9 +87,7 @@ export function DestinationsPageClient() {
             {filters.map((f) => {
               const active = region === f;
               const count =
-                f === "All"
-                  ? destinations.length
-                  : destinations.filter((d) => d.region === f).length;
+                f === "All" ? items.length : items.filter((d) => d.region === f).length;
               return (
                 <button
                   key={f}
@@ -97,8 +96,8 @@ export function DestinationsPageClient() {
                   className={cn(
                     "shrink-0 rounded-full border px-4 py-2 text-xs font-semibold tracking-wide transition",
                     active
-                      ? "border-primary bg-primary text-on-primary"
-                      : "border-outline-variant/40 text-on-surface-variant hover:border-primary/50 hover:text-secondary",
+                      ? "border-accent bg-accent text-on-accent"
+                      : "border-outline-variant/40 text-on-surface-variant hover:border-accent/50 hover:text-secondary",
                   )}
                 >
                   {f}
@@ -115,9 +114,9 @@ export function DestinationsPageClient() {
       <section className="bg-surface px-margin-mobile py-10 md:px-margin-desktop md:py-14">
         <div className="mx-auto max-w-container-max">
           {filtered.length > 0 ? (
-            <StaggerChildren className="grid gap-4 md:gap-5">
+            <StaggerChildren className="grid items-stretch gap-5 sm:grid-cols-2">
               {filtered.map((d) => (
-                <StaggerItem key={d.slug}>
+                <StaggerItem key={d.slug} className="h-full">
                   <DestinationCard destination={d} />
                 </StaggerItem>
               ))}
@@ -143,22 +142,12 @@ export function DestinationsPageClient() {
         </div>
       </section>
 
-      <FullBleedParallax
-        src={media.heroMist}
-        alt="Mist over Meghalaya"
+      <CtaBand
         eyebrow="Next step"
-        title="Turn a place into a day — or a full journey"
-        body="Book short experiences, join a departure, or craft an itinerary around the hills that call you."
-        cta={{ href: "/experiences", label: "Browse experiences" }}
-        height="md"
-        align="center"
-      />
-
-      <BreathSection
-        size="md"
-        eyebrow="Need a route?"
-        title="We’ll shape dates, stays, and rides around these places"
-        cta={{ href: "/craft-my-journey", label: "Craft My Journey" }}
+        title="Turn a place into a trip"
+        body="Book a day nearby, join a departure, or send a brief and we’ll shape the week around these hills."
+        primary={{ href: "/experiences", label: "Browse experiences" }}
+        secondary={{ href: "/craft-my-journey", label: "Craft my journey" }}
       />
     </div>
   );

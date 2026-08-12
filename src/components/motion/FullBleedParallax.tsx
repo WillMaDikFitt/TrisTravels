@@ -93,27 +93,42 @@ export function FullBleedParallax({
           alignClass,
         )}
       >
-        <div className={cn("max-w-2xl", align === "center" && "mx-auto", contentClassName)}>
-          {eyebrow && (
-            <p className="label-caps mb-3 tracking-[0.22em] text-white/75">{eyebrow}</p>
+        <div
+          className={cn(
+            "mx-auto w-full max-w-container-max",
+            align === "center" && "text-center",
+            align === "right" && "text-right",
           )}
-          <h2
+        >
+          <div
             className={cn(
-              "font-display text-3xl leading-tight tracking-tight text-white text-shadow-subtle md:text-5xl",
-              titleClassName,
+              "max-w-2xl",
+              align === "center" && "mx-auto",
+              align === "right" && "ml-auto",
+              contentClassName,
             )}
           >
-            {title}
-          </h2>
-          {body && (
-            <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">{body}</p>
-          )}
-          {cta && (
-            <Button href={cta.href} variant="light" className="mt-6">
-              {cta.label}
-            </Button>
-          )}
-          {children}
+            {eyebrow && (
+              <p className="label-caps mb-3 tracking-[0.22em] text-accent">{eyebrow}</p>
+            )}
+            <h2
+              className={cn(
+                "font-display text-3xl leading-tight tracking-tight text-white text-shadow-subtle md:text-5xl",
+                titleClassName,
+              )}
+            >
+              {title}
+            </h2>
+            {body && (
+              <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">{body}</p>
+            )}
+            {cta && (
+              <Button href={cta.href} variant="light" className="mt-6">
+                {cta.label}
+              </Button>
+            )}
+            {children}
+          </div>
         </div>
       </div>
     </section>
@@ -159,7 +174,7 @@ export function PageHero({
         "relative flex w-full items-end overflow-hidden",
         clearHeader ? "pt-header" : "",
         compact
-          ? "min-h-[calc(52vh+var(--header-offset))]"
+          ? "min-h-[calc(58vh+var(--header-offset))]"
           : "min-h-[85vh] h-[85vh]",
       )}
     >
@@ -172,7 +187,7 @@ export function PageHero({
       >
         <Image src={src} alt={alt} fill priority className="object-cover" sizes="100vw" quality={80} />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/50" />
       <div
         className={cn(
           "relative z-10 w-full px-margin-mobile pb-10 md:px-margin-desktop md:pb-14",
@@ -181,12 +196,12 @@ export function PageHero({
       >
         <div className="mx-auto max-w-container-max">
           {eyebrow && (
-            <p className="label-caps mb-3 tracking-[0.22em] text-white/75">{eyebrow}</p>
+            <p className="label-caps mb-3 tracking-[0.22em] text-accent">{eyebrow}</p>
           )}
           <h1
             className={cn(
-              "max-w-4xl font-display leading-[1.05] tracking-tight text-white text-shadow-subtle",
-              compact ? "text-3xl md:text-5xl" : "text-4xl md:text-6xl",
+              "max-w-4xl font-display leading-[0.98] tracking-tight text-white text-shadow-subtle",
+              compact ? "text-4xl md:text-6xl" : "text-4xl md:text-6xl",
             )}
           >
             {title}
@@ -195,7 +210,7 @@ export function PageHero({
             <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">{body}</p>
           )}
           {(primaryCta || secondaryCta) && (
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               {primaryCta && (
                 <Button href={primaryCta.href} variant="light">
                   {primaryCta.label}
@@ -204,7 +219,7 @@ export function PageHero({
               {secondaryCta && (
                 <Link
                   href={secondaryCta.href}
-                  className="inline-flex items-center rounded-full border border-white/40 px-6 py-2.5 text-xs font-bold tracking-[0.12em] text-white uppercase transition hover:bg-white/10"
+                  className="inline-flex h-10 items-center rounded-full border border-white/40 px-6 text-xs font-bold tracking-[0.12em] text-white uppercase transition hover:bg-white/10"
                 >
                   {secondaryCta.label}
                 </Link>

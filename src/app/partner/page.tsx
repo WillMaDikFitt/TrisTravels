@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
+import { PageHero } from "@/components/motion/FullBleedParallax";
+import { CtaBand } from "@/components/ui/CtaBand";
 import { BreathSection } from "@/components/ui/BreathSection";
 import {
   FormCard,
@@ -14,9 +15,12 @@ import {
   FormTextarea,
 } from "@/components/ui/Form";
 import { media } from "@/data/media";
+import { submitEnquiry } from "@/lib/actions/enquiries";
 
 export default function PartnerPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   if (sent) {
     return (
@@ -67,9 +71,31 @@ export default function PartnerPage() {
           >
             <form
               className="space-y-5"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setSent(true);
+                const fd = new FormData(e.currentTarget);
+                setBusy(true);
+                setError("");
+                try {
+                  const res = await submitEnquiry({
+                    source: "partner",
+                    name: String(fd.get("name") || ""),
+                    email: String(fd.get("email") || ""),
+                    phone: String(fd.get("phone") || ""),
+                    message: String(fd.get("about") || ""),
+                    payload: {
+                      type: String(fd.get("type") || ""),
+                      location: String(fd.get("location") || ""),
+                      credentials: String(fd.get("credentials") || ""),
+                    },
+                  });
+                  if (!res.ok) setError(res.error);
+                  else setSent(true);
+                } catch {
+                  setError("Could not send. Try again.");
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
               <div className="grid gap-5 md:grid-cols-2">
@@ -100,7 +126,7 @@ export default function PartnerPage() {
                   required
                   autoComplete="tel"
                 />
-                <FormInput label="Email" name="email" type="email" autoComplete="email" />
+                <FormInput label="Email" name="email" type="email" required autoComplete="email" />
                 <FormInput
                   label="Location / village"
                   name="location"
@@ -125,8 +151,9 @@ export default function PartnerPage() {
                 <p className="max-w-sm text-xs text-on-surface-variant">
                   Applying starts a conversation — not a contract.
                 </p>
-                <Button type="submit" size="lg">
-                  Submit application
+                {error && <p className="text-sm text-primary">{error}</p>}
+                <Button type="submit" size="lg" disabled={busy}>
+                  {busy ? "Sending…" : "Submit application"}
                 </Button>
               </div>
             </form>
@@ -155,14 +182,12 @@ export default function PartnerPage() {
         </div>
       </section>
 
-      <FullBleedParallax
-        src={media.heroForest}
-        alt="Meghalaya forest"
-        title="Community is the heartbeat of TRIS"
-        cta={{ href: "/about", label: "Our story" }}
-        height="md"
-        align="center"
-        overlay="soft"
+      <CtaBand
+        eyebrow="The TRIS way"
+        title="Community is the heartbeat"
+        body="Read how TRIS began — and why hosts, guides, and travellers grow together."
+        primary={{ href: "/about", label: "Our story" }}
+        secondary={{ href: "/experiences", label: "See experiences" }}
       />
     </div>
   );

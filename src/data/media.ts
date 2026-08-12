@@ -1,6 +1,9 @@
 /** Verified image URLs for the frontend prototype (checked Aug 2026). */
 
 export const media = {
+  /** Living root bridge, Cherrapunji — iconic Meghalaya experience (home hero) */
+  heroMeghalaya:
+    "https://images.unsplash.com/photo-1625654325562-762dcec9e6f2?auto=format&fit=crop&w=2400&q=80",
   heroForest:
     "https://static.wixstatic.com/media/adf5fb_396e57cc5065424da022db96d29064d8~mv2.jpeg",
   heroRoots:

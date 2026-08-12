@@ -1,13 +1,17 @@
-import { stories } from "@/data/stories";
+import { stories as staticStories } from "@/data/stories";
+import { listStories } from "@/lib/data/repo";
 import { media } from "@/data/media";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
+import { PageHero } from "@/components/motion/FullBleedParallax";
 import { BreathSection } from "@/components/ui/BreathSection";
 import { StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { StoryCard } from "@/components/listings/StoryCard";
+import { ShareStoryForm } from "@/components/stories/ShareStoryForm";
 
 export const metadata = { title: "Stories" };
+export const revalidate = 60;
 
-export default function StoriesPage() {
+export default async function StoriesPage() {
+  const stories = await listStories().catch(() => staticStories);
   const [featured, ...rest] = stories;
 
   return (
@@ -20,7 +24,7 @@ export default function StoriesPage() {
         title="Your Stories"
         body="An open journal for travellers, guides, hosts & friends — moments that stay long after the mist lifts."
         primaryCta={{ href: "#stories", label: "Read stories" }}
-        secondaryCta={{ href: "/contact", label: "Share yours" }}
+        secondaryCta={{ href: "#share", label: "Share yours" }}
       />
 
       <BreathSection
@@ -41,9 +45,9 @@ export default function StoriesPage() {
             </div>
           )}
 
-          <StaggerChildren className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+          <StaggerChildren className="grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
             {rest.map((s) => (
-              <StaggerItem key={s.slug}>
+              <StaggerItem key={s.slug} className="h-full">
                 <StoryCard story={s} />
               </StaggerItem>
             ))}
@@ -51,15 +55,24 @@ export default function StoriesPage() {
         </div>
       </section>
 
-      <FullBleedParallax
-        src={media.canopy}
-        alt="Forest canopy"
-        title="Have a story from Meghalaya?"
-        body="Share your journey with TRIS — guest voices help future travellers travel with care."
-        cta={{ href: "/contact", label: "Share your story" }}
-        height="md"
-        align="center"
-      />
+      <section id="share" className="scroll-mt-header bg-primary-container py-16 md:py-24">
+        <div className="mx-auto grid max-w-container-max gap-10 px-margin-mobile md:grid-cols-12 md:px-margin-desktop">
+          <div className="md:col-span-4">
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">Share yours</p>
+            <h2 className="mt-3 font-display text-3xl text-primary-fixed md:text-4xl">
+              Have a story from Meghalaya?
+            </h2>
+            <p className="mt-4 text-primary-fixed/80">
+              Send it here — words and a few photos. We’ll read every one, and some become part of
+              the journal.
+            </p>
+          </div>
+          <div className="rounded-[1.75rem] bg-[#f7f4ee] p-6 md:col-span-8 md:p-8">
+            <ShareStoryForm />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

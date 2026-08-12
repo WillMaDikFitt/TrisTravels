@@ -1,54 +1,50 @@
 @import "tailwindcss";
 
 /*
-  Brand direction (client feedback):
-  Primary = olive · Secondary = off-white
-  Softer, lighter olive-tinted surfaces (less heavy dark).
+  Public site: warm cream ground (#f7f4ee) + deep olive type.
+  Dark olive bands (primary-container) stay for contrast sections and photo overlays.
 */
 :root {
-  --background: #2a3124;
-  --foreground: #f7f4ee;
-  --surface: #2a3124;
-  --surface-dim: #323a2a;
-  --surface-container: #333b2c;
-  --surface-container-low: #2e3628;
-  --surface-container-high: #3c4534;
-  --surface-container-highest: #47513d;
-  --surface-container-lowest: #353e2e;
-  --on-surface: #f7f4ee;
-  --on-surface-variant: #c8cdb8;
+  --background: #f7f4ee;
+  --foreground: #2a2e1f;
+  --surface: #f7f4ee;
+  --surface-dim: #efeae1;
+  --surface-container: #efeae1;
+  --surface-container-low: #f3efe8;
+  --surface-container-high: #e8e2d6;
+  --surface-container-highest: #e0d9cb;
+  --surface-container-lowest: #ffffff;
+  --on-surface: #2a2e1f;
+  --on-surface-variant: #5c6350;
 
-  /* Primary — lighter olive */
-  --primary: #b4c46a;
-  --on-primary: #1f2414;
-  --primary-container: #5a6832;
+  --primary: #4a5a28;
+  --on-primary: #f7f4ee;
+  --primary-container: #3d4a28;
   --on-primary-container: #eaf0d0;
-  --primary-fixed: #eaf0d0;
-  --primary-fixed-dim: #d0db9a;
+  --primary-fixed: #f7f4ee;
+  --primary-fixed-dim: #e4e8d4;
 
-  /* Secondary — off-white */
-  --secondary: #f7f4ee;
-  --on-secondary: #2a2e1f;
-  --secondary-container: #4a5240;
-  --on-secondary-container: #f7f4ee;
+  --secondary: #2a2e1f;
+  --on-secondary: #f7f4ee;
+  --secondary-container: #e4e8d4;
+  --on-secondary-container: #2a2e1f;
 
-  /* Accent alias used across UI (eyebrows, chips) = off-white */
-  --accent: #f7f4ee;
-  --on-accent: #2a2e1f;
+  --accent: #c2643a;
+  --on-accent: #f7f4ee;
 
-  --outline: #9aa28e;
-  --outline-variant: #525a48;
-  --inverse-surface: #f7f4ee;
-  --inverse-on-surface: #2a3124;
-  --glass-nav-bg: rgba(42, 49, 36, 0.9);
-  --shadow-ambient: 0 16px 40px rgba(0, 0, 0, 0.22);
-  --header-offset: 6.5rem;
-  color-scheme: dark;
+  --outline: #8a917c;
+  --outline-variant: #d4cec0;
+  --inverse-surface: #2a2e1f;
+  --inverse-on-surface: #f7f4ee;
+  --glass-nav-bg: rgba(247, 244, 238, 0.92);
+  --shadow-ambient: 0 14px 36px rgba(42, 46, 31, 0.08);
+  --header-offset: 4.5rem;
+  color-scheme: light;
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-offset: 7.5rem;
+    --header-offset: 5.25rem;
   }
 }
 
@@ -106,8 +102,8 @@
   }
 
   ::selection {
-    background: var(--primary);
-    color: var(--on-primary);
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   img {
@@ -121,10 +117,10 @@
   }
 
   .glass-panel {
-    background: rgba(245, 242, 235, 0.08);
+    background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(245, 242, 235, 0.18);
+    border: 1px solid rgba(42, 46, 31, 0.08);
   }
 
   .glass-nav {
@@ -134,8 +130,8 @@
   }
 
   .texture-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    opacity: 0.35;
   }
 
   .label-caps {
@@ -157,5 +153,21 @@
 
   .scroll-mt-header {
     scroll-margin-top: calc(var(--header-offset) + 1rem);
+  }
+
+  .ink-rule {
+    height: 2px;
+    width: 2.5rem;
+    background: var(--accent);
+  }
+
+  .watermark {
+    pointer-events: none;
+    user-select: none;
+    font-family: var(--font-montserrat), sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+    color: rgba(42, 46, 31, 0.06);
   }
 }

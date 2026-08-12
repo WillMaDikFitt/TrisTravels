@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/Form";
 import { media } from "@/data/media";
 import { cn, daysFromNow } from "@/lib/utils";
+import { submitEnquiry } from "@/lib/actions/enquiries";
 
 const interestOptions = [
   "Adventure",
@@ -178,6 +179,8 @@ function ChoiceGrid({
 
 export default function CraftMyJourneyPage() {
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [sending, setSending] = useState(false);
   const [step, setStep] = useState(0);
   const [nights, setNights] = useState(5);
   const [interests, setInterests] = useState<string[]>(["Nature", "Culture"]);
@@ -238,7 +241,12 @@ export default function CraftMyJourneyPage() {
     setStep((s) => Math.max(s - 1, 0));
   };
 
+  const firstPaint = useRef(true);
   useEffect(() => {
+    if (firstPaint.current) {
+      firstPaint.current = false;
+      return;
+    }
     formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
@@ -379,7 +387,7 @@ export default function CraftMyJourneyPage() {
 
               <form
                 className="space-y-6"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   if (step < STEPS.length - 1) {
                     goNext();
@@ -387,7 +395,32 @@ export default function CraftMyJourneyPage() {
                   }
                   setAttempted(true);
                   if (!stepValid) return;
-                  setSent(true);
+                  setSending(true);
+                  setSubmitError("");
+                  try {
+                    const res = await submitEnquiry({
+                      source: "craft-my-journey",
+                      name: form.name,
+                      email: form.email,
+                      phone: form.phone,
+                      message: form.notes || "Craft My Journey brief",
+                      payload: {
+                        group: form.group,
+                        start: form.start,
+                        end: form.end,
+                        pace: form.pace,
+                        stay: form.stay,
+                        budget: form.budget,
+                        interests,
+                      },
+                    });
+                    if (!res.ok) setSubmitError(res.error);
+                    else setSent(true);
+                  } catch {
+                    setSubmitError("Could not send. Try again.");
+                  } finally {
+                    setSending(false);
+                  }
                 }}
               >
                 {step === 0 && (
@@ -618,6 +651,11 @@ export default function CraftMyJourneyPage() {
                       : "Check your dates — end should be on or after start."}
                   </p>
                 )}
+                {submitError && (
+                  <p className="text-sm text-primary" role="alert">
+                    {submitError}
+                  </p>
+                )}
 
                 <div className="flex flex-col gap-3 border-t border-outline-variant/20 pt-5 sm:flex-row sm:items-center sm:justify-between">
                   <p className="max-w-xs text-xs text-on-surface-variant">
@@ -636,8 +674,8 @@ export default function CraftMyJourneyPage() {
                         Continue
                       </Button>
                     ) : (
-                      <Button type="submit" size="lg">
-                        Submit enquiry
+                      <Button type="submit" size="lg" disabled={sending}>
+                        {sending ? "Sending…" : "Submit enquiry"}
                       </Button>
                     )}
                   </div>

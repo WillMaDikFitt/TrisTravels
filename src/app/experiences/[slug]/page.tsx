@@ -1,12 +1,11 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Clock, Mountain, MapPin, Users, Star, Check } from "lucide-react";
-import { getExperience, experiences } from "@/data/experiences";
-import { media } from "@/data/media";
+import { experiences } from "@/data/experiences";
+import { findExperience } from "@/lib/data/repo";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { FadeIn } from "@/components/motion/Motion";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
-import { FullBleedParallax } from "@/components/motion/FullBleedParallax";
 import { BreathSection } from "@/components/ui/BreathSection";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -17,13 +16,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const exp = getExperience(slug);
-  return { title: exp?.name ?? "Experience" };
+  const exp = await findExperience(slug);
+  return { title: exp?.seo?.title ?? exp?.name ?? "Experience" };
 }
 
 export default async function ExperienceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const exp = getExperience(slug);
+  const exp = await findExperience(slug);
   if (!exp) notFound();
 
   return (
@@ -35,7 +34,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
           <div className="w-full px-margin-mobile pb-10 pt-8 md:px-margin-desktop md:pb-14">
             <div className="mx-auto max-w-container-max">
               <div className="flex flex-wrap gap-2">
-                <span className="label-caps rounded-full bg-white/15 px-3 py-1 text-white backdrop-blur-sm">
+                <span className="label-caps rounded-full bg-accent px-3 py-1 text-on-accent">
                   {exp.category}
                 </span>
                 {exp.tags.slice(0, 2).map((t) => (
@@ -47,7 +46,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
                   </span>
                 ))}
               </div>
-              <h1 className="mt-4 max-w-3xl font-display text-4xl text-white text-shadow-subtle md:text-5xl">
+              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[0.98] text-white text-shadow-subtle md:text-6xl">
                 {exp.name}
               </h1>
               <p className="mt-3 max-w-xl text-white/85">{exp.tagline}</p>
@@ -74,6 +73,10 @@ export default async function ExperienceDetailPage({ params }: Props) {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto max-w-container-max px-margin-mobile pt-6 md:hidden">
+        <BookingWidget experience={exp} compact />
       </div>
 
       <div className="mx-auto grid max-w-container-max gap-10 px-margin-mobile py-10 md:grid-cols-[1fr_360px] md:px-margin-desktop md:py-12">
@@ -119,7 +122,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
               <div className="grid gap-3 md:grid-cols-3">
                 {exp.gallery.map((src) => (
                   <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-xl">
-                    <Image src={src} alt="" fill className="object-cover" sizes="33vw" />
+                    <Image src={src} alt={`${exp.name} gallery`} fill className="object-cover" sizes="33vw" />
                   </div>
                 ))}
               </div>
@@ -159,7 +162,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
               <ol className="relative mt-8 space-y-8 border-l border-outline-variant/40 pl-8">
                 {exp.itinerary.map((step) => (
                   <li key={step.time} className="relative">
-                    <span className="absolute top-1.5 -left-[39px] h-3 w-3 rounded-full bg-accent" />
+                    <span className="absolute top-1.5 left-0 h-3 w-3 -translate-x-[calc(2rem+6px)] rounded-full bg-accent" />
                     <p className="label-caps text-accent">{step.time}</p>
                     <h4 className="mt-1 font-display text-lg text-primary">{step.title}</h4>
                     <p className="mt-1 text-on-surface-variant">{step.description}</p>
@@ -235,7 +238,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
                 <div className="mt-6 divide-y divide-outline-variant/30">
                   {exp.faqs.map((f) => (
                     <details key={f.q} className="group py-4">
-                      <summary className="cursor-pointer list-none font-medium text-primary marker:content-none">
+                      <summary className="cursor-pointer list-none font-medium text-primary marker:content-none focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                         {f.q}
                       </summary>
                       <p className="mt-2 text-on-surface-variant">{f.a}</p>
@@ -247,21 +250,10 @@ export default async function ExperienceDetailPage({ params }: Props) {
           )}
         </div>
 
-        <div className="md:self-start">
+        <div className="hidden md:block md:self-start">
           <BookingWidget experience={exp} />
         </div>
       </div>
-
-      <FullBleedParallax
-        src={media.ride}
-        alt="Road journey through Meghalaya hills"
-        eyebrow="Optional add-on"
-        title="Add a Trusted Local Ride at checkout"
-        body="Verified drivers from our partner network — optional, transparent, community powered."
-        height="md"
-        align="center"
-        overlay="soft"
-      />
 
       <BreathSection
         size="md"

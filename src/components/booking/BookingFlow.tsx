@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -8,48 +8,93 @@ import { formatINR, cn, isInstantBookingDate, BOOKING_NOTICE_DAYS } from "@/lib/
 import type { Experience } from "@/data/experiences";
 import { FormInput } from "@/components/ui/Form";
 import { Check, CreditCard } from "lucide-react";
-
-const RIDE_FEE = 1800;
+import { confirmPayment, createBooking } from "@/lib/actions/bookings";
+import { useAuth } from "@/components/auth/AuthProvider";
+import type { BookingRecord } from "@/lib/types";
+import { DEFAULT_SLOTS } from "@/lib/catalog";
 
 export function BookingFlow({ experience }: { experience: Experience }) {
   const search = useSearchParams();
+  const { user, profile } = useAuth();
+  const slots = experience.slots?.length ? experience.slots : DEFAULT_SLOTS;
   const [step, setStep] = useState(0);
-  const [slot, setSlot] = useState("09:00");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [slot, setSlot] = useState(search.get("slot") || slots[0]);
+  const [name, setName] = useState(profile?.name ?? "");
+  const [email, setEmail] = useState(profile?.email ?? user?.email ?? "");
+  const [phone, setPhone] = useState(profile?.phone ?? "");
+
+  useEffect(() => {
+    if (profile?.name) setName((n) => n || profile.name);
+    if (profile?.email || user?.email) setEmail((e) => e || profile?.email || user?.email || "");
+    if (profile?.phone) setPhone((p) => p || profile.phone || "");
+  }, [profile, user?.email]);
   const [done, setDone] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
+  const [booking, setBooking] = useState<BookingRecord | null>(null);
 
   const date = search.get("date") ?? "";
   const guests = Number(search.get("guests") ?? 2);
-  const ride = search.get("ride") === "1";
   const requestMode =
     search.get("request") === "1" || (date ? !isInstantBookingDate(date) : false);
 
   const steps = requestMode
     ? ["Details", "Contact", "Submit request"]
-    : ["Details", "Contact", "Review", "Payment"];
+    : ["Details", "Contact", "Pay"];
 
-  const total = useMemo(
-    () => experience.priceFrom * guests + (ride ? RIDE_FEE : 0),
-    [experience.priceFrom, guests, ride],
-  );
+  const total = useMemo(() => experience.priceFrom * guests, [experience.priceFrom, guests]);
 
-  const slots = ["08:30", "09:00", "10:00"];
-
-  const finish = async () => {
-    setPaying(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setPaying(false);
-    setDone(true);
-    setStep(requestMode ? 2 : 3);
+  const persist = async () => {
+    const result = await createBooking({
+      experienceSlug: experience.slug,
+      date,
+      slot,
+      guests,
+      customerName: name,
+      customerEmail: email,
+      customerPhone: phone,
+      uid: user?.uid,
+      request: requestMode,
+    });
+    if (!result.ok) {
+      setError(result.error);
+      return null;
+    }
+    setBooking(result.booking);
+    return result.booking;
   };
 
-  if (done) {
+  const finishRequest = async () => {
+    setPaying(true);
+    setError("");
+    const rec = await persist();
+    setPaying(false);
+    if (rec) {
+      setDone(true);
+      setStep(2);
+    }
+  };
+
+  const finishPay = async () => {
+    setPaying(true);
+    setError("");
+    try {
+      const rec = booking ?? (await persist());
+      if (!rec) return;
+      await confirmPayment(rec.id);
+      setDone(true);
+      setStep(2);
+    } catch {
+      setError("Payment simulation failed. Try again.");
+    } finally {
+      setPaying(false);
+    }
+  };
+
+  if (done && booking) {
     return (
       <div className="mx-auto max-w-lg rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-8 text-center shadow-ambient md:p-10">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-fixed text-primary-container">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-primary">
           <Check size={32} />
         </div>
         <h1 className="mt-6 font-display text-3xl text-primary">
@@ -58,37 +103,20 @@ export function BookingFlow({ experience }: { experience: Experience }) {
         <p className="mt-3 text-on-surface-variant">
           {requestMode ? (
             <>
-              Demo request for <strong>{experience.name}</strong> on {date} at {slot}. Dates within{" "}
-              {BOOKING_NOTICE_DAYS} days need our confirmation — we’ll get back within 24 hours
-              (simulated).
+              Request for <strong>{experience.name}</strong> on {date}. Dates within{" "}
+              {BOOKING_NOTICE_DAYS} days need confirmation — ref {booking.id}.
             </>
           ) : (
             <>
-              Demo confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Payment
-              simulated via Razorpay — no charge was made.
+              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Payment
+              simulated — ref {booking.id}.
             </>
           )}
         </p>
-        <div className="mt-6 rounded-2xl bg-surface-container-low p-4 text-left text-sm">
-          <p>
-            <span className="text-on-surface-variant">Guest:</span> {name || "Guest"}
-          </p>
-          <p className="mt-1">
-            <span className="text-on-surface-variant">
-              {requestMode ? "Estimated total:" : "Total:"}
-            </span>{" "}
-            {formatINR(total)}
-          </p>
-          <p className="mt-1">
-            <span className="text-on-surface-variant">Ref:</span> TRIS-
-            {requestMode ? "REQ" : "DEMO"}-
-            {Math.random().toString(36).slice(2, 8).toUpperCase()}
-          </p>
-        </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button href={`/experiences/${experience.slug}`}>Back to experience</Button>
-          <Button href="/experiences" variant="ghost">
-            Browse more
+          <Button href="/account" variant="ghost">
+            My bookings
           </Button>
         </div>
       </div>
@@ -100,8 +128,8 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       <div className="rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-6 shadow-ambient md:p-8">
         {requestMode && (
           <p className="mb-6 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-secondary">
-            This date is within {BOOKING_NOTICE_DAYS} days — online booking isn’t available yet.
-            Submit a request and we’ll confirm availability.
+            This date is within {BOOKING_NOTICE_DAYS} days — submit a request and we’ll confirm
+            availability.
           </p>
         )}
 
@@ -114,7 +142,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 i === step
                   ? "bg-primary-container text-primary-fixed"
                   : i < step
-                    ? "bg-primary-fixed text-primary"
+                    ? "bg-secondary-container text-primary"
                     : "bg-surface-container text-on-surface-variant",
               )}
             >
@@ -127,8 +155,16 @@ export function BookingFlow({ experience }: { experience: Experience }) {
           <div>
             <h1 className="font-display text-3xl text-primary">Select time slot</h1>
             <p className="mt-2 text-on-surface-variant">
-              {date || "Date from widget"} · {guests} guests
+              {date || "No date selected"} · {guests} guests
             </p>
+            {!date && (
+              <p className="mt-3 text-sm text-primary">
+                Pick a date on the experience page first.{" "}
+                <Link href={`/experiences/${experience.slug}`} className="underline">
+                  Go back
+                </Link>
+              </p>
+            )}
             <div className="mt-6 flex flex-wrap gap-3">
               {slots.map((s) => (
                 <button
@@ -146,18 +182,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 </button>
               ))}
             </div>
-            <label className="mt-8 flex items-start gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-              <input type="checkbox" checked={ride} readOnly className="mt-1" />
-              <span>
-                <span className="font-medium text-primary">Trusted Local Ride</span>
-                <span className="mt-1 block text-sm text-on-surface-variant">
-                  {ride
-                    ? `Included · ${formatINR(RIDE_FEE)}`
-                    : "Not selected — you can go back to the experience page to add it."}
-                </span>
-              </span>
-            </label>
-            <Button className="mt-8" onClick={() => setStep(1)}>
+            <Button className="mt-8" onClick={() => setStep(1)} disabled={!date}>
               Continue
             </Button>
           </div>
@@ -166,28 +191,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
         {step === 1 && (
           <div>
             <h1 className="font-display text-3xl text-primary">Your details</h1>
-            <p className="mt-2 text-on-surface-variant">
-              {requestMode
-                ? "We’ll use these details to confirm your short-notice request."
-                : "We’ll send confirmation and travel notes here."}
-            </p>
             <div className="mt-6 space-y-4">
-              <FormInput
-                label="Full name"
-                name="name"
-                value={name}
-                onChange={setName}
-                placeholder="Your name"
-                required
-                autoComplete="name"
-              />
+              <FormInput label="Full name" name="name" value={name} onChange={setName} required autoComplete="name" />
               <FormInput
                 label="Email"
                 name="email"
                 type="email"
                 value={email}
                 onChange={setEmail}
-                placeholder="you@email.com"
                 required
                 autoComplete="email"
               />
@@ -197,7 +208,6 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 type="tel"
                 value={phone}
                 onChange={setPhone}
-                placeholder="+91 ..."
                 required
                 autoComplete="tel"
               />
@@ -206,10 +216,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
               <Button variant="ghost" onClick={() => setStep(0)}>
                 Back
               </Button>
-              <Button
-                onClick={() => setStep(2)}
-                disabled={!name || !email || !phone}
-              >
+              <Button onClick={() => setStep(2)} disabled={!name || !email || !phone}>
                 {requestMode ? "Review request" : "Review booking"}
               </Button>
             </div>
@@ -227,33 +234,23 @@ export function BookingFlow({ experience }: { experience: Experience }) {
               <Row label="Time" value={slot} />
               <Row label="Guests" value={String(guests)} />
               <Row label="Guest name" value={name} />
-              <Row label="Contact" value={`${email} · ${phone}`} />
-              {ride && <Row label="Local ride" value={formatINR(RIDE_FEE)} />}
               <div className="border-t border-outline-variant/30 pt-3">
-                <Row
-                  label={requestMode ? "Estimated total" : "Total payable"}
-                  value={formatINR(total)}
-                  bold
-                />
+                <Row label={requestMode ? "Estimated total" : "Total payable"} value={formatINR(total)} bold />
               </div>
             </div>
-            <p className="mt-4 text-xs text-on-surface-variant">
-              {requestMode
-                ? `Short-notice requests (under ${BOOKING_NOTICE_DAYS} days) are confirmed by the TRIS team before payment.`
-                : "Customer view shows only the total. Internal pricing components stay in admin — as per PRD."}
-            </p>
+            {error && <p className="mt-3 text-sm text-primary">{error}</p>}
             <div className="mt-8 flex gap-3">
               <Button variant="ghost" onClick={() => setStep(1)}>
                 Back
               </Button>
               {requestMode ? (
-                <Button onClick={finish} disabled={paying}>
+                <Button onClick={finishRequest} disabled={paying}>
                   {paying ? "Submitting…" : "Submit request"}
                 </Button>
               ) : (
-                <Button onClick={finish} disabled={paying} className="gap-2">
+                <Button onClick={finishPay} disabled={paying} className="gap-2">
                   <CreditCard size={16} />
-                  {paying ? "Opening Razorpay…" : "Pay with Razorpay"}
+                  {paying ? "Processing…" : "Pay (demo)"}
                 </Button>
               )}
             </div>
@@ -262,22 +259,16 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       </div>
 
       <aside className="h-fit rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-6 shadow-ambient">
-        <p className="label-caps text-accent">
-          {requestMode ? "Request summary" : "Booking summary"}
-        </p>
+        <p className="label-caps text-accent">{requestMode ? "Request summary" : "Booking summary"}</p>
         <h2 className="mt-2 font-display text-xl text-primary">{experience.name}</h2>
         <p className="mt-1 text-sm text-on-surface-variant">
           {experience.location} · {experience.duration}
         </p>
         <div className="mt-6 space-y-2 text-sm">
           <Row label="Subtotal" value={formatINR(experience.priceFrom * guests)} />
-          {ride && <Row label="Ride" value={formatINR(RIDE_FEE)} />}
           <Row label="Total" value={formatINR(total)} bold />
         </div>
-        <Link
-          href={`/experiences/${experience.slug}`}
-          className="mt-6 inline-block text-sm text-accent hover:underline"
-        >
+        <Link href={`/experiences/${experience.slug}`} className="mt-6 inline-block text-sm text-accent hover:underline">
           ← Edit on experience page
         </Link>
       </aside>
@@ -285,15 +276,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   );
 }
 
-function Row({
-  label,
-  value,
-  bold,
-}: {
-  label: string;
-  value: string;
-  bold?: boolean;
-}) {
+function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className={cn("flex justify-between gap-4", bold && "font-semibold text-primary")}>
       <span className={bold ? undefined : "text-on-surface-variant"}>{label}</span>

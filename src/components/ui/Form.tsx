@@ -40,6 +40,8 @@ export function FormInput({
   enterKeyHint,
   autoFocus,
   hint,
+  readOnly,
+  disabled,
 }: {
   label: string;
   name: string;
@@ -58,25 +60,28 @@ export function FormInput({
   enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
   autoFocus?: boolean;
   hint?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
 }) {
   const id = name;
+  const locked = Boolean(readOnly || disabled);
   return (
     <div className={cn("block", className)}>
-      <FieldLabel htmlFor={id} hint={required ? undefined : hint}>
+      <FieldLabel htmlFor={id} hint={required && !locked ? undefined : hint}>
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
-        {!required && !hint ? (
+        {required && !locked ? <span className="text-accent"> *</span> : null}
+        {!required && !hint && !locked ? (
           <span className="ml-1.5 text-xs font-normal text-on-surface-variant">(optional)</span>
         ) : null}
       </FieldLabel>
-      {hint && required ? (
+      {hint && (required || locked) ? (
         <p className="mt-1 text-xs text-on-surface-variant">{hint}</p>
       ) : null}
       <input
         id={id}
         name={name}
         type={type}
-        required={required}
+        required={required && !locked}
         min={min}
         max={max}
         step={step}
@@ -86,9 +91,11 @@ export function FormInput({
         inputMode={inputMode}
         enterKeyHint={enterKeyHint}
         autoFocus={autoFocus}
+        readOnly={readOnly}
+        disabled={disabled}
         value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-        className={fieldClass}
+        onChange={onChange && !locked ? (e) => onChange(e.target.value) : undefined}
+        className={cn(fieldClass, locked && "cursor-not-allowed bg-surface-container opacity-80")}
       />
     </div>
   );
@@ -271,15 +278,29 @@ export function FormSuccess({
   title,
   body,
   children,
+  compact,
 }: {
   title: string;
   body: string;
   children?: React.ReactNode;
+  compact?: boolean;
 }) {
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-margin-mobile pt-header pb-20">
-      <div className="w-full max-w-md rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-8 text-center shadow-ambient md:p-10">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-fixed text-primary-container">
+    <div
+      className={cn(
+        "flex items-center justify-center",
+        compact ? "py-4" : "min-h-[70vh] px-margin-mobile pt-header pb-20",
+      )}
+    >
+      <div
+        className={cn(
+          "w-full text-center",
+          compact
+            ? "max-w-none py-2"
+            : "max-w-md rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-8 shadow-ambient md:p-10",
+        )}
+      >
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-primary">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M5 12.5l4.5 4.5L19 7.5"

@@ -1,96 +1,124 @@
+import Link from "next/link";
+import Image from "next/image";
 import { journeys } from "@/data/journeys";
 import { media } from "@/data/media";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
-import { BreathSection } from "@/components/ui/BreathSection";
 import { JourneyCard } from "@/components/listings/JourneyCard";
-import { StaggerChildren, StaggerItem } from "@/components/motion/Motion";
+import { listJourneys } from "@/lib/data/repo";
+import { CtaBand } from "@/components/ui/CtaBand";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Journeys" };
 
-export default function JourneysPage() {
-  const curated = journeys.filter((j) => j.type === "curated");
-  const small = journeys.filter((j) => j.type === "small-group");
+type Props = { searchParams: Promise<{ type?: string }> };
+
+export default async function JourneysPage({ searchParams }: Props) {
+  const { type } = await searchParams;
+  const all = await listJourneys().catch(() => journeys);
+  const curated = all.filter((j) => j.type === "curated");
+  const small = all.filter((j) => j.type === "small-group");
+  const focus = type === "small-group" || type === "curated" ? type : null;
 
   return (
     <div className="bg-background">
-      <PageHero
-        src={media.peaks}
-        alt="Meghalaya mountain journey"
-        compact
-        eyebrow="Journeys"
-        title="Travel deeper across Meghalaya"
-        body="Customizable packages and fixed departures from TRIS Meghalaya — curated for depth, scheduled for connection."
-        primaryCta={{ href: "#journeys", label: "View journeys" }}
-        secondaryCta={{ href: "/craft-my-journey", label: "Craft my own" }}
-      />
-
-      <BreathSection
-        size="sm"
-        eyebrow="From trismeghalaya.com"
-        title="Join a departure — or customise a package"
-        body="Fixed departures share dates with like-hearted travellers. Customizable packages let you shape dates, stays, rides, and add-ons."
-      />
-
-      <div id="journeys" className="scroll-mt-header">
-        <section className="bg-surface py-12 md:py-16">
-          <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-            <h2 className="font-display text-2xl text-primary md:text-3xl">Fixed Departures</h2>
-            <p className="mt-2 max-w-xl text-on-surface-variant">
-              Scheduled small-group journeys — just show up with your curiosity.
+      <section className="grid min-h-[78vh] pt-header md:grid-cols-2">
+        <Link
+          href="/journeys?type=curated"
+          className={cn(
+            "group relative flex min-h-[44vh] flex-col justify-end overflow-hidden p-8 md:min-h-0 md:p-12",
+            focus === "small-group" && "md:opacity-60",
+          )}
+        >
+          <Image
+            src={media.packages}
+            alt="Curated journeys"
+            fill
+            className="object-cover transition duration-700 group-hover:scale-110"
+            sizes="(max-width:768px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+          <div className="relative z-10 text-white">
+            <p className="font-serif text-4xl text-accent">01</p>
+            <p className="label-caps mt-2 text-accent">Enquire · flexible</p>
+            <h1 className="mt-3 font-display text-4xl md:text-6xl">Curated Journeys</h1>
+            <p className="mt-3 max-w-md text-white/80">
+              Multi-day packages you shape — dates, stays, pace. Not an instant checkout.
             </p>
-            <StaggerChildren className="mt-8 grid gap-5">
+            <span className="mt-5 inline-block text-xs font-bold tracking-widest text-accent uppercase">
+              View packages →
+            </span>
+          </div>
+        </Link>
+        <Link
+          href="/journeys?type=small-group"
+          className={cn(
+            "group relative flex min-h-[44vh] flex-col justify-end overflow-hidden p-8 md:min-h-0 md:p-12",
+            focus === "curated" && "md:opacity-60",
+          )}
+        >
+          <Image
+            src={media.departures}
+            alt="Small group journeys"
+            fill
+            className="object-cover transition duration-700 group-hover:scale-110"
+            sizes="(max-width:768px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+          <div className="relative z-10 text-white">
+            <p className="font-serif text-4xl text-accent">02</p>
+            <p className="label-caps mt-2 text-accent">Join a departure</p>
+            <h2 className="mt-3 font-display text-4xl md:text-6xl">Small Group</h2>
+            <p className="mt-3 max-w-md text-white/80">
+              Scheduled dates. Shared energy. Show up with your curiosity.
+            </p>
+            <span className="mt-5 inline-block text-xs font-bold tracking-widest text-accent uppercase">
+              See departures →
+            </span>
+          </div>
+        </Link>
+      </section>
+
+      {(!focus || focus === "small-group") && (
+        <section id="journeys" className="scroll-mt-header bg-surface py-14 md:py-20">
+          <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">Small group</p>
+            <h2 className="mt-2 font-display text-3xl text-secondary md:text-5xl">Fixed departures</h2>
+            <p className="mt-2 max-w-xl text-on-surface-variant">
+              Dates are set. Groups stay small. Enquire to hold a seat.
+            </p>
+            <div className="mt-10 grid gap-6">
               {small.map((j) => (
-                <StaggerItem key={j.slug}>
-                  <JourneyCard journey={j} />
-                </StaggerItem>
+                <JourneyCard key={j.slug} journey={j} />
               ))}
-            </StaggerChildren>
+            </div>
           </div>
         </section>
+      )}
 
-        <FullBleedParallax
-          src={media.heroRoots}
-          alt="Forest path"
-          eyebrow="Travel together"
-          title="Small groups. Deep connection."
-          body="Shared transport and stays keep it personal, affordable, and respectful to the land."
-          height="md"
-          align="center"
-        />
-
-        <section className="bg-surface py-12 md:py-16">
+      {(!focus || focus === "curated") && (
+        <section className="bg-surface-container-low py-14 md:py-20">
           <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-            <h2 className="font-display text-2xl text-primary md:text-3xl">Customizable Packages</h2>
+            <div className="ink-rule" />
+            <p className="label-caps mt-4 text-accent">Curated</p>
+            <h2 className="mt-2 font-display text-3xl text-secondary md:text-5xl">Customizable packages</h2>
             <p className="mt-2 max-w-xl text-on-surface-variant">
-              Itineraries with flexible choices — prices based on a group of 4, customise dates and
-              stays.
+              Itineraries with flexible choices — prices typically based on a group of 4.
             </p>
-            <StaggerChildren className="mt-8 grid gap-5 lg:grid-cols-1 xl:gap-6">
+            <div className="mt-10 grid gap-6">
               {curated.map((j) => (
-                <StaggerItem key={j.slug}>
-                  <JourneyCard journey={j} />
-                </StaggerItem>
+                <JourneyCard key={j.slug} journey={j} />
               ))}
-            </StaggerChildren>
+            </div>
           </div>
         </section>
-      </div>
+      )}
 
-      <BreathSection
-        size="md"
-        eyebrow="Personalised"
-        title="Need something entirely yours?"
-        body="Tell us your dates, interests, and budget — we craft a Meghalaya itinerary around you."
-        cta={{ href: "/craft-my-journey", label: "Craft My Journey" }}
-      />
-
-      <FullBleedParallax
-        src={media.heroMist}
-        alt="Misty hills"
-        title="The hills keep their own calendar."
-        height="md"
-        align="center"
-        overlay="soft"
+      <CtaBand
+        eyebrow="Neither quite fits?"
+        title="Craft my journey"
+        body="Three short steps. We design a route around your dates, pace, and curiosities."
+        primary={{ href: "/craft-my-journey", label: "Start a brief" }}
+        secondary={{ href: "/experiences", label: "Browse days" }}
       />
     </div>
   );

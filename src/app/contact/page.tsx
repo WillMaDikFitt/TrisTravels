@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
+import { PageHero } from "@/components/motion/FullBleedParallax";
+import { CtaBand } from "@/components/ui/CtaBand";
 import { BreathSection } from "@/components/ui/BreathSection";
 import {
   FormCard,
@@ -14,9 +15,12 @@ import {
 } from "@/components/ui/Form";
 import { media } from "@/data/media";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { submitEnquiry } from "@/lib/actions/enquiries";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   if (sent) {
     return (
@@ -86,8 +90,8 @@ export default function ContactPage() {
               {
                 icon: MessageCircle,
                 label: "WhatsApp",
-                value: "Message us for quick queries",
-                href: "/contact",
+                value: "Leave your number on the form — we’ll ping you back",
+                href: undefined,
               },
               {
                 icon: Phone,
@@ -133,9 +137,27 @@ export default function ContactPage() {
           >
             <form
               className="space-y-5"
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setSent(true);
+                const fd = new FormData(e.currentTarget);
+                setBusy(true);
+                setError("");
+                try {
+                  const res = await submitEnquiry({
+                    source: "contact",
+                    name: String(fd.get("name") || ""),
+                    email: String(fd.get("email") || ""),
+                    phone: String(fd.get("phone") || ""),
+                    message: String(fd.get("message") || ""),
+                    payload: { subject: String(fd.get("subject") || "") },
+                  });
+                  if (!res.ok) setError(res.error);
+                  else setSent(true);
+                } catch {
+                  setError("Could not send. Try again.");
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
               <div className="grid gap-5 sm:grid-cols-2">
@@ -167,12 +189,13 @@ export default function ContactPage() {
                 rows={6}
                 placeholder="Dates, group size, questions…"
               />
+              {error && <p className="text-sm text-primary">{error}</p>}
               <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-on-surface-variant">
                   We typically reply within 1 working day.
                 </p>
-                <Button type="submit" size="lg">
-                  Send message
+                <Button type="submit" size="lg" disabled={busy}>
+                  {busy ? "Sending…" : "Send message"}
                 </Button>
               </div>
             </form>
@@ -180,15 +203,12 @@ export default function ContactPage() {
         </FadeIn>
       </section>
 
-      <FullBleedParallax
-        src={media.ride}
-        alt="Meghalaya journey"
-        title="Or start planning online"
-        body="Browse experiences and journeys — book or enquire without the back-and-forth."
-        cta={{ href: "/experiences", label: "Explore experiences" }}
-        height="md"
-        align="center"
-        overlay="soft"
+      <CtaBand
+        eyebrow="Or start online"
+        title="Browse without the back-and-forth"
+        body="Experiences book in a few steps. Journeys start with an enquiry."
+        primary={{ href: "/experiences", label: "Explore experiences" }}
+        secondary={{ href: "/journeys", label: "See journeys" }}
       />
     </div>
   );

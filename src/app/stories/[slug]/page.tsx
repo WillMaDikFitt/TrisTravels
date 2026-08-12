@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { getStory, stories } from "@/data/stories";
+import { stories as staticStories } from "@/data/stories";
+import { findStory, listStories } from "@/lib/data/repo";
 import { media } from "@/data/media";
 import { Button } from "@/components/ui/Button";
 import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
@@ -10,21 +11,22 @@ import { StoryCard } from "@/components/listings/StoryCard";
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return stories.map((s) => ({ slug: s.slug }));
+  return staticStories.map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const story = getStory(slug);
+  const story = await findStory(slug);
   return { title: story?.title ?? "Story" };
 }
 
 export default async function StoryPage({ params }: Props) {
   const { slug } = await params;
-  const story = getStory(slug);
+  const story = await findStory(slug);
   if (!story) notFound();
 
-  const others = stories.filter((s) => s.slug !== slug).slice(0, 2);
+  const all = await listStories().catch(() => staticStories);
+  const others = all.filter((s) => s.slug !== slug).slice(0, 2);
   const dateLabel = new Date(story.date).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "long",

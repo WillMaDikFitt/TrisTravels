@@ -25,9 +25,10 @@ export function BreathSection({
 
   return (
     <section className={cn("bg-surface", padding, className)}>
-      <FadeIn className="mx-auto max-w-2xl px-margin-mobile text-center md:px-margin-desktop">
-        {eyebrow && <p className="label-caps text-accent">{eyebrow}</p>}
-        <h2 className="mt-3 font-display text-3xl tracking-tight text-primary md:text-4xl">
+      <FadeIn className="mx-auto max-w-4xl px-margin-mobile text-center md:px-margin-desktop">
+        <div className="mx-auto ink-rule" />
+        {eyebrow && <p className="label-caps mt-4 text-accent">{eyebrow}</p>}
+        <h2 className="mt-3 font-display text-3xl tracking-tight text-pretty text-primary md:text-5xl">
           {title}
         </h2>
         {body && (
