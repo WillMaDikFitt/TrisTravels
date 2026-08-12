@@ -45,15 +45,6 @@ export function Footer() {
               Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
               stronger.
             </p>
-            <div className="mt-8">
-              <p className="label-caps text-accent">Proudly recognized by</p>
-              <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                <RecognitionLogos compact className="justify-start" />
-                <p className="shrink-0 text-sm text-on-surface-variant/60 sm:text-right">
-                  © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:max-w-xl lg:justify-self-end">
@@ -72,6 +63,16 @@ export function Footer() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mt-12 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="label-caps text-accent">Proudly recognized by</p>
+            <RecognitionLogos compact className="mt-4 justify-start" />
+          </div>
+          <p className="w-full shrink-0 text-sm text-on-surface-variant/60 sm:w-auto sm:text-right">
+            © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
