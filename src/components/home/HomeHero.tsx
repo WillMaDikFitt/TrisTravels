@@ -4,21 +4,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { Compass, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { media } from "@/data/media";
 
 const stats = [
   {
+    icon: Compass,
     title: "Curated experiences",
     detail: "Six immersive styles—adventure, nature, food, culture, wellness, and craft.",
   },
   {
+    icon: Heart,
     title: "Warm hospitality",
     detail: "Shared meals, open homes, and genuine, heartfelt care.",
   },
   {
+    icon: Users,
     title: "Local Khasi guides",
-    detail: "Community-led days instead of a generic tour.",
+    detail: "Community-led days with guides who know the trails, villages, and stories.",
   },
 ];
 
@@ -79,15 +83,23 @@ export function HomeHero() {
 
       <div className="relative z-20 mx-auto -mt-10 max-w-container-max px-margin-mobile md:-mt-12 md:px-margin-desktop">
         <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-[#f7f4ee] shadow-[0_18px_50px_rgba(42,46,31,0.12)] sm:grid-cols-3">
-          {stats.map((s, i) => (
-            <div
-              key={s.title}
-              className={`flex flex-col justify-center px-5 py-5 md:px-7 md:py-6 ${i > 0 ? "border-t border-[#e4dfd4] sm:border-t-0 sm:border-l" : ""}`}
-            >
-              <p className="font-display text-xl leading-snug text-primary md:text-2xl">{s.title}</p>
-              <p className="mt-2 text-xs leading-snug text-on-surface-variant md:text-sm">{s.detail}</p>
-            </div>
-          ))}
+          {stats.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.title}
+                className={`flex flex-col justify-center px-5 py-5 md:px-7 md:py-6 ${i > 0 ? "border-t border-[#e4dfd4] sm:border-t-0 sm:border-l" : ""}`}
+              >
+                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Icon size={18} strokeWidth={1.75} aria-hidden />
+                </div>
+                <p className="font-display text-xl leading-snug text-primary md:text-2xl">{s.title}</p>
+                <p className="mt-2 min-h-[2.5rem] text-xs leading-snug text-on-surface-variant md:min-h-[2.75rem] md:text-sm">
+                  {s.detail}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
