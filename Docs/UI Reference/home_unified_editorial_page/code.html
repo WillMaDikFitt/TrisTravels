@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRIS - Discover Meghalaya</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container": "#efeeea",
+                "inverse-primary": "#b4cdb8",
+                "surface-variant": "#e3e2df",
+                "surface-dim": "#dbdad6",
+                "outline": "#737973",
+                "on-surface": "#1b1c1a",
+                "secondary-container": "#ffa76b",
+                "on-primary-fixed": "#0b2013",
+                "surface-container-highest": "#e3e2df",
+                "on-secondary-fixed-variant": "#733600",
+                "secondary-fixed": "#ffdbc7",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "outline-variant": "#c3c8c1",
+                "secondary": "#904c18",
+                "background": "#faf9f5",
+                "on-surface-variant": "#434843",
+                "tertiary-fixed-dim": "#bfc8c5",
+                "surface-container-high": "#e9e8e4",
+                "on-primary-container": "#819986",
+                "on-secondary-fixed": "#311300",
+                "on-secondary-container": "#783a04",
+                "tertiary-container": "#252d2b",
+                "primary": "#061b0e",
+                "tertiary-fixed": "#dbe4e1",
+                "tertiary": "#101917",
+                "on-tertiary-container": "#8c9592",
+                "inverse-surface": "#2f312e",
+                "on-tertiary-fixed-variant": "#404946",
+                "on-error-container": "#93000a",
+                "primary-fixed": "#d0e9d4",
+                "secondary-fixed-dim": "#ffb687",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed-variant": "#364c3c",
+                "surface-container-lowest": "#ffffff",
+                "primary-container": "#1b3022",
+                "surface-tint": "#4d6453",
+                "inverse-on-surface": "#f2f1ed",
+                "primary-fixed-dim": "#b4cdb8",
+                "error-container": "#ffdad6",
+                "on-background": "#1b1c1a",
+                "surface": "#faf9f5",
+                "on-tertiary-fixed": "#151d1b",
+                "surface-container-low": "#f4f4f0",
+                "surface-bright": "#faf9f5"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-max": "1280px",
+                "stack-sm": "16px",
+                "margin-desktop": "64px",
+                "gutter": "24px",
+                "stack-lg": "80px",
+                "margin-mobile": "20px",
+                "stack-md": "32px",
+                "unit": "8px"
+        },
+        "fontFamily": {
+                "caption": [
+                        "Montserrat"
+                ],
+                "body-lg": [
+                        "Montserrat"
+                ],
+                "headline-md": [
+                        "Montserrat"
+                ],
+                "headline-lg-mobile": [
+                        "Montserrat"
+                ],
+                "label-caps": [
+                        "Montserrat"
+                ],
+                "headline-lg": [
+                        "Montserrat"
+                ],
+                "body-md": [
+                        "Montserrat"
+                ],
+                "display": [
+                        "Montserrat"
+                ]
+        },
+        "fontSize": {
+                "caption": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display": [
+                        "64px",
+                        {
+                                "lineHeight": "72px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ]
+        },
+        "backgroundImage": {
+          "texture-noise": "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.03%22/%3E%3C/svg%3E')"
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-shadow-subtle {
+            text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-secondary-container selection:text-on-secondary-container flex flex-col min-h-screen relative">
+<div class="fixed inset-0 pointer-events-none bg-texture-noise z-50"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 transition-all duration-300 glass-panel border-b-0 shadow-sm">
+<div class="flex items-center justify-between h-[80px] px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-gutter">
+<a class="font-display text-[28px] font-bold text-primary tracking-tighter" href="#">TRIS</a>
+</div>
+<nav class="hidden md:flex gap-gutter h-full items-center">
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 h-full flex items-center mt-1 uppercase tracking-widest text-xs" href="#">Explore</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-sm uppercase tracking-widest h-full flex items-center hover:opacity-80 transition-opacity" href="#">Journeys</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-sm uppercase tracking-widest h-full flex items-center hover:opacity-80 transition-opacity" href="#">Crafts</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-sm uppercase tracking-widest h-full flex items-center hover:opacity-80 transition-opacity" href="#">Stories</a>
+</nav>
+<div class="flex items-center gap-stack-sm">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface/50 backdrop-blur-sm rounded-full border border-outline-variant/30 focus:ring-1 focus:ring-primary font-body-md text-sm text-on-surface placeholder:text-outline-variant w-64 transition-all" placeholder="Discover Meghalaya..." type="text"/>
+</div>
+<button class="hidden md:flex items-center justify-center text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+<button class="font-label-caps text-label-caps uppercase bg-primary text-on-primary px-6 py-2.5 rounded-full hover:opacity-90 transition-opacity active:scale-95 transition-transform duration-150 hidden md:block shadow-md">Login</button>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="relative h-[90vh] min-h-[700px] w-full flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center scale-105" data-alt="A breathtaking, cinematic wide shot of the living root bridges in Meghalaya, India, shrouded in morning mist. Lush green foliage, ancient intertwining roots, and soft diffused sunlight filtering through the canopy. The mood is ancient, serene, and mystical, grounded in natural textures and deep earthy greens." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_SFTTjx6RZK7vPr3rTr61LyBjFOty5HksXuP3x0LlqNTiI5nJ1HO3l-FPuNTOQfvGUf0DNL3qKai4TCP1wLfyk2T5c9kFzdPflliQA63IUN8Gdq2j2z8QgayYsdGTEgRlkKy0ZwADPT8EwMyFTPUkB4ZxZkln8HO94L3DLnltnGVkVgJ3v4xvUHYLyVCaD55niyd7stPC_Ky_xOKHojoKKJbQMfpjD2YZ6qY9YF0boMDU9OY3Va4qUA')">
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-surface"></div>
+</div>
+<div class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-5xl mx-auto flex flex-col items-center mt-20">
+<span class="font-label-caps text-white/80 uppercase tracking-[0.3em] mb-4">Curated Journeys</span>
+<h1 class="font-display text-[64px] md:text-[88px] leading-none text-white text-shadow-subtle mb-6 tracking-tighter">The Living Roots<br/><span class="italic font-serif font-light text-primary-fixed-dim">of India</span></h1>
+<p class="font-body-lg text-xl md:text-2xl text-white/90 text-shadow-subtle mb-12 max-w-3xl font-light">Journey into the ancestral wisdom of Meghalaya. Discover pristine landscapes, profound traditions, and a community deeply connected to the earth.</p>
+<!-- Hero Search -->
+<div class="glass-panel p-2 rounded-full shadow-2xl flex items-center w-full max-w-2xl mx-auto border border-white/20">
+<div class="flex-grow flex items-center px-4">
+<span class="material-symbols-outlined text-white mr-3">location_on</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-lg text-white placeholder-white/70 p-0" placeholder="Where do you want to wander?" type="text"/>
+</div>
+<button class="bg-white text-primary px-8 py-4 rounded-full font-label-caps text-label-caps uppercase hover:bg-surface transition-colors shadow-lg">Explore</button>
+</div>
+</div>
+</section>
+<!-- Container for remaining content -->
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop space-y-stack-lg py-stack-lg -mt-32 relative z-20">
+<!-- Categories / Asymmetrical Grid -->
+<section>
+<div class="flex justify-between items-end mb-12 px-4 md:px-0">
+<div class="max-w-2xl bg-surface/90 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-white/40 -ml-4 md:ml-0">
+<h2 class="font-display text-5xl text-primary mb-4 tracking-tight">Curated Realms</h2>
+<p class="font-body-lg text-xl text-on-surface-variant font-light">Explore Meghalaya through distinct lenses of experience, carefully selected for the discerning traveler.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[300px]">
+<!-- Adventure -->
+<div class="md:col-span-7 relative rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="A dramatic high-angle shot looking down at clear turquoise river winding through a deep rocky gorge in Meghalaya. A small boat is visible, emphasizing scale. The lighting is bright and sunny, highlighting natural textures of stone and water. Earthy, premium adventure aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArtFt3BmrpjVY_FNnTqanUmRrBwasyIBGtw_-a4t1ZtZek11ASsxlCyLYY-HKxRoNY65X4E1hAsvVlLdytig6bwz2n7zebpZRJo53ZivQu-n7efkknBDu5gFYXYBj7nMhU05CGU-SnfV9SMnKAZoZ6GIm1-rcV6GKa_fACIuhDU-1ypX5cbA7Wqn7CGFYl7B18YzFJ1rmhWHcR41FQOD0jVEdDPw5F__3XLJA1wyxkkoeLrToRMH91Ww')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-8 left-8 text-white max-w-sm">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-sm bg-white/20 p-1.5 rounded-full backdrop-blur-sm">hiking</span>
+<span class="font-label-caps text-[10px] tracking-[0.2em] uppercase">Adventure</span>
+</div>
+<h3 class="font-display text-4xl mb-2">Canyons &amp; Cascades</h3>
+<p class="font-body-md text-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">Navigate the turquoise waters of hidden gorges.</p>
+</div>
+</div>
+<!-- Culture -->
+<div class="md:col-span-5 relative rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl md:mt-16">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="Close up intimate portrait of a Khasi elder woman with deep wrinkles, wearing traditional woven garments. Warm, soft natural light illuminating her face against a dark, moody background. Authentic, editorial cultural photography style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBLHx_R-z0wm7da--WdbKkJxpJPYbVG5xaLdp79wnhcN9I9QrJaJliye82AV2dl9VtOs3wE3gUKEEjtFFspsjZUt8uGO-yOoYmZBu_cGFXA6RCmhKmlquE4tF6hgl6vfszRR2uCZGkU4D5YRm6gLyDshCXfK_EM8Mo1EGKY4tKDFOQZadLeScoVkttWSwyg4DNih1ct4R2DmVOyj1pXcVbBeUT3BWlo2FW3oTZxFYhUnEw_yK7DMLbvHg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-8 left-8 text-white max-w-sm">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-sm bg-white/20 p-1.5 rounded-full backdrop-blur-sm">diversity_3</span>
+<span class="font-label-caps text-[10px] tracking-[0.2em] uppercase">Culture</span>
+</div>
+<h3 class="font-display text-4xl mb-2">Ancestral Echoes</h3>
+<p class="font-body-md text-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">Connect with the keepers of ancient traditions.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- TRIS Impact -->
+<section class="py-16">
+<div class="text-center mb-16">
+<h2 class="font-display text-4xl text-primary mb-4">TRIS Impact</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Committed to preserving the ecological and cultural integrity of Meghalaya through responsible practices.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+<div class="flex flex-col items-center">
+<div class="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined text-4xl">eco</span>
+</div>
+<h3 class="font-headline-md mb-3 text-primary">Sustainable Travel</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">Minimizing footprints and championing conservation efforts across every journey.</p>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined text-4xl">groups</span>
+</div>
+<h3 class="font-headline-md mb-3 text-primary">Community Led</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">Empowering local custodians by integrating them directly into the travel experience.</p>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined text-4xl">handyman</span>
+</div>
+<h3 class="font-headline-md mb-3 text-primary">Reviving Crafts</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">Supporting indigenous artisans and promoting ancestral weaving and bamboo crafts.</p>
+</div>
+</div>
+</section>
+<!-- Meet the Custodians -->
+<section class="py-16 bg-surface-container rounded-3xl px-8">
+<div class="text-center mb-16">
+<h2 class="font-display text-4xl text-primary mb-4">Meet the Custodians</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">The voices and hands that shape the authentic Meghalaya experience.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="flex flex-col items-center text-center">
+<img alt="Guide Profile" class="w-32 h-32 rounded-full object-cover mb-6 shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUKoHlhCMXa5rld4ht8G6dY5EL-B0bx5063mNG0dc7Phs1xHtyx-ltShUazOPYe_6ctve4t5tFhcdocD8CBYbQwyuC93pUus1VI_n7PiQRLsseOr8_NGtiqa_FiwNFgFR4Ca3YZasNZJp_n_3h3FhOfSWsvkHs1yMqWVE0LnBe40jIcsxF6b1p6mUYNROYzFf5T0LdaTPMwGFSgAbsKy4bUHz-pgRpGG9Vi-WnYR_fR9KD1KgQEzYKCw"/>
+<h4 class="font-headline-md text-primary mb-1">Dawman</h4>
+<span class="font-label-caps text-secondary mb-4">Forest Guide</span>
+<p class="font-body-md text-on-surface-variant italic">"The roots teach us patience. We must walk with the forest, not against it."</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<img alt="Artisan Profile" class="w-32 h-32 rounded-full object-cover mb-6 shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmAlNzERaxjiAY6T3ZoYQ20-4vTUdVg5ZuxwQ6cOKkxvA3uoj-Q0YLKPH37zK3syDUr2hbAAx80bnB6b1XQwmgtn9YX-4xLz2XBb48p1sVyrQq2LOHQf5xtWB2VLM6N2gi1eprY8XksJqy9ZeVaHUEW5QmGwCJwEj22KvEhb1wcdRyFTM8sZh4-q0vY1BJk_mShFfBz6ynwbQsoU-KInn8YkUZ6N418DNwzOdIixbdsVdhfSqAi03VkA"/>
+<h4 class="font-headline-md text-primary mb-1">Silvera</h4>
+<span class="font-label-caps text-secondary mb-4">Master Weaver</span>
+<p class="font-body-md text-on-surface-variant italic">"Every thread carries the story of our ancestors, woven into the present."</p>
+</div>
+<div class="flex flex-col items-center text-center">
+<img alt="Guide Profile" class="w-32 h-32 rounded-full object-cover mb-6 shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzzfl8WT5QY8WdQt46a-Hjn0urL3XffE1IupxyMR6rirurE2sm37TeQUDDtojgC34lNZjkNW-CWuC-nzWDRBGbGcgqJwXoUHl4mcMiGyl1N86K_Ut8Rj3eEpncP31p0hyJ45JHg9pLyczSNb7UWNlILlbS_WBKACzBnykH8PI2ZFDG_rw9GXlbnE2GC5C_6EcPiaJrvzOymJ7Xhd-edtLS8oSCDiobRPNRfpgws89PuAjTml2Itfm0HQ"/>
+<h4 class="font-headline-md text-primary mb-1">Phrang</h4>
+<span class="font-label-caps text-secondary mb-4">Cave Explorer</span>
+<p class="font-body-md text-on-surface-variant italic">"The darkness below holds ancient secrets. It is a privilege to reveal them safely."</p>
+</div>
+</div>
+</section>
+<!-- The TRIS Journal -->
+<section class="py-16">
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="font-display text-4xl text-primary mb-2">The TRIS Journal</h2>
+<p class="font-body-lg text-on-surface-variant">Stories from the misty hills.</p>
+</div>
+<a class="hidden md:flex items-center gap-2 font-label-caps text-primary hover:text-secondary transition-colors" href="#">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<article class="group cursor-pointer">
+<div class="overflow-hidden rounded-2xl mb-6">
+<img alt="Journal Image" class="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2kpPVnopmmfXm5yWTHAXt8qZ0m9KfcK_6ibV05U67qcbhLeywC_g4OYVsUCHtHmiylcGneleUdrd0R1PM7TISd_LCDFLPNSTrH4QNDQ8uK957RtvG5gmqpBEl0oUjZuHN-bmB_68-uqMG7iP-zQe3ZsiFGbQyXFfQb1b8tyLom5Ze2ZaI4Fba5NjChnuZNOAOcw-kkkoa6YmW3z0KrvnBk9dPxOPX-f4gRJd31aWE3d4HZGTO99xgA"/>
+</div>
+<div class="flex items-center gap-4 mb-3 text-sm font-label-caps text-on-surface-variant/70">
+<span>Culture</span>
+<span>•</span>
+<span>Oct 12, 2023</span>
+</div>
+<h3 class="font-headline-md text-primary mb-3 group-hover:text-secondary transition-colors">The Art of Root Bridging</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-3">Discover the generational dedication required to weave a living root bridge across roaring rivers.</p>
+</article>
+<article class="group cursor-pointer">
+<div class="overflow-hidden rounded-2xl mb-6">
+<img alt="Journal Image" class="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2Pm45uVD5lFKtAk9tSlD_bQJxWV4iejA_ofD3ckZREdHGpfFuromt2B5SJy7TMmbtw-4dlkPE_U2x4iNRkxXVrY85M4MDrNq3-beoV6_6jXg4IqAP0W2czbewQglX64ygW2TQzWN4jYLDRoPTgiOm2r70ShyGCkx8rWkDxIuHPE-PhvnDeVLXS7121or94oyTyrMuKZHGZkFHHPuL6q5RenndYSaFTS0bbhZdVwdgARR20BhHPY5rFw"/>
+</div>
+<div class="flex items-center gap-4 mb-3 text-sm font-label-caps text-on-surface-variant/70">
+<span>Nature</span>
+<span>•</span>
+<span>Sep 28, 2023</span>
+</div>
+<h3 class="font-headline-md text-primary mb-3 group-hover:text-secondary transition-colors">Whispers in the Sacred Groves</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-3">A journey into the protected forests where nature rules supreme and ancient laws preserve biodiversity.</p>
+</article>
+<article class="group cursor-pointer">
+<div class="overflow-hidden rounded-2xl mb-6">
+<img alt="Journal Image" class="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMtuTBDhKYCD5lj0MLjO3O2ak6BVYCz6P_cYaFufKrQJkMyb0UXO90mpXPlRlbWTB9fhclJfAwnvUGxzl58YXnyNDCF1HlCm0gZ9mwCaVIa4aQH59AyGsq5BQ-hUbjtVJDwy7x9esFIIAfqiB4TtMYM4B2wL7BAOzkpSpIecY7p03JrvzH6Z2MKoTbHkskMX0oy6-iT4BsKHaAuNNEwp9myhtdrWIWTPUugrHXon4rU0tr5yEVZC1YDw"/>
+</div>
+<div class="flex items-center gap-4 mb-3 text-sm font-label-caps text-on-surface-variant/70">
+<span>Heritage</span>
+<span>•</span>
+<span>Sep 15, 2023</span>
+</div>
+<h3 class="font-headline-md text-primary mb-3 group-hover:text-secondary transition-colors">Monoliths of Nartiang</h3>
+<p class="font-body-md text-on-surface-variant line-clamp-3">Standing tall for centuries, these ancient stones tell tales of forgotten kings and vibrant pasts.</p>
+</article>
+</div>
+</section>
+<!-- Instagram Gallery -->
+<section class="py-16">
+<div class="text-center mb-12">
+<h2 class="font-display text-4xl text-primary mb-2">@TRIS_Journeys</h2>
+<p class="font-body-lg text-on-surface-variant">Follow the adventure</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-UHoJBKCRKxXS4_1rkZfORHuhRKp0IjHisoveqDBdC8niopXNUTx5hFLzU0wk36Md0yPudwsGAQVAGXnVvkM3tJJvRbiugYYlxrvl30vTlsOu17iLCgEOYmV0G3Yyvyvlwig-vRKp4pn2K4it41NlzSFiPfqS_E0rtxrjuJql_X4FvyNH604lusAEpdBHNOUMoLMEyxQSaYINUtFyKho9zkqCiQKR396TFMIhMcy7q6tfMk5ywbXjUg"/>
+</a>
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA_QUZguUfmb7lrpXZU7uH4JWbZfCK__0am25JFgpkQ5jIfEKkAxu2of1ch9UdjR9knq8j0xuS9OjNqm3BuJrr_K3xoPHiMEVNK-fqVZTmrTv-ChO3ip078tXPo7q5MEpzkHsyv0bGbG7z81sYY22Jd08dqfhgTNwGzU2sfyl37tHLzLV-jOczYiQOgAZAVxb244XYB286kDmqTtNRvAuWS_8tEx2Bk0pxJUTXlHLX30WP3a30h0DWKg"/>
+</a>
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUHnd3SbvUx1wjLjnJKg-fy67iujOyIv6ZLfXiJwOdDpGr2_Ydru5fmU9WAaaJF8h0skIx2PC7a8KVZH4IzTH43qUJlKeMlemRkxdrzeKwzn4oBR9SR9276kRohqz545PGWggMqEIPm3cs9opCIEnBrskhVIA_8US0qi1eSLg7ojyetW9tnLUeEpkEkWZ57QhQTTsbYEQYSAljp-5UgEcykn72UWp8zmft-Rr8mmd6IpWG2eJP_4gw4Q"/>
+</a>
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJLNsmhlju9mnumTk2Gz6hGIq9JxbCZhgEsFCJai2TThBgIcVxtWnJyUu9cQSl7a_CoYHZh1JB2v1gLYZ5kzuQBF2A-sbqU3Z9mxwKkCTprfx9JCPItB06CQjVhi776OtqQB396tnKbYKgZ9FPmPiCbWeE5ubNvgqZmj61n0lXAOIWNvUMDZ91gj76U-REEjeeIgaSZb25uNcUdKAqY7wlgmyjRz3viJyo-JYjQI4gjZp40pqqLbTTLw"/>
+</a>
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrGCUbKZY-Xiuv-PmWJBs2Ol-p3RqT6iWml_Ri7E7dyHyLKS2CfprNfh_F3hzn_BeY8z_Dbw3ekumlj0EM229e2iepQWS4xh5VEfh3WGFpwNuzuRPDEA6ET546ZAi37_rEWNDVUU36gNaMQKf1DGbI2ZVJixQPz-LdQ-BArMHGZ1ESutTZ50GplfnZcA-YmWzPOCRTeZXmy469f6PjoKCGrL2zm26EP9yg58o8NIyINB-BI2Kodkbu3A"/>
+</a>
+<a class="block aspect-square overflow-hidden group" href="#">
+<img alt="IG Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFe0ZQ3OmgFmvnjPwipZHv8u4o5hfwnRDHphUd6ElAEGFjt-kRK-R0ZSjOMr1b08viq1ypbu4ZeTeBEorWCtFwHcbCYxi5BChf48zIzFaoeF_XiAVF6tBBwxupDlycOYFZ6ISlvi5aZ7LzlowwvokyTN2EAVwGfU5I1kwUf2NH6y4nIeepID6d2UIfXG-kiweJ2lEyx11mTZ5B21pwB_wQvZiSjsOOM4PAmp-JD-xrCUmITY4m3CESmA"/>
+</a>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full pt-24 pb-12 bg-surface border-t border-outline-variant/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto relative z-10">
+<div class="md:col-span-5 flex flex-col justify-between pr-8">
+<div>
+<h3 class="font-display text-4xl text-primary mb-6 tracking-tighter">TRIS</h3>
+<p class="font-body-lg text-xl text-on-surface-variant max-w-sm mb-8 font-light leading-relaxed">Honoring the ancestral wisdom of Meghalaya through curated journeys and sustainable connections.</p>
+</div>
+<p class="font-caption text-sm text-on-surface-variant/60 tracking-wide">© 2024 TRIS. Honoring the ancestral wisdom of Meghalaya.</p>
+</div>
+<div class="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12 mt-12 md:mt-0">
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-xs text-primary uppercase tracking-[0.2em] mb-2">Platform</span>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Our Story</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Community Led</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Impact Report</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-xs text-primary uppercase tracking-[0.2em] mb-2">Legal</span>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Privacy Policy</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Contact</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-xs text-primary uppercase tracking-[0.2em] mb-2">Social</span>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Instagram</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Journal</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

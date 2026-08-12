@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRIS - Living Root Bridge Trek</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "secondary": "#904c18",
+                "surface-container-high": "#e9e8e4",
+                "on-primary-fixed": "#0b2013",
+                "outline-variant": "#c3c8c1",
+                "surface-bright": "#faf9f5",
+                "tertiary-fixed-dim": "#bfc8c5",
+                "on-secondary-fixed-variant": "#733600",
+                "surface-container-low": "#f4f4f0",
+                "primary-container": "#1b3022",
+                "surface": "#faf9f5",
+                "on-secondary-container": "#783a04",
+                "primary-fixed-dim": "#b4cdb8",
+                "tertiary": "#101917",
+                "on-secondary-fixed": "#311300",
+                "error": "#ba1a1a",
+                "secondary-container": "#ffa76b",
+                "inverse-primary": "#b4cdb8",
+                "primary-fixed": "#d0e9d4",
+                "on-tertiary-container": "#8c9592",
+                "on-background": "#1b1c1a",
+                "on-error-container": "#93000a",
+                "primary": "#061b0e",
+                "on-surface-variant": "#434843",
+                "surface-variant": "#e3e2df",
+                "error-container": "#ffdad6",
+                "on-primary-container": "#819986",
+                "secondary-fixed": "#ffdbc7",
+                "inverse-on-surface": "#f2f1ed",
+                "inverse-surface": "#2f312e",
+                "on-primary": "#ffffff",
+                "tertiary-fixed": "#dbe4e1",
+                "secondary-fixed-dim": "#ffb687",
+                "on-primary-fixed-variant": "#364c3c",
+                "surface-dim": "#dbdad6",
+                "on-secondary": "#ffffff",
+                "surface-container-highest": "#e3e2df",
+                "on-error": "#ffffff",
+                "on-surface": "#1b1c1a",
+                "tertiary-container": "#252d2b",
+                "outline": "#737973",
+                "surface-tint": "#4d6453",
+                "on-tertiary-fixed": "#151d1b",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "background": "#faf9f5",
+                "on-tertiary-fixed-variant": "#404946",
+                "surface-container": "#efeeea"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-max": "1280px",
+                "stack-md": "32px",
+                "stack-lg": "80px",
+                "margin-mobile": "20px",
+                "gutter": "24px",
+                "stack-sm": "16px",
+                "unit": "8px",
+                "margin-desktop": "64px"
+        },
+        "fontFamily": {
+                "caption": [
+                        "Montserrat", "sans-serif"
+                ],
+                "display": [
+                        "Montserrat", "sans-serif"
+                ],
+                "headline-md": [
+                        "Montserrat", "sans-serif"
+                ],
+                "headline-lg-mobile": [
+                        "Montserrat", "sans-serif"
+                ],
+                "body-lg": [
+                        "Montserrat", "sans-serif"
+                ],
+                "label-caps": [
+                        "Montserrat", "sans-serif"
+                ],
+                "body-md": [
+                        "Montserrat", "sans-serif"
+                ],
+                "headline-lg": [
+                        "Montserrat", "sans-serif"
+                ]
+        },
+        "fontSize": {
+                "caption": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display": [
+                        "64px",
+                        {
+                                "lineHeight": "72px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .glass-panel {
+            background: rgba(250, 249, 245, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(195, 200, 193, 0.4);
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container" style="font-family: 'Montserrat', sans-serif;">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 border-b border-outline-variant/10 glass-panel">
+<div class="flex items-center justify-between h-[80px] px-margin-desktop max-w-container-max mx-auto">
+<a class="font-display text-headline-md text-primary tracking-tight font-bold" href="#">TRIS</a>
+<div class="hidden md:flex gap-gutter items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md hover:opacity-80 active:scale-95 transition-transform duration-150" href="#">Explore</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 font-body-md text-body-md hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150" href="#">Journeys</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md hover:opacity-80 active:scale-95 transition-transform duration-150" href="#">Crafts</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md hover:opacity-80 active:scale-95 transition-transform duration-150" href="#">Stories</a>
+</div>
+<div class="flex items-center gap-stack-sm">
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 flex items-center justify-center p-2 rounded-full hover:bg-surface-variant text-primary">
+<span class="material-symbols-outlined">person</span>
+</button>
+<button class="hidden md:block bg-primary text-on-primary px-6 py-2.5 rounded-full hover:bg-primary/90 transition-all active:scale-95 duration-150 font-body-md text-body-md">Login</button>
+</div>
+</div>
+</nav>
+<main class="pt-[80px] min-h-screen">
+<!-- Hero Section -->
+<section class="relative w-full h-[716px] md:h-[870px] bg-surface-container-high overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center w-full h-full transform scale-105 hover:scale-100 transition-transform duration-[10s] ease-out" data-alt="A breathtaking, wide-angle cinematic shot of a living root bridge in Meghalaya, India, shrouded in a soft, ethereal morning mist. The intricate, interwoven roots of the Ficus elastica tree form a sturdy, natural bridge over a gently flowing, crystal-clear stream. Lush, vibrant green tropical foliage surrounds the structure, conveying a deep sense of ancestral wisdom, harmony with nature, and tranquil isolation. The lighting is soft and diffused, characteristic of a high-end travel documentary, aligning with a premium, organic minimalist design aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBa_5eIHBhoyji4ggijnaa6JrA3TEIj8aOEZFFl80OpEJu1pqRtppR601pap60jzT1m_ti-WKpPQ0R_CrhRbRupDidoXxBOjZ0hv13h5oirxLIWg-Hy7Kc6oozUCUlbs8U8796WVJBR6-P1WPTzaZOqoJremoJoEMXjs9ajG-TTOF8_0FCKjgW50HbXMcyWKR6yrq7NeqejBjunz6x2ESiLxUklDkY4h9OWbjszYNrmJ-JIGsa0-IzUGg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full px-margin-desktop max-w-container-max mx-auto pb-stack-lg z-10 flex flex-col justify-end h-full pointer-events-none">
+<div class="max-w-[800px] pointer-events-auto glass-panel p-8 rounded-2xl">
+<div class="flex gap-2 mb-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant/80 text-primary font-label-caps text-label-caps border border-outline-variant/20">Community-Led</span>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant/80 text-primary font-label-caps text-label-caps border border-outline-variant/20">Active</span>
+</div>
+<h1 class="font-display text-display text-primary mb-4 leading-tight">Living Root Bridge Trek</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Descend into the emerald depths of the Khasi Hills. Experience a bioengineering marvel forged over generations by indigenous communities in complete harmony with the forest.</p>
+</div>
+</div>
+</section>
+<!-- Main Content Area -->
+<section class="px-margin-desktop max-w-container-max mx-auto py-stack-lg relative">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Story & Details -->
+<div class="lg:col-span-8 flex flex-col gap-stack-lg pr-0 lg:pr-gutter">
+<!-- Overview Stats -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-stack-sm py-stack-md border-y border-outline-variant/20">
+<div>
+<p class="font-label-caps text-label-caps text-outline mb-1">DURATION</p>
+<p class="font-body-lg text-body-lg text-primary font-medium">6 Hours</p>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-outline mb-1">DIFFICULTY</p>
+<p class="font-body-lg text-body-lg text-primary font-medium">Moderate - Hard</p>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-outline mb-1">LOCATION</p>
+<p class="font-body-lg text-body-lg text-primary font-medium">Nongriat, Meghalaya</p>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-outline mb-1">GROUP SIZE</p>
+<p class="font-body-lg text-body-lg text-primary font-medium">Max 6 Guests</p>
+</div>
+</div>
+<!-- The TRIS Story -->
+<article class="max-w-[65ch]">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-stack-md">The TRIS Story</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-6 leading-relaxed">
+                            The Jingkieng Jri, or living root bridges, are not built; they are grown. This journey takes you deep into the valleys of Cherrapunji, where the Khasi people have guided the aerial roots of rubber fig trees across rivers for centuries.
+                        </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8 leading-relaxed">
+                            It is a testament to sustainable living and generational patience. You won't just see a bridge; you will understand the profound philosophy of a community that builds for its grandchildren, respecting the forest's timeline over human convenience.
+                        </p>
+<!-- Specialized Story Component -->
+<div class="bg-surface-container-low p-stack-md rounded-2xl border border-outline-variant/10 my-stack-md">
+<p class="font-body-lg text-body-lg italic text-primary mb-6 leading-relaxed border-l-4 border-secondary/40 pl-6">
+                                "We do not own these bridges. We are merely their caretakers, just as our grandfathers were, and just as our children will be. To cross it is to walk across time itself."
+                            </p>
+<div class="flex items-center gap-4">
+<img class="w-14 h-14 rounded-full object-cover border-2 border-surface" data-alt="A close-up, authentic portrait of an elderly Khasi tribal elder from Meghalaya, with deep, weathered lines on his face suggesting wisdom and a life lived close to nature. He wears traditional woven garments in muted earth tones. The background is a soft, out-of-focus lush green forest, emphasizing his connection to the land. Lighting is natural, warm, and highly respectful, resembling a premium editorial photograph." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd95VF1sdbhNNfPmvGQTIlHqtnjCat1YIxmSILxo-DNyineWc5CfVjvCShF3sHZmKyLn_lvAxukNkRxZAJ02eqv6txIT7NGEEE2ORE2NkCYB8_wcDsVmQbkBuVZLY5TNYtFyWvP6jqAdUs8g9_vs-al5aVcOFLgXPlPwyWZTC9e0jvIAFjdIrHNqwVtdfLjl3D2Cz0yaBuuKKppwlWQQqmrFzxorQu6GCLekQrTr4POFGk_PyekmPpaQ"/>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Bah Kupar</p>
+<p class="font-caption text-caption text-on-surface-variant">Village Elder &amp; Guide, Nongriat</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Gallery Grid (Bento Style) -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-unit mb-stack-lg">
+<img class="w-full h-56 object-cover rounded-xl col-span-2 md:col-span-1" data-alt="A detail shot showing the intricate, intertwined, and moss-covered roots of a living root bridge in Meghalaya. The textures of the thick, aged bark are sharply in focus against a shallow depth of field, revealing vibrant green moss and small ferns growing directly on the living structure. The image evokes organic minimalism and deep reverence for nature, lit by dappled sunlight filtering through a dense forest canopy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE8acuw4bJiN7U-IAhfZWKicizkczP0DdRIYJX6UjxOSfCQrATLFIhRIEbYsTsZJZDV8pmxcAYJQVQVwa522u0V7oMmu6OkqhbNEZkABDUXuTjnDfl-V1T2Sc3auNQ8YmBLoe1zk5K45oRV2y2bZgN49gNPhjpTzDjI29Qt9gMSeiAw1ozsDjf0cJKiPJhFk3VqGOF3d9L7Qsj7I8xx53VWXCuAxdAgjwopvCrDtSy-VryBj4GQYERCg"/>
+<img class="w-full h-56 object-cover rounded-xl col-span-1" data-alt="A wide-angle perspective looking down a steep, narrow stone stairway winding endlessly through a dense, foggy tropical jungle in Meghalaya. The worn, mossy steps disappear into the mist, illustrating the challenging descent required to reach the living root bridges. The mood is adventurous yet serene, with a color palette dominated by deep forest greens and the cool gray of wet stone, shot in a high-end documentary style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCRoJd3TiLKkPVELbrKhuHt7klcbxkteOhDfoLj1wXMAz19D_ODl50WiYLr83cD19alaDY3dZQ8WwjgxwI9fEPrwCbDLLMkAtb2DwxacGI9E9iKrsyHOSIu7fkuwHn321lMx0et1bXBLC1Kwh8GYhE_70p5aFXdsYHnN-cEoxqfPzo5CmE71cWdrb4PPj9PDFIpr6GMSvqMLu-IGgnCSz8ykjSO625Pm5bGhyPqp8grsjqOI8YWmn-Wg"/>
+<img class="w-full h-56 object-cover rounded-xl col-span-1 md:col-span-1" data-alt="A serene landscape photograph featuring a crystal-clear, aquamarine river flowing gently over smooth, rounded river stones in a pristine Meghalayan valley. The water reflects the surrounding lush greenery and overhanging jungle vines. The composition is clean and minimalist, focusing on the pristine, untouched beauty of the natural environment, fitting perfectly within a premium, culturally respectful travel narrative." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6T_gbvG_SgWL7P_RipkeBTpOSlnzFlX_qseTblDWcRjxieJhL5E0xVR2-qJKPwakSWbiw0onfAsD5syNT1aqLY53IQMbTM_YbcVpOty8T-WMHAeuAVKMCSnrt324LoE5hElOL41pPNyxahzEDxBOkrsf79OVMbX1RsOslGFR4EVyeBlzDVJzpRYqV8JqZ9LbYdFYIyeUZV1SmM4OoXFQ-RAjcEwEmJ-av8OKBscAvUOVkBH8E7fCPGg"/>
+</div>
+<!-- Highlights & Inclusions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg border-b border-outline-variant/20 pb-stack-lg">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-stack-sm">Highlights</h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1">nature</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Trek down 3,000 stone steps through pristine rainforest.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1">video_file</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Cross the iconic Double Decker Living Root Bridge.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1">water_drop</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Swim in the crystal-clear natural pools of the Rainbow Falls.</p>
+</li>
+</ul>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-stack-sm">What's Included</h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline mt-1">person_check</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Expert local Khasi community guide.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline mt-1">restaurant</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Traditional Khasi lunch prepared by a local family.</p>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline mt-1">local_police</span>
+<p class="font-body-md text-body-md text-on-surface-variant">All village entry fees and conservation contributions.</p>
+</li>
+</ul>
+</div>
+</div>
+<!-- The Journey (Itinerary) -->
+<div class="py-stack-md border-b border-outline-variant/20">
+<h3 class="font-headline-lg text-headline-md text-primary mb-stack-md">The Journey</h3>
+<div class="relative border-l border-outline-variant/30 ml-4 space-y-8 pb-4">
+<div class="relative pl-8">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[6.5px] top-1.5 ring-4 ring-background"></div>
+<p class="font-label-caps text-label-caps text-secondary mb-1">08:00 AM</p>
+<h4 class="font-headline-md text-[20px] text-primary mb-2">Gathering at Tyrna</h4>
+<p class="font-body-md text-on-surface-variant max-w-xl">Meet your expert Khasi guide at the village square. We'll begin with a brief introduction to the local customs and a safety overview for the descent.</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[6.5px] top-1.5 ring-4 ring-background"></div>
+<p class="font-label-caps text-label-caps text-secondary mb-1">10:00 AM</p>
+<h4 class="font-headline-md text-[20px] text-primary mb-2">The Descent</h4>
+<p class="font-body-md text-on-surface-variant max-w-xl">Navigate the legendary 3,000 steps down into the valley. Along the way, we'll pause to learn about the unique flora and fauna of the region.</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[6.5px] top-1.5 ring-4 ring-background"></div>
+<p class="font-label-caps text-label-caps text-secondary mb-1">11:30 AM</p>
+<h4 class="font-headline-md text-[20px] text-primary mb-2">Double Decker Bridge</h4>
+<p class="font-body-md text-on-surface-variant max-w-xl">Arrive at the awe-inspiring Umshiang Double Decker bridge. Spend time exploring this architectural wonder and capturing memories.</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute w-3 h-3 bg-secondary rounded-full -left-[6.5px] top-1.5 ring-4 ring-background"></div>
+<p class="font-label-caps text-label-caps text-secondary mb-1">01:00 PM</p>
+<h4 class="font-headline-md text-[20px] text-primary mb-2">Riverside Lunch</h4>
+<p class="font-body-md text-on-surface-variant max-w-xl">Enjoy a traditional Khasi meal prepared by a local family, followed by a refreshing swim in the natural pools near Rainbow Falls.</p>
+</div>
+</div>
+</div>
+<!-- Cultural Significance -->
+<div class="py-stack-md border-b border-outline-variant/20">
+<h3 class="font-headline-lg text-headline-md text-primary mb-stack-md">Cultural Significance</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md items-center">
+<div>
+<p class="font-body-lg text-on-surface-variant mb-4 leading-relaxed">
+    The Living Root Bridges are more than just a means of crossing rivers; they are living testaments to the indigenous ingenuity of the Khasi people. Grown over decades by manipulating the flexible roots of the <i>Ficus elastica</i> tree, these bridges embody a deep-rooted respect for nature and a sustainable approach to engineering.
+</p>
+<p class="font-body-lg text-on-surface-variant leading-relaxed">
+    This tradition is a profound example of long-term thinking, where each generation nurtures the growth for the benefit of the next, seamlessly blending human infrastructure with the natural environment.
+</p>
+</div>
+<img class="w-full h-[300px] object-cover rounded-2xl" data-alt="An atmospheric, medium shot showing a local Khasi community member gently tending to the roots of a living root bridge. The scene is illuminated by soft, natural light filtering through the dense forest canopy, highlighting the rich textures of the roots and the serene expression of the caretaker. The image conveys a sense of deep cultural heritage, stewardship, and harmony with nature." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE8acuw4bJiN7U-IAhfZWKicizkczP0DdRIYJX6UjxOSfCQrATLFIhRIEbYsTsZJZDV8pmxcAYJQVQVwa522u0V7oMmu6OkqhbNEZkABDUXuTjnDfl-V1T2Sc3auNQ8YmBLoe1zk5K45oRV2y2bZgN49gNPhjpTzDjI29Qt9gMSeiAw1ozsDjf0cJKiPJhFk3VqGOF3d9L7Qsj7I8xx53VWXCuAxdAgjwopvCrDtSy-VryBj4GQYERCg"/>
+</div>
+</div>
+<!-- Essential Information -->
+<div class="py-stack-md border-b border-outline-variant/20">
+<h3 class="font-headline-lg text-headline-md text-primary mb-stack-md">Essential Information</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-sm">
+<div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-3 text-3xl">backpack</span>
+<h4 class="font-headline-md text-[18px] text-primary mb-2">What to Pack</h4>
+<p class="font-body-md text-on-surface-variant">Comfortable trekking shoes, a lightweight rain jacket, reusable water bottle, swimwear, and a small towel.</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-3 text-3xl">fitness_center</span>
+<h4 class="font-headline-md text-[18px] text-primary mb-2">Physical Requirements</h4>
+<p class="font-body-md text-on-surface-variant">The trek involves descending and ascending around 3,000 steep stone steps. A good level of fitness is highly recommended.</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-3 text-3xl">thermostat</span>
+<h4 class="font-headline-md text-[18px] text-primary mb-2">Weather Considerations</h4>
+<p class="font-body-md text-on-surface-variant">Meghalaya can experience sudden showers. We proceed in light rain, but severe conditions may lead to itinerary adjustments for safety.</p>
+</div>
+</div>
+</div>
+<!-- Traveler Perspectives -->
+<div class="py-stack-md border-b border-outline-variant/20">
+<h3 class="font-headline-lg text-headline-md text-primary mb-stack-md">Traveler Perspectives</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="bg-surface-container p-8 rounded-2xl">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span>
+</div>
+<p class="font-body-md text-on-surface-variant italic mb-6">"An absolutely transformative experience. The physical challenge of the steps is completely overshadowed by the breathtaking beauty and the profound story of the community."</p>
+<p class="font-label-caps text-label-caps text-primary">— Sarah T., Australia</p>
+</div>
+<div class="bg-surface-container p-8 rounded-2xl">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span>
+</div>
+<p class="font-body-md text-on-surface-variant italic mb-6">"Our guide, Bah Kupar, made the trip. His knowledge of the forest and the history of the bridges gave us an insight we would never have gotten on our own."</p>
+<p class="font-label-caps text-label-caps text-primary">— Mark &amp; Lisa, UK</p>
+</div>
+<div class="bg-surface-container p-8 rounded-2xl">
+<div class="flex text-secondary mb-4">
+<span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star</span><span class="material-symbols-outlined">star_half</span>
+</div>
+<p class="font-body-md text-on-surface-variant italic mb-6">"The lunch by the river was a highlight. Authentic, delicious, and a perfect break before the climb back up. Highly recommend preparing your knees though!"</p>
+<p class="font-label-caps text-label-caps text-primary">— Rajesh M., India</p>
+</div>
+</div>
+</div>
+<!-- FAQ -->
+<div class="py-stack-md">
+<h3 class="font-headline-lg text-headline-md text-primary mb-stack-md">Frequently Asked Questions</h3>
+<div class="space-y-4">
+<details class="group bg-surface-container-low rounded-2xl border border-outline-variant/20 open:bg-surface-container transition-colors">
+<summary class="flex justify-between items-center cursor-pointer p-6 font-body-lg text-primary font-bold">
+    Is transportation to the starting point included?
+    <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-secondary">expand_more</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-on-surface-variant">
+    Transportation to Tyrna village is not included in the standard price, but we can arrange an eco-friendly local cab pickup from Cherrapunji or Shillong at an additional cost.
+</div>
+</details>
+<details class="group bg-surface-container-low rounded-2xl border border-outline-variant/20 open:bg-surface-container transition-colors">
+<summary class="flex justify-between items-center cursor-pointer p-6 font-body-lg text-primary font-bold">
+    Can children participate in this trek?
+    <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-secondary">expand_more</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-on-surface-variant">
+    Due to the physical demands of the steep 3,000 steps, we recommend this trek for children over 12 years of age who are accustomed to active hiking.
+</div>
+</details>
+<details class="group bg-surface-container-low rounded-2xl border border-outline-variant/20 open:bg-surface-container transition-colors">
+<summary class="flex justify-between items-center cursor-pointer p-6 font-body-lg text-primary font-bold">
+    What happens if there's an emergency on the trail?
+    <span class="material-symbols-outlined transition-transform group-open:rotate-180 text-secondary">expand_more</span>
+</summary>
+<div class="px-6 pb-6 font-body-md text-on-surface-variant">
+    All our local guides are trained in wilderness first aid and carry basic medical kits. We maintain constant communication with the village network for immediate assistance if required.
+</div>
+</details>
+</div>
+</div>
+</div>
+<!-- Right Column: Persistent Booking Widget -->
+<div class="lg:col-span-4 relative mt-stack-lg lg:mt-0">
+<div class="sticky top-[100px] glass-panel rounded-2xl p-8 shadow-[0_8px_32px_rgba(6,27,14,0.08)]">
+<div class="flex items-end gap-2 mb-6 border-b border-outline-variant/20 pb-6">
+<span class="font-headline-lg text-headline-lg text-primary font-bold">$120</span>
+<span class="font-body-md text-body-md text-on-surface-variant mb-2">/ person</span>
+</div>
+<form class="space-y-6">
+<div>
+<label class="block font-label-caps text-label-caps text-primary mb-2">DATE</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 font-body-md text-body-md text-primary focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" type="date" value="2024-05-15"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-primary mb-2">GUESTS</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-3 font-body-md text-body-md text-primary focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors appearance-none">
+<option>1 Guest</option>
+<option selected="">2 Guests</option>
+<option>3 Guests</option>
+<option>4 Guests</option>
+</select>
+</div>
+<div class="pt-6 border-t border-outline-variant/20">
+<div class="flex justify-between mb-3">
+<span class="font-body-md text-body-md text-on-surface-variant">120 × 2 guests</span>
+<span class="font-body-md text-body-md text-primary font-medium">$240</span>
+</div>
+<div class="flex justify-between mb-6">
+<span class="font-body-md text-body-md text-on-surface-variant">Conservation Fee</span>
+<span class="font-body-md text-body-md text-primary font-medium">$20</span>
+</div>
+<div class="flex justify-between font-bold items-center">
+<span class="font-body-lg text-body-lg text-primary">Total</span>
+<span class="font-body-lg text-headline-md text-primary">$260</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-full font-body-lg text-body-lg font-medium hover:bg-primary/90 active:scale-[0.98] transition-all duration-300 mt-6" type="button">
+                                Reserve Experience
+                            </button>
+<p class="text-center font-caption text-caption text-on-surface-variant mt-4">You won't be charged yet.</p>
+</form>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container w-full pt-stack-lg pb-stack-md border-t border-outline-variant/10">
+<div class="grid grid-cols-12 gap-gutter px-margin-desktop max-w-container-max mx-auto">
+<div class="col-span-12 md:col-span-4 mb-stack-md md:mb-0">
+<div class="font-display text-headline-md text-primary mb-4 font-bold">TRIS</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs mb-8">© 2024 TRIS. Honoring the ancestral wisdom of Meghalaya.</p>
+</div>
+<div class="col-span-12 md:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
+<div class="flex flex-col gap-4">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Our Story</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Sustainability</a>
+</div>
+<div class="flex flex-col gap-4">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Community Led</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Impact Report</a>
+</div>
+<div class="flex flex-col gap-4">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Contact</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors hover:underline focus:outline-none focus:ring-2 focus:ring-secondary w-fit" href="#">Privacy Policy</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
