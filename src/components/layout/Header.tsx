@@ -174,27 +174,14 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className={cn(
-                    "hidden rounded-full px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition md:inline-flex lg:hidden",
-                    darkNav || !solid
-                      ? "text-white/90 hover:text-white"
-                      : "text-primary hover:text-accent",
-                  )}
-                >
-                  Log in
-                </Link>
-                <Button
-                  href="/login"
-                  size="sm"
-                  variant={darkNav || !solid ? "light" : "primary"}
-                  className="hidden lg:inline-flex"
-                >
-                  Log in / Sign up
-                </Button>
-              </>
+              <Button
+                href="/login"
+                size="sm"
+                variant={darkNav || !solid ? "light" : "primary"}
+                className="hidden lg:inline-flex"
+              >
+                Log in / Sign up
+              </Button>
             )}
             <button
               type="button"
@@ -403,29 +390,37 @@ export function Header() {
                   </Link>
                 ))}
               </div>
-              {user ? (
-                <>
-                  <Button href="/account" className="w-full">
-                    Account
-                  </Button>
-                  {isAdmin && (
-                    <Button href="/admin" variant="ghost" className="w-full">
-                      Admin
-                    </Button>
-                  )}
-                  <button
-                    type="button"
-                    className="text-sm text-on-surface-variant"
-                    onClick={() => logout()}
-                  >
-                    Log out
-                  </button>
-                </>
-              ) : (
-                <Button href="/login" className="w-full">
-                  Log in / Sign up
-                </Button>
-              )}
+              <div className="border-t border-outline-variant/25 pt-4">
+                <p className="label-caps text-accent">Account</p>
+                {user ? (
+                  <div className="mt-2 flex flex-col gap-2">
+                    <Link href="/account" className="font-display text-xl text-primary">
+                      {profile?.name?.split(" ")[0] || "Account"}
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/admin" className="text-secondary">
+                        Studio
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      className="text-left text-sm text-on-surface-variant"
+                      onClick={() => logout()}
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex flex-col gap-2">
+                    <Link href="/login" className="font-display text-xl text-primary">
+                      Log in
+                    </Link>
+                    <Link href="/signup" className="font-display text-xl text-primary">
+                      Sign up
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
