@@ -190,31 +190,31 @@ export function Header() {
         </div>
 
         {mega && (
-          <div className="hidden border-t border-[#e4dfd4] bg-[#f7f4ee] lg:block">
+          <div className="hidden border-t border-white/10 bg-[#2a2e1f] text-primary-fixed lg:block">
             <div className="mx-auto max-w-container-max px-margin-desktop py-7">
               {mega === "experiences" && (
                 <div>
                   <div className="mb-5 flex items-end justify-between gap-4">
                     <div>
                       <p className="label-caps text-accent">Experience types</p>
-                      <p className="mt-1 text-sm text-on-surface-variant">
+                      <p className="mt-1 text-sm text-primary-fixed/70">
                         A few hours to a full day — pick how it should feel.
                       </p>
                     </div>
                     <Link
                       href="/experiences"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-primary uppercase"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-accent uppercase"
                     >
                       Browse all <ArrowRight size={14} />
                     </Link>
                   </div>
-                  <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+                  <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-white/10 bg-[#323628]">
                     {EXPERIENCE_CATEGORIES.map((c, i) => (
                       <Link
                         key={c.id}
                         href={`/experiences?type=${c.slug}`}
                         className={cn(
-                          "group border-[#e4dfd4] p-4 transition hover:bg-[#f7f4ee]",
+                          "group border-white/10 p-4 transition hover:bg-[#3a4030]",
                           i % 3 !== 2 && "border-r",
                           i < 3 && "border-b",
                         )}
@@ -222,10 +222,10 @@ export function Header() {
                         <span className="font-serif text-sm text-accent/80">
                           {String(i + 1).padStart(2, "0")}
                         </span>
-                        <p className="mt-1 font-display text-lg text-secondary group-hover:text-primary">
+                        <p className="mt-1 font-display text-lg text-primary-fixed group-hover:text-accent">
                           {c.id}
                         </p>
-                        <p className="mt-1 text-xs text-on-surface-variant">{c.blurb}</p>
+                        <p className="mt-1 text-xs text-primary-fixed/65">{c.blurb}</p>
                       </Link>
                     ))}
                   </div>
@@ -233,21 +233,21 @@ export function Header() {
               )}
 
               {mega === "journeys" && (
-                <div className="flex overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+                <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-[#323628]">
                   {journeyCols.map((c, i) => (
                     <Link
                       key={c.href}
                       href={c.href}
                       className={cn(
-                        "group flex-1 p-6 transition hover:bg-[#f7f4ee]",
-                        i > 0 && "border-l border-[#e4dfd4]",
+                        "group flex-1 p-6 transition hover:bg-[#3a4030]",
+                        i > 0 && "border-l border-white/10",
                       )}
                     >
                       <span className="label-caps text-accent">{c.tag}</span>
-                      <p className="mt-3 font-display text-2xl text-secondary group-hover:text-primary">
+                      <p className="mt-3 font-display text-2xl text-primary-fixed group-hover:text-accent">
                         {c.title}
                       </p>
-                      <p className="mt-2 text-sm text-on-surface-variant">{c.body}</p>
+                      <p className="mt-2 text-sm text-primary-fixed/70">{c.body}</p>
                       <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
                         Explore <ArrowRight size={12} />
                       </span>
@@ -263,14 +263,14 @@ export function Header() {
                       key={c.href}
                       href={c.href}
                       className={cn(
-                        "group rounded-2xl border border-[#e4dfd4] bg-white p-8 transition hover:border-accent/40 hover:shadow-[0_12px_32px_rgba(42,46,31,0.06)]",
+                        "group rounded-2xl border border-white/10 bg-[#323628] p-8 transition hover:border-accent/40 hover:bg-[#3a4030]",
                         i === 0 ? "col-span-7" : "col-span-5",
                       )}
                     >
-                      <p className="font-display text-3xl text-secondary group-hover:text-primary">
+                      <p className="font-display text-3xl text-primary-fixed group-hover:text-accent">
                         {c.title}
                       </p>
-                      <p className="mt-3 max-w-sm text-sm text-on-surface-variant">{c.body}</p>
+                      <p className="mt-3 max-w-sm text-sm text-primary-fixed/70">{c.body}</p>
                       <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-accent uppercase">
                         Open <ArrowRight size={14} />
                       </span>
@@ -286,9 +286,9 @@ export function Header() {
                       <Link
                         key={c.href}
                         href={c.href}
-                        className="group flex items-baseline justify-between gap-4 border-b border-[#e4dfd4] py-4 transition hover:border-accent/40"
+                        className="group flex items-baseline justify-between gap-4 border-b border-white/10 py-4 transition hover:border-accent/40"
                       >
-                        <span className="font-display text-xl text-secondary group-hover:text-primary">
+                        <span className="font-display text-xl text-primary-fixed group-hover:text-accent">
                           {c.title}
                         </span>
                         <ArrowRight
@@ -298,25 +298,25 @@ export function Header() {
                       </Link>
                     ))}
                   </div>
-                  <div className="col-span-7 rounded-2xl border border-[#e4dfd4] bg-white p-8">
+                  <div className="col-span-7 rounded-2xl border border-white/10 bg-[#323628] p-8">
                     <p className="label-caps text-accent">The TRIS way</p>
-                    <p className="mt-3 font-display text-2xl text-secondary">
+                    <p className="mt-3 font-display text-2xl text-primary-fixed">
                       Community-rooted travel in Meghalaya
                     </p>
-                    <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                    <p className="mt-3 text-sm leading-relaxed text-primary-fixed/70">
                       Slow days, local hosts, and journeys that leave communities stronger. Start
                       with our story or reach out directly.
                     </p>
                     <div className="mt-6 flex flex-wrap gap-3">
                       <Link
                         href="/about"
-                        className="inline-flex h-9 items-center rounded-full bg-primary px-5 text-xs font-bold tracking-[0.12em] text-on-primary uppercase"
+                        className="inline-flex h-9 items-center rounded-full bg-accent px-5 text-xs font-bold tracking-[0.12em] text-on-accent uppercase"
                       >
                         Our story
                       </Link>
                       <Link
                         href="/contact"
-                        className="inline-flex h-9 items-center rounded-full border border-outline-variant/40 px-5 text-xs font-bold tracking-[0.12em] text-secondary uppercase transition hover:border-primary/40"
+                        className="inline-flex h-9 items-center rounded-full border border-white/25 px-5 text-xs font-bold tracking-[0.12em] text-primary-fixed uppercase transition hover:border-accent/50 hover:text-accent"
                       >
                         Contact
                       </Link>
