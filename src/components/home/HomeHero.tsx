@@ -56,7 +56,7 @@ export function HomeHero() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="label-caps mb-4 tracking-[0.22em] text-accent">TRIS · The unseen North East</p>
             <h1 className="font-display text-5xl leading-[1.02] tracking-tight text-white text-shadow-subtle md:text-7xl lg:text-[5rem]">
-              Experience the unseen, travel your way with us.
+              Travel your way with us.
             </h1>
             <p className="mx-auto mt-5 max-w-lg text-base text-white/85 md:text-lg">
               Community-rooted days in Meghalaya — living bridges, kitchens, mist, and people who host
