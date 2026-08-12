@@ -123,7 +123,9 @@ export default function CraftMyJourneyPage() {
                     payload: {
                       group: form.group,
                       timing: timingLabel,
-                      start: form.timing === "specific" ? form.start : undefined,
+                      ...(form.timing === "specific" && form.start
+                        ? { start: form.start }
+                        : {}),
                     },
                   });
                   if (!res.ok) setSubmitError(res.error);
