@@ -215,9 +215,13 @@ export default async function HomePage() {
                 </span>
               ))}
             </div>
-            <Button href="/about" variant="light" className="mt-8">
+            <Link
+              href="/about"
+              className="group mt-10 inline-flex items-center gap-3 rounded-full border border-accent bg-accent px-7 py-3.5 text-xs font-bold tracking-[0.14em] text-on-accent uppercase shadow-[0_10px_28px_rgba(0,0,0,0.22)] transition hover:brightness-110"
+            >
               Read our story
-            </Button>
+              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+            </Link>
           </SlideIn>
         </div>
       </section>
