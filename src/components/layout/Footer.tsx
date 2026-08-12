@@ -33,29 +33,39 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-outline-variant/20 bg-surface pt-16 pb-10 md:pt-20">
+    <footer className="relative overflow-hidden border-t border-outline-variant/20 bg-surface pt-12 pb-8 md:pt-16 md:pb-10 lg:pt-20">
       <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
       <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-          <div className="max-w-sm shrink-0">
-            <Link href="/" className="inline-block">
-              <BrandLogo on="light" size="md" className="h-20 w-20 md:h-24 md:w-24" />
-            </Link>
-            <p className="mt-5 text-base leading-relaxed text-on-surface-variant md:text-lg">
-              Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
-              stronger.
-            </p>
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:max-w-md lg:flex-col lg:gap-0">
+            <div className="max-w-sm">
+              <Link href="/" className="inline-block">
+                <BrandLogo on="light" size="sm" className="h-14 w-14 sm:h-16 sm:w-16 lg:h-20 lg:w-20" />
+              </Link>
+              <p className="mt-4 text-sm leading-relaxed text-on-surface-variant md:mt-5 md:text-base lg:text-lg">
+                Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
+                stronger.
+              </p>
+            </div>
+
+            <div className="md:ml-auto md:shrink-0 md:text-right lg:ml-0 lg:mt-8 lg:text-left">
+              <p className="label-caps text-accent">Proudly recognized by</p>
+              <RecognitionLogos
+                compact
+                className="mt-3 justify-start md:mt-4 md:justify-end lg:justify-start"
+              />
+            </div>
           </div>
 
-          <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:max-w-xl lg:justify-self-end">
+          <div className="grid flex-1 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 sm:gap-x-8 lg:max-w-xl lg:justify-self-end">
             {columns.map((col) => (
-              <div key={col.title} className="flex flex-col gap-3">
+              <div key={col.title} className="flex flex-col gap-2.5">
                 <span className="label-caps mb-1 text-primary">{col.title}</span>
                 {col.links.map((link) => (
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="text-on-surface-variant transition hover:text-primary"
+                    className="text-sm text-on-surface-variant transition hover:text-primary"
                   >
                     {link.label}
                   </Link>
@@ -65,12 +75,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="label-caps text-accent">Proudly recognized by</p>
-            <RecognitionLogos compact className="mt-4 justify-start" />
-          </div>
-          <p className="w-full shrink-0 text-sm text-on-surface-variant/60 sm:w-auto sm:text-right">
+        <div className="mt-10 border-t border-outline-variant/20 pt-5 text-right md:mt-12 md:pt-6">
+          <p className="text-xs text-on-surface-variant/60 sm:text-sm">
             © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
           </p>
         </div>

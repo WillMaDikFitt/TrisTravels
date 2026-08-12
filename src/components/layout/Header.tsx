@@ -101,10 +101,10 @@ export function Header() {
               : "bg-transparent",
         )}
       >
-        <div className="mx-auto grid h-16 max-w-container-max grid-cols-[1fr_auto_1fr] items-center px-margin-mobile md:h-20 md:px-margin-desktop">
+        <div className="mx-auto flex h-14 max-w-container-max items-center justify-between gap-3 px-margin-mobile md:h-16 md:px-margin-desktop lg:grid lg:h-20 lg:grid-cols-[1fr_auto_1fr] lg:gap-0">
           <Link
             href="/"
-            className="relative z-10 flex shrink-0 items-center justify-self-start"
+            className="relative z-10 flex shrink-0 items-center lg:justify-self-start"
             aria-label="TRIS Travels home"
           >
             <Image
@@ -115,7 +115,7 @@ export function Header() {
               priority
               unoptimized
               className={cn(
-                "h-12 w-12 object-contain transition md:h-14 md:w-14",
+                "h-9 w-9 object-contain transition sm:h-10 sm:w-10 md:h-11 md:w-11 lg:h-14 lg:w-14",
                 !solid && !darkNav && "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]",
               )}
             />
@@ -161,9 +161,9 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex items-center justify-self-end gap-1.5 md:gap-2">
+          <div className="flex shrink-0 items-center gap-2 lg:justify-self-end lg:gap-2">
             {user ? (
-              <div className="hidden items-center gap-2 md:flex">
+              <div className="hidden items-center gap-2 lg:flex">
                 {isAdmin && (
                   <Button href="/admin" size="sm" variant={darkNav || !solid ? "light" : "ghost"}>
                     Studio
@@ -174,14 +174,27 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <Button
-                href="/login"
-                size="sm"
-                variant={darkNav || !solid ? "light" : "primary"}
-                className="hidden md:inline-flex"
-              >
-                Log in / Sign up
-              </Button>
+              <>
+                <Link
+                  href="/login"
+                  className={cn(
+                    "hidden rounded-full px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition md:inline-flex lg:hidden",
+                    darkNav || !solid
+                      ? "text-white/90 hover:text-white"
+                      : "text-primary hover:text-accent",
+                  )}
+                >
+                  Log in
+                </Link>
+                <Button
+                  href="/login"
+                  size="sm"
+                  variant={darkNav || !solid ? "light" : "primary"}
+                  className="hidden lg:inline-flex"
+                >
+                  Log in / Sign up
+                </Button>
+              </>
             )}
             <button
               type="button"

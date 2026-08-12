@@ -54,7 +54,7 @@ export function RecognitionLogos({
         className,
       )}
     >
-      <div className={cn("relative", compact ? "h-12 w-40" : "h-16 w-52")}>
+      <div className={cn("relative", compact ? "h-10 w-32 md:h-12 md:w-40" : "h-16 w-52")}>
         <Image
           src={MEGHALAYA_SRC}
           alt="Meghalaya Tourism"
@@ -64,7 +64,7 @@ export function RecognitionLogos({
           sizes="220px"
         />
       </div>
-      <div className={cn("relative", compact ? "h-14 w-36" : "h-[4.5rem] w-48")}>
+      <div className={cn("relative", compact ? "h-11 w-28 md:h-14 md:w-36" : "h-[4.5rem] w-48")}>
         <Image
           src={NIDHI_SRC}
           alt="NIDHI — National Integrated Database of Hospitality Industry"
