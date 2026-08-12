@@ -51,7 +51,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:max-w-xl">
+          <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:max-w-xl lg:justify-self-end">
             {columns.map((col) => (
               <div key={col.title} className="flex flex-col gap-3">
                 <span className="label-caps mb-1 text-primary">{col.title}</span>
@@ -67,13 +67,12 @@ export function Footer() {
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="flex shrink-0 flex-col items-end justify-end text-right lg:min-w-[11rem]">
-            <p className="watermark text-[22vw] leading-none sm:text-[5rem] lg:text-[6rem]">TRIS</p>
-            <p className="mt-2 max-w-[14rem] text-sm text-on-surface-variant/60">
-              © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
-            </p>
-          </div>
+        <div className="mt-12 border-t border-outline-variant/20 pt-6 text-right">
+          <p className="text-sm text-on-surface-variant/60">
+            © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
