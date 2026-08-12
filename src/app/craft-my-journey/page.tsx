@@ -52,6 +52,48 @@ function addDays(iso: string, days: number) {
   return d.toISOString().slice(0, 10);
 }
 
+function PillRow({
+  label,
+  required,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  required?: boolean;
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-primary">
+        {label} {required ? <span className="text-accent">*</span> : null}
+      </legend>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {options.map((o) => {
+          const active = value === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => onChange(o.value)}
+              className={cn(
+                "rounded-full border px-4 py-2 text-sm font-semibold transition",
+                active
+                  ? "border-primary bg-primary text-on-primary"
+                  : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
+              )}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 export default function CraftMyJourneyPage() {
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -118,7 +160,7 @@ export default function CraftMyJourneyPage() {
 
       <section
         id="craft-form"
-        className="scroll-mt-header mx-auto max-w-2xl px-margin-mobile py-14 md:px-margin-desktop md:py-20"
+        className="scroll-mt-header mx-auto max-w-container-max px-margin-mobile py-14 md:px-margin-desktop md:py-20"
       >
         <FadeIn>
           <FormCard>
@@ -127,7 +169,7 @@ export default function CraftMyJourneyPage() {
             </p>
 
             <form
-              className="space-y-7"
+              className="space-y-8 lg:space-y-0"
               onSubmit={async (e) => {
                 e.preventDefault();
                 if (!valid) return;
@@ -158,165 +200,138 @@ export default function CraftMyJourneyPage() {
                 }
               }}
             >
-              <div className="grid gap-5 sm:grid-cols-2">
-                <FormInput
-                  label="Full name"
-                  name="name"
-                  required
-                  autoComplete="name"
-                  placeholder="Your name"
-                  value={form.name}
-                  onChange={(v) => setField("name", v)}
-                />
-                <FormInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="you@email.com"
-                  value={form.email}
-                  onChange={(v) => setField("email", v)}
-                />
-                <FormInput
-                  label="Mobile / WhatsApp"
-                  name="phone"
-                  type="tel"
-                  required
-                  autoComplete="tel"
-                  placeholder="+91 98XXX XXXXX"
-                  className="sm:col-span-2"
-                  value={form.phone}
-                  onChange={(v) => setField("phone", v)}
-                />
+              <div className="grid gap-8 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-6">
+                <div className="space-y-6">
+                  <p className="label-caps text-accent">You & your trip</p>
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                    <FormInput
+                      label="Full name"
+                      name="name"
+                      required
+                      autoComplete="name"
+                      placeholder="Your name"
+                      value={form.name}
+                      onChange={(v) => setField("name", v)}
+                    />
+                    <FormInput
+                      label="Email"
+                      name="email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      placeholder="you@email.com"
+                      value={form.email}
+                      onChange={(v) => setField("email", v)}
+                    />
+                    <FormInput
+                      label="Mobile / WhatsApp"
+                      name="phone"
+                      type="tel"
+                      required
+                      autoComplete="tel"
+                      placeholder="+91 98XXX XXXXX"
+                      className="sm:col-span-2 lg:col-span-1 xl:col-span-2"
+                      value={form.phone}
+                      onChange={(v) => setField("phone", v)}
+                    />
+                  </div>
+
+                  <PillRow
+                    label="Guests"
+                    required
+                    options={groupOptions}
+                    value={form.group}
+                    onChange={(v) => setField("group", v)}
+                  />
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <FormInput
+                      label="Arrival date"
+                      name="start"
+                      type="date"
+                      required
+                      min={daysFromNow(5)}
+                      value={form.start}
+                      onChange={(v) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          start: v,
+                          end: prev.end < v ? addDays(v, 3) : prev.end,
+                        }));
+                      }}
+                    />
+                    <FormInput
+                      label="Departure date"
+                      name="end"
+                      type="date"
+                      required
+                      min={form.start || daysFromNow(5)}
+                      value={form.end}
+                      onChange={(v) => setField("end", v)}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <p className="label-caps text-accent">Preferences</p>
+                  <FormChipGroup
+                    label="Vehicle"
+                    name="vehicles"
+                    options={vehicleOptions}
+                    selected={vehicles}
+                    hint="Optional"
+                    onToggle={(v) =>
+                      setVehicles((prev) =>
+                        prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+                      )
+                    }
+                  />
+
+                  <FormChipGroup
+                    label="Include"
+                    name="experiences"
+                    options={experienceOptions}
+                    selected={experiences}
+                    hint="Optional"
+                    onToggle={(v) =>
+                      setExperiences((prev) =>
+                        prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+                      )
+                    }
+                  />
+
+                  <PillRow
+                    label="Food"
+                    options={foodOptions.map((f) => ({ label: f, value: f }))}
+                    value={form.food}
+                    onChange={(v) => setField("food", v)}
+                  />
+
+                  <FormTextarea
+                    label="Anything else?"
+                    name="notes"
+                    rows={2}
+                    placeholder="Budget, kids, accessibility…"
+                    value={form.notes}
+                    onChange={(v) => setField("notes", v)}
+                  />
+                </div>
               </div>
 
-              <fieldset>
-                <legend className="text-sm font-medium text-primary">
-                  Guests <span className="text-accent">*</span>
-                </legend>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {groupOptions.map((g) => {
-                    const active = form.group === g.value;
-                    return (
-                      <button
-                        key={g.value}
-                        type="button"
-                        onClick={() => setField("group", g.value)}
-                        className={cn(
-                          "rounded-full border px-4 py-2.5 text-sm font-semibold transition",
-                          active
-                            ? "border-primary bg-primary text-on-primary"
-                            : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
-                        )}
-                      >
-                        {g.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <FormInput
-                  label="Arrival date"
-                  name="start"
-                  type="date"
-                  required
-                  min={daysFromNow(5)}
-                  value={form.start}
-                  onChange={(v) => {
-                    setForm((prev) => ({
-                      ...prev,
-                      start: v,
-                      end: prev.end < v ? addDays(v, 3) : prev.end,
-                    }));
-                  }}
-                />
-                <FormInput
-                  label="Departure date"
-                  name="end"
-                  type="date"
-                  required
-                  min={form.start || daysFromNow(5)}
-                  value={form.end}
-                  onChange={(v) => setField("end", v)}
-                />
+              <div className="mt-8 flex flex-col gap-4 border-t border-outline-variant/20 pt-6 sm:flex-row sm:items-center sm:justify-between lg:mt-6">
+                {submitError ? (
+                  <p className="text-sm text-primary" role="alert">
+                    {submitError}
+                  </p>
+                ) : (
+                  <p className="text-xs text-on-surface-variant">
+                    One short form — a planner follows up personally.
+                  </p>
+                )}
+                <Button type="submit" size="lg" disabled={sending || !valid}>
+                  {sending ? "Sending…" : "Submit enquiry"}
+                </Button>
               </div>
-
-              <FormChipGroup
-                label="Vehicle preference"
-                name="vehicles"
-                options={vehicleOptions}
-                selected={vehicles}
-                hint="Optional — tap if you know"
-                onToggle={(v) =>
-                  setVehicles((prev) =>
-                    prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-                  )
-                }
-              />
-
-              <FormChipGroup
-                label="What should we include?"
-                name="experiences"
-                options={experienceOptions}
-                selected={experiences}
-                hint="Optional — trekking, culture, food…"
-                onToggle={(v) =>
-                  setExperiences((prev) =>
-                    prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-                  )
-                }
-              />
-
-              <fieldset>
-                <legend className="text-sm font-medium text-primary">Food preference</legend>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {foodOptions.map((f) => {
-                    const active = form.food === f;
-                    return (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => setField("food", f)}
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-sm font-semibold transition",
-                          active
-                            ? "border-primary bg-primary text-on-primary"
-                            : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
-                        )}
-                      >
-                        {f}
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-
-              <FormTextarea
-                label="Anything else?"
-                name="notes"
-                rows={3}
-                placeholder="Budget, kids, accessibility, places you’ve heard about…"
-                value={form.notes}
-                onChange={(v) => setField("notes", v)}
-              />
-
-              {submitError && (
-                <p className="text-sm text-primary" role="alert">
-                  {submitError}
-                </p>
-              )}
-
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full sm:w-auto"
-                disabled={sending || !valid}
-              >
-                {sending ? "Sending…" : "Submit enquiry"}
-              </Button>
             </form>
           </FormCard>
         </FadeIn>
