@@ -9,41 +9,35 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { TRIS_LOGO_ON_DARK, TRIS_LOGO_ON_LIGHT } from "@/components/brand/BrandLogo";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
-import { media } from "@/data/media";
 import { useAuth } from "@/components/auth/AuthProvider";
-
-const typeVisuals: Record<string, string> = {
-  adventure: media.heroRoots,
-  "nature-wildlife": media.familyWaterfall,
-  "culture-heritage": media.valueCommunity,
-  "food-local-life": media.kitchen,
-  wellness: media.heroMist,
-  creative: media.craft,
-};
 
 const journeyCols = [
   {
     href: "/journeys?type=curated",
     title: "Curated Journeys",
     body: "Flexible multi-day packages — shape dates and stays.",
-    image: media.packages,
+    tag: "Enquire",
   },
   {
     href: "/journeys?type=small-group",
     title: "Small Group",
     body: "Fixed departures. Show up and travel with others.",
-    image: media.departures,
+    tag: "Join a date",
   },
   {
     href: "/craft-my-journey",
     title: "Craft My Journey",
     body: "A brief to our planners — entirely around you.",
-    image: media.heroMist,
+    tag: "Personal",
   },
 ];
 
 const discoverLinks = [
-  { href: "/destinations", title: "Destinations", body: "Villages, rivers, and living bridges we know well." },
+  {
+    href: "/destinations",
+    title: "Destinations",
+    body: "Villages, rivers, and living bridges we know well.",
+  },
   { href: "/stories", title: "Stories", body: "Guest voices from the hills." },
 ];
 
@@ -52,49 +46,6 @@ const aboutLinks = [
   { href: "/partner", title: "Partner with us", body: "Guides, hosts, and local operators." },
   { href: "/contact", title: "Contact", body: "Plan, ask, or say hello." },
 ];
-
-function MegaCard({
-  href,
-  title,
-  body,
-  image,
-  index,
-}: {
-  href: string;
-  title: string;
-  body: string;
-  image?: string;
-  index?: number;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group relative overflow-hidden rounded-2xl bg-white px-5 py-4 ring-1 ring-[#e4dfd4] transition hover:-translate-y-0.5 hover:ring-accent/50 hover:shadow-[0_12px_32px_rgba(42,46,31,0.08)]"
-    >
-      {image ? (
-        <div className="pointer-events-none absolute inset-0">
-          <Image
-            src={image}
-            alt=""
-            fill
-            className="object-cover opacity-[0.12] transition duration-500 group-hover:opacity-25"
-            sizes="200px"
-          />
-        </div>
-      ) : null}
-      <div className="relative z-10">
-        {index !== undefined ? (
-          <span className="font-serif text-sm text-accent/80">{String(index + 1).padStart(2, "0")}</span>
-        ) : null}
-        <p className="font-display text-lg text-secondary transition group-hover:text-primary">{title}</p>
-        <p className="mt-1.5 text-sm text-on-surface-variant">{body}</p>
-        <span className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase opacity-0 transition group-hover:opacity-100">
-          Explore <ArrowRight size={12} />
-        </span>
-      </div>
-    </Link>
-  );
-}
 
 export function Header() {
   const pathname = usePathname();
@@ -140,7 +91,11 @@ export function Header() {
         )}
       >
         <div className="mx-auto grid h-16 max-w-container-max grid-cols-[1fr_auto_1fr] items-center px-margin-mobile md:h-20 md:px-margin-desktop">
-          <Link href="/" className="relative z-10 flex shrink-0 items-center justify-self-start" aria-label="TRIS Travels home">
+          <Link
+            href="/"
+            className="relative z-10 flex shrink-0 items-center justify-self-start"
+            aria-label="TRIS Travels home"
+          >
             <Image
               src={solid ? TRIS_LOGO_ON_LIGHT : TRIS_LOGO_ON_DARK}
               alt="TRIS Travels"
@@ -210,7 +165,12 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <Button href="/login" size="sm" variant={solid ? "primary" : "light"} className="hidden md:inline-flex">
+              <Button
+                href="/login"
+                size="sm"
+                variant={solid ? "primary" : "light"}
+                className="hidden md:inline-flex"
+              >
                 Log in / Sign up
               </Button>
             )}
@@ -248,53 +208,120 @@ export function Header() {
                       Browse all <ArrowRight size={14} />
                     </Link>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
                     {EXPERIENCE_CATEGORIES.map((c, i) => (
-                      <MegaCard
+                      <Link
                         key={c.id}
                         href={`/experiences?type=${c.slug}`}
-                        title={c.id}
-                        body={c.blurb}
-                        image={typeVisuals[c.slug]}
-                        index={i}
-                      />
+                        className={cn(
+                          "group border-[#e4dfd4] p-4 transition hover:bg-[#f7f4ee]",
+                          i % 3 !== 2 && "border-r",
+                          i < 3 && "border-b",
+                        )}
+                      >
+                        <span className="font-serif text-sm text-accent/80">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p className="mt-1 font-display text-lg text-secondary group-hover:text-primary">
+                          {c.id}
+                        </p>
+                        <p className="mt-1 text-xs text-on-surface-variant">{c.blurb}</p>
+                      </Link>
                     ))}
                   </div>
                 </div>
               )}
+
               {mega === "journeys" && (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="flex overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
                   {journeyCols.map((c, i) => (
-                    <MegaCard key={c.href} href={c.href} title={c.title} body={c.body} image={c.image} index={i} />
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      className={cn(
+                        "group flex-1 p-6 transition hover:bg-[#f7f4ee]",
+                        i > 0 && "border-l border-[#e4dfd4]",
+                      )}
+                    >
+                      <span className="label-caps text-accent">{c.tag}</span>
+                      <p className="mt-3 font-display text-2xl text-secondary group-hover:text-primary">
+                        {c.title}
+                      </p>
+                      <p className="mt-2 text-sm text-on-surface-variant">{c.body}</p>
+                      <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                        Explore <ArrowRight size={12} />
+                      </span>
+                    </Link>
                   ))}
                 </div>
               )}
+
               {mega === "discover" && (
-                <div className="grid max-w-3xl grid-cols-2 gap-3">
+                <div className="grid grid-cols-12 gap-4">
                   {discoverLinks.map((c, i) => (
-                    <MegaCard
+                    <Link
                       key={c.href}
                       href={c.href}
-                      title={c.title}
-                      body={c.body}
-                      image={i === 0 ? media.mountains : media.rain}
-                      index={i}
-                    />
+                      className={cn(
+                        "group rounded-2xl border border-[#e4dfd4] bg-white p-8 transition hover:border-accent/40 hover:shadow-[0_12px_32px_rgba(42,46,31,0.06)]",
+                        i === 0 ? "col-span-7" : "col-span-5",
+                      )}
+                    >
+                      <p className="font-display text-3xl text-secondary group-hover:text-primary">
+                        {c.title}
+                      </p>
+                      <p className="mt-3 max-w-sm text-sm text-on-surface-variant">{c.body}</p>
+                      <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-accent uppercase">
+                        Open <ArrowRight size={14} />
+                      </span>
+                    </Link>
                   ))}
                 </div>
               )}
+
               {mega === "about" && (
-                <div className="grid grid-cols-3 gap-3">
-                  {aboutLinks.map((c, i) => (
-                    <MegaCard
-                      key={c.href}
-                      href={c.href}
-                      title={c.title}
-                      body={c.body}
-                      image={i === 0 ? media.aboutPortrait : i === 1 ? media.craft : media.peaks}
-                      index={i}
-                    />
-                  ))}
+                <div className="grid grid-cols-12 items-start gap-8">
+                  <div className="col-span-5 space-y-1">
+                    {aboutLinks.map((c) => (
+                      <Link
+                        key={c.href}
+                        href={c.href}
+                        className="group flex items-baseline justify-between gap-4 border-b border-[#e4dfd4] py-4 transition hover:border-accent/40"
+                      >
+                        <span className="font-display text-xl text-secondary group-hover:text-primary">
+                          {c.title}
+                        </span>
+                        <ArrowRight
+                          size={16}
+                          className="shrink-0 text-accent opacity-0 transition group-hover:opacity-100"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="col-span-7 rounded-2xl border border-[#e4dfd4] bg-white p-8">
+                    <p className="label-caps text-accent">The TRIS way</p>
+                    <p className="mt-3 font-display text-2xl text-secondary">
+                      Community-rooted travel in Meghalaya
+                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                      Slow days, local hosts, and journeys that leave communities stronger. Start
+                      with our story or reach out directly.
+                    </p>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <Link
+                        href="/about"
+                        className="inline-flex h-9 items-center rounded-full bg-primary px-5 text-xs font-bold tracking-[0.12em] text-on-primary uppercase"
+                      >
+                        Our story
+                      </Link>
+                      <Link
+                        href="/contact"
+                        className="inline-flex h-9 items-center rounded-full border border-outline-variant/40 px-5 text-xs font-bold tracking-[0.12em] text-secondary uppercase transition hover:border-primary/40"
+                      >
+                        Contact
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -336,8 +363,16 @@ export function Header() {
                   <Button href="/account" className="w-full">
                     Account
                   </Button>
-                  {isAdmin && <Button href="/admin" variant="ghost" className="w-full">Admin</Button>}
-                  <button type="button" className="text-sm text-on-surface-variant" onClick={() => logout()}>
+                  {isAdmin && (
+                    <Button href="/admin" variant="ghost" className="w-full">
+                      Admin
+                    </Button>
+                  )}
+                  <button
+                    type="button"
+                    className="text-sm text-on-surface-variant"
+                    onClick={() => logout()}
+                  >
                     Log out
                   </button>
                 </>
