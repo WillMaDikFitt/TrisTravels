@@ -1,6 +1,10 @@
 "use server";
 
 import {
+  findDestination,
+  findExperience,
+  findJourney,
+  findStory,
   getSettings,
   listAllExperiencesAdmin,
   listClosures,
@@ -22,16 +26,32 @@ export async function fetchExperiencesAdmin() {
   return listAllExperiencesAdmin();
 }
 
+export async function fetchExperienceAdmin(slug: string) {
+  return findExperience(slug);
+}
+
 export async function fetchJourneysAdmin() {
   return listJourneys();
+}
+
+export async function fetchJourneyAdmin(slug: string) {
+  return findJourney(slug);
 }
 
 export async function fetchDestinationsAdmin() {
   return listDestinations();
 }
 
+export async function fetchDestinationAdmin(slug: string) {
+  return findDestination(slug);
+}
+
 export async function fetchStoriesAdmin() {
   return listStories();
+}
+
+export async function fetchStoryAdmin(slug: string) {
+  return findStory(slug);
 }
 
 export async function fetchClosuresAdmin() {

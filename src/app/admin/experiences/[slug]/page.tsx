@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus } from "@/data/experiences";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
-import { fetchExperiencesAdmin } from "@/lib/actions/content-read";
+import { fetchExperienceAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
@@ -64,11 +64,8 @@ export default function ExperienceEditorPage() {
 
   useEffect(() => {
     if (isNew) return;
-    fetchExperiencesAdmin()
-      .then((list) => {
-        const found = list.find((e) => e.slug === slug);
-        setRow(found ?? blank(slug));
-      })
+    fetchExperienceAdmin(slug)
+      .then((exp) => setRow(exp ?? blank(slug)))
       .catch(() => setRow(blank(slug)));
   }, [isNew, slug]);
 
@@ -89,6 +86,7 @@ export default function ExperienceEditorPage() {
         }
       />
       <form
+        key={row.slug}
         className="space-y-6"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -260,7 +258,7 @@ export default function ExperienceEditorPage() {
 
         <Panel>
           <h2 className="mb-4 font-display text-lg">Media & SEO</h2>
-          <ImageField name="image" label="Cover image" defaultValue={row.image} />
+          <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
           <div className="mt-4">
             <Field label="Gallery URLs" hint="one per line">
               <textarea name="gallery" rows={4} defaultValue={row.gallery.join("\n")} className={inputClass} />

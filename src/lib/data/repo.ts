@@ -1,11 +1,47 @@
 import { experiences, getExperience as getStaticExperience } from "@/data/experiences";
 import { journeys, getJourney as getStaticJourney } from "@/data/journeys";
 import { destinations, getDestination as getStaticDestination } from "@/data/destinations";
-import { stories } from "@/data/stories";
+import { stories, type Story } from "@/data/stories";
 import { getAdminDb } from "@/lib/firebase/admin";
-import type { ClosureRecord, Experience, Journey, Destination, Story, PlatformSettings } from "@/lib/types";
+import type { ClosureRecord, Experience, Journey, Destination, PlatformSettings } from "@/lib/types";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import { memoryStore } from "@/lib/store";
+
+function docSlug(item: { slug?: string; id?: string }) {
+  return item.slug ?? item.id ?? "";
+}
+
+function isEmptyOverlay(value: unknown) {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "string" && value.trim() === "") return true;
+  if (Array.isArray(value) && value.length === 0) return true;
+  return false;
+}
+
+/** Merge seed catalogue with Firestore overrides; ignore empty remote fields. */
+function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, slug: string): T {
+  const out = { ...(base ?? {}), slug } as T & { slug: string };
+  for (const [key, value] of Object.entries(remote)) {
+    if (key === "slug" || key === "id") continue;
+    if (isEmptyOverlay(value)) continue;
+    (out as Record<string, unknown>)[key] = value;
+  }
+  return out as T;
+}
+
+function mergeCatalog<T extends { slug: string }>(
+  staticItems: T[],
+  remote: ({ slug?: string; id?: string } & Partial<T>)[] | null,
+): T[] {
+  const map = new Map(staticItems.map((item) => [item.slug, item]));
+  if (!remote?.length) return staticItems;
+  for (const item of remote) {
+    const slug = docSlug(item);
+    if (!slug) continue;
+    map.set(slug, mergeRecord(map.get(slug), item, slug));
+  }
+  return Array.from(map.values());
+}
 
 async function collectionDocs<T>(name: string): Promise<T[] | null> {
   const db = getAdminDb();
@@ -20,78 +56,104 @@ async function collectionDocs<T>(name: string): Promise<T[] | null> {
 }
 
 export async function listExperiences(): Promise<Experience[]> {
-  const remote = await collectionDocs<Experience & { slug?: string }>("experiences");
-  if (!remote?.length) return experiences.filter((e) => (e.status ?? "active") !== "hidden" && e.status !== "draft");
-  return remote
-    .filter((e) => (e.status ?? "active") === "active" || e.status === "seasonal")
-    .map((e) => ({ ...e, slug: e.slug ?? (e as { id?: string }).id! }));
+  const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
+  const merged = mergeCatalog(experiences, remote);
+  return merged.filter((e) => (e.status ?? "active") === "active" || e.status === "seasonal");
 }
 
 export async function listAllExperiencesAdmin(): Promise<Experience[]> {
-  const remote = await collectionDocs<Experience & { slug?: string }>("experiences");
-  if (!remote?.length) return experiences;
-  return remote.map((e) => ({ ...e, slug: e.slug ?? (e as { id?: string }).id! }));
+  const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
+  return mergeCatalog(experiences, remote);
 }
 
 export async function findExperience(slug: string): Promise<Experience | undefined> {
+  const staticFallback = getStaticExperience(slug);
   const db = getAdminDb();
   if (db) {
-    const doc = await db.collection("experiences").doc(slug).get();
-    if (doc.exists) return { ...(doc.data() as Experience), slug };
+    try {
+      const doc = await db.collection("experiences").doc(slug).get();
+      if (doc.exists) {
+        return mergeRecord(staticFallback, doc.data() as Experience, slug);
+      }
+    } catch (err) {
+      console.error(`Firestore read failed (experiences/${slug}):`, err);
+    }
   }
-  return getStaticExperience(slug);
+  return staticFallback;
 }
 
 export async function listJourneys(): Promise<Journey[]> {
-  const remote = await collectionDocs<Journey & { slug?: string }>("journeys");
-  if (!remote?.length) return journeys;
-  return remote.map((j) => ({ ...j, slug: j.slug ?? (j as { id?: string }).id! }));
+  const remote = await collectionDocs<Journey & { slug?: string; id?: string }>("journeys");
+  return mergeCatalog(journeys, remote);
 }
 
 export async function findJourney(slug: string): Promise<Journey | undefined> {
+  const staticFallback = getStaticJourney(slug);
   const db = getAdminDb();
   if (db) {
-    const doc = await db.collection("journeys").doc(slug).get();
-    if (doc.exists) return { ...(doc.data() as Journey), slug };
+    try {
+      const doc = await db.collection("journeys").doc(slug).get();
+      if (doc.exists) {
+        return mergeRecord(staticFallback, doc.data() as Journey, slug);
+      }
+    } catch (err) {
+      console.error(`Firestore read failed (journeys/${slug}):`, err);
+    }
   }
-  return getStaticJourney(slug);
+  return staticFallback;
 }
 
 export async function listDestinations(): Promise<Destination[]> {
-  const remote = await collectionDocs<Destination & { slug?: string }>("destinations");
-  if (!remote?.length) return destinations;
-  return remote.map((d) => ({ ...d, slug: d.slug ?? (d as { id?: string }).id! }));
+  const remote = await collectionDocs<Destination & { slug?: string; id?: string }>("destinations");
+  return mergeCatalog(destinations, remote);
 }
 
 export async function findDestination(slug: string): Promise<Destination | undefined> {
+  const staticFallback = getStaticDestination(slug);
   const db = getAdminDb();
   if (db) {
-    const doc = await db.collection("destinations").doc(slug).get();
-    if (doc.exists) return { ...(doc.data() as Destination), slug };
+    try {
+      const doc = await db.collection("destinations").doc(slug).get();
+      if (doc.exists) {
+        return mergeRecord(staticFallback, doc.data() as Destination, slug);
+      }
+    } catch (err) {
+      console.error(`Firestore read failed (destinations/${slug}):`, err);
+    }
   }
-  return getStaticDestination(slug);
+  return staticFallback;
 }
 
 export async function listStories(): Promise<Story[]> {
-  const remote = await collectionDocs<Story & { slug?: string }>("stories");
-  if (!remote?.length) return stories;
-  return remote.map((s) => ({ ...s, slug: s.slug ?? (s as { id?: string }).id! }));
+  const remote = await collectionDocs<Story & { slug?: string; id?: string }>("stories");
+  return mergeCatalog(stories, remote);
 }
 
 export async function findStory(slug: string): Promise<Story | undefined> {
+  const staticFallback = stories.find((s) => s.slug === slug);
   const db = getAdminDb();
   if (db) {
-    const doc = await db.collection("stories").doc(slug).get();
-    if (doc.exists) return { ...(doc.data() as Story), slug };
+    try {
+      const doc = await db.collection("stories").doc(slug).get();
+      if (doc.exists) {
+        return mergeRecord(staticFallback, doc.data() as Story, slug);
+      }
+    } catch (err) {
+      console.error(`Firestore read failed (stories/${slug}):`, err);
+    }
   }
-  return stories.find((s) => s.slug === slug);
+  return staticFallback;
 }
 
 export async function getSettings(): Promise<PlatformSettings> {
   const db = getAdminDb();
   if (db) {
-    const doc = await db.collection("settings").doc("platform").get();
-    if (doc.exists) return { ...DEFAULT_SETTINGS, ...(doc.data() as Partial<PlatformSettings>) };
+    try {
+      const doc = await db.collection("settings").doc("platform").get();
+      if (doc.exists) return { ...DEFAULT_SETTINGS, ...(doc.data() as Partial<PlatformSettings>) };
+    } catch (err) {
+      console.error("Firestore read failed (settings/platform):", err);
+    }
   }
   return DEFAULT_SETTINGS;
 }
@@ -99,9 +161,13 @@ export async function getSettings(): Promise<PlatformSettings> {
 export async function listClosures(experienceSlug?: string): Promise<ClosureRecord[]> {
   const db = getAdminDb();
   if (db) {
-    const snap = await db.collection("closures").get();
-    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ClosureRecord);
-    return experienceSlug ? all.filter((c) => c.experienceSlug === experienceSlug) : all;
+    try {
+      const snap = await db.collection("closures").get();
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as ClosureRecord);
+      return experienceSlug ? all.filter((c) => c.experienceSlug === experienceSlug) : all;
+    } catch (err) {
+      console.error("Firestore read failed (closures):", err);
+    }
   }
   const all = memoryStore().closures;
   return experienceSlug ? all.filter((c) => c.experienceSlug === experienceSlug) : all;

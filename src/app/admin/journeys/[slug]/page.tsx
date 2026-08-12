@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Journey } from "@/data/journeys";
-import { fetchJourneysAdmin } from "@/lib/actions/content-read";
+import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
@@ -48,8 +48,8 @@ export default function JourneyEditorPage() {
 
   useEffect(() => {
     if (isNew) return;
-    fetchJourneysAdmin()
-      .then((list) => setRow(list.find((j) => j.slug === slug) ?? blank()))
+    fetchJourneyAdmin(slug)
+      .then((j) => setRow(j ?? blank()))
       .catch(() => setRow(blank()));
   }, [isNew, slug]);
 
@@ -67,6 +67,7 @@ export default function JourneyEditorPage() {
         }
       />
       <form
+        key={row.slug}
         className="space-y-6"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -211,7 +212,7 @@ export default function JourneyEditorPage() {
           </div>
         </Panel>
         <Panel>
-          <ImageField name="image" label="Cover image" defaultValue={row.image} />
+          <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
         </Panel>
         {note && <Notice tone={note === "Saved." ? "ok" : "warn"}>{note}</Notice>}
         <AdminButton type="submit" disabled={busy}>
