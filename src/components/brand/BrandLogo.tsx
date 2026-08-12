@@ -50,11 +50,16 @@ export function RecognitionLogos({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-8 md:gap-14",
+        "flex flex-wrap items-center justify-center gap-6 md:gap-5 lg:gap-10",
         className,
       )}
     >
-      <div className={cn("relative", compact ? "h-10 w-32 md:h-12 md:w-40" : "h-16 w-52")}>
+      <div
+        className={cn(
+          "relative",
+          compact ? "h-9 w-28 md:h-8 md:w-24 lg:h-12 lg:w-40" : "h-16 w-52",
+        )}
+      >
         <Image
           src={MEGHALAYA_SRC}
           alt="Meghalaya Tourism"
@@ -64,7 +69,12 @@ export function RecognitionLogos({
           sizes="220px"
         />
       </div>
-      <div className={cn("relative", compact ? "h-11 w-28 md:h-14 md:w-36" : "h-[4.5rem] w-48")}>
+      <div
+        className={cn(
+          "relative",
+          compact ? "h-10 w-24 md:h-8 md:w-20 lg:h-14 lg:w-36" : "h-[4.5rem] w-48",
+        )}
+      >
         <Image
           src={NIDHI_SRC}
           alt="NIDHI — National Integrated Database of Hospitality Industry"
