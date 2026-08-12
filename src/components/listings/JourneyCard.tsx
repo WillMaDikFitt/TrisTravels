@@ -7,10 +7,49 @@ import { formatINR, cn } from "@/lib/utils";
 type Props = {
   journey: Journey;
   className?: string;
+  variant?: "horizontal" | "tile";
 };
 
-export function JourneyCard({ journey, className }: Props) {
+export function JourneyCard({ journey, className, variant = "horizontal" }: Props) {
   const isFixed = journey.type === "small-group";
+
+  if (variant === "tile") {
+    return (
+      <Link
+        href={`/journeys/${journey.slug}`}
+        className={cn(
+          "group relative block aspect-[4/5] overflow-hidden rounded-[1.5rem]",
+          className,
+        )}
+      >
+        <Image
+          src={journey.image}
+          alt={journey.name}
+          fill
+          className="object-cover transition duration-700 group-hover:scale-105"
+          sizes="25vw"
+          quality={75}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/15" />
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold tracking-[0.12em] text-on-accent uppercase">
+            {isFixed ? "Small group" : "Curated"}
+          </span>
+          <span className="rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold text-white uppercase backdrop-blur-sm">
+            {journey.days}D · {journey.nights}N
+          </span>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <h3 className="line-clamp-2 font-display text-lg leading-snug text-white">{journey.name}</h3>
+          <p className="mt-1 line-clamp-2 text-xs text-white/75">{journey.tagline}</p>
+          <div className="mt-3 flex items-end justify-between gap-2">
+            <p className="font-display text-base text-white">{formatINR(journey.priceFrom)}</p>
+            <span className="text-[9px] font-bold tracking-[0.12em] text-accent uppercase">View</span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -22,7 +61,7 @@ export function JourneyCard({ journey, className }: Props) {
         className,
       )}
     >
-      <div className="relative aspect-[16/11] md:aspect-auto md:min-h-[280px]">
+      <div className="relative aspect-[16/11] md:aspect-auto md:min-h-[240px]">
         <Image
           src={journey.image}
           alt={journey.name}
@@ -47,7 +86,7 @@ export function JourneyCard({ journey, className }: Props) {
         )}
       </div>
 
-      <div className="flex flex-col p-6 md:p-8">
+      <div className="flex flex-col p-6 md:p-7">
         <div className="flex min-h-[1.75rem] flex-wrap gap-1.5">
           {journey.style.slice(0, 3).map((s) => (
             <span
@@ -59,10 +98,10 @@ export function JourneyCard({ journey, className }: Props) {
           ))}
         </div>
 
-        <h3 className="mt-3 line-clamp-2 min-h-[3.5rem] font-display text-2xl leading-snug text-secondary transition group-hover:text-accent md:text-[1.65rem]">
+        <h3 className="mt-3 line-clamp-2 min-h-[3.25rem] font-display text-2xl leading-snug text-secondary transition group-hover:text-accent">
           {journey.name}
         </h3>
-        <p className="mt-2 line-clamp-2 min-h-[2.75rem] text-sm leading-relaxed text-on-surface-variant">
+        <p className="mt-2 line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-on-surface-variant">
           {journey.tagline}
         </p>
 

@@ -61,41 +61,41 @@ export function StoryCard({ story, featured, className }: Props) {
     <Link
       href={`/stories/${story.slug}`}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-surface-container-lowest transition duration-300",
+        "group flex h-full min-h-[22rem] flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest transition duration-300",
         "hover:-translate-y-1 hover:shadow-ambient",
         className,
       )}
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-[16/10] shrink-0 overflow-hidden">
         <Image
           src={story.image}
           alt={story.title}
           fill
           className="object-cover transition duration-700 group-hover:scale-105"
-          sizes="(max-width:768px) 100vw, 33vw"
+          sizes="25vw"
           quality={75}
         />
         <div className="absolute top-3 left-3 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-[0.12em] text-on-accent uppercase">
           {story.category}
         </div>
       </div>
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-4 md:p-5">
         <div className="ink-rule mb-3" />
-        <h3 className="font-display text-xl leading-snug text-secondary transition group-hover:text-accent">
+        <h3 className="line-clamp-2 min-h-[3rem] font-display text-lg leading-snug text-secondary transition group-hover:text-accent">
           {story.title}
         </h3>
-        <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-on-surface-variant">
+        <p className="mt-2 line-clamp-3 min-h-[4.25rem] flex-1 text-sm leading-relaxed text-on-surface-variant">
           {story.excerpt}
         </p>
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-outline-variant/20 pt-4 text-xs text-on-surface-variant">
-          <span>
+          <span className="line-clamp-1">
             {story.author}
             <span className="mx-1.5 text-outline-variant">·</span>
             {dateLabel}
           </span>
           <ArrowUpRight
             size={14}
-            className="text-accent transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="shrink-0 text-accent transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
         </div>
       </div>

@@ -14,7 +14,7 @@ export function DestinationCard({ destination, className }: Props) {
     <Link
       href={`/destinations/${destination.slug}`}
       className={cn(
-        "group relative block h-full min-h-[22rem] overflow-hidden rounded-[1.75rem] md:min-h-[26rem]",
+        "group relative block aspect-[4/5] overflow-hidden rounded-[1.5rem]",
         className,
       )}
     >
@@ -23,24 +23,26 @@ export function DestinationCard({ destination, className }: Props) {
         alt={destination.name}
         fill
         className="object-cover transition duration-700 group-hover:scale-105"
-        sizes="(max-width:768px) 100vw, 50vw"
+        sizes="25vw"
         quality={75}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
-      <p className="absolute top-4 left-4 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-[0.14em] text-on-accent uppercase">
+      <p className="absolute top-3 left-3 rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold tracking-[0.14em] text-on-accent uppercase">
         {destination.region}
       </p>
-      <div className="absolute inset-x-0 bottom-0 p-6">
-        <h3 className="font-display text-3xl leading-snug text-white">{destination.name}</h3>
-        <p className="mt-2 line-clamp-2 text-sm text-white/75">{destination.tagline}</p>
-        <div className="mt-5 flex items-center justify-between gap-3 text-xs text-white/70">
-          <p className="inline-flex items-center gap-1.5">
-            <Navigation size={13} />
-            {destination.distances.shillong} from Shillong
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
+        <h3 className="line-clamp-2 font-display text-xl leading-snug text-white md:text-2xl">
+          {destination.name}
+        </h3>
+        <p className="mt-1.5 line-clamp-2 text-xs text-white/75 md:text-sm">{destination.tagline}</p>
+        <div className="mt-4 flex items-center justify-between gap-2 text-[10px] text-white/70">
+          <p className="inline-flex items-center gap-1 line-clamp-1">
+            <Navigation size={11} />
+            {destination.distances.shillong}
           </p>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.12em] text-accent uppercase">
+          <span className="inline-flex shrink-0 items-center gap-1 text-[9px] font-bold tracking-[0.12em] text-accent uppercase">
             View
-            <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
           </span>
         </div>
       </div>

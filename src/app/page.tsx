@@ -188,26 +188,38 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="relative bg-surface py-16 md:py-24">
-        <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile md:grid-cols-12 md:gap-10 md:px-margin-desktop">
-          <div className="relative md:col-span-6 md:pb-8">
+      <section className="relative overflow-hidden bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
+        <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile md:grid-cols-12 md:gap-12 md:px-margin-desktop">
+          <div className="relative md:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
-              <Image src={media.aboutPortrait} alt="The heart behind TRIS" fill className="object-cover" sizes="50vw" />
+              <Image src={media.aboutPortrait} alt="The heart behind TRIS" fill className="object-cover" sizes="40vw" />
             </div>
-            <div className="absolute right-5 bottom-2 hidden h-40 w-32 overflow-hidden rounded-2xl border-4 border-[#f7f4ee] shadow-ambient md:block">
-              <Image src={media.heroMist} alt="" fill className="object-cover" sizes="160px" />
+            <div className="absolute -bottom-4 -right-4 hidden h-36 w-28 overflow-hidden rounded-2xl border-4 border-[#2a2e1f] shadow-ambient md:block">
+              <Image src={media.heroMist} alt="" fill className="object-cover" sizes="120px" />
             </div>
           </div>
-          <SlideIn from="right" className="md:col-span-6">
-            <div className="ink-rule" />
-            <p className="label-caps mt-4 text-accent">Our story</p>
-            <h2 className="mt-3 font-display text-3xl text-primary md:text-5xl">Named for Mei-ieid</h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              Grandmother. Born in Mairang. Generous, hard-working, unconditionally caring. Every
-              homestay, meal, and guide still carries that promise.
+          <SlideIn from="right" className="md:col-span-7">
+            <p className="label-caps text-accent">Our story</p>
+            <h2 className="mt-3 font-display text-3xl md:text-5xl">The heart behind TRIS</h2>
+            <blockquote className="mt-6 border-l-2 border-accent pl-5 font-serif text-xl leading-relaxed italic text-primary-fixed/90 md:text-2xl">
+              Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally caring.
+            </blockquote>
+            <p className="mt-6 text-base leading-relaxed text-primary-fixed/75 md:text-lg">
+              Born in Mairang, she didn’t speak the language of business. TRIS is a promise to carry her spirit
+              through every homestay, meal, guide, and journey we craft for you.
             </p>
-            <Button href="/about" className="mt-8">
-              The heart behind TRIS
+            <div className="mt-8 flex flex-wrap gap-2">
+              {["Community-first", "Slow travel", "Gives back"].map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold tracking-wide text-primary-fixed/80"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <Button href="/about" variant="light" className="mt-8">
+              Read our story
             </Button>
           </SlideIn>
         </div>
@@ -225,7 +237,7 @@ export default async function HomePage() {
               </Link>
             </div>
           </FadeIn>
-          <StaggerChildren className="mt-12 grid items-stretch gap-5 md:grid-cols-3">
+          <StaggerChildren className="mt-12 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {allStories.slice(0, 3).map((s) => (
               <StaggerItem key={s.slug} className="h-full">
                 <StoryCard story={s} />

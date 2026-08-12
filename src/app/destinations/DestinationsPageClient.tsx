@@ -114,7 +114,7 @@ export function DestinationsPageClient({ items }: { items: Destination[] }) {
       <section className="bg-surface px-margin-mobile py-10 md:px-margin-desktop md:py-14">
         <div className="mx-auto max-w-container-max">
           {filtered.length > 0 ? (
-            <StaggerChildren className="grid items-stretch gap-5 sm:grid-cols-2">
+            <StaggerChildren className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {filtered.map((d) => (
                 <StaggerItem key={d.slug} className="h-full">
                   <DestinationCard destination={d} />

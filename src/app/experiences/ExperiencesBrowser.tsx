@@ -141,7 +141,7 @@ export function ExperiencesBrowser({ experiences }: { experiences: Experience[] 
             {filtered.length} {filtered.length === 1 ? "experience" : "experiences"}
             {category ? ` · ${category}` : ""}
           </p>
-          <StaggerChildren className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerChildren className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filtered.map((exp) => (
               <StaggerItem key={exp.slug} className="h-full">
                 <ExperienceCard experience={exp} />

@@ -9,19 +9,16 @@ import { media } from "@/data/media";
 
 const stats = [
   {
-    n: "Curated",
-    title: "Experiences",
-    detail: "Choose from six immersive styles—adventure, nature, food, culture, wellness, and craft.",
+    title: "Curated experiences",
+    detail: "Six immersive styles—adventure, nature, food, culture, wellness, and craft.",
   },
   {
-    n: "Warm",
-    title: "Hospitality",
-    detail: "Experience shared meals, open homes, and genuine, heartfelt care.",
+    title: "Warm hospitality",
+    detail: "Shared meals, open homes, and genuine, heartfelt care.",
   },
   {
-    n: "Local",
-    title: "Khasi guides",
-    detail: "Enjoy community-led days instead of a generic tour.",
+    title: "Local Khasi guides",
+    detail: "Community-led days instead of a generic tour.",
   },
 ];
 
@@ -58,13 +55,10 @@ export function HomeHero() {
         <div className="relative z-10 w-full px-margin-mobile pt-[var(--header-offset)] pb-16 md:px-margin-desktop md:pb-20">
           <div className="mx-auto max-w-3xl text-center">
             <p className="label-caps mb-4 tracking-[0.22em] text-accent">TRIS · The unseen North East</p>
-            <h1 className="font-display text-5xl leading-[0.95] tracking-tight text-white text-shadow-subtle md:text-7xl lg:text-[5.25rem]">
-              Experience the unseen.
+            <h1 className="font-display text-5xl leading-[1.02] tracking-tight text-white text-shadow-subtle md:text-7xl lg:text-[5rem]">
+              Experience the unseen, travel your way with us.
             </h1>
-            <p className="mx-auto mt-5 max-w-md font-serif text-2xl text-white/90 italic md:text-3xl">
-              Travel your way, with us.
-            </p>
-            <p className="mx-auto mt-4 max-w-lg text-base text-white/80 md:text-lg">
+            <p className="mx-auto mt-5 max-w-lg text-base text-white/85 md:text-lg">
               Community-rooted days in Meghalaya — living bridges, kitchens, mist, and people who host
               like family.
             </p>
@@ -90,9 +84,8 @@ export function HomeHero() {
               key={s.title}
               className={`flex flex-col justify-center px-5 py-5 md:px-7 md:py-6 ${i > 0 ? "border-t border-[#e4dfd4] sm:border-t-0 sm:border-l" : ""}`}
             >
-              <p className="font-display text-2xl leading-none text-primary md:text-3xl">{s.n}</p>
-              <p className="mt-2 text-sm font-semibold text-secondary">{s.title}</p>
-              <p className="mt-1 text-xs leading-snug text-on-surface-variant md:text-sm">{s.detail}</p>
+              <p className="font-display text-xl leading-snug text-primary md:text-2xl">{s.title}</p>
+              <p className="mt-2 text-xs leading-snug text-on-surface-variant md:text-sm">{s.detail}</p>
             </div>
           ))}
         </div>

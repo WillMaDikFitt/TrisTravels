@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
-import { PageHero } from "@/components/motion/FullBleedParallax";
 import { CtaBand } from "@/components/ui/CtaBand";
-import { BreathSection } from "@/components/ui/BreathSection";
 import {
   FormCard,
   FormInput,
@@ -27,7 +26,7 @@ export default function ContactPage() {
       <div className="bg-background">
         <FormSuccess
           title="Message received"
-          body="Thanks for reaching out. In production this lands in the TRIS inbox — we’ll reply within one working day."
+          body="Thanks for reaching out. We’ll reply within one working day."
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button href="/experiences">Explore experiences</Button>
@@ -42,99 +41,97 @@ export default function ContactPage() {
 
   return (
     <div className="bg-background">
-      <PageHero
-        src={media.peaks}
-        alt="Contact TRIS"
-        compact
-        eyebrow="Contact"
-        title="We're here when you need us"
-        body="Questions before you book? Browse online first — or send a note and we’ll help you plan."
-        primaryCta={{ href: "#contact-form", label: "Send a message" }}
-        secondaryCta={{ href: "/craft-my-journey", label: "Craft a journey" }}
-      />
-
-      <BreathSection
-        size="sm"
-        eyebrow="Get in touch"
-        title="Say hello"
-        body="Use the form for planning notes. Prefer a quick chat? WhatsApp works for short questions."
-      />
+      <section className="border-b border-outline-variant/20 bg-surface pt-header">
+        <div className="mx-auto grid max-w-container-max md:grid-cols-2">
+          <div className="flex flex-col justify-center px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+            <p className="label-caps text-accent">Contact</p>
+            <h1 className="mt-3 font-display text-4xl text-primary md:text-5xl">Say hello</h1>
+            <p className="mt-4 max-w-md text-on-surface-variant">
+              Questions before you book? Send a note — or leave your number and we’ll WhatsApp back.
+            </p>
+            <Link
+              href="#contact-form"
+              className="mt-8 inline-flex h-10 items-center rounded-full bg-primary px-6 text-xs font-bold tracking-[0.12em] text-on-primary uppercase transition hover:bg-primary/90"
+            >
+              Send a message
+            </Link>
+          </div>
+          <div className="relative min-h-[280px] md:min-h-0">
+            <Image
+              src={media.peaks}
+              alt="Meghalaya hills"
+              fill
+              className="object-cover"
+              sizes="50vw"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/25" />
+          </div>
+        </div>
+      </section>
 
       <section
         id="contact-form"
-        className="scroll-mt-header mx-auto grid max-w-container-max gap-10 px-margin-mobile pb-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14 lg:px-margin-desktop lg:pb-24"
+        className="scroll-mt-header mx-auto grid max-w-container-max gap-10 px-margin-mobile py-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14 md:px-margin-desktop md:py-16"
       >
-        <FadeIn className="space-y-6">
-          <div className="relative aspect-[16/11] overflow-hidden rounded-3xl">
+        <FadeIn className="space-y-4">
+          {[
+            {
+              icon: Mail,
+              label: "Email",
+              value: "hello@trismeghalaya.com",
+              href: "mailto:hello@trismeghalaya.com",
+            },
+            {
+              icon: MessageCircle,
+              label: "WhatsApp",
+              value: "Leave your number — we’ll ping you back",
+            },
+            {
+              icon: Phone,
+              label: "Phone",
+              value: "Shared on confirmation",
+            },
+            {
+              icon: MapPin,
+              label: "Based in",
+              value: "Shillong · Meghalaya, India",
+            },
+          ].map(({ icon: Icon, label, value, href }) => {
+            const inner = (
+              <>
+                <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
+                <div>
+                  <p className="text-xs text-on-surface-variant">{label}</p>
+                  <p className="mt-0.5 font-medium text-primary">{value}</p>
+                </div>
+              </>
+            );
+            const className =
+              "flex gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-low p-4 transition hover:border-accent/40";
+            return href ? (
+              <a key={label} href={href} className={className}>
+                {inner}
+              </a>
+            ) : (
+              <div key={label} className={className}>
+                {inner}
+              </div>
+            );
+          })}
+          <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-2xl">
             <Image
               src={media.aboutPortrait}
               alt="TRIS Travels"
               fill
               className="object-cover"
-              sizes="50vw"
+              sizes="40vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <p className="absolute bottom-5 left-5 right-5 font-display text-2xl text-white">
-              Based in Meghalaya · Serving travellers worldwide
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            {[
-              {
-                icon: Mail,
-                label: "Email",
-                value: "hello@trismeghalaya.com",
-                href: "mailto:hello@trismeghalaya.com",
-              },
-              {
-                icon: MessageCircle,
-                label: "WhatsApp",
-                value: "Leave your number on the form — we’ll ping you back",
-                href: undefined,
-              },
-              {
-                icon: Phone,
-                label: "Phone",
-                value: "Shared on confirmation",
-                href: undefined,
-              },
-              {
-                icon: MapPin,
-                label: "Based in",
-                value: "Shillong · Meghalaya, India",
-                href: undefined,
-              },
-            ].map(({ icon: Icon, label, value, href }) => {
-              const inner = (
-                <>
-                  <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
-                  <div>
-                    <p className="text-xs text-on-surface-variant">{label}</p>
-                    <p className="mt-0.5 font-medium text-primary">{value}</p>
-                  </div>
-                </>
-              );
-              const className =
-                "flex gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-low p-4 transition hover:border-accent/40";
-              return href && href !== "/contact" ? (
-                <a key={label} href={href} className={className}>
-                  {inner}
-                </a>
-              ) : (
-                <div key={label} className={className}>
-                  {inner}
-                </div>
-              );
-            })}
           </div>
         </FadeIn>
 
         <FadeIn>
-          <FormCard
-            title="Send a message"
-            subtitle="Tell us what you need — booking help, trip ideas, or partnership questions."
-          >
+          <FormCard title="Send a message" subtitle="We typically reply within one working day.">
             <form
               className="space-y-5"
               onSubmit={async (e) => {
@@ -180,24 +177,19 @@ export default function ContactPage() {
               <FormInput
                 label="Subject"
                 name="subject"
-                placeholder="e.g. Help with Root Trails booking"
+                placeholder="e.g. Help with a booking"
               />
               <FormTextarea
                 label="How can we help?"
                 name="message"
                 required
-                rows={6}
+                rows={5}
                 placeholder="Dates, group size, questions…"
               />
               {error && <p className="text-sm text-primary">{error}</p>}
-              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-on-surface-variant">
-                  We typically reply within 1 working day.
-                </p>
-                <Button type="submit" size="lg" disabled={busy}>
-                  {busy ? "Sending…" : "Send message"}
-                </Button>
-              </div>
+              <Button type="submit" size="lg" disabled={busy}>
+                {busy ? "Sending…" : "Send message"}
+              </Button>
             </form>
           </FormCard>
         </FadeIn>

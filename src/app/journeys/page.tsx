@@ -20,75 +20,73 @@ export default async function JourneysPage({ searchParams }: Props) {
 
   return (
     <div className="bg-background">
-      <section className="grid min-h-[78vh] pt-header md:grid-cols-2">
-        <Link
-          href="/journeys?type=curated"
-          className={cn(
-            "group relative flex min-h-[44vh] flex-col justify-end overflow-hidden p-8 md:min-h-0 md:p-12",
-            focus === "small-group" && "md:opacity-60",
-          )}
-        >
-          <Image
-            src={media.packages}
-            alt="Curated journeys"
-            fill
-            className="object-cover transition duration-700 group-hover:scale-110"
-            sizes="(max-width:768px) 100vw, 50vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-          <div className="relative z-10 text-white">
-            <p className="font-serif text-4xl text-accent">01</p>
-            <p className="label-caps mt-2 text-accent">Enquire · flexible</p>
-            <h1 className="mt-3 font-display text-4xl md:text-6xl">Curated Journeys</h1>
-            <p className="mt-3 max-w-md text-white/80">
-              Multi-day packages you shape — dates, stays, pace. Not an instant checkout.
+      <section className="border-b border-outline-variant/20 bg-surface pt-header">
+        <div className="mx-auto grid max-w-container-max md:grid-cols-2">
+          <div className="flex flex-col justify-center px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+            <p className="label-caps text-accent">Journeys</p>
+            <h1 className="mt-3 font-display text-4xl text-primary md:text-5xl">
+              Multi-day routes, two ways
+            </h1>
+            <p className="mt-4 max-w-md text-on-surface-variant">
+              Curated packages you shape with a planner, or small-group departures with fixed dates.
             </p>
-            <span className="mt-5 inline-block text-xs font-bold tracking-widest text-accent uppercase">
-              View packages →
-            </span>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/journeys?type=curated"
+                className={cn(
+                  "rounded-full border px-5 py-2.5 text-sm font-semibold transition",
+                  focus === "curated" || !focus
+                    ? "border-primary bg-primary text-on-primary"
+                    : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
+                )}
+              >
+                Curated packages
+              </Link>
+              <Link
+                href="/journeys?type=small-group"
+                className={cn(
+                  "rounded-full border px-5 py-2.5 text-sm font-semibold transition",
+                  focus === "small-group"
+                    ? "border-primary bg-primary text-on-primary"
+                    : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
+                )}
+              >
+                Small group
+              </Link>
+              <Link
+                href="/craft-my-journey"
+                className="rounded-full border border-dashed border-outline-variant/50 px-5 py-2.5 text-sm font-semibold text-secondary transition hover:border-accent hover:text-accent"
+              >
+                Craft my journey
+              </Link>
+            </div>
           </div>
-        </Link>
-        <Link
-          href="/journeys?type=small-group"
-          className={cn(
-            "group relative flex min-h-[44vh] flex-col justify-end overflow-hidden p-8 md:min-h-0 md:p-12",
-            focus === "curated" && "md:opacity-60",
-          )}
-        >
-          <Image
-            src={media.departures}
-            alt="Small group journeys"
-            fill
-            className="object-cover transition duration-700 group-hover:scale-110"
-            sizes="(max-width:768px) 100vw, 50vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-          <div className="relative z-10 text-white">
-            <p className="font-serif text-4xl text-accent">02</p>
-            <p className="label-caps mt-2 text-accent">Join a departure</p>
-            <h2 className="mt-3 font-display text-4xl md:text-6xl">Small Group</h2>
-            <p className="mt-3 max-w-md text-white/80">
-              Scheduled dates. Shared energy. Show up with your curiosity.
-            </p>
-            <span className="mt-5 inline-block text-xs font-bold tracking-widest text-accent uppercase">
-              See departures →
-            </span>
+          <div className="relative min-h-[280px] md:min-h-0">
+            <Image
+              src={media.packages}
+              alt="Journeys through Meghalaya"
+              fill
+              className="object-cover"
+              sizes="50vw"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-black/10 to-black/30" />
           </div>
-        </Link>
+        </div>
       </section>
 
       {(!focus || focus === "small-group") && (
-        <section id="journeys" className="scroll-mt-header bg-surface py-14 md:py-20">
+        <section id="journeys" className="scroll-mt-header bg-surface py-12 md:py-16">
           <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
             <div className="ink-rule" />
             <p className="label-caps mt-4 text-accent">Small group</p>
-            <h2 className="mt-2 font-display text-3xl text-secondary md:text-5xl">Fixed departures</h2>
-            <p className="mt-2 max-w-xl text-on-surface-variant">
+            <h2 className="mt-2 font-display text-3xl text-secondary md:text-4xl">Fixed departures</h2>
+            <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
               Dates are set. Groups stay small. Enquire to hold a seat.
             </p>
-            <div className="mt-10 grid gap-6">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {small.map((j) => (
-                <JourneyCard key={j.slug} journey={j} />
+                <JourneyCard key={j.slug} journey={j} variant="tile" />
               ))}
             </div>
           </div>
@@ -96,17 +94,17 @@ export default async function JourneysPage({ searchParams }: Props) {
       )}
 
       {(!focus || focus === "curated") && (
-        <section className="bg-surface-container-low py-14 md:py-20">
+        <section className="bg-surface-container-low py-12 md:py-16">
           <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
             <div className="ink-rule" />
             <p className="label-caps mt-4 text-accent">Curated</p>
-            <h2 className="mt-2 font-display text-3xl text-secondary md:text-5xl">Customizable packages</h2>
-            <p className="mt-2 max-w-xl text-on-surface-variant">
+            <h2 className="mt-2 font-display text-3xl text-secondary md:text-4xl">Customizable packages</h2>
+            <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
               Itineraries with flexible choices — prices typically based on a group of 4.
             </p>
-            <div className="mt-10 grid gap-6">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {curated.map((j) => (
-                <JourneyCard key={j.slug} journey={j} />
+                <JourneyCard key={j.slug} journey={j} variant="tile" />
               ))}
             </div>
           </div>
@@ -116,7 +114,7 @@ export default async function JourneysPage({ searchParams }: Props) {
       <CtaBand
         eyebrow="Neither quite fits?"
         title="Craft my journey"
-        body="Three short steps. We design a route around your dates, pace, and curiosities."
+        body="Send a short brief — dates, guests, and what draws you. We’ll design the route."
         primary={{ href: "/craft-my-journey", label: "Start a brief" }}
         secondary={{ href: "/experiences", label: "Browse days" }}
       />

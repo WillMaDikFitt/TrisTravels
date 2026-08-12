@@ -9,23 +9,36 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { TRIS_LOGO_ON_DARK, TRIS_LOGO_ON_LIGHT } from "@/components/brand/BrandLogo";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
+import { media } from "@/data/media";
 import { useAuth } from "@/components/auth/AuthProvider";
+
+const typeVisuals: Record<string, string> = {
+  adventure: media.heroRoots,
+  "nature-wildlife": media.familyWaterfall,
+  "culture-heritage": media.valueCommunity,
+  "food-local-life": media.kitchen,
+  wellness: media.heroMist,
+  creative: media.craft,
+};
 
 const journeyCols = [
   {
     href: "/journeys?type=curated",
     title: "Curated Journeys",
     body: "Flexible multi-day packages — shape dates and stays.",
+    image: media.packages,
   },
   {
     href: "/journeys?type=small-group",
     title: "Small Group",
     body: "Fixed departures. Show up and travel with others.",
+    image: media.departures,
   },
   {
     href: "/craft-my-journey",
     title: "Craft My Journey",
     body: "A brief to our planners — entirely around you.",
+    image: media.heroMist,
   },
 ];
 
@@ -40,14 +53,45 @@ const aboutLinks = [
   { href: "/contact", title: "Contact", body: "Plan, ask, or say hello." },
 ];
 
-function MegaCard({ href, title, body }: { href: string; title: string; body: string }) {
+function MegaCard({
+  href,
+  title,
+  body,
+  image,
+  index,
+}: {
+  href: string;
+  title: string;
+  body: string;
+  image?: string;
+  index?: number;
+}) {
   return (
     <Link
       href={href}
-      className="rounded-2xl bg-white px-5 py-4 ring-1 ring-[#e4dfd4] transition hover:ring-accent/40"
+      className="group relative overflow-hidden rounded-2xl bg-white px-5 py-4 ring-1 ring-[#e4dfd4] transition hover:-translate-y-0.5 hover:ring-accent/50 hover:shadow-[0_12px_32px_rgba(42,46,31,0.08)]"
     >
-      <p className="font-display text-lg text-secondary">{title}</p>
-      <p className="mt-1.5 text-sm text-on-surface-variant">{body}</p>
+      {image ? (
+        <div className="pointer-events-none absolute inset-0">
+          <Image
+            src={image}
+            alt=""
+            fill
+            className="object-cover opacity-[0.12] transition duration-500 group-hover:opacity-25"
+            sizes="200px"
+          />
+        </div>
+      ) : null}
+      <div className="relative z-10">
+        {index !== undefined ? (
+          <span className="font-serif text-sm text-accent/80">{String(index + 1).padStart(2, "0")}</span>
+        ) : null}
+        <p className="font-display text-lg text-secondary transition group-hover:text-primary">{title}</p>
+        <p className="mt-1.5 text-sm text-on-surface-variant">{body}</p>
+        <span className="mt-3 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase opacity-0 transition group-hover:opacity-100">
+          Explore <ArrowRight size={12} />
+        </span>
+      </div>
     </Link>
   );
 }
@@ -205,12 +249,14 @@ export function Header() {
                     </Link>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    {EXPERIENCE_CATEGORIES.map((c) => (
+                    {EXPERIENCE_CATEGORIES.map((c, i) => (
                       <MegaCard
                         key={c.id}
                         href={`/experiences?type=${c.slug}`}
                         title={c.id}
                         body={c.blurb}
+                        image={typeVisuals[c.slug]}
+                        index={i}
                       />
                     ))}
                   </div>
@@ -218,22 +264,36 @@ export function Header() {
               )}
               {mega === "journeys" && (
                 <div className="grid grid-cols-3 gap-3">
-                  {journeyCols.map((c) => (
-                    <MegaCard key={c.href} href={c.href} title={c.title} body={c.body} />
+                  {journeyCols.map((c, i) => (
+                    <MegaCard key={c.href} href={c.href} title={c.title} body={c.body} image={c.image} index={i} />
                   ))}
                 </div>
               )}
               {mega === "discover" && (
                 <div className="grid max-w-3xl grid-cols-2 gap-3">
-                  {discoverLinks.map((c) => (
-                    <MegaCard key={c.href} href={c.href} title={c.title} body={c.body} />
+                  {discoverLinks.map((c, i) => (
+                    <MegaCard
+                      key={c.href}
+                      href={c.href}
+                      title={c.title}
+                      body={c.body}
+                      image={i === 0 ? media.mountains : media.rain}
+                      index={i}
+                    />
                   ))}
                 </div>
               )}
               {mega === "about" && (
                 <div className="grid grid-cols-3 gap-3">
-                  {aboutLinks.map((c) => (
-                    <MegaCard key={c.href} href={c.href} title={c.title} body={c.body} />
+                  {aboutLinks.map((c, i) => (
+                    <MegaCard
+                      key={c.href}
+                      href={c.href}
+                      title={c.title}
+                      body={c.body}
+                      image={i === 0 ? media.aboutPortrait : i === 1 ? media.craft : media.peaks}
+                      index={i}
+                    />
                   ))}
                 </div>
               )}
