@@ -7,16 +7,21 @@ import { isFirebaseAdminConfigured } from "./config";
 
 function initAdmin() {
   if (!isFirebaseAdminConfigured()) return null;
-  if (!getApps().length) {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      }),
-    });
+  try {
+    if (!getApps().length) {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        }),
+      });
+    }
+    return getApps()[0] ?? null;
+  } catch (err) {
+    console.error("Firebase admin init failed:", err);
+    return null;
   }
-  return getApps()[0] ?? null;
 }
 
 export function getAdminAuth() {

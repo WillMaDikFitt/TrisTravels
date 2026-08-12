@@ -64,10 +64,12 @@ export default function ExperienceEditorPage() {
 
   useEffect(() => {
     if (isNew) return;
-    fetchExperiencesAdmin().then((list) => {
-      const found = list.find((e) => e.slug === slug);
-      setRow(found ?? blank(slug));
-    });
+    fetchExperiencesAdmin()
+      .then((list) => {
+        const found = list.find((e) => e.slug === slug);
+        setRow(found ?? blank(slug));
+      })
+      .catch(() => setRow(blank(slug)));
   }, [isNew, slug]);
 
   if (!row) {

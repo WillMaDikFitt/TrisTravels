@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { fetchStudioHealth } from "@/lib/actions/studio-health";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -64,6 +65,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const { loading, isAdmin, configured, profile, logout, user } = useAuth();
+  const [health, setHealth] = useState<{ adminConfigured: boolean; adminConnected: boolean } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    fetchStudioHealth().then(setHealth);
+  }, []);
 
   useEffect(() => {
     if (loading || !configured) return;
@@ -195,6 +203,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {!configured && (
           <p className="mx-4 mt-4 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 md:mx-8">
             Studio is in preview mode — edits won’t be saved permanently until the site is fully connected.
+          </p>
+        )}
+        {configured && health && !health.adminConfigured && (
+          <p className="mx-4 mt-4 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 md:mx-8">
+            Saves won’t stick yet — add the Firebase admin keys in Vercel (project ID, client email, private key),
+            then redeploy.
           </p>
         )}
         <div className="p-4 md:p-8">{children}</div>

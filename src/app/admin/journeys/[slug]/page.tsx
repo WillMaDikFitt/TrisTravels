@@ -48,7 +48,9 @@ export default function JourneyEditorPage() {
 
   useEffect(() => {
     if (isNew) return;
-    fetchJourneysAdmin().then((list) => setRow(list.find((j) => j.slug === slug) ?? blank()));
+    fetchJourneysAdmin()
+      .then((list) => setRow(list.find((j) => j.slug === slug) ?? blank()))
+      .catch(() => setRow(blank()));
   }, [isNew, slug]);
 
   if (!row) return <p className="text-sm text-[#5c6350]">Loading editor…</p>;

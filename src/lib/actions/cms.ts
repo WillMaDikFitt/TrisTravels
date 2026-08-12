@@ -10,15 +10,25 @@ const SAVE_UNAVAILABLE = "Saving isn’t available right now";
 export async function saveDocument(collection: string, id: string, data: Record<string, unknown>) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };
-  await db.collection(collection).doc(id).set({ ...data, slug: id }, { merge: true });
-  return { ok: true as const };
+  try {
+    await db.collection(collection).doc(id).set({ ...data, slug: id }, { merge: true });
+    return { ok: true as const };
+  } catch (err) {
+    console.error("saveDocument failed:", err);
+    return { ok: false as const, error: "Could not save. Check Firebase admin keys on the server." };
+  }
 }
 
 export async function deleteDocument(collection: string, id: string) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };
-  await db.collection(collection).doc(id).delete();
-  return { ok: true as const };
+  try {
+    await db.collection(collection).doc(id).delete();
+    return { ok: true as const };
+  } catch (err) {
+    console.error("deleteDocument failed:", err);
+    return { ok: false as const, error: "Could not delete. Check Firebase admin keys on the server." };
+  }
 }
 
 export async function saveSettings(settings: PlatformSettings) {

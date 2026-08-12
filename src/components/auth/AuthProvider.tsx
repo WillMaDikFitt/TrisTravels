@@ -78,9 +78,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return onAuthStateChanged(auth, async (next) => {
       setUser(next);
-      if (next) setProfile(await ensureProfile(next));
-      else setProfile(null);
-      setLoading(false);
+      try {
+        if (next) setProfile(await ensureProfile(next));
+        else setProfile(null);
+      } catch {
+        if (next) {
+          setProfile({
+            uid: next.uid,
+            email: next.email ?? "",
+            name: next.displayName ?? "Traveller",
+            role: "traveller",
+            wishlist: [],
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          setProfile(null);
+        }
+      } finally {
+        setLoading(false);
+      }
     });
   }, []);
 

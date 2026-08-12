@@ -10,8 +10,13 @@ import { memoryStore } from "@/lib/store";
 async function collectionDocs<T>(name: string): Promise<T[] | null> {
   const db = getAdminDb();
   if (!db) return null;
-  const snap = await db.collection(name).get();
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as T);
+  try {
+    const snap = await db.collection(name).get();
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as T);
+  } catch (err) {
+    console.error(`Firestore read failed (${name}):`, err);
+    return null;
+  }
 }
 
 export async function listExperiences(): Promise<Experience[]> {
