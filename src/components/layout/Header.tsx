@@ -11,7 +11,13 @@ import { TRIS_LOGO_ON_DARK, TRIS_LOGO_ON_LIGHT } from "@/components/brand/BrandL
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { useAuth } from "@/components/auth/AuthProvider";
 
-const journeyCols = [
+const journeyCols: {
+  href: string;
+  title: string;
+  body: string;
+  tag: string;
+  featured?: boolean;
+}[] = [
   {
     href: "/journeys?type=curated",
     title: "Curated Journeys",
@@ -29,6 +35,7 @@ const journeyCols = [
     title: "Craft My Journey",
     body: "A brief to our planners — entirely around you.",
     tag: "Personal",
+    featured: true,
   },
 ];
 
@@ -235,26 +242,49 @@ export function Header() {
               )}
 
               {mega === "journeys" && (
-                <div className="flex overflow-hidden rounded-2xl border border-white/10 bg-[#323628]">
-                  {journeyCols.map((c, i) => (
-                    <Link
-                      key={c.href}
-                      href={c.href}
-                      className={cn(
-                        "group flex-1 p-6 transition hover:bg-[#3a4030]",
-                        i > 0 && "border-l border-white/10",
-                      )}
-                    >
-                      <span className="label-caps text-accent">{c.tag}</span>
-                      <p className="mt-3 font-display text-2xl text-primary-fixed group-hover:text-accent">
-                        {c.title}
-                      </p>
-                      <p className="mt-2 text-sm text-primary-fixed/70">{c.body}</p>
-                      <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
-                        Explore <ArrowRight size={12} />
-                      </span>
-                    </Link>
-                  ))}
+                <div className="grid grid-cols-12 gap-4">
+                  <div className="col-span-12 flex flex-col gap-4 lg:col-span-7">
+                    {journeyCols
+                      .filter((c) => !c.featured)
+                      .map((c) => (
+                        <Link
+                          key={c.href}
+                          href={c.href}
+                          className="group rounded-2xl border border-white/10 bg-[#323628] p-6 transition hover:bg-[#3a4030]"
+                        >
+                          <span className="label-caps text-accent">{c.tag}</span>
+                          <p className="mt-3 font-display text-2xl text-primary-fixed group-hover:text-accent">
+                            {c.title}
+                          </p>
+                          <p className="mt-2 text-sm text-primary-fixed/70">{c.body}</p>
+                          <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
+                            Explore <ArrowRight size={12} />
+                          </span>
+                        </Link>
+                      ))}
+                  </div>
+                  {journeyCols
+                    .filter((c) => c.featured)
+                    .map((c) => (
+                      <Link
+                        key={c.href}
+                        href={c.href}
+                        className="group col-span-12 flex flex-col justify-between rounded-2xl border-2 border-accent bg-accent/15 p-8 transition hover:bg-accent/25 lg:col-span-5"
+                      >
+                        <div>
+                          <span className="inline-flex rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-on-accent uppercase">
+                            {c.tag} · recommended
+                          </span>
+                          <p className="mt-4 font-display text-3xl text-primary-fixed group-hover:text-accent">
+                            {c.title}
+                          </p>
+                          <p className="mt-3 text-sm leading-relaxed text-primary-fixed/80">{c.body}</p>
+                        </div>
+                        <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-accent uppercase">
+                          Start your brief <ArrowRight size={14} />
+                        </span>
+                      </Link>
+                    ))}
                 </div>
               )}
 
