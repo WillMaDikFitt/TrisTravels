@@ -78,16 +78,20 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const solid = scrolled || !isHome || open || Boolean(mega);
+  const megaOpen = Boolean(mega);
+  const solid = scrolled || !isHome || open || megaOpen;
+  const darkNav = megaOpen && !open;
 
   return (
     <header className="fixed top-0 z-50 w-full" onMouseLeave={() => setMega(null)}>
       <div
         className={cn(
           "transition-[background-color,border-color,box-shadow] duration-300",
-          solid
-            ? "bg-surface-container-lowest border-b border-outline-variant/25 shadow-sm"
-            : "bg-transparent",
+          darkNav
+            ? "bg-[#2a2e1f] border-b border-white/10"
+            : solid
+              ? "bg-surface-container-lowest border-b border-outline-variant/25 shadow-sm"
+              : "bg-transparent",
         )}
       >
         <div className="mx-auto grid h-16 max-w-container-max grid-cols-[1fr_auto_1fr] items-center px-margin-mobile md:h-20 md:px-margin-desktop">
@@ -97,7 +101,7 @@ export function Header() {
             aria-label="TRIS Travels home"
           >
             <Image
-              src={solid ? TRIS_LOGO_ON_LIGHT : TRIS_LOGO_ON_DARK}
+              src={darkNav || !solid ? TRIS_LOGO_ON_DARK : TRIS_LOGO_ON_LIGHT}
               alt="TRIS Travels"
               width={72}
               height={72}
@@ -105,7 +109,7 @@ export function Header() {
               unoptimized
               className={cn(
                 "h-12 w-12 object-contain transition md:h-14 md:w-14",
-                !solid && "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]",
+                !solid && !darkNav && "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]",
               )}
             />
           </Link>
@@ -136,12 +140,10 @@ export function Header() {
                     className={cn(
                       "label-caps inline-flex items-center gap-1 border-b-2 px-3 pb-1 transition-colors",
                       active || mega === key
-                        ? solid
-                          ? "border-accent text-accent"
-                          : "border-white text-white"
-                        : solid
-                          ? "border-transparent text-on-surface-variant hover:text-primary"
-                          : "border-transparent text-white/75 hover:text-white",
+                        ? "border-accent text-accent"
+                        : darkNav || !solid
+                          ? "border-transparent text-white/75 hover:text-white"
+                          : "border-transparent text-on-surface-variant hover:text-primary",
                     )}
                   >
                     {label}
@@ -156,11 +158,11 @@ export function Header() {
             {user ? (
               <div className="hidden items-center gap-2 md:flex">
                 {isAdmin && (
-                  <Button href="/admin" size="sm" variant={solid ? "ghost" : "light"}>
+                  <Button href="/admin" size="sm" variant={darkNav || !solid ? "light" : "ghost"}>
                     Studio
                   </Button>
                 )}
-                <Button href="/account" size="sm" variant={solid ? "primary" : "light"}>
+                <Button href="/account" size="sm" variant={darkNav || !solid ? "light" : "primary"}>
                   {profile?.name?.split(" ")[0] || "Account"}
                 </Button>
               </div>
@@ -168,7 +170,7 @@ export function Header() {
               <Button
                 href="/login"
                 size="sm"
-                variant={solid ? "primary" : "light"}
+                variant={darkNav || !solid ? "light" : "primary"}
                 className="hidden md:inline-flex"
               >
                 Log in / Sign up
@@ -178,7 +180,7 @@ export function Header() {
               type="button"
               className={cn(
                 "rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:ring-primary lg:hidden",
-                solid ? "text-primary" : "text-white",
+                darkNav || !solid ? "text-white" : "text-primary",
               )}
               aria-label={open ? "Close menu" : "Menu"}
               aria-expanded={open}
@@ -190,7 +192,7 @@ export function Header() {
         </div>
 
         {mega && (
-          <div className="hidden border-t border-white/10 bg-[#2a2e1f] text-primary-fixed lg:block">
+          <div className="hidden bg-[#2a2e1f] text-primary-fixed lg:block">
             <div className="mx-auto max-w-container-max px-margin-desktop py-7">
               {mega === "experiences" && (
                 <div>

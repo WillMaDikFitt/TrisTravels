@@ -47,7 +47,12 @@ export function Footer() {
             </p>
             <div className="mt-8">
               <p className="label-caps text-accent">Proudly recognized by</p>
-              <RecognitionLogos compact className="mt-4 justify-start" />
+              <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                <RecognitionLogos compact className="justify-start" />
+                <p className="shrink-0 text-sm text-on-surface-variant/60 sm:text-right">
+                  © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -67,12 +72,6 @@ export function Footer() {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="mt-12 border-t border-outline-variant/20 pt-6 text-right">
-          <p className="text-sm text-on-surface-variant/60">
-            © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>
