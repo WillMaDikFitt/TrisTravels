@@ -172,12 +172,12 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="relative overflow-hidden bg-primary-container py-24 text-primary-fixed md:py-32">
+      <section className="relative overflow-hidden bg-primary-container py-24 text-center text-primary-fixed md:py-32">
         <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <span className="pointer-events-none absolute -top-6 left-0 font-serif text-[7rem] leading-none text-accent/35 md:-top-10 md:text-[10rem]">
+          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[7rem] leading-none text-accent/35 md:-top-10 md:text-[10rem]">
             “
           </span>
-          <FadeIn className="relative max-w-3xl pt-10 md:pt-14">
+          <FadeIn className="relative mx-auto max-w-3xl pt-10 md:pt-14">
             <p className="label-caps text-accent">Guest highlight</p>
             <blockquote className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
               Wholesome service from planning to the end of the trip. Recommend TRIS to anyone new to
