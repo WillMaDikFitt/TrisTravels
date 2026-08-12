@@ -1,16 +1,45 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/Button";
 import { FormCard, FormInput } from "@/components/ui/Form";
+import { GoogleIcon } from "@/components/auth/GoogleIcon";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { media } from "@/data/media";
+import { cn } from "@/lib/utils";
 
 function safeNext(raw: string | null) {
   if (raw && raw.startsWith("/") && !raw.startsWith("//")) return raw;
   return "/account";
+}
+
+function GoogleButton({
+  disabled,
+  busy,
+  onClick,
+}: {
+  disabled?: boolean;
+  busy?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled || busy}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-outline-variant/35 bg-white px-4 text-sm font-semibold text-[#3c4043] shadow-sm transition",
+        "hover:bg-[#f8f9fa] hover:shadow disabled:cursor-not-allowed disabled:opacity-50",
+      )}
+    >
+      <GoogleIcon className="h-5 w-5 shrink-0" />
+      Continue with Google
+    </button>
+  );
 }
 
 function SignupForm() {
@@ -23,72 +52,133 @@ function SignupForm() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError("");
+    try {
+      await fn();
+      router.push(dest);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not sign up");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="bg-background pt-header">
-      <div className="mx-auto max-w-md px-margin-mobile py-16 md:py-24">
-        <FormCard title="Create account" subtitle="Traveller accounts — wishlist, bookings, and enquiries.">
-          {!configured && (
-            <p className="mb-4 rounded-xl bg-primary/10 px-4 py-3 text-sm text-secondary">
-              Sign-up isn’t available right now. Please try again later.
-            </p>
-          )}
-          <form
-            className="space-y-4"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              setError("");
-              try {
-                await signUp(name, email, password);
-                router.push(dest);
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "Could not sign up");
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <FormInput label="Full name" name="name" value={name} onChange={setName} required />
-            <FormInput label="Email" name="email" type="email" value={email} onChange={setEmail} required />
-            <FormInput
-              label="Password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={setPassword}
-              required
-            />
-            {error && <p className="text-sm text-primary">{error}</p>}
-            <Button type="submit" className="w-full" disabled={busy || !configured}>
-              {busy ? "Creating…" : "Sign up"}
-            </Button>
-          </form>
-          <Button
-            variant="ghost"
-            className="mt-3 w-full"
-            disabled={!configured}
-            onClick={async () => {
-              try {
-                await signInGoogle();
-                router.push(dest);
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "Google sign-in failed");
-              }
-            }}
-          >
-            Continue with Google
-          </Button>
-          <p className="mt-6 text-center text-sm text-on-surface-variant">
-            Already have an account?{" "}
-            <Link
-              href={dest !== "/account" ? `/login?next=${encodeURIComponent(dest)}` : "/login"}
-              className="text-primary underline-offset-2 hover:underline"
-            >
-              Log in
-            </Link>
-          </p>
+      <section className="mx-auto max-w-container-max px-margin-mobile py-10 md:px-margin-desktop md:py-14 lg:py-16">
+        <FormCard className="overflow-hidden p-0 md:p-0">
+          <div className="grid md:grid-cols-[0.9fr_1.1fr] lg:grid-cols-[1fr_1.15fr]">
+            <div className="relative min-h-[200px] md:min-h-full">
+              <Image
+                src={media.familyWaterfall}
+                alt="Travellers in Meghalaya"
+                fill
+                className="object-cover"
+                sizes="(max-width:768px) 100vw, 45vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/25" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8 lg:p-10">
+                <p className="label-caps text-accent">Join TRIS</p>
+                <p className="mt-2 font-display text-2xl leading-snug md:text-3xl">
+                  Wishlist, bookings, and enquiries — all in one place.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-center p-6 sm:p-8 md:p-8 lg:p-10">
+              <div className="mb-6 border-b border-outline-variant/20 pb-5">
+                <h1 className="font-display text-2xl text-primary md:text-3xl">Create account</h1>
+                <p className="mt-2 text-sm text-on-surface-variant">
+                  Traveller accounts for wishlists, bookings, and enquiries.
+                </p>
+              </div>
+
+              {!configured && (
+                <p className="mb-4 rounded-xl bg-primary/10 px-4 py-3 text-sm text-secondary">
+                  Sign-up isn&apos;t available right now. Please try again later.
+                </p>
+              )}
+
+              <GoogleButton
+                disabled={!configured}
+                busy={busy}
+                onClick={() => run(() => signInGoogle())}
+              />
+
+              <div className="my-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-outline-variant/30" />
+                <span className="text-xs font-medium tracking-wide text-on-surface-variant uppercase">
+                  or email
+                </span>
+                <div className="h-px flex-1 bg-outline-variant/30" />
+              </div>
+
+              <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  run(() => signUp(name, email, password));
+                }}
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormInput
+                    label="Full name"
+                    name="name"
+                    value={name}
+                    onChange={setName}
+                    required
+                    autoComplete="name"
+                    className="sm:col-span-2"
+                  />
+                  <FormInput
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    required
+                    autoComplete="email"
+                  />
+                  <FormInput
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={setPassword}
+                    required
+                    autoComplete="new-password"
+                  />
+                </div>
+                {error && <p className="text-sm text-primary">{error}</p>}
+                <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-on-surface-variant">
+                    Already have an account?{" "}
+                    <Link
+                      href={
+                        dest !== "/account" ? `/login?next=${encodeURIComponent(dest)}` : "/login"
+                      }
+                      className="font-medium text-primary underline-offset-2 hover:underline"
+                    >
+                      Log in
+                    </Link>
+                  </p>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    disabled={busy || !configured}
+                  >
+                    {busy ? "Creating…" : "Sign up"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
         </FormCard>
-      </div>
+      </section>
     </div>
   );
 }

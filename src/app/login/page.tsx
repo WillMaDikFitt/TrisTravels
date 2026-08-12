@@ -67,28 +67,33 @@ function LoginForm() {
 
   return (
     <div className="bg-background pt-header">
-      <div className="mx-auto grid min-h-[calc(100vh-var(--header-offset))] max-w-container-max lg:grid-cols-2">
-        <div className="relative hidden min-h-[420px] lg:block">
-          <Image
-            src={media.heroMist}
-            alt="Meghalaya mist and hills"
-            fill
-            className="object-cover"
-            sizes="50vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-black/20" />
-          <div className="absolute inset-x-0 bottom-0 p-10 text-white">
-            <p className="label-caps text-accent">Your TRIS account</p>
-            <p className="mt-3 font-display text-3xl leading-snug">
-              Save wishlists, track bookings, and pick up enquiries.
-            </p>
-          </div>
-        </div>
+      <section className="mx-auto max-w-container-max px-margin-mobile py-10 md:px-margin-desktop md:py-14 lg:py-16">
+        <FormCard className="overflow-hidden p-0 md:p-0">
+          <div className="grid md:grid-cols-[0.9fr_1.1fr] lg:grid-cols-[1fr_1.15fr]">
+            <div className="relative min-h-[200px] md:min-h-full">
+              <Image
+                src={media.heroMist}
+                alt="Meghalaya mist and hills"
+                fill
+                className="object-cover"
+                sizes="(max-width:768px) 100vw, 45vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/25" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8 lg:p-10">
+                <p className="label-caps text-accent">Your TRIS account</p>
+                <p className="mt-2 font-display text-2xl leading-snug md:text-3xl">
+                  Save wishlists, track bookings, and pick up enquiries.
+                </p>
+              </div>
+            </div>
 
-        <div className="flex items-center px-margin-mobile py-14 md:px-margin-desktop md:py-20">
-          <div className="mx-auto w-full max-w-md">
-            <FormCard title="Log in" subtitle="Welcome back.">
+            <div className="flex flex-col justify-center p-6 sm:p-8 md:p-8 lg:p-10">
+              <div className="mb-6 border-b border-outline-variant/20 pb-5">
+                <h1 className="font-display text-2xl text-primary md:text-3xl">Log in</h1>
+                <p className="mt-2 text-sm text-on-surface-variant">Welcome back.</p>
+              </div>
+
               {!configured && (
                 <p className="mb-4 rounded-xl bg-primary/10 px-4 py-3 text-sm text-secondary">
                   Accounts aren&apos;t available right now. Please try again later.
@@ -101,7 +106,7 @@ function LoginForm() {
                 onClick={() => run(() => signInGoogle())}
               />
 
-              <div className="my-6 flex items-center gap-3">
+              <div className="my-5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-outline-variant/30" />
                 <span className="text-xs font-medium tracking-wide text-on-surface-variant uppercase">
                   or email
@@ -116,43 +121,53 @@ function LoginForm() {
                   run(() => signIn(email, password));
                 }}
               >
-                <FormInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={setEmail}
-                  required
-                  autoComplete="email"
-                />
-                <FormInput
-                  label="Password"
-                  name="password"
-                  type="password"
-                  value={password}
-                  onChange={setPassword}
-                  required
-                  autoComplete="current-password"
-                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormInput
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    required
+                    autoComplete="email"
+                  />
+                  <FormInput
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={setPassword}
+                    required
+                    autoComplete="current-password"
+                  />
+                </div>
                 {error && <p className="text-sm text-primary">{error}</p>}
-                <Button type="submit" className="w-full" size="lg" disabled={busy || !configured}>
-                  {busy ? "Signing in…" : "Log in"}
-                </Button>
+                <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-on-surface-variant">
+                    New here?{" "}
+                    <Link
+                      href={
+                        dest !== "/account" ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"
+                      }
+                      className="font-medium text-primary underline-offset-2 hover:underline"
+                    >
+                      Create an account
+                    </Link>
+                  </p>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    disabled={busy || !configured}
+                  >
+                    {busy ? "Signing in…" : "Log in"}
+                  </Button>
+                </div>
               </form>
-
-              <p className="mt-8 text-center text-sm text-on-surface-variant">
-                New here?{" "}
-                <Link
-                  href={dest !== "/account" ? `/signup?next=${encodeURIComponent(dest)}` : "/signup"}
-                  className="font-medium text-primary underline-offset-2 hover:underline"
-                >
-                  Create an account
-                </Link>
-              </p>
-            </FormCard>
+            </div>
           </div>
-        </div>
-      </div>
+        </FormCard>
+      </section>
     </div>
   );
 }
