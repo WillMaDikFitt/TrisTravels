@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Journey } from "@/data/journeys";
+import { getJourney as getStaticJourney } from "@/data/journeys";
 import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
@@ -39,19 +40,38 @@ const lines = (v: string) =>
     .filter(Boolean);
 
 export default function JourneyEditorPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams<{ slug: string }>();
+  const slugKey = decodeURIComponent(String(params.slug ?? ""));
   const router = useRouter();
-  const isNew = slug === "new";
-  const [row, setRow] = useState<Journey | null>(isNew ? blank() : null);
+  const isNew = slugKey === "new";
+  const [row, setRow] = useState<Journey | null>(() => {
+    if (isNew) return blank();
+    return getStaticJourney(slugKey) ?? null;
+  });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (isNew) return;
-    fetchJourneyAdmin(slug)
-      .then((j) => setRow(j ?? blank()))
-      .catch(() => setRow(blank()));
-  }, [isNew, slug]);
+    const seeded = getStaticJourney(slugKey);
+    let cancelled = false;
+
+    fetchJourneyAdmin(slugKey)
+      .then((j) => {
+        if (cancelled) return;
+        if (j?.name?.trim()) setRow(j);
+        else if (seeded) setRow(seeded);
+        else if (j) setRow(j);
+        else setRow(blank());
+      })
+      .catch(() => {
+        if (!cancelled) setRow(seeded ?? blank());
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isNew, slugKey]);
 
   if (!row) return <p className="text-sm text-[#5c6350]">Loading editor…</p>;
 

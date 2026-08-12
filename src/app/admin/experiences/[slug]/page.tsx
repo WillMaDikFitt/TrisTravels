@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus } from "@/data/experiences";
+import { getExperience as getStaticExperience } from "@/data/experiences";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { fetchExperienceAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
@@ -55,19 +56,38 @@ function lines(v: string) {
 }
 
 export default function ExperienceEditorPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams<{ slug: string }>();
+  const slugKey = decodeURIComponent(String(params.slug ?? ""));
   const router = useRouter();
-  const isNew = slug === "new";
-  const [row, setRow] = useState<Experience | null>(isNew ? blank() : null);
+  const isNew = slugKey === "new";
+  const [row, setRow] = useState<Experience | null>(() => {
+    if (isNew) return blank();
+    return getStaticExperience(slugKey) ?? null;
+  });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (isNew) return;
-    fetchExperienceAdmin(slug)
-      .then((exp) => setRow(exp ?? blank(slug)))
-      .catch(() => setRow(blank(slug)));
-  }, [isNew, slug]);
+    const seeded = getStaticExperience(slugKey);
+    let cancelled = false;
+
+    fetchExperienceAdmin(slugKey)
+      .then((exp) => {
+        if (cancelled) return;
+        if (exp?.name?.trim()) setRow(exp);
+        else if (seeded) setRow(seeded);
+        else if (exp) setRow(exp);
+        else setRow(blank(slugKey));
+      })
+      .catch(() => {
+        if (!cancelled) setRow(seeded ?? blank(slugKey));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isNew, slugKey]);
 
   if (!row) {
     return <p className="text-sm text-[#5c6350]">Loading editor…</p>;
@@ -78,7 +98,11 @@ export default function ExperienceEditorPage() {
       <PageHeader
         eyebrow="Catalogue"
         title={isNew ? "New experience" : row.name || "Edit experience"}
-        description="Public pages show active and seasonal experiences. Drafts stay in the studio."
+        description={
+          !row.name.trim() && !isNew
+            ? "This listing has no saved content yet. If it should be a seed experience, check the URL slug matches the list."
+            : "Public pages show active and seasonal experiences. Drafts stay in the studio."
+        }
         actions={
           <AdminButton variant="ghost" onClick={() => router.push("/admin/experiences")}>
             Back to list

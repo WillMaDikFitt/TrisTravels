@@ -73,7 +73,9 @@ export async function findExperience(slug: string): Promise<Experience | undefin
     try {
       const doc = await db.collection("experiences").doc(slug).get();
       if (doc.exists) {
-        return mergeRecord(staticFallback, doc.data() as Experience, slug);
+        const merged = mergeRecord(staticFallback, doc.data() as Experience, slug);
+        if (staticFallback && !merged.name?.trim()) return staticFallback;
+        return merged;
       }
     } catch (err) {
       console.error(`Firestore read failed (experiences/${slug}):`, err);
@@ -94,7 +96,9 @@ export async function findJourney(slug: string): Promise<Journey | undefined> {
     try {
       const doc = await db.collection("journeys").doc(slug).get();
       if (doc.exists) {
-        return mergeRecord(staticFallback, doc.data() as Journey, slug);
+        const merged = mergeRecord(staticFallback, doc.data() as Journey, slug);
+        if (staticFallback && !merged.name?.trim()) return staticFallback;
+        return merged;
       }
     } catch (err) {
       console.error(`Firestore read failed (journeys/${slug}):`, err);
