@@ -190,12 +190,9 @@ export default async function HomePage() {
 
       <section className="relative overflow-hidden bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
         <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile md:grid-cols-12 md:gap-12 md:px-margin-desktop">
-          <div className="relative md:col-span-5">
+          <div className="md:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
               <Image src={media.aboutPortrait} alt="The heart behind TRIS" fill className="object-cover" sizes="40vw" />
-            </div>
-            <div className="absolute -bottom-4 -right-4 hidden h-36 w-28 overflow-hidden rounded-2xl border-4 border-[#2a2e1f] shadow-ambient md:block">
-              <Image src={media.heroMist} alt="" fill className="object-cover" sizes="120px" />
             </div>
           </div>
           <SlideIn from="right" className="md:col-span-7">
