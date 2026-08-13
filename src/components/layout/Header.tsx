@@ -174,14 +174,15 @@ export function Header() {
                 </Button>
               </div>
             ) : (
-              <Button
-                href="/login"
-                size="sm"
-                variant={darkNav || !solid ? "light" : "primary"}
-                className="hidden lg:inline-flex"
-              >
-                Log in / Sign up
-              </Button>
+              <div className="max-lg:hidden">
+                <Button
+                  href="/login"
+                  size="sm"
+                  variant={darkNav || !solid ? "light" : "primary"}
+                >
+                  Log in / Sign up
+                </Button>
+              </div>
             )}
             <button
               type="button"
