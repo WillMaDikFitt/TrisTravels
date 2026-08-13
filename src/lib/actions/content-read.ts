@@ -10,6 +10,7 @@ import {
   listClosures,
   listDestinations,
   listExperiences,
+  listAllJourneysAdmin,
   listJourneys,
   listStories,
 } from "@/lib/data/repo";
@@ -31,7 +32,7 @@ export async function fetchExperienceAdmin(slug: string) {
 }
 
 export async function fetchJourneysAdmin() {
-  return listJourneys();
+  return listAllJourneysAdmin();
 }
 
 export async function fetchJourneyAdmin(slug: string) {

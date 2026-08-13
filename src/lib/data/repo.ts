@@ -18,15 +18,48 @@ function isEmptyOverlay(value: unknown) {
   return false;
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
+}
+
+/** Firestore Timestamps / Dates → ISO strings so RSC payloads stay serializable. */
+function sanitizeOverlay(value: unknown): unknown {
+  if (value == null || typeof value !== "object") return value;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof (value as { toDate?: () => Date }).toDate === "function") {
+    try {
+      return (value as { toDate: () => Date }).toDate().toISOString();
+    } catch {
+      return undefined;
+    }
+  }
+  if (Array.isArray(value)) return value.map(sanitizeOverlay);
+  if (!isPlainObject(value)) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const [key, nested] of Object.entries(value)) out[key] = sanitizeOverlay(nested);
+  return out;
+}
+
 /** Merge seed catalogue with Firestore overrides; ignore empty remote fields. */
 function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, slug: string): T {
   const out = { ...(base ?? {}), slug } as T & { slug: string };
   for (const [key, value] of Object.entries(remote)) {
     if (key === "slug" || key === "id") continue;
     if (isEmptyOverlay(value)) continue;
-    (out as Record<string, unknown>)[key] = value;
+    const clean = sanitizeOverlay(value);
+    if (isEmptyOverlay(clean)) continue;
+    (out as Record<string, unknown>)[key] = clean;
   }
   return out as T;
+}
+
+function isPublicJourney(j: Journey) {
+  const status = j.status ?? "active";
+  if (status === "draft" || status === "hidden") return false;
+  if (!j.slug || !j.name?.trim()) return false;
+  if (j.type !== "curated" && j.type !== "small-group") return false;
+  if (typeof j.image !== "string" || !j.image.trim()) return false;
+  return true;
 }
 
 function mergeCatalog<T extends { slug: string }>(
@@ -85,6 +118,11 @@ export async function findExperience(slug: string): Promise<Experience | undefin
 }
 
 export async function listJourneys(): Promise<Journey[]> {
+  const remote = await collectionDocs<Journey & { slug?: string; id?: string }>("journeys");
+  return mergeCatalog(journeys, remote).filter(isPublicJourney);
+}
+
+export async function listAllJourneysAdmin(): Promise<Journey[]> {
   const remote = await collectionDocs<Journey & { slug?: string; id?: string }>("journeys");
   return mergeCatalog(journeys, remote);
 }

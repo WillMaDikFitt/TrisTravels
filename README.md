@@ -28,4 +28,4 @@ npm start
 
 Copy `.env.example` to `.env.local` and add Firebase + Cloudinary keys. Seed Firestore with `npm run seed`. Without env keys the site still runs on static data; bookings/enquiries use in-memory store until restart.
 
-Payments are simulated. Spec: project `Docs/` folder.
+Payments are simulated. Spec: `Docs/For website rebuilding.pdf`. Design tokens: `Docs/DESIGN.md`.

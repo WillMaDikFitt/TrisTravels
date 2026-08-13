@@ -5,13 +5,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatINR(amount: number) {
-  const hasFraction = !Number.isInteger(amount);
+  const n = Number(amount);
+  if (!Number.isFinite(n)) return "—";
+  const hasFraction = !Number.isInteger(n);
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: hasFraction ? 2 : 0,
     minimumFractionDigits: hasFraction ? 2 : 0,
-  }).format(amount);
+  }).format(n);
 }
 
 export function daysFromNow(days: number) {

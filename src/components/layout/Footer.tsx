@@ -40,7 +40,11 @@ export function Footer() {
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:max-w-md lg:flex-col lg:gap-0">
             <div className="max-w-sm">
               <Link href="/" className="inline-block">
-                <BrandLogo on="light" size="sm" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20" />
+                <BrandLogo
+                  on="light"
+                  size="sm"
+                  className="h-12 w-auto max-w-[4.5rem] sm:h-14 sm:max-w-[5.5rem] md:h-16 md:max-w-none lg:h-20"
+                />
               </Link>
               <p className="mt-4 text-sm leading-relaxed text-on-surface-variant md:mt-5 md:text-base lg:text-lg">
                 Community-rooted journeys across Meghalaya — authentic experiences that leave hosts

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, Users } from "lucide-react";
 import type { Journey } from "@/data/journeys";
+import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
 
 type Props = {
@@ -12,6 +13,9 @@ type Props = {
 
 export function JourneyCard({ journey, className, variant = "horizontal" }: Props) {
   const isFixed = journey.type === "small-group";
+  const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
+  const styles = Array.isArray(journey.style) ? journey.style : [];
+  const price = Number(journey.priceFrom);
 
   if (variant === "tile") {
     return (
@@ -23,7 +27,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
         )}
       >
         <Image
-          src={journey.image}
+          src={image}
           alt={journey.name}
           fill
           className="object-cover transition duration-700 group-hover:scale-105"
@@ -43,7 +47,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
           <h3 className="line-clamp-2 font-display text-lg leading-snug text-white">{journey.name}</h3>
           <p className="mt-1 line-clamp-2 text-xs text-white/75">{journey.tagline}</p>
           <div className="mt-3 flex items-end justify-between gap-2">
-            <p className="font-display text-base text-white">{formatINR(journey.priceFrom)}</p>
+            <p className="font-display text-base text-white">{formatINR(price)}</p>
             <span className="text-[9px] font-bold tracking-[0.12em] text-accent uppercase">View</span>
           </div>
         </div>
@@ -63,7 +67,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
     >
       <div className="relative aspect-[16/11] md:aspect-auto md:min-h-[240px]">
         <Image
-          src={journey.image}
+          src={image}
           alt={journey.name}
           fill
           className="object-cover transition duration-700 group-hover:scale-105"
@@ -88,7 +92,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
 
       <div className="flex flex-col p-6 md:p-7">
         <div className="flex min-h-[1.75rem] flex-wrap gap-1.5">
-          {journey.style.slice(0, 3).map((s) => (
+          {styles.slice(0, 3).map((s) => (
             <span
               key={s}
               className="rounded-full border border-outline-variant/35 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-on-surface-variant uppercase"
@@ -118,7 +122,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
           </div>
           <div className="shrink-0 text-right">
             <p className="text-[10px] tracking-wider text-on-surface-variant uppercase">From</p>
-            <p className="font-display text-xl leading-none text-secondary">{formatINR(journey.priceFrom)}</p>
+            <p className="font-display text-xl leading-none text-secondary">{formatINR(price)}</p>
             <span className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.14em] text-accent uppercase">
               View journey
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />

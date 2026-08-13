@@ -35,7 +35,7 @@ export function BrandLogo({
       height={dims.h}
       priority={priority}
       unoptimized
-      className={cn("h-auto w-auto object-contain", className)}
+      className={cn("object-contain", className)}
     />
   );
 }
