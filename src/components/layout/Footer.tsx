@@ -38,12 +38,12 @@ export function Footer() {
       <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:max-w-md lg:flex-col lg:gap-0">
-            <div className="max-w-sm">
+            <div className="mx-auto max-w-sm text-center md:mx-0 md:text-left">
               <Link href="/" className="inline-block">
                 <BrandLogo
                   on="light"
-                  size="sm"
-                  className="h-12 w-auto max-w-[4.5rem] sm:h-14 sm:max-w-[5.5rem] md:h-16 md:max-w-none lg:h-20"
+                  size="lg"
+                  className="mx-auto h-28 w-auto sm:h-32 md:mx-0 md:h-28 lg:h-32"
                 />
               </Link>
               <p className="mt-4 text-sm leading-relaxed text-on-surface-variant md:mt-5 md:text-base lg:text-lg">
@@ -52,11 +52,11 @@ export function Footer() {
               </p>
             </div>
 
-            <div className="md:ml-auto md:shrink-0 md:text-right lg:ml-0 lg:mt-8 lg:text-left">
+            <div className="text-center md:ml-auto md:shrink-0 md:text-right lg:ml-0 lg:mt-8 lg:text-left">
               <p className="label-caps text-accent">Proudly recognized by</p>
               <RecognitionLogos
                 compact
-                className="mt-3 justify-start md:mt-4 md:justify-end lg:justify-start"
+                className="mt-3 justify-center md:mt-4 md:justify-end lg:justify-start"
               />
             </div>
           </div>
