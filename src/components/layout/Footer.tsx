@@ -52,11 +52,11 @@ export function Footer() {
               </p>
             </div>
 
-            <div className="text-center md:ml-auto md:shrink-0 md:text-right lg:ml-0 lg:mt-8 lg:text-left">
+            <div className="text-center md:ml-auto md:shrink-0 md:text-right lg:hidden">
               <p className="label-caps text-accent">Proudly recognized by</p>
               <RecognitionLogos
                 compact
-                className="mt-3 justify-center md:mt-4 md:justify-end lg:justify-start"
+                className="mt-3 justify-center md:mt-4 md:justify-end"
               />
             </div>
           </div>
@@ -79,10 +79,19 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-outline-variant/20 pt-5 text-right md:mt-12 md:pt-6">
-          <p className="text-xs text-on-surface-variant/60 sm:text-sm">
+        <div className="mt-10 border-t border-outline-variant/20 pt-5 md:mt-12 md:pt-6">
+          <p className="text-center text-xs text-on-surface-variant/60 sm:text-sm md:text-right lg:hidden">
             © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
           </p>
+          <div className="hidden items-end justify-between gap-8 lg:flex">
+            <div>
+              <p className="label-caps text-accent">Proudly recognized by</p>
+              <RecognitionLogos compact className="mt-3 justify-start" />
+            </div>
+            <p className="shrink-0 text-sm text-on-surface-variant/60">
+              © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

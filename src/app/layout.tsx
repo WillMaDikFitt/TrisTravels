@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
     >
       <body className="relative flex min-h-full flex-col antialiased">
-        <div className="pointer-events-none fixed inset-0 z-[60] texture-noise" aria-hidden />
+        <div className="pointer-events-none fixed inset-0 z-[1] texture-noise" aria-hidden />
         <AuthProvider>
           <SiteChrome>{children}</SiteChrome>
         </AuthProvider>

@@ -85,12 +85,21 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   const megaOpen = Boolean(mega);
   const solid = scrolled || !isHome || open || megaOpen;
   const darkNav = megaOpen && !open;
 
   return (
-    <header className="fixed top-0 z-50 w-full" onMouseLeave={() => setMega(null)}>
+    <header className="fixed top-0 z-[70] w-full" onMouseLeave={() => setMega(null)}>
       <div
         className={cn(
           "transition-[background-color,border-color,box-shadow] duration-300",
@@ -362,67 +371,97 @@ export function Header() {
         )}
 
         {open && (
-          <div className="max-h-[70vh] overflow-y-auto border-t border-outline-variant/20 bg-surface px-margin-mobile py-6 lg:hidden">
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="label-caps text-accent">Experiences</p>
-                <div className="mt-2 flex flex-col gap-2">
+          <div
+            className="fixed inset-x-0 bottom-0 top-14 z-[70] overflow-y-auto bg-[#f7f4ee] px-margin-mobile py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-16 lg:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+          >
+            <div className="mb-4">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <Button href="/account" size="sm" className="flex-1">
+                    {profile?.name?.split(" ")[0] || "Account"}
+                  </Button>
+                  {isAdmin && (
+                    <Button href="/admin" size="sm" variant="ghost">
+                      Studio
+                    </Button>
+                  )}
+                  <button
+                    type="button"
+                    className="px-2 text-sm text-on-surface-variant"
+                    onClick={() => logout()}
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Button href="/login" size="sm" variant="ghost" className="flex-1">
+                    Log in
+                  </Button>
+                  <Button href="/signup" size="sm" className="flex-1">
+                    Sign up
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <section className="rounded-2xl border border-outline-variant/25 bg-white p-4 shadow-[0_8px_24px_rgba(42,46,31,0.04)]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="label-caps text-accent">Experiences</p>
+                  <Link
+                    href="/experiences"
+                    className="text-[11px] font-bold tracking-[0.12em] text-accent uppercase"
+                  >
+                    Browse all
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
                   {EXPERIENCE_CATEGORIES.map((c) => (
-                    <Link key={c.id} href={`/experiences?type=${c.slug}`} className="text-secondary">
+                    <Link
+                      key={c.id}
+                      href={`/experiences?type=${c.slug}`}
+                      className="rounded-xl bg-surface-container-low px-3 py-2.5 text-sm font-medium text-secondary transition active:bg-secondary-container"
+                    >
                       {c.id}
                     </Link>
                   ))}
                 </div>
-              </div>
-              <div>
+              </section>
+
+              <section className="mt-4 rounded-2xl border border-outline-variant/25 bg-white p-4 shadow-[0_8px_24px_rgba(42,46,31,0.04)]">
                 <p className="label-caps text-accent">Journeys</p>
-                <div className="mt-2 flex flex-col gap-2">
+                <div className="mt-1 divide-y divide-outline-variant/20">
                   {journeyCols.map((c) => (
-                    <Link key={c.href} href={c.href} className="text-secondary">
-                      {c.title}
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      className="flex items-center justify-between gap-3 py-3.5"
+                    >
+                      <span>
+                        <span className="block font-medium text-primary">{c.title}</span>
+                        <span className="mt-0.5 block text-xs text-on-surface-variant">{c.tag}</span>
+                      </span>
+                      <ArrowRight size={16} className="shrink-0 text-accent" />
                     </Link>
                   ))}
                 </div>
-              </div>
-              <div className="flex flex-col gap-2">
+              </section>
+
+              <section className="mt-4 overflow-hidden rounded-2xl border border-outline-variant/25 bg-white shadow-[0_8px_24px_rgba(42,46,31,0.04)]">
                 {[...discoverLinks, ...aboutLinks].map((c) => (
-                  <Link key={c.href} href={c.href} className="font-display text-xl text-primary">
-                    {c.title}
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    className="flex items-center justify-between gap-3 border-b border-outline-variant/20 px-4 py-3.5 last:border-b-0"
+                  >
+                    <span className="font-display text-lg text-primary">{c.title}</span>
+                    <ArrowRight size={16} className="shrink-0 text-accent" />
                   </Link>
                 ))}
-              </div>
-              <div className="border-t border-outline-variant/25 pt-4">
-                <p className="label-caps text-accent">Account</p>
-                {user ? (
-                  <div className="mt-2 flex flex-col gap-2">
-                    <Link href="/account" className="font-display text-xl text-primary">
-                      {profile?.name?.split(" ")[0] || "Account"}
-                    </Link>
-                    {isAdmin && (
-                      <Link href="/admin" className="text-secondary">
-                        Studio
-                      </Link>
-                    )}
-                    <button
-                      type="button"
-                      className="text-left text-sm text-on-surface-variant"
-                      onClick={() => logout()}
-                    >
-                      Log out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-2 flex flex-col gap-2">
-                    <Link href="/login" className="font-display text-xl text-primary">
-                      Log in
-                    </Link>
-                    <Link href="/signup" className="font-display text-xl text-primary">
-                      Sign up
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+              </section>
           </div>
         )}
       </div>
