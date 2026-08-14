@@ -7,7 +7,7 @@ const columns = [
     links: [
       { href: "/experiences", label: "Experiences" },
       { href: "/journeys?type=curated", label: "Curated Journeys" },
-      { href: "/journeys?type=small-group", label: "Small Group Journeys" },
+      { href: "/journeys?type=small-group", label: "Fixed Journeys" },
       { href: "/craft-my-journey", label: "Craft My Journey" },
     ],
   },

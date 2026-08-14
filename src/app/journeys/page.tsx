@@ -19,7 +19,7 @@ export default async function JourneysPage() {
     <section id="journeys" className="scroll-mt-header bg-surface py-12 md:py-16">
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
         <div className="ink-rule" />
-        <p className="label-caps mt-4 text-accent">Small group</p>
+        <p className="label-caps mt-4 text-accent">Fixed journeys</p>
         <h2 className="mt-2 font-display text-3xl text-secondary md:text-4xl">Fixed departures</h2>
         <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
           Dates are set. Groups stay small. Enquire to hold a seat.

@@ -34,7 +34,7 @@ export function JourneyTypeTabs() {
             : "border-outline-variant/40 text-on-surface-variant hover:border-primary/40",
         )}
       >
-        Small group
+        Fixed journeys
       </Link>
       <Link
         href="/craft-my-journey"

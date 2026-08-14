@@ -245,6 +245,70 @@ export function FormChipGroup({
   );
 }
 
+export function FormCheckboxGroup({
+  label,
+  name,
+  options,
+  required,
+  hint,
+  columns = 2,
+}: {
+  label: string;
+  name: string;
+  options: string[];
+  required?: boolean;
+  hint?: string;
+  columns?: 1 | 2 | 3;
+}) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-primary">
+        {label}
+        {required ? <span className="text-accent"> *</span> : null}
+      </legend>
+      {hint ? <p className="mt-1 text-xs text-on-surface-variant">{hint}</p> : null}
+      <div
+        className={cn(
+          "mt-3 grid gap-2",
+          columns === 1 && "grid-cols-1",
+          columns === 2 && "grid-cols-1 sm:grid-cols-2",
+          columns === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+        )}
+      >
+        {options.map((option) => (
+          <label
+            key={option}
+            className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-low px-3 py-2.5 text-sm text-on-surface transition hover:border-primary/35"
+          >
+            <input
+              type="checkbox"
+              name={name}
+              value={option}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline-variant text-primary focus:ring-accent"
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+export function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-5">
+      <h3 className="font-display text-xl text-primary">{title}</h3>
+      <div className="space-y-5">{children}</div>
+    </section>
+  );
+}
+
 export function FormCard({
   title,
   subtitle,

@@ -37,7 +37,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/15" />
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           <span className="rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold tracking-[0.12em] text-on-accent uppercase">
-            {isFixed ? "Small group" : "Curated"}
+            {isFixed ? "Fixed" : "Curated"}
           </span>
           <span className="rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold text-white uppercase backdrop-blur-sm">
             {journey.days}D · {journey.nights}N
@@ -77,7 +77,7 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
         <div className="absolute top-4 left-4 flex flex-wrap gap-2">
           <span className="rounded-full bg-accent px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] text-on-accent uppercase">
-            {isFixed ? "Small group" : "Curated"}
+            {isFixed ? "Fixed" : "Curated"}
           </span>
           <span className="rounded-full bg-black/55 px-3 py-1.5 text-[11px] font-bold tracking-[0.08em] text-white uppercase backdrop-blur-sm">
             {journey.days}D · {journey.nights}N

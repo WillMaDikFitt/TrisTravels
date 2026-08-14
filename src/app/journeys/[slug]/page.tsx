@@ -33,7 +33,7 @@ export default async function JourneyDetailPage({ params }: Props) {
         src={journey.image}
         alt={journey.name}
         compact
-        eyebrow={journey.type === "small-group" ? "Small Group Journey" : "Curated Journey"}
+        eyebrow={journey.type === "small-group" ? "Fixed Journey" : "Curated Journey"}
         title={journey.name}
         body={journey.tagline}
         primaryCta={{ href: "#enquire", label: "Enquire" }}

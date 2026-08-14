@@ -43,74 +43,96 @@ export default async function HomePage() {
             <div className="ink-rule" />
             <p className="label-caps mt-4 text-accent">How you travel</p>
             <h2 className="mt-3 font-display text-3xl text-secondary md:text-5xl">
-              Three ways to travel with us
+              Four ways to travel with us
             </h2>
           </FadeIn>
 
-          <div className="relative mt-12 grid items-stretch gap-5 lg:grid-cols-12">
+          <div className="relative mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/experiences"
-              className="group relative min-h-[380px] overflow-hidden rounded-[2rem] lg:col-span-7 lg:min-h-[520px]"
+              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
             >
               <Image
                 src={media.heroRoots}
                 alt="Living root bridge experience in Meghalaya"
                 fill
                 className="object-cover transition duration-700 group-hover:scale-105"
-                sizes="(max-width:1024px) 100vw, 58vw"
+                sizes="(max-width:1024px) 50vw, 25vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-              <div className="absolute top-6 left-6 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
                 01 · Book online
               </div>
-              <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-10">
-                <h3 className="font-display text-4xl md:text-5xl">Experiences</h3>
-                <p className="mt-3 max-w-md text-white/80">
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <h3 className="font-display text-3xl">Experiences</h3>
+                <p className="mt-2 text-sm text-white/80">
                   A few hours to a full day — six types, a clear price, a real date.
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-[0.16em] uppercase">
-                  Browse types <ArrowRight size={14} />
-                </span>
               </div>
             </Link>
-            <div className="flex min-h-0 flex-col gap-5 lg:col-span-5">
-              <Link
-                href="/journeys?type=curated"
-                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[2rem]"
-              >
-                <Image
-                  src={media.packages}
-                  alt="Curated journeys through Meghalaya"
-                  fill
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="40vw"
-                />
-                <div className="absolute inset-0 bg-black/50 transition group-hover:bg-black/40" />
-                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white md:p-8">
-                  <p className="text-[10px] font-bold tracking-[0.16em] text-accent uppercase">02 · Enquire</p>
-                  <h3 className="mt-2 font-display text-3xl">Curated journeys</h3>
-                  <p className="mt-2 text-sm text-white/80">Shape dates, stays, and pace with a planner.</p>
-                </div>
-              </Link>
-              <Link
-                href="/journeys?type=small-group"
-                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[2rem]"
-              >
-                <Image
-                  src={media.departures}
-                  alt="Small group departure in Meghalaya"
-                  fill
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="40vw"
-                />
-                <div className="absolute inset-0 bg-black/50 transition group-hover:bg-black/40" />
-                <div className="absolute inset-0 flex flex-col justify-end p-6 text-white md:p-8">
-                  <p className="text-[10px] font-bold tracking-[0.16em] text-accent uppercase">03 · Join a date</p>
-                  <h3 className="mt-2 font-display text-3xl">Small group</h3>
-                  <p className="mt-2 text-sm text-white/80">Fixed departures. Show up with curiosity.</p>
-                </div>
-              </Link>
-            </div>
+
+            <Link
+              href="/journeys?type=curated"
+              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
+            >
+              <Image
+                src={media.packages}
+                alt="Curated journeys through Meghalaya"
+                fill
+                className="object-cover transition duration-700 group-hover:scale-105"
+                sizes="(max-width:1024px) 50vw, 25vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
+                02 · Enquire
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <h3 className="font-display text-3xl">Curated journeys</h3>
+                <p className="mt-2 text-sm text-white/80">Shape dates, stays, and pace with a planner.</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/journeys?type=small-group"
+              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
+            >
+              <Image
+                src={media.departures}
+                alt="Fixed journey departure in Meghalaya"
+                fill
+                className="object-cover transition duration-700 group-hover:scale-105"
+                sizes="(max-width:1024px) 50vw, 25vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
+                03 · Join a date
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <h3 className="font-display text-3xl">Fixed journeys</h3>
+                <p className="mt-2 text-sm text-white/80">Fixed departures. Show up with curiosity.</p>
+              </div>
+            </Link>
+
+            <Link
+              href="/craft-my-journey"
+              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
+            >
+              <Image
+                src={media.craft}
+                alt="Craft a personal Meghalaya journey"
+                fill
+                className="object-cover transition duration-700 group-hover:scale-105"
+                sizes="(max-width:1024px) 50vw, 25vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
+                04 · Personal
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <h3 className="font-display text-3xl">Craft my journey</h3>
+                <p className="mt-2 text-sm text-white/80">Send a brief — we design the route around you.</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
