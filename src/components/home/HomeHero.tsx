@@ -55,7 +55,7 @@ export function HomeHero() {
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
               poster={media.heroPoster}
               aria-label="Scenic film of Meghalaya landscapes"
             >

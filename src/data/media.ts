@@ -1,8 +1,8 @@
 /** Marketing media curated exclusively from the supplied TRIS image library. */
 
 const local = {
-  heroPoster: "/images/hero-poster.jpg",
-  heroVideoMp4: "/videos/hero.mp4",
+  heroPoster: "/images/hero-poster-dji.jpg",
+  heroVideoMp4: "/videos/hero-dji.mp4",
   bridgeTrail: "/images/bridge-trail.jpg",
   campfire: "/images/campfire.jpg",
   cliffView: "/images/cliff-view.jpg",

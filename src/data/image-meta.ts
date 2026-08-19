@@ -9,7 +9,7 @@ export const imageMeta: Record<string, { w: number; h: number }> = {
   "/images/detail-04.jpg": { w: 724, h: 1084 },
   "/images/forest-light.jpg": { w: 1920, h: 2560 },
   "/images/group-trail.jpg": { w: 4032, h: 3024 },
-  "/images/hero-poster.jpg": { w: 1920, h: 1080 },
+  "/images/hero-poster-dji.jpg": { w: 1280, h: 720 },
   "/images/highland-road.jpg": { w: 1920, h: 1440 },
   "/images/homestay.jpg": { w: 1920, h: 2562 },
   "/images/kyllang-rock.png": { w: 1536, h: 1024 },
