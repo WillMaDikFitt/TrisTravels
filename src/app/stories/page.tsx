@@ -77,7 +77,7 @@ export default async function StoriesPage() {
         <div className="mx-auto grid max-w-container-max gap-10 px-margin-mobile md:grid-cols-12 md:px-margin-desktop">
           <div className="md:col-span-4">
             <div className="ink-rule" />
-            <p className="label-caps mt-4 text-accent">Share yours</p>
+            <p className="label-caps mt-4 text-primary-fixed/70">Share yours</p>
             <h2 className="mt-3 font-display text-3xl text-primary-fixed md:text-4xl">
               Have a story from Meghalaya?
             </h2>

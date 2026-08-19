@@ -78,7 +78,7 @@ export function ParallaxSlideshow({
                   priority={priority && i === 0}
                   className="object-cover"
                   sizes="100vw"
-                  quality={80}
+                  quality={90}
                 />
               </motion.div>
             ) : null,

@@ -10,6 +10,7 @@ import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
 import { formatDepartureSeats, parseDepartureSeats, seatsLeft } from "@/lib/journey-seats";
+import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 function blank(): Journey {
   return {
@@ -21,6 +22,7 @@ function blank(): Journey {
     nights: 2,
     priceFrom: 0,
     image: "",
+    gallery: [],
     style: [],
     season: "",
     overview: "",
@@ -107,9 +109,15 @@ export default function JourneyEditorPage() {
             nights: Number(fd.get("nights") || 2),
             priceFrom: Number(fd.get("priceFrom") || 0),
             priceNote: String(fd.get("priceNote") || ""),
+            priceChild: Number(fd.get("priceChild") || 0) || undefined,
+            transportAvailable: fd.get("transportAvailable") === "on",
+            transportPrice: Number(fd.get("transportPrice") || 0) || undefined,
+            transportNote: String(fd.get("transportNote") || ""),
+            transportVehicles: readTransportVehiclePrices(fd),
             season: String(fd.get("season")),
             overview: String(fd.get("overview")),
             image: String(fd.get("image")),
+            gallery: lines(String(fd.get("gallery") || "")),
             highlights: lines(String(fd.get("highlights") || "")),
             stays: lines(String(fd.get("stays") || "")),
             inclusions: lines(String(fd.get("inclusions") || "")),
@@ -161,6 +169,9 @@ export default function JourneyEditorPage() {
             <Field label="Price from (₹)">
               <input name="priceFrom" type="number" defaultValue={row.priceFrom} className={inputClass} />
             </Field>
+            <Field label="Child price (₹)" hint="blank = 70% of adult">
+              <input name="priceChild" type="number" min="0" defaultValue={row.priceChild ?? ""} className={inputClass} />
+            </Field>
             <Field label="Price note">
               <input name="priceNote" defaultValue={row.priceNote ?? ""} className={inputClass} />
             </Field>
@@ -176,6 +187,49 @@ export default function JourneyEditorPage() {
             <Field label="Simple departure dates" hint="comma-separated, for public cards">
               <input name="departures" defaultValue={(row.departures ?? []).join(", ")} className={inputClass} />
             </Field>
+          </div>
+          <div className="mt-6 border-t border-[#e4dfd4] pt-5">
+            <h3 className="font-display text-base text-[#2a2e1f]">Transportation</h3>
+            <label className="mt-3 flex items-center gap-2 text-sm text-[#2a2e1f]">
+              <input
+                name="transportAvailable"
+                type="checkbox"
+                defaultChecked={row.transportAvailable !== false}
+              />
+              Offer transportation on the enquire form
+            </label>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field label="Base transport price (₹)" hint="Used when a vehicle rate below is blank">
+                <input
+                  name="transportPrice"
+                  type="number"
+                  min="0"
+                  defaultValue={row.transportPrice ?? ""}
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Transport note">
+                <input name="transportNote" defaultValue={row.transportNote ?? ""} className={inputClass} />
+              </Field>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {TRANSPORT_VEHICLE_IDS.map((id) => (
+                <Field
+                  key={id}
+                  label={`${TRANSPORT_VEHICLE_META[id].label} (₹)`}
+                  hint={TRANSPORT_VEHICLE_META[id].seats}
+                >
+                  <input
+                    name={`transport${id.charAt(0).toUpperCase()}${id.slice(1)}`}
+                    type="number"
+                    min="0"
+                    defaultValue={row.transportVehicles?.[id] ?? ""}
+                    className={inputClass}
+                    placeholder="Auto from base"
+                  />
+                </Field>
+              ))}
+            </div>
           </div>
           <div className="mt-4">
             <Field
@@ -233,6 +287,16 @@ export default function JourneyEditorPage() {
         </Panel>
         <Panel>
           <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
+          <div className="mt-4">
+            <Field label="Gallery images" hint="one URL or path per line — shown in the detail carousel">
+              <textarea
+                name="gallery"
+                rows={5}
+                defaultValue={(row.gallery ?? []).join("\n")}
+                className={inputClass}
+              />
+            </Field>
+          </div>
         </Panel>
         {note && <Notice tone={note === "Saved." ? "ok" : "warn"}>{note}</Notice>}
         <AdminButton type="submit" disabled={busy}>

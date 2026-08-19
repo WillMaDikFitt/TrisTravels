@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-outline-variant/35 bg-surface-container-low px-4 py-3 text-on-surface outline-none transition placeholder:text-on-surface-variant/50 focus:border-accent focus:ring-2 focus:ring-accent/20";
+  "mt-2 min-h-12 w-full rounded-xl border border-outline-variant/45 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface shadow-[0_1px_0_rgba(42,46,31,0.03)] outline-none transition placeholder:text-on-surface-variant/45 hover:border-outline focus:border-accent focus:ring-4 focus:ring-accent/15";
 
 export function FieldLabel({
   children,
@@ -14,10 +14,10 @@ export function FieldLabel({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <label htmlFor={htmlFor} className="text-sm font-medium text-primary">
+      <label htmlFor={htmlFor} className="text-[13px] font-semibold text-primary">
         {children}
       </label>
-      {hint ? <span className="text-xs text-on-surface-variant">{hint}</span> : null}
+      {hint ? <span className="text-[11px] text-on-surface-variant">{hint}</span> : null}
     </div>
   );
 }
@@ -95,7 +95,7 @@ export function FormInput({
         disabled={disabled}
         value={value}
         onChange={onChange && !locked ? (e) => onChange(e.target.value) : undefined}
-        className={cn(fieldClass, locked && "cursor-not-allowed bg-surface-container opacity-80")}
+        className={cn(fieldClass, locked && "cursor-not-allowed bg-surface-container opacity-70")}
       />
     </div>
   );

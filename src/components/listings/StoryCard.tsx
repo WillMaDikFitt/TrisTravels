@@ -30,13 +30,14 @@ export function StoryCard({ story, featured, className }: Props) {
             fill
             className="object-cover transition duration-700 group-hover:scale-105"
             sizes="100vw"
+            quality={90}
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/25" />
           <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
-            <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.14em] text-accent uppercase">
+            <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.14em] text-white/80 uppercase">
               <span>Featured</span>
-              <span className="h-px w-8 bg-accent" />
+              <span className="h-px w-8 bg-white/60" />
               <span className="text-white/70">{story.category}</span>
             </div>
             <h2 className="mt-4 max-w-3xl font-display text-3xl leading-tight text-white md:text-5xl">
@@ -47,7 +48,7 @@ export function StoryCard({ story, featured, className }: Props) {
               <p className="text-sm text-white/65">
                 {story.author} · {dateLabel}
               </p>
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-accent uppercase">
+              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-white uppercase">
                 Read story <ArrowUpRight size={14} />
               </span>
             </div>
@@ -72,8 +73,8 @@ export function StoryCard({ story, featured, className }: Props) {
           alt={story.title}
           fill
           className="object-cover transition duration-700 group-hover:scale-105"
-          sizes="25vw"
-          quality={75}
+          sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
+          quality={80}
         />
         <div className="absolute top-3 left-3 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-[0.12em] text-on-accent uppercase">
           {story.category}

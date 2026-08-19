@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import { fetchSettingsAdmin } from "@/lib/actions/content-read";
 import { saveSettings } from "@/lib/actions/cms";
+import {
+  clearStudioDemo,
+  getStudioDemoStatus,
+  seedStudioDemo,
+} from "@/lib/actions/studio-demo";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import type { PlatformSettings } from "@/lib/types";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
@@ -11,9 +16,13 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [demoBusy, setDemoBusy] = useState(false);
+  const [demoNote, setDemoNote] = useState("");
+  const [demoSeeded, setDemoSeeded] = useState(false);
 
   useEffect(() => {
     fetchSettingsAdmin().then(setSettings);
+    getStudioDemoStatus().then((status) => setDemoSeeded(status.seeded));
   }, []);
 
   return (
@@ -90,6 +99,61 @@ export default function AdminSettingsPage() {
           {busy ? "Saving…" : "Save settings"}
         </AdminButton>
       </form>
+
+      <Panel className="mt-8 max-w-xl space-y-4">
+        <div>
+          <h2 className="font-display text-lg text-[#2a2e1f]">Sample Studio data</h2>
+          <p className="mt-1 text-sm text-[#5c6350]">
+            Load realistic bookings, enquiries, closures, and travellers so you can review every Studio
+            screen. Marked as demo and safe to clear later.
+          </p>
+        </div>
+        <p className="text-xs font-semibold tracking-wider text-[#6b734f] uppercase">
+          Status · {demoSeeded ? "Sample data loaded" : "No sample data"}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <AdminButton
+            type="button"
+            disabled={demoBusy}
+            onClick={async () => {
+              setDemoBusy(true);
+              setDemoNote("");
+              const res = await seedStudioDemo();
+              setDemoBusy(false);
+              if (res.ok) {
+                setDemoSeeded(true);
+                setDemoNote(
+                  `Loaded ${res.counts.bookings} bookings, ${res.counts.enquiries} enquiries, ${res.counts.closures} closures, ${res.counts.users} travellers.`,
+                );
+              } else {
+                setDemoNote("Could not load sample data.");
+              }
+            }}
+          >
+            {demoBusy ? "Working…" : "Load sample data"}
+          </AdminButton>
+          <AdminButton
+            type="button"
+            variant="ghost"
+            disabled={demoBusy || !demoSeeded}
+            onClick={async () => {
+              setDemoBusy(true);
+              setDemoNote("");
+              const res = await clearStudioDemo();
+              setDemoBusy(false);
+              if (res.ok) {
+                setDemoSeeded(false);
+                setDemoNote("Sample data cleared.");
+              } else {
+                setDemoNote("Could not clear sample data.");
+              }
+            }}
+          >
+            Clear sample data
+          </AdminButton>
+        </div>
+        {demoNote && <Notice tone={demoNote.includes("Could not") ? "warn" : "ok"}>{demoNote}</Notice>}
+      </Panel>
     </div>
   );
 }

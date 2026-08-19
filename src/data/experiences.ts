@@ -1,4 +1,5 @@
 import { media } from "./media";
+import type { TransportVehiclePrices } from "./transport";
 
 export type ExperienceCategory =
   | "Adventure"
@@ -11,6 +12,16 @@ export type ExperienceCategory =
 export type Difficulty = "Easy" | "Moderate" | "Challenging";
 
 export type ExperienceStatus = "draft" | "active" | "hidden" | "seasonal" | "soldOut";
+
+export type ExperienceSlotConfig = {
+  mode: "fixed" | "interval";
+  times?: string[];
+  start?: string;
+  end?: string;
+  intervalMinutes?: number;
+  /** Optional rest windows. Slot times that fall inside [start, end) are skipped. */
+  breaks?: { start: string; end: string }[];
+};
 
 export type Experience = {
   slug: string;
@@ -30,7 +41,14 @@ export type Experience = {
   priceChild?: number;
   minGuests?: number;
   maxGuests: number;
+  /** Legacy explicit time slots; retained for existing Firestore records. */
   slots?: string[];
+  slotConfig?: ExperienceSlotConfig;
+  transportAvailable?: boolean;
+  transportPrice?: number;
+  transportNote?: string;
+  /** Optional per-vehicle transfer prices. Missing ids fall back to transportPrice multipliers. */
+  transportVehicles?: TransportVehiclePrices;
   status?: ExperienceStatus;
   staffRules?: {
     minGuests: number;
@@ -77,8 +95,16 @@ export const experiences: Experience[] = [
     bestSeason: "Weekly Mondays · Jan–Apr",
     priceFrom: 6990,
     maxGuests: 10,
+    slotConfig: {
+      mode: "fixed",
+      times: ["08:30", "09:00", "10:00"],
+      breaks: [{ start: "12:00", end: "13:00" }],
+    },
+    transportAvailable: true,
+    transportPrice: 2500,
+    transportNote: "Shared pickup from Shillong",
     image: media.heroRoots,
-    gallery: [media.canopy, media.forest, media.trail],
+    gallery: [media.local.bridgeTrail, media.local.forestLight, media.local.villagePath, media.local.raksan02],
     communityLed: true,
     overview:
       "Root Trails is designed for travellers who want Meghalaya beyond the postcard route. Stay in a village, walk quiet forest paths, and visit living root bridges most travellers never reach. Groups remain small — 4 to 10 — so experiences stay personal, safe, and open to connection.",
@@ -154,8 +180,15 @@ export const experiences: Experience[] = [
     bestSeason: "October – April",
     priceFrom: 4200,
     maxGuests: 8,
+    slotConfig: {
+      mode: "interval",
+      start: "07:00",
+      end: "11:00",
+      intervalMinutes: 60,
+      breaks: [{ start: "09:00", end: "09:30" }],
+    },
     image: media.heroRoots,
-    gallery: [media.trail, media.canopy],
+    gallery: [media.local.livingBridge, media.local.waterfallPool, media.local.ridgeLight],
     communityLed: true,
     overview:
       "Nongriat is famous for living root bridges of the banyan (Ficus elastica). The Double Decker is not to be missed — traditional Khasi architecture woven from one generation to the next until the bridge is complete.",
@@ -221,8 +254,18 @@ export const experiences: Experience[] = [
     bestSeason: "September – November (ideal) · July – April package season",
     priceFrom: 5500,
     maxGuests: 10,
+    slotConfig: {
+      mode: "interval",
+      start: "08:00",
+      end: "16:00",
+      intervalMinutes: 60,
+      breaks: [{ start: "12:00", end: "13:00" }],
+    },
+    transportAvailable: true,
+    transportPrice: 1800,
+    transportNote: "Optional private transfer",
     image: media.rain,
-    gallery: [media.water, media.cliffs],
+    gallery: [media.local.riverStones, media.local.cliffView, media.local.trailMist],
     communityLed: true,
     overview:
       "A day shaped by Split Rock — believed formed in the 1897 Assam earthquake — and a river trek through narrow stone walls to a waterfall reward. Immersive, grounding, and unhurried.",
@@ -290,7 +333,7 @@ export const experiences: Experience[] = [
     priceFrom: 2600,
     maxGuests: 12,
     image: media.forest,
-    gallery: [media.canopy],
+    gallery: [media.local.forestLight, media.local.detail01, media.local.raksan05],
     sustainabilityFocus: true,
     overview:
       "Walking inside Mawphlang’s sacred forest feels like stepping into an unspoken past. Roots twist like ancient scripts; nothing may be taken — not even a fallen leaf — because this isn’t just land, it is heritage.",
@@ -337,7 +380,7 @@ export const experiences: Experience[] = [
     priceFrom: 2800,
     maxGuests: 10,
     image: media.river,
-    gallery: [media.water],
+    gallery: [media.local.waterfallPool, media.local.landscapePanorama, media.local.groupTrail],
     sustainabilityFocus: true,
     overview:
       "A calm river day on the Umngot at Dawki — clear water, cliff light, and time to simply float with local boatmen who know this river’s moods.",
@@ -389,7 +432,7 @@ export const experiences: Experience[] = [
     priceFrom: 4500,
     maxGuests: 10,
     image: media.heroMist,
-    gallery: [media.cliffs, media.familyWaterfall],
+    gallery: [media.local.cliffView, media.local.meadowWalk, media.local.valleyGreen],
     overview:
       "Drawn from TRIS’s Short Escape – Sohra package: a stunning getaway into Sohra with options spanning waterfalls, caves, Laitlum canyons, and living root bridge approaches.",
     trisStory:
@@ -444,7 +487,7 @@ export const experiences: Experience[] = [
     priceFrom: 3200,
     maxGuests: 8,
     image: media.trail,
-    gallery: [],
+    gallery: [media.local.bridgeTrail, media.local.detail03, media.local.campfire],
     overview:
       "Trek toward Krem Puri — one of the longest sandstone caves in the world, stretching over 24 kilometres. Inside, cool ancient air, wet walls, and silence that feels far from the noise outside.",
     trisStory:
@@ -490,7 +533,7 @@ export const experiences: Experience[] = [
     priceFrom: 4800,
     maxGuests: 8,
     image: media.valueCommunity,
-    gallery: [media.valueAuthentic],
+    gallery: [media.local.homestay, media.local.marketDay, media.local.tishu02, media.local.portraitWarm],
     communityLed: true,
     overview:
       "Featured across TRIS fixed departures and classic packages — Mawlynnong overnight stays put you with local hosts in Asia’s cleanest village, with guided village walks and heritage house visits.",

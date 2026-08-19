@@ -93,46 +93,67 @@ export default function AdminStorySubmissionsPage() {
         <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-3">
-          {visible.map((e) => (
-            <button
-              key={e.id}
-              type="button"
-              onClick={() => {
-                setOpen(e);
-                setMessage("");
-              }}
-              className={cn(
-                "w-full rounded-2xl border bg-white p-4 text-left transition",
-                open?.id === e.id ? "border-[#4a5a28]" : "border-[#e4dfd4] hover:border-[#c8c2b4]",
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-display text-lg text-[#2a2e1f]">{titleOf(e)}</p>
-                  <p className="mt-1 text-sm text-[#5c6350]">
-                    {e.name}
-                    {placeOf(e) ? ` · ${placeOf(e)}` : ""}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-sm text-[#5c6350]">{e.message}</p>
-                </div>
-                <Badge tone={e.status === "new" ? "amber" : e.status === "closed" ? "slate" : "olive"}>
-                  {e.status === "in-progress" ? "in review" : e.status}
-                </Badge>
-              </div>
-            </button>
-          ))}
-          {!visible.length && (
-            <EmptyState
-              title={filter === "new" ? "No new stories" : "Nothing here"}
-              body="When someone shares a story on the site, it shows up here."
-            />
-          )}
-        </div>
+      <div className="grid gap-6">
+        {visible.length ? (
+          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
+            <table className="w-full min-w-[760px] text-left text-sm">
+              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <tr>
+                  <th className="px-4 py-3">Story</th>
+                  <th className="px-4 py-3">Traveller</th>
+                  <th className="px-4 py-3">Place</th>
+                  <th className="px-4 py-3">Received</th>
+                  <th className="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((e) => (
+                  <tr
+                    key={e.id}
+                    onClick={() => {
+                      setOpen(e);
+                      setMessage("");
+                    }}
+                    className={cn(
+                      "cursor-pointer border-t border-[#f0ebe3] transition hover:bg-[#faf8f3]",
+                      open?.id === e.id && "bg-[#eef0e3]",
+                    )}
+                  >
+                    <td className="max-w-[21rem] px-4 py-3">
+                      <p className="font-medium">{titleOf(e)}</p>
+                      <p className="mt-1 line-clamp-1 text-xs text-[#8a917c]">{e.message}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium">{e.name}</p>
+                      <p className="mt-0.5 text-xs text-[#8a917c]">{e.email}</p>
+                    </td>
+                    <td className="px-4 py-3 text-[#5c6350]">{placeOf(e) || "—"}</td>
+                    <td className="px-4 py-3 text-[#5c6350]">
+                      {new Date(e.createdAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge tone={e.status === "new" ? "amber" : e.status === "closed" ? "slate" : "olive"}>
+                        {e.status === "in-progress" ? "in review" : e.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            title={filter === "new" ? "No new stories" : "Nothing here"}
+            body="When someone shares a story on the site, it shows up here."
+          />
+        )}
 
         {open && (
-          <Panel className="h-fit space-y-4">
+          <Panel className="h-fit max-w-5xl space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 Guest submission

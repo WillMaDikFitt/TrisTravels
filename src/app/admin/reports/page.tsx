@@ -143,33 +143,53 @@ export default function AdminReportsPage() {
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Panel>
           <h2 className="font-display text-lg">Bookings by status</h2>
-          <ul className="mt-4 space-y-2">
+          <table className="mt-4 w-full text-left text-sm">
+            <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <tr>
+                <th className="pb-2">Status</th>
+                <th className="pb-2 text-right">Bookings</th>
+              </tr>
+            </thead>
+            <tbody>
             {Object.entries(byStatus).map(([status, count]) => (
-              <li key={status} className="flex justify-between border-b border-[#f0ebe3] py-2 text-sm">
-                <span className="capitalize">{status}</span>
-                <span className="font-medium">{count}</span>
-              </li>
+              <tr key={status} className="border-t border-[#f0ebe3]">
+                <td className="py-2 capitalize">{status}</td>
+                <td className="py-2 text-right font-medium">{count}</td>
+              </tr>
             ))}
             {!Object.keys(byStatus).length && (
-              <li className="text-sm text-[#8a917c]">No bookings in this range.</li>
+              <tr>
+                <td colSpan={2} className="py-4 text-[#8a917c]">No bookings in this range.</td>
+              </tr>
             )}
-          </ul>
+            </tbody>
+          </table>
         </Panel>
         <Panel>
           <h2 className="font-display text-lg">Enquiries by source</h2>
-          <ul className="mt-4 space-y-2">
+          <table className="mt-4 w-full text-left text-sm">
+            <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <tr>
+                <th className="pb-2">Source</th>
+                <th className="pb-2 text-right">Enquiries</th>
+              </tr>
+            </thead>
+            <tbody>
             {Object.entries(bySource).map(([source, count]) => (
-              <li key={source} className="flex justify-between border-b border-[#f0ebe3] py-2 text-sm">
-                <span className={cn("capitalize")}>
+              <tr key={source} className="border-t border-[#f0ebe3]">
+                <td className={cn("py-2 capitalize")}>
                   {source === "story" ? "Guest story" : source.replace(/-/g, " ")}
-                </span>
-                <span className="font-medium">{count}</span>
-              </li>
+                </td>
+                <td className="py-2 text-right font-medium">{count}</td>
+              </tr>
             ))}
             {!Object.keys(bySource).length && (
-              <li className="text-sm text-[#8a917c]">No enquiries in this range.</li>
+              <tr>
+                <td colSpan={2} className="py-4 text-[#8a917c]">No enquiries in this range.</td>
+              </tr>
             )}
-          </ul>
+            </tbody>
+          </table>
         </Panel>
       </div>
     </div>

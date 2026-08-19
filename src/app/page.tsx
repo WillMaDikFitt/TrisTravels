@@ -47,92 +47,66 @@ export default async function HomePage() {
             </h2>
           </FadeIn>
 
-          <div className="relative mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href="/experiences"
-              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
-            >
-              <Image
-                src={media.heroRoots}
-                alt="Living root bridge experience in Meghalaya"
-                fill
-                className="object-cover transition duration-700 group-hover:scale-105"
-                sizes="(max-width:1024px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
-                01 · Book online
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                <h3 className="font-display text-3xl">Experiences</h3>
-                <p className="mt-2 text-sm text-white/80">
-                  A few hours to a full day — six types, a clear price, a real date.
-                </p>
-              </div>
-            </Link>
-
-            <Link
-              href="/journeys?type=curated"
-              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
-            >
-              <Image
-                src={media.packages}
-                alt="Curated journeys through Meghalaya"
-                fill
-                className="object-cover transition duration-700 group-hover:scale-105"
-                sizes="(max-width:1024px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
-                02 · Enquire
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                <h3 className="font-display text-3xl">Curated journeys</h3>
-                <p className="mt-2 text-sm text-white/80">Shape dates, stays, and pace with a planner.</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/journeys?type=small-group"
-              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
-            >
-              <Image
-                src={media.departures}
-                alt="Fixed journey departure in Meghalaya"
-                fill
-                className="object-cover transition duration-700 group-hover:scale-105"
-                sizes="(max-width:1024px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
-                03 · Join a date
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                <h3 className="font-display text-3xl">Fixed journeys</h3>
-                <p className="mt-2 text-sm text-white/80">Fixed departures. Show up with curiosity.</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/craft-my-journey"
-              className="group relative min-h-[280px] overflow-hidden rounded-[1.75rem] md:min-h-[340px]"
-            >
-              <Image
-                src={media.craft}
-                alt="Craft a personal Meghalaya journey"
-                fill
-                className="object-cover transition duration-700 group-hover:scale-105"
-                sizes="(max-width:1024px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-              <div className="absolute top-5 left-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold tracking-[0.16em] text-white uppercase">
-                04 · Personal
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                <h3 className="font-display text-3xl">Craft my journey</h3>
-                <p className="mt-2 text-sm text-white/80">Send a brief — we design the route around you.</p>
-              </div>
-            </Link>
+          <div className="relative mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                href: "/experiences",
+                image: media.heroRoots,
+                alt: "Living root bridge experience in Meghalaya",
+                title: "Experiences",
+                body: "A few hours to a full day — clear prices, real dates.",
+              },
+              {
+                href: "/journeys?type=curated",
+                image: media.packages,
+                alt: "Curated journeys through Meghalaya",
+                title: "Curated journeys",
+                body: "Shape dates, stays, and pace with a planner.",
+              },
+              {
+                href: "/journeys?type=small-group",
+                image: media.departures,
+                alt: "Fixed journey departure in Meghalaya",
+                title: "Fixed journeys",
+                body: "Fixed departures. Show up with curiosity.",
+              },
+              {
+                href: "/craft-my-journey",
+                image: media.craft,
+                alt: "Craft a personal Meghalaya journey",
+                title: "Craft my journey",
+                body: "Send a brief — we design the route around you.",
+              },
+            ].map((card, index) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="group relative min-h-[22rem] overflow-hidden rounded-[1.75rem] shadow-[0_16px_40px_rgba(42,46,31,0.12)] md:min-h-[26rem]"
+              >
+                <Image
+                  src={card.image}
+                  alt={card.alt}
+                  fill
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                  sizes="(max-width:1024px) 50vw, 25vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10" />
+                <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="font-display text-sm leading-none font-semibold text-white/60">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="h-px flex-1 bg-white/25 transition-colors duration-500 group-hover:bg-accent" />
+                  </div>
+                  <h3 className="flex min-h-[2.2em] items-end font-display text-[1.6rem] leading-[1.1] text-balance md:text-[1.8rem]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2.5 min-h-[2.75rem] max-w-[19rem] text-sm leading-relaxed text-pretty text-white/85">
+                    {card.body}
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -140,7 +114,7 @@ export default async function HomePage() {
       <section className="bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
         <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
           <div className="ink-rule" />
-          <p className="label-caps mt-4 text-accent">Experience types</p>
+          <p className="label-caps mt-4 text-primary-fixed/70">Experience types</p>
           <h2 className="mt-3 font-display text-3xl md:text-5xl">Pick how a day should feel</h2>
           <div className="mt-10 grid gap-px overflow-hidden rounded-[1.75rem] bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
             {EXPERIENCE_CATEGORIES.map((c, i) => (
@@ -156,7 +130,7 @@ export default async function HomePage() {
                   className="object-cover opacity-0 transition duration-500 group-hover:opacity-35"
                   sizes="33vw"
                 />
-                <span className="relative z-10 font-serif text-3xl text-accent/90">
+                <span className="relative z-10 font-serif text-3xl text-primary-fixed/65">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="relative z-10 mt-8">
@@ -176,19 +150,16 @@ export default async function HomePage() {
               <div className="ink-rule" />
               <p className="label-caps mt-4 text-accent">Bookable now</p>
               <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-                <h2 className="font-display text-3xl text-primary md:text-5xl">Featured days</h2>
+                <h2 className="font-display text-3xl text-primary md:text-5xl">Featured experiences</h2>
                 <Link href="/experiences" className="label-caps mb-1 inline-flex items-center gap-2 text-primary">
                   All experiences <ArrowRight size={16} />
                 </Link>
               </div>
             </FadeIn>
-            <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-2">
-              <ExperienceCard experience={lead} variant="feature" className="h-full" />
-              <div className="flex min-h-0 flex-col gap-5">
-                {featuredRest.map((exp) => (
-                  <ExperienceCard key={exp.slug} experience={exp} variant="row" className="min-h-[14rem] flex-1" />
-                ))}
-              </div>
+            <div className="mt-12 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {[lead, ...featuredRest].map((exp) => (
+                <ExperienceCard key={exp.slug} experience={exp} />
+              ))}
             </div>
           </div>
         </section>
@@ -196,11 +167,11 @@ export default async function HomePage() {
 
       <section className="relative overflow-hidden bg-primary-container py-24 text-center text-primary-fixed md:py-32">
         <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[7rem] leading-none text-accent/35 md:-top-10 md:text-[10rem]">
+          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[7rem] leading-none text-primary-fixed/15 md:-top-10 md:text-[10rem]">
             “
           </span>
           <FadeIn className="relative mx-auto max-w-3xl pt-10 md:pt-14">
-            <p className="label-caps text-accent">Guest highlight</p>
+            <p className="label-caps text-primary-fixed/70">Guest highlight</p>
             <blockquote className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
               Wholesome service from planning to the end of the trip. Recommend TRIS to anyone new to
               the North East.
@@ -218,9 +189,9 @@ export default async function HomePage() {
             </div>
           </div>
           <SlideIn from="right" className="md:col-span-7">
-            <p className="label-caps text-accent">Our story</p>
+            <p className="label-caps text-primary-fixed/70">Our story</p>
             <h2 className="mt-3 font-display text-3xl md:text-5xl">The heart behind TRIS</h2>
-            <blockquote className="mt-6 border-l-2 border-accent pl-5 font-serif text-xl leading-relaxed italic text-primary-fixed/90 md:text-2xl">
+            <blockquote className="mt-6 border-l-2 border-primary-fixed/35 pl-5 font-serif text-xl leading-relaxed italic text-primary-fixed/90 md:text-2xl">
               Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally caring.
             </blockquote>
             <p className="mt-6 text-base leading-relaxed text-primary-fixed/75 md:text-lg">

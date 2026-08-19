@@ -1,4 +1,5 @@
 import { media } from "./media";
+import type { TransportVehiclePrices } from "./transport";
 
 export type Journey = {
   slug: string;
@@ -10,7 +11,14 @@ export type Journey = {
   priceFrom: number;
   /** Prices on trismeghalaya.com are based on a group of 4 unless noted */
   priceNote?: string;
+  priceChild?: number;
+  transportAvailable?: boolean;
+  transportPrice?: number;
+  transportNote?: string;
+  transportVehicles?: TransportVehiclePrices;
   image: string;
+  /** Optional hero carousel stills (cover is prepended on the public page). */
+  gallery?: string[];
   style: string[];
   season: string;
   overview: string;
@@ -63,6 +71,7 @@ export const journeys: Journey[] = [
     priceFrom: 12600,
     priceNote: "per person, based on a group of 4",
     image: media.heroMist,
+    gallery: [media.local.cliffView, media.local.waterfallPool, media.local.livingBridge, media.local.valleyGreen],
     style: ["Nature", "Trek", "Sohra"],
     season: "October to April",
     overview:
@@ -97,6 +106,7 @@ export const journeys: Journey[] = [
     priceFrom: 11100,
     priceNote: "per person, based on a group of 4",
     image: media.peaks,
+    gallery: [media.local.meadowWalk, media.local.kyllangRock, media.local.ridgeLight, media.local.homestay],
     style: ["Highlands", "Village", "Slow"],
     season: "August to April",
     overview:
@@ -127,6 +137,7 @@ export const journeys: Journey[] = [
     priceFrom: 14000,
     priceNote: "per person, based on a group of 4",
     image: media.rain,
+    gallery: [media.local.trailMist, media.local.riverStones, media.local.bridgeTrail, media.local.campfire],
     style: ["Adventure", "River", "Caves"],
     season: "July to April",
     overview:
@@ -161,6 +172,7 @@ export const journeys: Journey[] = [
     priceFrom: 25990,
     priceNote: "per person, based on a group of 4",
     image: media.heroRoots,
+    gallery: [media.local.livingBridge, media.local.forestLight, media.local.villagePath, media.local.waterfallPool],
     style: ["Trek", "Roots", "Adventure"],
     season: "Mid October to March",
     overview:
@@ -197,6 +209,7 @@ export const journeys: Journey[] = [
     priceFrom: 22100,
     priceNote: "per person, based on a group of 4",
     image: media.familyWaterfall,
+    gallery: [media.local.waterfallPool, media.local.campfire, media.local.groupTrail, media.local.tishu01],
     style: ["Offbeat", "Camping", "Village"],
     season: "Mid-October to March",
     overview:
@@ -230,6 +243,7 @@ export const journeys: Journey[] = [
     priceFrom: 22300,
     priceNote: "per person, based on a group of 4",
     image: media.river,
+    gallery: [media.local.riverStones, media.local.forestLight, media.local.raksan03, media.local.highlandRoad],
     style: ["Balanced", "Sacred groves", "Kayak"],
     season: "Mid-October to March",
     overview:
@@ -263,6 +277,7 @@ export const journeys: Journey[] = [
     priceFrom: 22250,
     priceNote: "per person, based on a group of 4",
     image: media.packages,
+    gallery: [media.local.meadowWalk, media.local.marketDay, media.local.homestay, media.local.landscapePanorama],
     style: ["Classic", "Comfort", "Family-friendly"],
     season: "January to December",
     overview:
@@ -296,6 +311,7 @@ export const journeys: Journey[] = [
     priceFrom: 30150,
     priceNote: "per person, based on a group of 4",
     image: media.forest,
+    gallery: [media.local.forestLight, media.local.trailMist, media.local.bridgeTrail, media.local.detail02],
     style: ["Monsoon", "Offbeat", "Adventure"],
     season: "Mid-May to September",
     overview:
@@ -330,6 +346,7 @@ export const journeys: Journey[] = [
     priceFrom: 49350,
     priceNote: "per person, based on a group of 4",
     image: media.mountains,
+    gallery: [media.local.cliffView, media.local.landscapePanorama, media.local.raksan06, media.local.livingBridge],
     style: ["Safari", "Culture", "Nature"],
     season: "Mid-October to March",
     overview:
@@ -366,6 +383,7 @@ export const journeys: Journey[] = [
     priceFrom: 38730,
     priceNote: "per person, based on a group of 4",
     image: media.familyWaterfall,
+    gallery: [media.local.waterfallPool, media.local.groupTrail, media.local.homestay, media.local.portraitWarm],
     style: ["Family", "Gentle pace", "Seniors"],
     season: "October to April",
     overview:
@@ -402,6 +420,7 @@ export const journeys: Journey[] = [
     priceFrom: 68250,
     priceNote: "per person, based on a group of 4",
     image: media.heroForest,
+    gallery: [media.local.villagePath, media.local.bridgeTrail, media.local.tishu02, media.local.raksan04, media.local.campfire],
     style: ["Immersive", "Offbeat", "Culture"],
     season: "Mid October to March",
     overview:
@@ -441,6 +460,7 @@ export const journeys: Journey[] = [
     nights: 6,
     priceFrom: 38299,
     image: media.departures,
+    gallery: [media.local.ridgeLight, media.local.groupTrail, media.local.raksan07, media.local.tishu03],
     style: ["Women-only", "Small group", "Culture"],
     season: "Multiple dates",
     overview:
@@ -483,6 +503,7 @@ export const journeys: Journey[] = [
     nights: 1,
     priceFrom: 6990,
     image: media.heroRoots,
+    gallery: [media.local.livingBridge, media.local.bridgeTrail, media.local.forestLight, media.local.homestay],
     style: ["Roots", "Small group", "Offbeat"],
     season: "Weekly Mondays · 12 Jan 2026 — 6 Apr 2026",
     overview:

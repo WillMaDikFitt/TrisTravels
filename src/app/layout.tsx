@@ -1,21 +1,20 @@
-import { Montserrat, Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
+import { Instrument_Serif, Manrope, Syne } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import "./globals.css";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -55,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${jakarta.variable} ${instrument.variable} h-full`}
+      className={`${syne.variable} ${instrument.variable} ${manrope.variable} h-full`}
       data-scroll-behavior="smooth"
     >
       <body className="relative flex min-h-full flex-col antialiased">

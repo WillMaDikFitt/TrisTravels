@@ -22,6 +22,15 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
 }
 
+function containsStockMedia(value: unknown): boolean {
+  if (typeof value === "string") {
+    return value.includes("images.unsplash.com") || value.includes("static.wixstatic.com");
+  }
+  if (Array.isArray(value)) return value.some(containsStockMedia);
+  if (isPlainObject(value)) return Object.values(value).some(containsStockMedia);
+  return false;
+}
+
 /** Firestore Timestamps / Dates → ISO strings so RSC payloads stay serializable. */
 function sanitizeOverlay(value: unknown): unknown {
   if (value == null || typeof value !== "object") return value;
@@ -46,6 +55,9 @@ function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, 
   for (const [key, value] of Object.entries(remote)) {
     if (key === "slug" || key === "id") continue;
     if (isEmptyOverlay(value)) continue;
+    // Older seeded records can contain the stock placeholders used by the prototype.
+    // Keep the curated local media from the static catalogue for those fields.
+    if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;
     const clean = sanitizeOverlay(value);
     if (isEmptyOverlay(clean)) continue;
     (out as Record<string, unknown>)[key] = clean;

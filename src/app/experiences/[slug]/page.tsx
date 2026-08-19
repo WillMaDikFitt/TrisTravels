@@ -2,11 +2,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Clock, Mountain, MapPin, Users, Star, Check } from "lucide-react";
 import { experiences } from "@/data/experiences";
+import { detailImages } from "@/data/media";
 import { findExperience } from "@/lib/data/repo";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { FadeIn } from "@/components/motion/Motion";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { BreathSection } from "@/components/ui/BreathSection";
+import { DetailGallery } from "@/components/detail/DetailGallery";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,74 +28,69 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
   return (
     <div className="bg-background">
-      <section className="relative h-[68vh] min-h-[calc(420px+var(--header-offset))] w-full overflow-hidden pt-header">
-        <ParallaxImage src={exp.image} alt={exp.name} priority overlay={false} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/20" />
-        <div className="absolute inset-0 z-10 flex items-end">
-          <div className="w-full px-margin-mobile pb-10 pt-8 md:px-margin-desktop md:pb-14">
-            <div className="mx-auto max-w-container-max">
-              <div className="flex flex-wrap gap-2">
-                <span className="label-caps rounded-full bg-accent px-3 py-1 text-on-accent">
-                  {exp.category}
-                </span>
-                {exp.tags.slice(0, 2).map((t) => (
-                  <span
-                    key={t}
-                    className="label-caps rounded-full bg-white/15 px-3 py-1 text-white/90 backdrop-blur-sm"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[0.98] text-white text-shadow-subtle md:text-6xl">
-                {exp.name}
-              </h1>
-              <p className="mt-3 max-w-xl text-white/85">{exp.tagline}</p>
-            </div>
-          </div>
+      <DetailGallery images={detailImages(exp.image, exp.gallery)} alt={exp.name}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="label-caps text-accent">{exp.category}</span>
+          {exp.tags.slice(0, 2).map((t) => (
+            <span
+              key={t}
+              className="label-caps border-l border-outline-variant/40 pl-3 text-on-surface-variant"
+            >
+              {t}
+            </span>
+          ))}
         </div>
-      </section>
+        <h1 className="mt-4 font-display text-4xl leading-[1.02] text-balance text-primary md:text-5xl lg:text-6xl">
+          {exp.name}
+        </h1>
+        <p className="mt-4 max-w-4xl text-base leading-relaxed text-pretty text-on-surface-variant md:text-lg">
+          {exp.tagline}
+        </p>
+      </DetailGallery>
 
-      <div className="grid border-b border-outline-variant/20 md:grid-cols-4">
-        {[
-          { icon: Clock, label: "Duration", value: exp.duration },
-          { icon: Mountain, label: "Difficulty", value: exp.difficulty },
-          { icon: MapPin, label: "Location", value: exp.location },
-          { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
-        ].map(({ icon: Icon, label, value }) => (
-          <div
-            key={label}
-            className="flex gap-3 border-b border-outline-variant/20 p-5 md:border-r md:border-b-0 md:last:border-r-0"
-          >
-            <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
-            <div>
-              <p className="text-xs text-on-surface-variant">{label}</p>
-              <p className="font-medium text-primary">{value}</p>
+      <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
+        <div className="grid overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_35px_rgba(42,46,31,0.06)] md:grid-cols-4">
+          {[
+            { icon: Clock, label: "Duration", value: exp.duration },
+            { icon: Mountain, label: "Difficulty", value: exp.difficulty },
+            { icon: MapPin, label: "Location", value: exp.location },
+            { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
+          ].map(({ icon: Icon, label, value }) => (
+            <div
+              key={label}
+              className="flex gap-3 border-b border-outline-variant/20 p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
+            >
+              <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
+              <div>
+                <p className="label-caps text-[10px] text-on-surface-variant">{label}</p>
+                <p className="mt-1 font-medium text-primary">{value}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <div className="mx-auto max-w-container-max px-margin-mobile pt-6 md:hidden">
         <BookingWidget experience={exp} compact />
       </div>
 
-      <div className="mx-auto grid max-w-container-max gap-10 px-margin-mobile py-10 md:grid-cols-[1fr_360px] md:px-margin-desktop md:py-12">
-        <div className="space-y-12">
-
+      <div className="mx-auto grid max-w-container-max gap-12 px-margin-mobile py-12 md:grid-cols-[minmax(0,1fr)_360px] md:px-margin-desktop md:py-16 lg:gap-16">
+        <div className="space-y-16">
           <FadeIn>
-            <section>
-              <h2 className="font-display text-2xl text-primary">Overview</h2>
-              <p className="mt-4 text-lg leading-relaxed text-on-surface-variant">{exp.overview}</p>
+            <section className="border-l-2 border-accent pl-6 md:pl-8">
+              <p className="label-caps text-accent">The experience</p>
+              <h2 className="mt-3 font-display text-3xl text-primary md:text-4xl">A day rooted in place</h2>
+              <p className="mt-5 max-w-3xl text-lg leading-8 text-on-surface-variant">{exp.overview}</p>
             </section>
           </FadeIn>
 
           <FadeIn>
-            <section>
-              <h2 className="font-display text-2xl text-primary">The TRIS Story</h2>
-              <p className="mt-4 text-lg leading-relaxed text-on-surface-variant">{exp.trisStory}</p>
+            <section className="rounded-3xl bg-primary p-7 text-white md:p-10">
+              <p className="label-caps text-white/65">Why TRIS chose it</p>
+              <h2 className="mt-3 font-display text-3xl text-white">The story behind the journey</h2>
+              <p className="mt-5 text-lg leading-8 text-white/70">{exp.trisStory}</p>
               {exp.guideQuote && (
-                <blockquote className="mt-8 flex gap-4 rounded-2xl bg-surface-container p-6">
+                <blockquote className="mt-8 flex gap-4 border-t border-white/15 pt-6">
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full">
                     <Image
                       src={exp.guideQuote.avatar}
@@ -105,10 +101,10 @@ export default async function ExperienceDetailPage({ params }: Props) {
                     />
                   </div>
                   <div>
-                    <p className="text-lg italic text-on-surface">
+                    <p className="text-lg italic text-white/90">
                       &ldquo;{exp.guideQuote.quote}&rdquo;
                     </p>
-                    <p className="mt-2 text-sm text-on-surface-variant">
+                    <p className="mt-2 text-sm text-white/55">
                       {exp.guideQuote.name} · {exp.guideQuote.role}
                     </p>
                   </div>
@@ -117,22 +113,11 @@ export default async function ExperienceDetailPage({ params }: Props) {
             </section>
           </FadeIn>
 
-          {exp.gallery.length > 0 && (
-            <FadeIn>
-              <div className="grid gap-3 md:grid-cols-3">
-                {exp.gallery.map((src) => (
-                  <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-xl">
-                    <Image src={src} alt={`${exp.name} gallery`} fill className="object-cover" sizes="33vw" />
-                  </div>
-                ))}
-              </div>
-            </FadeIn>
-          )}
-
           <FadeIn>
-            <div className="grid gap-8 md:grid-cols-2">
-              <div>
-                <h3 className="font-display text-xl text-primary">Highlights</h3>
+            <div className="grid overflow-hidden rounded-3xl border border-outline-variant/25 md:grid-cols-2">
+              <div className="p-7 md:p-8">
+                <p className="label-caps text-accent">What stands out</p>
+                <h3 className="mt-2 font-display text-2xl text-primary">Highlights</h3>
                 <ul className="mt-4 space-y-3">
                   {exp.highlights.map((h) => (
                     <li key={h} className="flex gap-2 text-on-surface-variant">
@@ -142,8 +127,9 @@ export default async function ExperienceDetailPage({ params }: Props) {
                   ))}
                 </ul>
               </div>
-              <div>
-                <h3 className="font-display text-xl text-primary">What&apos;s included</h3>
+              <div className="border-t border-outline-variant/25 bg-surface-container-low p-7 md:border-t-0 md:border-l md:p-8">
+                <p className="label-caps text-accent">Taken care of</p>
+                <h3 className="mt-2 font-display text-2xl text-primary">What&apos;s included</h3>
                 <ul className="mt-4 space-y-3">
                   {exp.included.map((h) => (
                     <li key={h} className="flex gap-2 text-on-surface-variant">
@@ -158,7 +144,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           <FadeIn>
             <section>
-              <h2 className="font-display text-2xl text-primary">The Journey</h2>
+              <p className="label-caps text-accent">Step by step</p>
+              <h2 className="mt-2 font-display text-3xl text-primary">How the day unfolds</h2>
               <ol className="relative mt-8 space-y-8 border-l border-outline-variant/40 pl-8">
                 {exp.itinerary.map((step) => (
                   <li key={step.time} className="relative">
@@ -174,13 +161,15 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           <FadeIn>
             <section>
-              <h2 className="font-display text-2xl text-primary">Essential information</h2>
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <p className="label-caps text-accent">Before you go</p>
+              <h2 className="mt-2 font-display text-2xl text-primary md:text-3xl">Essential information</h2>
+              <div className="mt-7 grid gap-4 md:grid-cols-3">
                 {[
-                  { title: "What to bring", items: exp.whatToBring },
-                  { title: "Suitable for", items: exp.suitableFor },
+                  { title: "What to bring", eyebrow: "Pack list", items: exp.whatToBring },
+                  { title: "Suitable for", eyebrow: "Who it fits", items: exp.suitableFor },
                   {
                     title: "Before you book",
+                    eyebrow: "Good to know",
                     items: [
                       `Best season: ${exp.bestSeason}`,
                       `Meeting point: ${exp.meetingPoint}`,
@@ -191,12 +180,16 @@ export default async function ExperienceDetailPage({ params }: Props) {
                 ].map((card) => (
                   <div
                     key={card.title}
-                    className="rounded-2xl border border-outline-variant/30 bg-surface-container-low p-5"
+                    className="flex flex-col rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-6 shadow-[0_10px_30px_rgba(42,46,31,0.05)]"
                   >
-                    <h3 className="font-display text-lg text-primary">{card.title}</h3>
-                    <ul className="mt-3 space-y-2 text-sm text-on-surface-variant">
+                    <p className="label-caps text-[10px] text-accent">{card.eyebrow}</p>
+                    <h3 className="mt-2 font-display text-xl text-primary">{card.title}</h3>
+                    <ul className="mt-5 flex-1 space-y-3">
                       {card.items.map((item) => (
-                        <li key={item}>· {item}</li>
+                        <li key={item} className="flex gap-3 text-sm leading-relaxed text-on-surface-variant">
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                          <span>{item}</span>
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -250,9 +243,9 @@ export default async function ExperienceDetailPage({ params }: Props) {
           )}
         </div>
 
-        <div className="hidden md:block md:self-start">
+        <aside className="hidden md:block md:self-start md:sticky md:top-[calc(var(--header-offset)+2.5rem)]">
           <BookingWidget experience={exp} />
-        </div>
+        </aside>
       </div>
 
       <BreathSection

@@ -23,10 +23,10 @@ export function DestinationCard({ destination, className }: Props) {
         alt={destination.name}
         fill
         className="object-cover transition duration-700 group-hover:scale-105"
-        sizes="25vw"
-        quality={75}
+        sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
+        quality={80}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10" />
       <p className="absolute top-3 left-3 rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold tracking-[0.14em] text-on-accent uppercase">
         {destination.region}
       </p>
@@ -40,7 +40,7 @@ export function DestinationCard({ destination, className }: Props) {
             <Navigation size={11} />
             {destination.distances.shillong}
           </p>
-          <span className="inline-flex shrink-0 items-center gap-1 text-[9px] font-bold tracking-[0.12em] text-accent uppercase">
+          <span className="inline-flex shrink-0 items-center gap-1 text-[9px] font-bold tracking-[0.12em] text-white uppercase">
             View
             <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
           </span>

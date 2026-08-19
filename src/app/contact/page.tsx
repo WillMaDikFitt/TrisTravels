@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
 import { PageHero } from "@/components/motion/FullBleedParallax";
@@ -13,10 +14,20 @@ import {
   FormTextarea,
 } from "@/components/ui/Form";
 import { media } from "@/data/media";
+import { getCraftProduct } from "@/data/artisans";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 
 export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="bg-background pt-header min-h-[50vh]" />}>
+      <ContactPageInner />
+    </Suspense>
+  );
+}
+
+function ContactPageInner() {
+  const craft = getCraftProduct(useSearchParams().get("craft") ?? "");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -128,7 +139,10 @@ export default function ContactPage() {
                     email: String(fd.get("email") || ""),
                     phone: String(fd.get("phone") || ""),
                     message: String(fd.get("message") || ""),
-                    payload: { subject: String(fd.get("subject") || "") },
+                    payload: {
+                      subject: String(fd.get("subject") || ""),
+                      ...(craft ? { craft: craft.slug, craftName: craft.name } : {}),
+                    },
                   });
                   if (!res.ok) setError(res.error);
                   else setSent(true);
@@ -160,6 +174,7 @@ export default function ContactPage() {
                 label="Subject"
                 name="subject"
                 placeholder="e.g. Help with a booking"
+                defaultValue={craft ? `Craft: ${craft.name}` : undefined}
               />
               <FormTextarea
                 label="How can we help?"
@@ -167,6 +182,11 @@ export default function ContactPage() {
                 required
                 rows={5}
                 placeholder="Dates, group size, questions…"
+                defaultValue={
+                  craft
+                    ? `I'd like help sourcing “${craft.name}” from Artisan’s Hub.`
+                    : undefined
+                }
               />
               {error && <p className="text-sm text-primary">{error}</p>}
               <Button type="submit" size="lg" disabled={busy}>

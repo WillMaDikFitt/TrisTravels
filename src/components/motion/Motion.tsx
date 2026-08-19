@@ -120,10 +120,12 @@ export function StaggerChildren({
   children,
   className,
   stagger = 0.12,
+  mode = "inView",
 }: {
   children: React.ReactNode;
   className?: string;
   stagger?: number;
+  mode?: "inView" | "mount";
 }) {
   const reduce = useMotionGate();
   if (reduce) return <div className={className}>{children}</div>;
@@ -131,8 +133,9 @@ export function StaggerChildren({
     <motion.div
       className={className}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-10% 0px" }}
+      animate={mode === "mount" ? "visible" : undefined}
+      whileInView={mode === "inView" ? "visible" : undefined}
+      viewport={mode === "inView" ? { once: true, margin: "-10% 0px" } : undefined}
       variants={{
         hidden: {},
         visible: { transition: { staggerChildren: stagger } },

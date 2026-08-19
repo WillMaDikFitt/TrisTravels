@@ -44,6 +44,12 @@
 
 @media (min-width: 768px) {
   :root {
+    --header-offset: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
     --header-offset: 5.25rem;
   }
 }
@@ -77,8 +83,8 @@
   --color-inverse-surface: var(--inverse-surface);
   --color-inverse-on-surface: var(--inverse-on-surface);
 
-  --font-display: var(--font-montserrat);
-  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-syne);
+  --font-sans: var(--font-manrope);
   --font-serif: var(--font-instrument);
 
   --spacing-container-max: 80rem;
@@ -98,7 +104,7 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-jakarta), system-ui, sans-serif;
+    font-family: var(--font-manrope), system-ui, sans-serif;
   }
 
   ::selection {
@@ -135,7 +141,7 @@
   }
 
   .label-caps {
-    font-family: var(--font-jakarta), system-ui, sans-serif;
+    font-family: var(--font-manrope), system-ui, sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1rem;
@@ -164,10 +170,61 @@
   .watermark {
     pointer-events: none;
     user-select: none;
-    font-family: var(--font-montserrat), sans-serif;
+    font-family: var(--font-syne), sans-serif;
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 0.85;
     color: rgba(42, 46, 31, 0.06);
+  }
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.route-exit) {
+  animation: 120ms ease-in both route-fade-out;
+}
+
+::view-transition-new(.route-enter) {
+  animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both route-reveal;
+}
+
+@keyframes route-fade-out {
+  to {
+    opacity: 0;
+    filter: blur(1px);
+  }
+}
+
+@keyframes route-reveal {
+  from {
+    opacity: 0;
+    filter: blur(1.5px);
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
   }
 }

@@ -23,6 +23,13 @@
 # misc
 .DS_Store
 *.pem
+.tmp-*/
+.tmp-*
+.tmp-ffmpeg/
+
+# local source dumps (files already live in public/)
+/Images.zip
+/hero-section-video.MOV
 
 # debug
 npm-debug.log*

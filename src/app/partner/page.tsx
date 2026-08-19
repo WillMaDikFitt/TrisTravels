@@ -35,7 +35,7 @@ export default function PartnerPage() {
     <div className="bg-background">
       <PageHero
         src={media.valueCommunity}
-        alt="Partner with TRIS"
+        alt="A village in the Meghalaya hills"
         compact
         eyebrow="Collaborate"
         title="Partner with us"

@@ -15,18 +15,17 @@ const columns = [
     title: "Discover",
     links: [
       { href: "/destinations", label: "Destinations" },
+      { href: "/artisans", label: "Crafts" },
       { href: "/stories", label: "Stories" },
-      { href: "/about", label: "About TRIS" },
-      { href: "/partner", label: "Partner with Us" },
     ],
   },
   {
-    title: "Connect",
+    title: "TRIS",
     links: [
+      { href: "/about", label: "About TRIS" },
+      { href: "/partner", label: "Partner with Us" },
       { href: "/contact", label: "Contact" },
       { href: "/login", label: "Log in / Sign up" },
-      { href: "/stories#share", label: "Share a story" },
-      { href: "/experiences", label: "Book an experience" },
     ],
   },
 ];
@@ -46,7 +45,7 @@ export function Footer() {
                   className="mx-auto h-28 w-auto sm:h-32 md:mx-0 md:h-28 lg:h-32"
                 />
               </Link>
-              <p className="mt-4 text-sm leading-relaxed text-on-surface-variant md:mt-5 md:text-base lg:text-lg">
+              <p className="mt-4 text-xs leading-relaxed text-on-surface-variant md:mt-5 md:text-sm">
                 Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
                 stronger.
               </p>

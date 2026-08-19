@@ -64,30 +64,49 @@ export default function AdminPlacesPage() {
           </AdminButton>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <Panel className="h-fit">
+      <div className="space-y-6">
+        <Panel className="overflow-x-auto">
           <p className="mb-3 text-xs font-semibold tracking-wider text-[#6b734f] uppercase">All places</p>
-          <ul className="space-y-1">
+          <table className="w-full min-w-[650px] text-left text-sm">
+            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <tr>
+                <th className="px-3 py-2.5">Place</th>
+                <th className="px-3 py-2.5">Region</th>
+                <th className="px-3 py-2.5">From Shillong</th>
+                <th className="px-3 py-2.5">Highlights</th>
+                <th className="px-3 py-2.5 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
             {dests.map((d) => (
-              <li key={d.slug}>
-                <button
+              <tr
+                key={d.slug}
+                className={cn(
+                  "border-t border-[#f0ebe3]",
+                  !creating && dest?.slug === d.slug ? "bg-[#eef0e3]" : "hover:bg-[#faf8f3]",
+                )}
+              >
+                <td className="px-3 py-3 font-medium">{d.name}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{d.region}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{d.distances.shillong || "—"}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{d.highlights.length}</td>
+                <td className="px-3 py-3 text-right">
+                  <button
                   type="button"
                   onClick={() => {
                     setCreating(false);
                     setDest(d);
                     setNote("");
                   }}
-                  className={cn(
-                    "w-full rounded-xl px-3 py-2 text-left text-sm",
-                    !creating && dest?.slug === d.slug ? "bg-[#e4e8d4]" : "hover:bg-[#f7f4ee]",
-                  )}
+                  className="text-xs font-semibold text-[#4a5a28]"
                 >
-                  {d.name}
-                  <span className="mt-0.5 block text-xs text-[#8a917c]">{d.region}</span>
+                  Edit
                 </button>
-              </li>
+                </td>
+              </tr>
             ))}
-          </ul>
+            </tbody>
+          </table>
         </Panel>
 
         {editing ? (

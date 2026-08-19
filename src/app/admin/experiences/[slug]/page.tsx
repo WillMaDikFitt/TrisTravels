@@ -10,6 +10,7 @@ import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
+import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 const categories = EXPERIENCE_CATEGORIES.map((c) => c.id) as ExperienceCategory[];
 const difficulties: Difficulty[] = ["Easy", "Moderate", "Challenging"];
@@ -32,7 +33,7 @@ function blank(slug = ""): Experience {
     priceFrom: 0,
     maxGuests: 10,
     minGuests: 1,
-    slots: ["08:30", "09:00", "10:00"],
+    slotConfig: { mode: "fixed", times: ["08:30", "09:00", "10:00"] },
     status: "draft",
     image: "",
     gallery: [],
@@ -130,9 +131,35 @@ export default function ExperienceEditorPage() {
             bestSeason: String(fd.get("bestSeason")),
             priceFrom: Number(fd.get("priceFrom") || 0),
             priceAdult: Number(fd.get("priceAdult") || fd.get("priceFrom") || 0),
+            priceChild: Number(fd.get("priceChild") || 0) || undefined,
             minGuests: Number(fd.get("minGuests") || 1),
             maxGuests: Number(fd.get("maxGuests") || 10),
             slots: lines(String(fd.get("slots") || "")),
+            slotConfig: (() => {
+              const breaks = lines(String(fd.get("slotBreaks") || ""))
+                .map((line) => {
+                  const [start, end] = line.split("-").map((part) => part.trim());
+                  return start && end ? { start, end } : null;
+                })
+                .filter((row): row is { start: string; end: string } => Boolean(row));
+              return String(fd.get("slotMode")) === "interval"
+                ? {
+                    mode: "interval" as const,
+                    start: String(fd.get("slotStart") || ""),
+                    end: String(fd.get("slotEnd") || ""),
+                    intervalMinutes: Number(fd.get("slotInterval") || 60),
+                    breaks: breaks.length ? breaks : undefined,
+                  }
+                : {
+                    mode: "fixed" as const,
+                    times: lines(String(fd.get("slots") || "")),
+                    breaks: breaks.length ? breaks : undefined,
+                  };
+            })(),
+            transportAvailable: fd.get("transportAvailable") === "on",
+            transportPrice: Number(fd.get("transportPrice") || 0) || undefined,
+            transportNote: String(fd.get("transportNote") || ""),
+            transportVehicles: readTransportVehiclePrices(fd),
             status: String(fd.get("status")) as ExperienceStatus,
             image: String(fd.get("image")),
             gallery: lines(String(fd.get("gallery") || "")),
@@ -224,6 +251,9 @@ export default function ExperienceEditorPage() {
             <Field label="Adult price (₹)" hint="optional">
               <input name="priceAdult" type="number" defaultValue={row.priceAdult ?? row.priceFrom} className={inputClass} />
             </Field>
+            <Field label="Child price (₹)" hint="blank = 70% of adult">
+              <input name="priceChild" type="number" min="0" defaultValue={row.priceChild ?? ""} className={inputClass} />
+            </Field>
             <Field label="Min guests">
               <input name="minGuests" type="number" defaultValue={row.minGuests ?? 1} className={inputClass} />
             </Field>
@@ -231,10 +261,81 @@ export default function ExperienceEditorPage() {
               <input name="maxGuests" type="number" defaultValue={row.maxGuests} className={inputClass} />
             </Field>
           </div>
-          <div className="mt-4">
-            <Field label="Time slots" hint="one per line">
-              <textarea name="slots" rows={3} defaultValue={(row.slots ?? ["08:30", "09:00", "10:00"]).join("\n")} className={inputClass} />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <Field label="Slot schedule">
+              <select name="slotMode" defaultValue={row.slotConfig?.mode ?? "fixed"} className={inputClass}>
+                <option value="fixed">Set times each day</option>
+                <option value="interval">Repeat at an interval</option>
+              </select>
             </Field>
+            <Field label="Time slots" hint="Fixed schedule: one per line">
+              <textarea
+                name="slots"
+                rows={3}
+                defaultValue={(row.slotConfig?.times ?? row.slots ?? ["08:30", "09:00", "10:00"]).join("\n")}
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <Field label="Interval start">
+              <input name="slotStart" type="time" defaultValue={row.slotConfig?.start ?? "09:00"} className={inputClass} />
+            </Field>
+            <Field label="Interval end">
+              <input name="slotEnd" type="time" defaultValue={row.slotConfig?.end ?? "17:00"} className={inputClass} />
+            </Field>
+            <Field label="Minutes between slots">
+              <input name="slotInterval" type="number" min="15" step="15" defaultValue={row.slotConfig?.intervalMinutes ?? 60} className={inputClass} />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field
+              label="Break windows (optional)"
+              hint="One per line as 12:00-13:00 — slot times inside a break are skipped"
+            >
+              <textarea
+                name="slotBreaks"
+                rows={2}
+                placeholder={"12:00-13:00"}
+                defaultValue={(row.slotConfig?.breaks ?? [])
+                  .map((window) => `${window.start}-${window.end}`)
+                  .join("\n")}
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <div className="mt-6 border-t border-[#e4dfd4] pt-5">
+            <h3 className="font-display text-base text-[#2a2e1f]">Transportation</h3>
+            <label className="mt-3 flex items-center gap-2 text-sm text-[#2a2e1f]">
+              <input name="transportAvailable" type="checkbox" defaultChecked={row.transportAvailable} />
+              Offer transportation as an optional add-on
+            </label>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field label="Base transport price (₹)" hint="Used when a vehicle rate below is blank">
+                <input name="transportPrice" type="number" min="0" defaultValue={row.transportPrice ?? ""} className={inputClass} />
+              </Field>
+              <Field label="Transport note" hint="Pickup area, shared/private, etc.">
+                <input name="transportNote" defaultValue={row.transportNote ?? ""} className={inputClass} />
+              </Field>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {TRANSPORT_VEHICLE_IDS.map((id) => (
+                <Field
+                  key={id}
+                  label={`${TRANSPORT_VEHICLE_META[id].label} (₹)`}
+                  hint={TRANSPORT_VEHICLE_META[id].seats}
+                >
+                  <input
+                    name={`transport${id.charAt(0).toUpperCase()}${id.slice(1)}`}
+                    type="number"
+                    min="0"
+                    defaultValue={row.transportVehicles?.[id] ?? ""}
+                    className={inputClass}
+                    placeholder="Auto from base"
+                  />
+                </Field>
+              ))}
+            </div>
           </div>
         </Panel>
 

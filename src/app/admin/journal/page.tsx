@@ -63,32 +63,49 @@ export default function AdminJournalPage() {
           </div>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-        <Panel className="h-fit">
+      <div className="space-y-6">
+        <Panel className="overflow-x-auto">
           <p className="mb-3 text-xs font-semibold tracking-wider text-[#6b734f] uppercase">Published</p>
-          <ul className="space-y-1">
+          <table className="w-full min-w-[700px] text-left text-sm">
+            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <tr>
+                <th className="px-3 py-2.5">Story</th>
+                <th className="px-3 py-2.5">Author</th>
+                <th className="px-3 py-2.5">Category</th>
+                <th className="px-3 py-2.5">Published</th>
+                <th className="px-3 py-2.5 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
             {stories.map((s) => (
-              <li key={s.slug}>
-                <button
+              <tr
+                key={s.slug}
+                className={cn(
+                  "border-t border-[#f0ebe3]",
+                  !creating && story?.slug === s.slug ? "bg-[#eef0e3]" : "hover:bg-[#faf8f3]",
+                )}
+              >
+                <td className="max-w-[28rem] px-3 py-3 font-medium">{s.title}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{s.author || "—"}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{s.category}</td>
+                <td className="px-3 py-3 text-[#5c6350]">{s.date}</td>
+                <td className="px-3 py-3 text-right">
+                  <button
                   type="button"
                   onClick={() => {
                     setCreating(false);
                     setStory(s);
                     setNote("");
                   }}
-                  className={cn(
-                    "w-full rounded-xl px-3 py-2 text-left text-sm",
-                    !creating && story?.slug === s.slug ? "bg-[#e4e8d4]" : "hover:bg-[#f7f4ee]",
-                  )}
+                  className="text-xs font-semibold text-[#4a5a28]"
                 >
-                  {s.title}
-                  <span className="mt-0.5 block text-xs text-[#8a917c]">
-                    {s.author} · {s.date}
-                  </span>
+                  Edit
                 </button>
-              </li>
+                </td>
+              </tr>
             ))}
-          </ul>
+            </tbody>
+          </table>
         </Panel>
 
         {editing ? (

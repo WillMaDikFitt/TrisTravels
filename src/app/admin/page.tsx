@@ -2,6 +2,8 @@ import Link from "next/link";
 import { listBookings } from "@/lib/actions/bookings";
 import { listEnquiries } from "@/lib/actions/enquiries";
 import { listExperiences, listJourneys } from "@/lib/data/repo";
+import { seedStudioDemo } from "@/lib/actions/studio-demo";
+import { OverviewCharts, type OverviewChartData } from "@/components/admin/OverviewCharts";
 import { Badge, PageHeader, Panel, StatCard, bookingTone } from "@/components/admin/ui";
 import { formatINR } from "@/lib/utils";
 import { nextOpenDeparture, seatsLeft } from "@/lib/journey-seats";
@@ -24,17 +26,111 @@ function thisMonthKey() {
   return new Date().toISOString().slice(0, 7);
 }
 
+function daysAgoISO(days: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+function buildOverviewCharts(
+  bookings: Awaited<ReturnType<typeof listBookings>>,
+  enquiries: Awaited<ReturnType<typeof listEnquiries>>,
+): OverviewChartData {
+  const start = daysAgoISO(29);
+  const trendMap = new Map<string, { bookings: number; revenue: number }>();
+  for (let i = 29; i >= 0; i--) {
+    const date = daysAgoISO(i);
+    trendMap.set(date, { bookings: 0, revenue: 0 });
+  }
+
+  for (const booking of bookings) {
+    const day = (booking.createdAt || booking.date || "").slice(0, 10);
+    if (!day || day < start) continue;
+    const row = trendMap.get(day);
+    if (!row) continue;
+    row.bookings += 1;
+    if (booking.status === "confirmed") row.revenue += booking.customerTotal || 0;
+  }
+
+  const bookingTrend = [...trendMap.entries()].map(([date, row]) => ({
+    date,
+    label: new Date(`${date}T12:00:00`).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    }),
+    bookings: row.bookings,
+    revenue: row.revenue,
+  }));
+
+  const statusColors: Record<string, string> = {
+    confirmed: "#4a5a28",
+    requested: "#c2643a",
+    hold: "#d4a017",
+    expired: "#b45353",
+    cancelled: "#8a917c",
+  };
+  const statusCounts = new Map<string, number>();
+  for (const booking of bookings) {
+    statusCounts.set(booking.status, (statusCounts.get(booking.status) ?? 0) + 1);
+  }
+  const statusMix = [...statusCounts.entries()].map(([name, value]) => ({
+    name,
+    value,
+    color: statusColors[name] ?? "#8a917c",
+  }));
+
+  const sourceLabels: Record<string, string> = {
+    "craft-my-journey": "Craft",
+    journey: "Journey",
+    contact: "Contact",
+    partner: "Partner",
+    story: "Stories",
+  };
+  const sourceCounts = new Map<string, number>();
+  for (const enquiry of enquiries) {
+    const key = sourceLabels[enquiry.source] ?? enquiry.source;
+    sourceCounts.set(key, (sourceCounts.get(key) ?? 0) + 1);
+  }
+  const enquirySources = [...sourceCounts.entries()]
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  const experienceMap = new Map<string, { bookings: number; revenue: number }>();
+  for (const booking of bookings) {
+    const current = experienceMap.get(booking.experienceName) ?? { bookings: 0, revenue: 0 };
+    current.bookings += 1;
+    if (booking.status === "confirmed") current.revenue += booking.customerTotal || 0;
+    experienceMap.set(booking.experienceName, current);
+  }
+  const topExperiences = [...experienceMap.entries()]
+    .map(([name, row]) => ({
+      name: name.length > 22 ? `${name.slice(0, 20)}…` : name,
+      bookings: row.bookings,
+      revenue: row.revenue,
+    }))
+    .sort((a, b) => b.bookings - a.bookings)
+    .slice(0, 5);
+
+  return { bookingTrend, statusMix, enquirySources, topExperiences };
+}
+
 export default async function AdminDashboard() {
-  const [bookings, enquiries, experiences, journeys] = await Promise.all([
+  let [bookings, enquiries, experiences, journeys] = await Promise.all([
     listBookings(),
     listEnquiries(),
     listExperiences(),
     listJourneys(),
   ]);
 
+  if (!bookings.length && !enquiries.length) {
+    await seedStudioDemo();
+    [bookings, enquiries] = await Promise.all([listBookings(), listEnquiries()]);
+  }
+
   const needsConfirm = bookings.filter((b) => b.status === "requested" || b.status === "hold");
   const newEnquiries = enquiries.filter((e) => e.status === "new" && e.source !== "story");
   const newStories = enquiries.filter((e) => e.status === "new" && e.source === "story");
+  const chartData = buildOverviewCharts(bookings, enquiries);
 
   const month = thisMonthKey();
   const departuresThisMonth = journeys
@@ -86,6 +182,10 @@ export default async function AdminDashboard() {
     })),
   ].slice(0, 12);
 
+  const confirmedRevenue = bookings
+    .filter((b) => b.status === "confirmed")
+    .reduce((sum, b) => sum + (b.customerTotal || 0), 0);
+
   return (
     <div>
       <PageHeader
@@ -98,11 +198,13 @@ export default async function AdminDashboard() {
         <StatCard label="New enquiries" value={newEnquiries.length} hint="Craft, journey, contact, partner" />
         <StatCard label="New guest stories" value={newStories.length} hint="Awaiting review" />
         <StatCard
-          label="Departures this month"
-          value={departuresThisMonth.length}
-          hint={`${experiences.length} live experiences`}
+          label="Confirmed revenue"
+          value={formatINR(confirmedRevenue)}
+          hint={`${departuresThisMonth.length} departures this month · ${experiences.length} experiences`}
         />
       </div>
+
+      <OverviewCharts data={chartData} />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <Panel>
@@ -113,22 +215,41 @@ export default async function AdminDashboard() {
               <Link href="/admin/enquiries">Inbox</Link>
             </div>
           </div>
-          <ul className="space-y-3">
-            {actionItems.map((item) => (
-              <li key={item.key} className="border-b border-[#f0ebe3] pb-3 last:border-0">
-                <Link href={item.href} className="block hover:opacity-80">
-                  <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-                    {item.kind}
-                  </p>
-                  <p className="mt-0.5 font-medium">{item.title}</p>
-                  <p className="mt-1 line-clamp-2 text-sm text-[#5c6350]">{item.meta}</p>
-                </Link>
-              </li>
-            ))}
-            {!actionItems.length && (
-              <li className="text-sm text-[#8a917c]">You’re clear — nothing waiting.</li>
-            )}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] text-left text-sm">
+              <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <tr>
+                  <th className="pb-2">Type</th>
+                  <th className="pb-2">Item</th>
+                  <th className="pb-2">Detail</th>
+                </tr>
+              </thead>
+              <tbody>
+                {actionItems.map((item) => (
+                  <tr key={item.key} className="border-t border-[#f0ebe3]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                      {item.kind}
+                    </td>
+                    <td className="py-2.5 pr-3 font-medium">
+                      <Link href={item.href} className="hover:underline">
+                        {item.title}
+                      </Link>
+                    </td>
+                    <td className="max-w-[14rem] py-2.5 text-[#5c6350]">
+                      <p className="line-clamp-2">{item.meta}</p>
+                    </td>
+                  </tr>
+                ))}
+                {!actionItems.length && (
+                  <tr>
+                    <td colSpan={3} className="py-4 text-[#8a917c]">
+                      You’re clear — nothing waiting.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </Panel>
 
         <Panel>
@@ -141,41 +262,61 @@ export default async function AdminDashboard() {
               Journeys
             </Link>
           </div>
-          <ul className="space-y-3">
-            {thisWeekBookings.map((b) => (
-              <li key={b.id} className="flex items-start justify-between gap-3 border-b border-[#f0ebe3] pb-3">
-                <div>
-                  <p className="font-medium">{b.experienceName}</p>
-                  <p className="text-sm text-[#5c6350]">
-                    {b.date} · {b.slot} · {b.customerName}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
-                  <p className="mt-1 text-xs text-[#8a917c]">{formatINR(b.customerTotal)}</p>
-                </div>
-              </li>
-            ))}
-            {thisWeekDepartures.map(({ journey, dep }) => (
-              <li
-                key={`${journey.slug}-${dep.date}`}
-                className="border-b border-[#f0ebe3] pb-3 last:border-0"
-              >
-                <Link href={`/admin/journeys/${journey.slug}`} className="block hover:opacity-80">
-                  <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-                    Small group
-                  </p>
-                  <p className="mt-0.5 font-medium">{journey.name}</p>
-                  <p className="mt-1 text-sm text-[#5c6350]">
-                    {dep.date} · {seatsLeft(dep)} seats left
-                  </p>
-                </Link>
-              </li>
-            ))}
-            {!thisWeekBookings.length && !thisWeekDepartures.length && (
-              <li className="text-sm text-[#8a917c]">Nothing scheduled this week yet.</li>
-            )}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[460px] text-left text-sm">
+              <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <tr>
+                  <th className="pb-2">Type</th>
+                  <th className="pb-2">Name</th>
+                  <th className="pb-2">When</th>
+                  <th className="pb-2">Status</th>
+                  <th className="pb-2 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {thisWeekBookings.map((b) => (
+                  <tr key={b.id} className="border-t border-[#f0ebe3]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                      Booking
+                    </td>
+                    <td className="py-2.5 pr-3 font-medium">{b.experienceName}</td>
+                    <td className="py-2.5 pr-3 text-[#5c6350]">
+                      {b.date}
+                      <span className="mt-0.5 block text-xs text-[#8a917c]">
+                        {b.slot} · {b.customerName}
+                      </span>
+                    </td>
+                    <td className="py-2.5 pr-3">
+                      <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
+                    </td>
+                    <td className="py-2.5 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
+                  </tr>
+                ))}
+                {thisWeekDepartures.map(({ journey, dep }) => (
+                  <tr key={`${journey.slug}-${dep.date}`} className="border-t border-[#f0ebe3]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                      Fixed
+                    </td>
+                    <td className="py-2.5 pr-3 font-medium">
+                      <Link href={`/admin/journeys/${journey.slug}`} className="hover:underline">
+                        {journey.name}
+                      </Link>
+                    </td>
+                    <td className="py-2.5 pr-3 text-[#5c6350]">{dep.date}</td>
+                    <td className="py-2.5 pr-3 text-[#5c6350]">{seatsLeft(dep)} seats left</td>
+                    <td className="py-2.5 text-right text-[#8a917c]">—</td>
+                  </tr>
+                ))}
+                {!thisWeekBookings.length && !thisWeekDepartures.length && (
+                  <tr>
+                    <td colSpan={5} className="py-4 text-[#8a917c]">
+                      Nothing scheduled this week yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {departuresThisMonth.length > 0 && (
             <div className="mt-6 border-t border-[#f0ebe3] pt-4">

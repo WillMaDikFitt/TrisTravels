@@ -125,50 +125,76 @@ export default function AdminBookingsPage() {
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={inputClass} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-2">
-          {visible.map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => openPanel(b)}
-              className={cn(
-                "w-full rounded-2xl border bg-white p-4 text-left transition",
-                open?.id === b.id ? "border-[#4a5a28]" : "border-[#e4dfd4] hover:border-[#c8c2b4]",
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-medium">{b.experienceName}</p>
-                  <p className="mt-1 text-sm text-[#5c6350]">
-                    {b.date} · {b.slot} · {b.guests} guests
-                  </p>
-                  <p className="mt-1 text-sm text-[#5c6350]">
-                    {b.customerName} · {b.customerEmail}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <Badge tone={bookingTone(b.status)}>{statusLabel[b.status]}</Badge>
-                  <p className="mt-2 text-sm font-medium">{formatINR(b.customerTotal)}</p>
-                </div>
-              </div>
-            </button>
-          ))}
-          {!visible.length && (
-            <EmptyState title="No bookings in this view" body="Try another filter or search." />
-          )}
-        </div>
+      <div className="grid gap-6">
+        {visible.length ? (
+          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
+            <table className="w-full min-w-[850px] text-left text-sm">
+              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <tr>
+                  <th className="px-4 py-3">Reference</th>
+                  <th className="px-4 py-3">Experience</th>
+                  <th className="px-4 py-3">Date & slot</th>
+                  <th className="px-4 py-3">Guest</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((b) => (
+                  <tr
+                    key={b.id}
+                    onClick={() => openPanel(b)}
+                    className={cn(
+                      "cursor-pointer border-t border-[#f0ebe3] transition hover:bg-[#faf8f3]",
+                      open?.id === b.id && "bg-[#eef0e3]",
+                    )}
+                  >
+                    <td className="px-4 py-3 font-mono text-xs text-[#6b734f]">{b.id}</td>
+                    <td className="px-4 py-3 font-medium">{b.experienceName}</td>
+                    <td className="px-4 py-3 text-[#5c6350]">
+                      {b.date}
+                      <span className="mt-0.5 block text-xs text-[#8a917c]">
+                        {b.slot} · {b.guests} guests
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium">{b.customerName}</p>
+                      <p className="mt-0.5 text-xs text-[#8a917c]">{b.customerEmail}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge tone={bookingTone(b.status)}>{statusLabel[b.status]}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right font-medium">{formatINR(b.customerTotal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState title="No bookings in this view" body="Try another filter or search." />
+        )}
 
         {open && (
-          <Panel className="h-fit space-y-4">
+          <Panel className="h-fit max-w-5xl space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 {open.id}
               </p>
               <h2 className="mt-1 font-display text-xl">{open.experienceName}</h2>
               <p className="mt-1 text-sm text-[#5c6350]">
-                {open.date} · {open.slot} · {open.guests} guests
+                {open.date} · {open.slot} · {open.adults ?? open.guests} adult
+                {(open.adults ?? open.guests) === 1 ? "" : "s"}
+                {open.children ? ` · ${open.children} child${open.children === 1 ? "" : "ren"}` : ""}
+                {open.childAges?.length ? ` (ages ${open.childAges.join(", ")})` : ""}
               </p>
+              {open.transportation?.requested ? (
+                <p className="mt-1 text-sm text-[#5c6350]">
+                  Transport: {open.transportation.vehicleLabel ?? "Requested"}
+                  {open.transportation.price
+                    ? ` · ${formatINR(open.transportation.price)}`
+                    : ""}
+                </p>
+              ) : null}
             </div>
             <div className="rounded-xl bg-[#f7f4ee] p-3 text-sm">
               <p className="font-medium">{open.customerName}</p>

@@ -32,6 +32,13 @@ export type BookingRecord = {
   guests: number;
   adults: number;
   children: number;
+  childAges?: number[];
+  transportation?: {
+    requested: boolean;
+    vehicle?: string;
+    vehicleLabel?: string;
+    price: number;
+  };
   status: BookingStatus;
   customerName: string;
   customerEmail: string;
@@ -71,6 +78,8 @@ export type ClosureRecord = {
   experienceSlug: string;
   dates?: string[];
   weekdays?: number[];
+  /** Empty or omitted blocks the full day; otherwise only these experience slots are blocked. */
+  slots?: string[];
   reason: string;
   soldOut?: boolean;
 };

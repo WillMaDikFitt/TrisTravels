@@ -73,10 +73,10 @@ export function FullBleedParallax({
     overlay === "none"
       ? ""
       : overlay === "soft"
-        ? "bg-gradient-to-t from-black/55 via-black/20 to-black/10"
+        ? "bg-gradient-to-t from-black/75 via-black/35 to-black/15"
         : overlay === "left"
-          ? "bg-gradient-to-r from-black/75 via-black/40 to-transparent"
-          : "bg-gradient-to-t from-black/75 via-black/35 to-black/20";
+          ? "bg-gradient-to-r from-black/90 via-black/55 to-black/10"
+          : "bg-gradient-to-t from-black/88 via-black/45 to-black/25";
 
   return (
     <section
@@ -84,7 +84,7 @@ export function FullBleedParallax({
       className={cn("relative w-full overflow-hidden", heights[height], className)}
     >
       <motion.div style={{ y, scale }} className="absolute inset-0 h-[140%] w-full -top-[20%]">
-        <Image src={src} alt={alt} fill className="object-cover" sizes="100vw" quality={75} />
+        <Image src={src} alt={alt} fill className="object-cover" sizes="100vw" quality={90} />
       </motion.div>
       {overlay !== "none" && <div className={cn("absolute inset-0", overlayClass)} />}
       <div
@@ -102,14 +102,13 @@ export function FullBleedParallax({
         >
           <div
             className={cn(
-              "max-w-2xl",
               align === "center" && "mx-auto",
               align === "right" && "ml-auto",
-              contentClassName,
+              contentClassName ?? "max-w-2xl",
             )}
           >
             {eyebrow && (
-              <p className="label-caps mb-3 tracking-[0.22em] text-accent">{eyebrow}</p>
+              <p className="label-caps mb-3 tracking-[0.22em] text-white/75">{eyebrow}</p>
             )}
             <h2
               className={cn(
@@ -123,7 +122,7 @@ export function FullBleedParallax({
               <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">{body}</p>
             )}
             {cta && (
-              <Button href={cta.href} variant="light" className="mt-6">
+              <Button href={cta.href} className="mt-6">
                 {cta.label}
               </Button>
             )}
@@ -185,9 +184,9 @@ export function PageHero({
           clearHeader ? "top-0 h-[calc(100%+20%)]" : "inset-0 h-[120%]",
         )}
       >
-        <Image src={src} alt={alt} fill priority className="object-cover" sizes="100vw" quality={80} />
+        <Image src={src} alt={alt} fill priority className="object-cover" sizes="100vw" quality={90} />
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/50 to-black/45" />
       <div
         className={cn(
           "relative z-10 w-full px-margin-mobile pb-10 md:px-margin-desktop md:pb-14",
@@ -196,7 +195,7 @@ export function PageHero({
       >
         <div className="mx-auto max-w-container-max">
           {eyebrow && (
-            <p className="label-caps mb-3 tracking-[0.22em] text-accent">{eyebrow}</p>
+            <p className="label-caps mb-3 tracking-[0.22em] text-white/75">{eyebrow}</p>
           )}
           <h1
             className={cn(
@@ -212,7 +211,7 @@ export function PageHero({
           {(primaryCta || secondaryCta) && (
             <div className="mt-7 flex flex-wrap items-center gap-3">
               {primaryCta && (
-                <Button href={primaryCta.href} variant="light">
+                <Button href={primaryCta.href}>
                   {primaryCta.label}
                 </Button>
               )}

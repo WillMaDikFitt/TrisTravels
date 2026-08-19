@@ -38,6 +38,13 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function configuredAdminEmails() {
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 async function ensureProfile(user: User): Promise<UserProfile> {
   const db = getClientDb();
   const fallback: UserProfile = {
@@ -51,12 +58,18 @@ async function ensureProfile(user: User): Promise<UserProfile> {
   if (!db) return fallback;
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  if (snap.exists()) return snap.data() as UserProfile;
-  const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  const role: UserRole = adminEmails.includes((user.email ?? "").toLowerCase())
+  const adminEmails = configuredAdminEmails();
+  const isConfiguredAdmin = adminEmails.includes((user.email ?? "").toLowerCase());
+  if (snap.exists()) {
+    const profile = snap.data() as UserProfile;
+    if (isConfiguredAdmin && profile.role !== "admin") {
+      const promoted = { ...profile, role: "admin" as const };
+      await setDoc(ref, { role: "admin" }, { merge: true });
+      return promoted;
+    }
+    return profile;
+  }
+  const role: UserRole = isConfiguredAdmin
     ? "admin"
     : "traveller";
   const profile = { ...fallback, role };

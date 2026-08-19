@@ -8,16 +8,30 @@ import type { BookingRecord, EnquiryRecord, UserRole } from "@/lib/types";
 import { Badge, EmptyState, PageHeader, Panel, bookingTone, inputClass } from "@/components/admin/ui";
 import { cn, formatINR } from "@/lib/utils";
 
-type Row = { uid?: string; name?: string; email?: string; role?: UserRole; createdAt?: string };
+type Row = {
+  uid?: string;
+  name?: string;
+  email?: string;
+  role?: UserRole;
+  createdAt?: string;
+  profileMissing?: boolean;
+};
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<Row[]>([]);
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [open, setOpen] = useState<Row | null>(null);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    listUsersAdmin().then((rows) => setUsers(rows as Row[]));
+    listUsersAdmin().then((result) => {
+      if (!result.ok) {
+        setLoadError(result.error);
+        return;
+      }
+      setUsers(result.users as Row[]);
+    });
     listBookings().then(setBookings);
     listEnquiries().then(setEnquiries);
   }, []);
@@ -39,9 +53,14 @@ export default function AdminUsersPage() {
       <PageHeader
         eyebrow="People"
         title="Travellers"
-        description="People who have signed up. Change roles carefully — staff and admin can open Studio."
+        description="Firebase accounts and their Studio roles. Change roles carefully — staff and admin can open Studio."
       />
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      {loadError && (
+        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-[#5c4b18]">
+          Couldn’t load Firebase accounts. Add the Firebase Admin environment variables in Vercel, then redeploy.
+        </div>
+      )}
+      <div className="grid gap-6">
         {users.length ? (
           <div className="overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
             <table className="w-full min-w-[640px] text-left text-sm">
@@ -63,7 +82,14 @@ export default function AdminUsersPage() {
                     )}
                     onClick={() => setOpen(u)}
                   >
-                    <td className="px-4 py-3 font-medium">{u.name || "—"}</td>
+                    <td className="px-4 py-3 font-medium">
+                      {u.name || "—"}
+                      {u.profileMissing && (
+                        <span className="ml-2 rounded-full bg-[#f0ebe3] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#6b734f] uppercase">
+                          Profile pending
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-[#5c6350]">{u.email}</td>
                     <td className="px-4 py-3 text-[#8a917c]">
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-IN") : "—"}
@@ -95,12 +121,12 @@ export default function AdminUsersPage() {
         ) : (
           <EmptyState
             title="No travellers yet"
-            body="Accounts appear here after someone signs up on the site."
+            body="No Firebase Auth accounts have signed up yet."
           />
         )}
 
         {open && (
-          <Panel className="h-fit space-y-4">
+          <Panel className="h-fit max-w-5xl space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">Traveller</p>
               <h2 className="mt-1 font-display text-xl">{open.name || "—"}</h2>
@@ -113,40 +139,67 @@ export default function AdminUsersPage() {
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 Recent bookings
               </p>
-              <ul className="mt-2 space-y-2">
-                {relatedBookings.map((b) => (
-                  <li key={b.id} className="rounded-xl border border-[#f0ebe3] px-3 py-2 text-sm">
-                    <div className="flex justify-between gap-2">
-                      <span className="font-medium">{b.experienceName}</span>
-                      <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-[#8a917c]">
-                      {b.date} · {formatINR(b.customerTotal)}
-                    </p>
-                  </li>
-                ))}
-                {!relatedBookings.length && (
-                  <li className="text-sm text-[#8a917c]">No bookings for this email.</li>
-                )}
-              </ul>
+              <table className="mt-2 w-full text-left text-sm">
+                <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
+                  <tr>
+                    <th className="pb-1.5">Date</th>
+                    <th className="pb-1.5">Experience</th>
+                    <th className="pb-1.5">Status</th>
+                    <th className="pb-1.5 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relatedBookings.map((b) => (
+                    <tr key={b.id} className="border-t border-[#f0ebe3]">
+                      <td className="py-2 text-[#5c6350]">{b.date}</td>
+                      <td className="py-2 font-medium">{b.experienceName}</td>
+                      <td className="py-2">
+                        <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
+                      </td>
+                      <td className="py-2 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
+                    </tr>
+                  ))}
+                  {!relatedBookings.length && (
+                    <tr>
+                      <td colSpan={4} className="py-3 text-[#8a917c]">
+                        No bookings for this email.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 Recent enquiries
               </p>
-              <ul className="mt-2 space-y-2">
-                {relatedEnquiries.map((e) => (
-                  <li key={e.id} className="rounded-xl border border-[#f0ebe3] px-3 py-2 text-sm">
-                    <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-                      {e.source === "story" ? "Guest story" : e.source.replace(/-/g, " ")}
-                    </p>
-                    <p className="mt-1 line-clamp-2 text-[#5c6350]">{e.message}</p>
-                  </li>
-                ))}
-                {!relatedEnquiries.length && (
-                  <li className="text-sm text-[#8a917c]">No enquiries for this email.</li>
-                )}
-              </ul>
+              <table className="mt-2 w-full text-left text-sm">
+                <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
+                  <tr>
+                    <th className="pb-1.5">Source</th>
+                    <th className="pb-1.5">Preview</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relatedEnquiries.map((e) => (
+                    <tr key={e.id} className="border-t border-[#f0ebe3]">
+                      <td className="py-2 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                        {e.source === "story" ? "Guest story" : e.source.replace(/-/g, " ")}
+                      </td>
+                      <td className="max-w-[12rem] py-2 text-[#5c6350]">
+                        <p className="line-clamp-2">{e.message}</p>
+                      </td>
+                    </tr>
+                  ))}
+                  {!relatedEnquiries.length && (
+                    <tr>
+                      <td colSpan={2} className="py-3 text-[#8a917c]">
+                        No enquiries for this email.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </Panel>
         )}

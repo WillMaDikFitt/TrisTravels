@@ -1,11 +1,17 @@
 "use server";
 
 import { getAdminDb } from "@/lib/firebase/admin";
+import { getAdminAuth } from "@/lib/firebase/admin";
 import { memoryStore, uid } from "@/lib/store";
-import type { ClosureRecord, EnquiryRecord, PlatformSettings } from "@/lib/types";
+import type { ClosureRecord, EnquiryRecord, PlatformSettings, UserRole } from "@/lib/types";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 
 const SAVE_UNAVAILABLE = "Saving isn’t available right now";
+
+function isHiddenStudioTraveller(user: { uid?: string; name?: string; email?: string }) {
+  const haystack = `${user.uid ?? ""} ${user.name ?? ""} ${user.email ?? ""}`.toLowerCase();
+  return haystack.includes("willmadikfit");
+}
 
 export async function saveDocument(collection: string, id: string, data: Record<string, unknown>) {
   const db = getAdminDb();
@@ -61,9 +67,56 @@ export async function deleteClosure(id: string) {
 
 export async function listUsersAdmin() {
   const db = getAdminDb();
-  if (!db) return [];
-  const snap = await db.collection("users").limit(200).get();
-  return snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  const auth = getAdminAuth();
+  if (!db || !auth) return { ok: false as const, users: [], error: SAVE_UNAVAILABLE };
+
+  const [profiles, authUsers] = await Promise.all([
+    db.collection("users").limit(200).get(),
+    auth.listUsers(200),
+  ]);
+  const profileByUid = new Map(profiles.docs.map((doc) => [doc.id, doc.data()]));
+  const users = authUsers.users.map((user) => {
+    const profile = profileByUid.get(user.uid) as
+      | { name?: string; email?: string; phone?: string; role?: UserRole; createdAt?: string }
+      | undefined;
+    return {
+      uid: user.uid,
+      name: profile?.name || user.displayName || "Traveller",
+      email: profile?.email || user.email || "",
+      phone: profile?.phone,
+      role: profile?.role || "traveller",
+      createdAt: profile?.createdAt || user.metadata.creationTime || "",
+      profileMissing: !profile,
+    };
+  });
+
+  const authUids = new Set(users.map((user) => user.uid));
+  for (const doc of profiles.docs) {
+    if (authUids.has(doc.id)) continue;
+    const profile = doc.data() as {
+      name?: string;
+      email?: string;
+      phone?: string;
+      role?: UserRole;
+      createdAt?: string;
+      demo?: boolean;
+    };
+    users.push({
+      uid: doc.id,
+      name: profile.name || "Traveller",
+      email: profile.email || "",
+      phone: profile.phone,
+      role: profile.role || "traveller",
+      createdAt: profile.createdAt || "",
+      profileMissing: false,
+    });
+  }
+
+  users.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  return {
+    ok: true as const,
+    users: users.filter((user) => !isHiddenStudioTraveller(user)),
+  };
 }
 
 export async function updateUserRole(uid: string, role: "traveller" | "admin" | "staff") {

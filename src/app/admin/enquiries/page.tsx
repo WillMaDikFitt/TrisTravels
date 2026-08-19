@@ -102,42 +102,70 @@ export default function AdminEnquiriesPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-3">
-          {visible.map((e) => (
-            <button
-              key={e.id}
-              type="button"
-              onClick={() => {
-                setOpen(e);
-                setNoteText("");
-              }}
-              className={cn(
-                "w-full rounded-2xl border bg-white p-4 text-left transition",
-                open?.id === e.id ? "border-[#4a5a28]" : "border-[#e4dfd4] hover:border-[#c8c2b4]",
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-                    {labels[e.source as Exclude<EnquirySource, "story">] ?? e.source}
-                  </p>
-                  <p className="mt-1 font-medium">
-                    {e.name} · {e.email}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-sm text-[#5c6350]">{e.message}</p>
-                </div>
-                <Badge tone={e.status === "new" ? "amber" : e.status === "closed" ? "slate" : "olive"}>
-                  {statusLabels[e.status]}
-                </Badge>
-              </div>
-            </button>
-          ))}
-          {!visible.length && <EmptyState title="Nothing here" body="No enquiries in this filter." />}
-        </div>
+      <div className="grid gap-6">
+        {visible.length ? (
+          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
+            <table className="w-full min-w-[800px] text-left text-sm">
+              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <tr>
+                  <th className="px-4 py-3">Received</th>
+                  <th className="px-4 py-3">Source</th>
+                  <th className="px-4 py-3">Traveller / partner</th>
+                  <th className="px-4 py-3">Message</th>
+                  <th className="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((e) => (
+                  <tr
+                    key={e.id}
+                    onClick={() => {
+                      setOpen(e);
+                      setNoteText("");
+                    }}
+                    className={cn(
+                      "cursor-pointer border-t border-[#f0ebe3] transition hover:bg-[#faf8f3]",
+                      open?.id === e.id && "bg-[#eef0e3]",
+                    )}
+                  >
+                    <td className="px-4 py-3 text-[#5c6350]">
+                      {new Date(e.createdAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                      <span className="mt-0.5 block text-xs text-[#8a917c]">
+                        {new Date(e.createdAt).toLocaleTimeString("en-IN", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs font-semibold tracking-wide text-[#6b734f] uppercase">
+                      {labels[e.source as Exclude<EnquirySource, "story">] ?? e.source}
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium">{e.name}</p>
+                      <p className="mt-0.5 text-xs text-[#8a917c]">{e.email}</p>
+                    </td>
+                    <td className="max-w-[20rem] px-4 py-3 text-[#5c6350]">
+                      <p className="line-clamp-2">{e.message}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge tone={e.status === "new" ? "amber" : e.status === "closed" ? "slate" : "olive"}>
+                        {statusLabels[e.status]}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState title="Nothing here" body="No enquiries in this filter." />
+        )}
 
         {open && (
-          <Panel className="h-fit space-y-4">
+          <Panel className="h-fit max-w-5xl space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 {labels[open.source as Exclude<EnquirySource, "story">] ?? open.source}

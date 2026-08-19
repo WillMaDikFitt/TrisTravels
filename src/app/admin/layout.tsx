@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { TRIS_LOGO_ON_DARK } from "@/components/brand/BrandLogo";
 import { fetchStudioHealth } from "@/lib/actions/studio-health";
 import { cn } from "@/lib/utils";
 import {
@@ -106,28 +107,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  const currentPage =
+    [...flatLinks].sort((a, b) => b.href.length - a.href.length).find((link) =>
+      linkActive(pathname, link.href),
+    )?.label ?? "Studio";
 
   return (
-    <div className="flex min-h-screen bg-[#f7f4ee] text-[#2a2e1f]">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[#e4dfd4] bg-white md:flex">
-        <Link href="/admin" className="flex items-center gap-3 px-5 py-5">
+    <div className="flex min-h-screen bg-[#f4f2ec] text-[#24281c]">
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-black/10 bg-[#252a1e] text-[#f7f4ee] md:flex">
+        <Link href="/admin" className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <Image
-            src="/brand/tris-logo-on-light.png?v=1"
-            alt=""
-            width={36}
-            height={36}
+            src={TRIS_LOGO_ON_DARK}
+            alt="TRIS Travels"
+            width={44}
+            height={44}
             unoptimized
-            className="h-9 w-9 object-contain"
+            className="h-11 w-11 object-contain"
           />
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.16em] text-[#6b734f] uppercase">TRIS Studio</p>
-            <p className="text-sm font-medium">Ops & catalogue</p>
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-[#d99a70] uppercase">TRIS Studio</p>
+            <p className="text-sm font-medium text-white">Operations hub</p>
           </div>
         </Link>
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {sections.map((section) => (
             <div key={section.label}>
-              <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-[0.16em] text-[#8a917c] uppercase">
+              <p className="mb-2 px-3 text-[10px] font-semibold tracking-[0.16em] text-white/45 uppercase">
                 {section.label}
               </p>
               <div className="space-y-0.5">
@@ -139,10 +144,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       key={l.href}
                       href={l.href}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition",
+                        "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition",
                         active
-                          ? "bg-[#e4e8d4] font-medium text-[#3d4a28]"
-                          : "text-[#5c6350] hover:bg-[#f3efe8]",
+                          ? "bg-[#d99a70] font-semibold text-[#282419] shadow-sm"
+                          : "text-white/70 hover:bg-white/10 hover:text-white",
                       )}
                     >
                       <Icon size={16} />
@@ -154,27 +159,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           ))}
         </nav>
-        <div className="border-t border-[#e4dfd4] p-4">
+        <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4a5a28] text-xs font-semibold text-[#f7f4ee]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d99a70] text-xs font-semibold text-[#282419]">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{profile?.name || "Admin"}</p>
-              <p className="truncate text-xs text-[#8a917c]">{profile?.email || "Preview mode"}</p>
+              <p className="truncate text-sm font-medium text-white">{profile?.name || "Admin"}</p>
+              <p className="truncate text-xs text-white/50">{profile?.email || "Preview mode"}</p>
             </div>
           </div>
           <div className="mt-3 flex gap-2">
             <Link
               href="/"
-              className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-[#d4cec0] py-1.5 text-[11px] font-semibold uppercase"
+              className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-white/20 py-1.5 text-[11px] font-semibold text-white/80 uppercase transition hover:bg-white/10"
             >
               <ExternalLink size={12} /> Site
             </Link>
             <button
               type="button"
               onClick={() => logout().then(() => router.push("/"))}
-              className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-[#d4cec0] py-1.5 text-[11px] font-semibold uppercase"
+              className="inline-flex flex-1 items-center justify-center gap-1 rounded-full border border-white/20 py-1.5 text-[11px] font-semibold text-white/80 uppercase transition hover:bg-white/10"
             >
               <LogOut size={12} /> Out
             </button>
@@ -211,7 +216,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             then redeploy.
           </p>
         )}
-        <div className="p-4 md:p-8">{children}</div>
+        <header className="sticky top-0 z-30 hidden h-[4.5rem] items-center border-b border-[#ded9cd] bg-white/90 px-8 backdrop-blur-xl md:flex">
+          <div>
+            <p className="text-[10px] font-bold tracking-[0.18em] text-[#8a917c] uppercase">
+              TRIS Studio
+            </p>
+            <p className="mt-0.5 text-sm font-semibold text-[#2a2e1f]">{currentPage}</p>
+          </div>
+        </header>
+        <div className="min-h-[calc(100vh-4.5rem)] bg-[radial-gradient(circle_at_top_right,rgba(194,100,58,0.08),transparent_32%),linear-gradient(180deg,#f8f6f1_0%,#f1eee7_100%)]">
+          <main className="mx-auto w-full max-w-[1600px] p-4 md:p-8 lg:p-10">{children}</main>
+        </div>
       </div>
     </div>
   );

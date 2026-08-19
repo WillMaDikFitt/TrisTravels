@@ -32,8 +32,15 @@ export const DEFAULT_SETTINGS = {
 
 export function dateIsClosed(
   date: string,
-  closures: { dates?: string[]; weekdays?: number[] }[],
+  closures: { dates?: string[]; weekdays?: number[]; slots?: string[] }[],
+  slot?: string,
 ) {
   const weekday = new Date(`${date}T12:00:00`).getDay();
-  return closures.some((c) => c.dates?.includes(date) || c.weekdays?.includes(weekday));
+  return closures.some((closure) => {
+    const appliesToDate =
+      closure.dates?.includes(date) || closure.weekdays?.includes(weekday);
+    if (!appliesToDate) return false;
+    if (!closure.slots?.length) return true;
+    return slot ? closure.slots.includes(slot) : false;
+  });
 }

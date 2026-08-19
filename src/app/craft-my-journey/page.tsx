@@ -15,15 +15,8 @@ import { media } from "@/data/media";
 import { cn, daysFromNow } from "@/lib/utils";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 
-const groupOptions = [
-  { label: "Solo", value: "1" },
-  { label: "Couple", value: "2" },
-  { label: "3–4", value: "4" },
-  { label: "5–6", value: "6" },
-  { label: "7+", value: "8" },
-];
-
 const vehicleOptions = ["Sedan", "SUV", "Traveller", "Flexible"];
+const stayOptions = ["Homestay", "Boutique hotel", "Resort", "Camping", "A mix of stays"];
 
 const experienceOptions = [
   "Trekking & trails",
@@ -39,7 +32,9 @@ type FormState = {
   name: string;
   email: string;
   phone: string;
-  group: string;
+  adults: string;
+  children: string;
+  childAges: string;
   start: string;
   end: string;
   food: string;
@@ -100,13 +95,16 @@ export default function CraftMyJourneyPage() {
   const [sending, setSending] = useState(false);
   const [vehicles, setVehicles] = useState<string[]>([]);
   const [experiences, setExperiences] = useState<string[]>([]);
+  const [stays, setStays] = useState<string[]>([]);
   const [form, setForm] = useState<FormState>(() => {
     const start = daysFromNow(7);
     return {
       name: "",
       email: "",
       phone: "",
-      group: "2",
+      adults: "2",
+      children: "0",
+      childAges: "",
       start,
       end: addDays(start, 5),
       food: "No preference",
@@ -122,7 +120,9 @@ export default function CraftMyJourneyPage() {
     form.name.trim() &&
     form.email.trim().includes("@") &&
     form.phone.trim().length >= 8 &&
-    form.group &&
+    Number(form.adults) > 0 &&
+    Number(form.children) >= 0 &&
+    (Number(form.children) === 0 || form.childAges.trim()) &&
     form.start &&
     form.end &&
     form.end >= form.start;
@@ -148,8 +148,8 @@ export default function CraftMyJourneyPage() {
   return (
     <div className="bg-background">
       <PageHero
-        src={media.heroMist}
-        alt="Craft your Meghalaya journey"
+        src={media.local.groupTrail}
+        alt="Sunset over the Meghalaya hills"
         compact
         eyebrow="Personalised travel"
         title="Craft My Journey"
@@ -183,12 +183,15 @@ export default function CraftMyJourneyPage() {
                     phone: form.phone,
                     message: form.notes || "Craft My Journey brief",
                     payload: {
-                      group: form.group,
+                      adults: form.adults,
+                      children: form.children,
+                      childAges: form.childAges,
                       start: form.start,
                       end: form.end,
                       vehicles,
                       experiences,
                       food: form.food,
+                      stays,
                     },
                   });
                   if (!res.ok) setSubmitError(res.error);
@@ -236,13 +239,42 @@ export default function CraftMyJourneyPage() {
                     />
                   </div>
 
-                  <PillRow
-                    label="Guests"
-                    required
-                    options={groupOptions}
-                    value={form.group}
-                    onChange={(v) => setField("group", v)}
-                  />
+                  <div>
+                    <p className="text-sm font-medium text-primary">
+                      Guests <span className="text-accent">*</span>
+                    </p>
+                    <div className="mt-3 grid gap-5 sm:grid-cols-2">
+                      <FormInput
+                        label="Adults"
+                        name="adults"
+                        type="number"
+                        min={1}
+                        required
+                        value={form.adults}
+                        onChange={(v) => setField("adults", v)}
+                      />
+                      <FormInput
+                        label="Children"
+                        name="children"
+                        type="number"
+                        min={0}
+                        required
+                        value={form.children}
+                        onChange={(v) => setField("children", v)}
+                      />
+                    </div>
+                    {Number(form.children) > 0 && (
+                      <FormInput
+                        label="Children’s ages"
+                        name="childAges"
+                        required
+                        placeholder="For example: 4, 8"
+                        className="mt-5"
+                        value={form.childAges}
+                        onChange={(v) => setField("childAges", v)}
+                      />
+                    )}
+                  </div>
 
                   <div className="grid gap-5 sm:grid-cols-2">
                     <FormInput
@@ -295,6 +327,18 @@ export default function CraftMyJourneyPage() {
                     hint="Optional"
                     onToggle={(v) =>
                       setExperiences((prev) =>
+                        prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+                      )
+                    }
+                  />
+                  <FormChipGroup
+                    label="Stay preference"
+                    name="stays"
+                    options={stayOptions}
+                    selected={stays}
+                    hint="Choose any that suit your trip"
+                    onToggle={(v) =>
+                      setStays((prev) =>
                         prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
                       )
                     }

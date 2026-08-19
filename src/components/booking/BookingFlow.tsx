@@ -4,37 +4,94 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { formatINR, cn, isInstantBookingDate, BOOKING_NOTICE_DAYS } from "@/lib/utils";
+import {
+  formatINR,
+  cn,
+  daysFromNow,
+  isInstantBookingDate,
+  BOOKING_NOTICE_DAYS,
+} from "@/lib/utils";
 import type { Experience } from "@/data/experiences";
 import { FormInput } from "@/components/ui/Form";
 import { Check, CreditCard } from "lucide-react";
 import { confirmPayment, createBooking } from "@/lib/actions/bookings";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type { BookingRecord } from "@/lib/types";
-import { DEFAULT_SLOTS } from "@/lib/catalog";
+import { experienceSlots } from "@/lib/experience-slots";
+import { fetchClosuresForExperience } from "@/lib/actions/content-read";
+import { dateIsClosed } from "@/lib/catalog";
+import type { ClosureRecord } from "@/lib/types";
+import { transportVehicleOptions } from "@/data/transport";
+import { adultRate, childRate } from "@/lib/pricing";
+import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
+import {
+  FieldGroup,
+  FlowActions,
+  FlowHeading,
+  FlowShell,
+  FlowSummary,
+  SecureNote,
+} from "@/components/forms/FlowUI";
+
+function parseAges(raw: string | null, count: number) {
+  if (!raw || count <= 0) return [] as number[];
+  const parsed = raw
+    .split(",")
+    .map((v) => Number(v.trim()))
+    .filter((v) => Number.isFinite(v));
+  return Array.from({ length: count }, (_, i) => parsed[i] ?? 8);
+}
 
 export function BookingFlow({ experience }: { experience: Experience }) {
   const search = useSearchParams();
   const { user, profile } = useAuth();
-  const slots = experience.slots?.length ? experience.slots : DEFAULT_SLOTS;
+  const slots = experienceSlots(experience);
+  const vehicles = useMemo(
+    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles),
+    [experience.transportPrice, experience.transportVehicles],
+  );
+  const minGuests = experience.minGuests ?? 1;
+  const initialChildren = Math.max(0, Number(search.get("children") ?? 0));
+  const fallbackGuests = Number(search.get("guests") ?? Math.max(minGuests, 2));
+  const initialAdults = Math.max(
+    1,
+    Number(search.get("adults") ?? Math.max(1, fallbackGuests - initialChildren)),
+  );
+
   const [step, setStep] = useState(0);
   const [slot, setSlot] = useState(search.get("slot") || slots[0]);
+  const [date, setDate] = useState(search.get("date") || daysFromNow(BOOKING_NOTICE_DAYS));
+  const [adults, setAdults] = useState(
+    Math.min(experience.maxGuests, Math.max(1, Number(search.get("adults") ?? initialAdults))),
+  );
+  const [children, setChildren] = useState(
+    Math.min(experience.maxGuests - 1, initialChildren),
+  );
+  const [childAges, setChildAges] = useState<number[]>(
+    parseAges(search.get("childAges"), initialChildren),
+  );
+  const [transportation, setTransportation] = useState(
+    search.get("transport") === "1" && Boolean(experience.transportAvailable),
+  );
+  const [vehicleId, setVehicleId] = useState<string>(search.get("vehicle") || vehicles[0]?.id || "sedan");
   const [name, setName] = useState(profile?.name ?? "");
   const [email, setEmail] = useState(profile?.email ?? user?.email ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
+  const [closures, setClosures] = useState<ClosureRecord[]>([]);
 
   useEffect(() => {
     if (profile?.name) setName((n) => n || profile.name);
     if (profile?.email || user?.email) setEmail((e) => e || profile?.email || user?.email || "");
     if (profile?.phone) setPhone((p) => p || profile.phone || "");
   }, [profile, user?.email]);
+  useEffect(() => {
+    fetchClosuresForExperience(experience.slug).then(setClosures).catch(() => setClosures([]));
+  }, [experience.slug]);
   const [done, setDone] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [booking, setBooking] = useState<BookingRecord | null>(null);
 
-  const date = search.get("date") ?? "";
-  const guests = Number(search.get("guests") ?? 2);
   const requestMode =
     search.get("request") === "1" || (date ? !isInstantBookingDate(date) : false);
 
@@ -42,19 +99,51 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     ? ["Details", "Contact", "Submit request"]
     : ["Details", "Contact", "Pay"];
 
-  const total = useMemo(() => experience.priceFrom * guests, [experience.priceFrom, guests]);
+  const guests = adults + children;
+  const selectedVehicle = vehicles.find((v) => v.id === vehicleId) ?? vehicles[0];
+  const transportFee = transportation ? selectedVehicle?.price ?? 0 : 0;
+  const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
+  const total = guestSubtotal + transportFee;
+
+  const syncChildren = (next: number) => {
+    const capped = Math.min(next, Math.max(0, experience.maxGuests - adults));
+    setChildren(capped);
+    setChildAges((prev) => Array.from({ length: capped }, (_, i) => prev[i] ?? 8));
+  };
+
+  const syncAdults = (next: number) => {
+    const capped = Math.min(Math.max(1, next), experience.maxGuests);
+    const nextChildren = Math.min(children, Math.max(0, experience.maxGuests - capped));
+    setAdults(capped);
+    if (nextChildren !== children) {
+      setChildren(nextChildren);
+      setChildAges((prev) => Array.from({ length: nextChildren }, (_, i) => prev[i] ?? 8));
+    }
+  };
+
+  const detailsReady =
+    Boolean(date) &&
+    !dateIsClosed(date, closures, slot) &&
+    guests >= minGuests &&
+    guests <= experience.maxGuests &&
+    (children === 0 || childAges.length === children) &&
+    (!transportation || Boolean(vehicleId));
 
   const persist = async () => {
     const result = await createBooking({
       experienceSlug: experience.slug,
       date,
       slot,
-      guests,
+      adults,
+      children,
+      childAges: children > 0 ? childAges : undefined,
       customerName: name,
       customerEmail: email,
       customerPhone: phone,
       uid: user?.uid,
       request: requestMode,
+      transportation,
+      transportVehicle: transportation ? vehicleId : undefined,
     });
     if (!result.ok) {
       setError(result.error);
@@ -108,8 +197,8 @@ export function BookingFlow({ experience }: { experience: Experience }) {
             </>
           ) : (
             <>
-              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Payment
-              simulated — ref {booking.id}.
+              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Your
+              place is held — ref {booking.id}.
             </>
           )}
         </p>
@@ -124,154 +213,212 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_320px]">
-      <div className="rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-6 shadow-ambient md:p-8">
+    <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+      <FlowShell steps={steps} current={step}>
         {requestMode && (
-          <p className="mb-6 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-secondary">
+          <p className="mb-7 rounded-2xl border border-primary/25 bg-secondary-container/60 px-4 py-3 text-sm leading-relaxed text-secondary">
             This date is within {BOOKING_NOTICE_DAYS} days — submit a request and we’ll confirm
             availability.
           </p>
         )}
 
-        <div className="mb-8 flex flex-wrap gap-2">
-          {steps.map((label, i) => (
-            <div
-              key={label}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase",
-                i === step
-                  ? "bg-primary-container text-primary-fixed"
-                  : i < step
-                    ? "bg-secondary-container text-primary"
-                    : "bg-surface-container text-on-surface-variant",
-              )}
-            >
-              {i + 1}. {label}
-            </div>
-          ))}
-        </div>
-
         {step === 0 && (
           <div>
-            <h1 className="font-display text-3xl text-primary">Select time slot</h1>
-            <p className="mt-2 text-on-surface-variant">
-              {date || "No date selected"} · {guests} guests
-            </p>
-            {!date && (
-              <p className="mt-3 text-sm text-primary">
-                Pick a date on the experience page first.{" "}
-                <Link href={`/experiences/${experience.slug}`} className="underline">
-                  Go back
-                </Link>
+            <FlowHeading
+              eyebrow="Trip details"
+              title="Choose your date and travellers"
+              body="Tell us who is joining. Child ages and transport choices update your total automatically."
+            />
+
+            <div className="space-y-4">
+              <FieldGroup title="Date & travellers" body={`This experience hosts up to ${experience.maxGuests} guests.`}>
+                <div className="space-y-5">
+                  <FormInput
+                    label="Experience date"
+                    name="booking-date"
+                    type="date"
+                    min={daysFromNow(1)}
+                    value={date}
+                    onChange={setDate}
+                    required
+                  />
+                <GuestCompositionFields
+                  adults={adults}
+                  children={children}
+                  childAges={childAges}
+                  maxGuests={experience.maxGuests}
+                  minGuests={minGuests}
+                  onAdults={syncAdults}
+                  onChildren={syncChildren}
+                  onChildAge={(index, age) =>
+                    setChildAges((prev) => prev.map((value, i) => (i === index ? age : value)))
+                  }
+                />
+                </div>
+              </FieldGroup>
+
+              <FieldGroup title="Start time" body="Unavailable times are disabled automatically.">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {slots.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      disabled={dateIsClosed(date, closures, s)}
+                      onClick={() => setSlot(s)}
+                      className={cn(
+                        "rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:border-outline-variant/20 disabled:bg-surface-container disabled:text-on-surface-variant/40",
+                        slot === s
+                          ? "border-primary bg-primary text-on-primary shadow-sm"
+                          : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/50",
+                      )}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </FieldGroup>
+
+              {experience.transportAvailable && (
+                <FieldGroup title="Getting there" body="Optional private transport can be added to this booking.">
+                  <TransportVehicleFields
+                    options={vehicles}
+                    enabled={transportation}
+                    vehicleId={vehicleId}
+                    note={experience.transportNote}
+                    onEnabled={setTransportation}
+                    onVehicle={setVehicleId}
+                  />
+                </FieldGroup>
+              )}
+            </div>
+
+            {dateIsClosed(date, closures) && (
+              <p className="mt-4 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
+                This date is fully unavailable. Please choose another date.
               </p>
             )}
-            <div className="mt-6 flex flex-wrap gap-3">
-              {slots.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSlot(s)}
-                  className={cn(
-                    "rounded-full border px-5 py-2.5 text-sm font-semibold transition",
-                    slot === s
-                      ? "border-primary bg-primary text-on-primary"
-                      : "border-outline-variant hover:border-accent",
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-            <Button className="mt-8" onClick={() => setStep(1)} disabled={!date}>
-              Continue
-            </Button>
+            <FlowActions>
+              <SecureNote request={requestMode} />
+              <Button className="sm:ml-auto" size="lg" onClick={() => setStep(1)} disabled={!detailsReady}>
+                Continue to contact
+              </Button>
+            </FlowActions>
           </div>
         )}
 
         {step === 1 && (
           <div>
-            <h1 className="font-display text-3xl text-primary">Your details</h1>
-            <div className="mt-6 space-y-4">
-              <FormInput label="Full name" name="name" value={name} onChange={setName} required autoComplete="name" />
-              <FormInput
-                label="Email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                required
-                autoComplete="email"
-              />
-              <FormInput
-                label="Mobile"
-                name="phone"
-                type="tel"
-                value={phone}
-                onChange={setPhone}
-                required
-                autoComplete="tel"
-              />
-            </div>
-            <div className="mt-8 flex gap-3">
-              <Button variant="ghost" onClick={() => setStep(0)}>
+            <FlowHeading
+              eyebrow="Contact details"
+              title="Where should we send your confirmation?"
+              body="We’ll only use these details for this booking and essential trip updates."
+            />
+            <FieldGroup title="Lead traveller">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormInput className="sm:col-span-2" label="Full name" name="name" value={name} onChange={setName} required autoComplete="name" />
+                <FormInput
+                  label="Email address"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={setEmail}
+                  required
+                  autoComplete="email"
+                />
+                <FormInput
+                  label="Mobile number"
+                  name="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={setPhone}
+                  required
+                  autoComplete="tel"
+                />
+              </div>
+            </FieldGroup>
+            <FlowActions>
+              <Button variant="text" onClick={() => setStep(0)}>
                 Back
               </Button>
-              <Button onClick={() => setStep(2)} disabled={!name || !email || !phone}>
+              <Button size="lg" onClick={() => setStep(2)} disabled={!name || !email || !phone}>
                 {requestMode ? "Review request" : "Review booking"}
               </Button>
-            </div>
+            </FlowActions>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <h1 className="font-display text-3xl text-primary">
-              {requestMode ? "Review & submit" : "Review & pay"}
-            </h1>
-            <div className="mt-6 space-y-3 rounded-2xl bg-surface-container-low p-5 text-sm">
+            <FlowHeading
+              eyebrow="Final check"
+              title={requestMode ? "Review your request" : "Review your booking"}
+              body="Please check the details below before continuing."
+            />
+            <div className="space-y-3 rounded-2xl border border-outline-variant/25 bg-surface-container-low/65 p-5 text-sm md:p-6">
               <Row label="Experience" value={experience.name} />
               <Row label="Date" value={date} />
               <Row label="Time" value={slot} />
-              <Row label="Guests" value={String(guests)} />
+              <Row label="Adults" value={String(adults)} />
+              {children > 0 && (
+                <Row
+                  label="Children"
+                  value={`${children} · ages ${childAges.join(", ")}`}
+                />
+              )}
+              {transportation && selectedVehicle && (
+                <Row
+                  label="Transportation"
+                  value={`${selectedVehicle.label} · ${formatINR(selectedVehicle.price)}`}
+                />
+              )}
               <Row label="Guest name" value={name} />
               <div className="border-t border-outline-variant/30 pt-3">
                 <Row label={requestMode ? "Estimated total" : "Total payable"} value={formatINR(total)} bold />
               </div>
             </div>
             {error && <p className="mt-3 text-sm text-primary">{error}</p>}
-            <div className="mt-8 flex gap-3">
-              <Button variant="ghost" onClick={() => setStep(1)}>
+            <FlowActions>
+              <Button variant="text" onClick={() => setStep(1)}>
                 Back
               </Button>
               {requestMode ? (
-                <Button onClick={finishRequest} disabled={paying}>
+                <Button size="lg" onClick={finishRequest} disabled={paying}>
                   {paying ? "Submitting…" : "Submit request"}
                 </Button>
               ) : (
-                <Button onClick={finishPay} disabled={paying} className="gap-2">
+                <Button size="lg" onClick={finishPay} disabled={paying} className="gap-2">
                   <CreditCard size={16} />
-                  {paying ? "Processing…" : "Pay (demo)"}
+                  {paying ? "Processing…" : "Confirm & pay"}
                 </Button>
               )}
-            </div>
+            </FlowActions>
           </div>
         )}
-      </div>
+      </FlowShell>
 
-      <aside className="h-fit rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-6 shadow-ambient">
-        <p className="label-caps text-accent">{requestMode ? "Request summary" : "Booking summary"}</p>
-        <h2 className="mt-2 font-display text-xl text-primary">{experience.name}</h2>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          {experience.location} · {experience.duration}
-        </p>
+      <FlowSummary
+        eyebrow={requestMode ? "Request summary" : "Booking summary"}
+        title={experience.name}
+        subtitle={`${experience.location} · ${experience.duration}`}
+        footer={
+          <Link href={`/experiences/${experience.slug}`} className="text-sm font-semibold text-accent hover:underline">
+            ← View experience details
+          </Link>
+        }
+      >
         <div className="mt-6 space-y-2 text-sm">
-          <Row label="Subtotal" value={formatINR(experience.priceFrom * guests)} />
-          <Row label="Total" value={formatINR(total)} bold />
+          <Row label={`Adults × ${adults}`} value={formatINR(adultRate(experience) * adults)} />
+          {children > 0 && (
+            <Row label={`Children × ${children}`} value={formatINR(childRate(experience) * children)} />
+          )}
+          {transportation && selectedVehicle && (
+            <Row label={selectedVehicle.label} value={formatINR(selectedVehicle.price)} />
+          )}
+          <div className="mt-4 border-t border-outline-variant/25 pt-4">
+            <Row label={requestMode ? "Estimated total" : "Total"} value={formatINR(total)} bold />
+          </div>
         </div>
-        <Link href={`/experiences/${experience.slug}`} className="mt-6 inline-block text-sm text-accent hover:underline">
-          ← Edit on experience page
-        </Link>
-      </aside>
+      </FlowSummary>
     </div>
   );
 }

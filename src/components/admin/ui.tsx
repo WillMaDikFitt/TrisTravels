@@ -13,10 +13,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-white/80 bg-white/75 px-6 py-6 shadow-[0_16px_45px_rgba(42,46,31,0.06)] backdrop-blur md:px-8">
       <div>
         {eyebrow && <p className="text-[11px] font-semibold tracking-[0.16em] text-[#6b734f] uppercase">{eyebrow}</p>}
-        <h1 className="mt-1 font-display text-2xl text-[#2a2e1f] md:text-3xl">{title}</h1>
+        <h1 className="mt-1 font-display text-3xl text-[#2a2e1f] md:text-4xl">{title}</h1>
         {description && <p className="mt-1.5 max-w-2xl text-sm text-[#5c6350]">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -34,7 +34,7 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e4dfd4] bg-white p-5 shadow-[0_1px_2px_rgba(42,46,31,0.04)]">
+      <div className="relative overflow-hidden rounded-2xl border border-white bg-white p-5 shadow-[0_14px_36px_rgba(42,46,31,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-[#c2643a]">
       <p className="text-[11px] font-semibold tracking-[0.14em] text-[#6b734f] uppercase">{label}</p>
       <p className="mt-2 font-display text-3xl text-[#2a2e1f]">{value}</p>
       {hint && <p className="mt-1 text-xs text-[#8a917c]">{hint}</p>}
@@ -46,7 +46,7 @@ export function Panel({ children, className }: { children: ReactNode; className?
   return (
     <div
       className={cn(
-        "rounded-2xl border border-[#e4dfd4] bg-white p-5 shadow-[0_1px_2px_rgba(42,46,31,0.04)] md:p-6",
+        "rounded-2xl border border-white bg-white p-5 shadow-[0_14px_36px_rgba(42,46,31,0.07)] md:p-6",
         className,
       )}
     >

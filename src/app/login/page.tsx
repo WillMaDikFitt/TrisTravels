@@ -79,9 +79,9 @@ function LoginForm() {
                 sizes="(max-width:768px) 100vw, 45vw"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/50 to-black/25" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-8 lg:p-10">
-                <p className="label-caps text-accent">Your TRIS account</p>
+                <p className="label-caps text-white/70">Your TRIS account</p>
                 <p className="mt-2 font-display text-2xl leading-snug md:text-3xl">
                   Save wishlists, track bookings, and pick up enquiries.
                 </p>
