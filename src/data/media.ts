@@ -3,7 +3,6 @@
 const local = {
   heroPoster: "/images/hero-poster.jpg",
   heroVideoMp4: "/videos/hero.mp4",
-  heroVideoMov: "/videos/hero.mov",
   bridgeTrail: "/images/bridge-trail.jpg",
   campfire: "/images/campfire.jpg",
   cliffView: "/images/cliff-view.jpg",
@@ -43,7 +42,6 @@ export const media = {
   /** Home hero still / reduced-motion poster */
   heroMeghalaya: local.heroPoster,
   heroVideoMp4: local.heroVideoMp4,
-  heroVideoMov: local.heroVideoMov,
   heroPoster: local.heroPoster,
   heroForest: local.forestLight,
   heroRoots: local.livingBridge,

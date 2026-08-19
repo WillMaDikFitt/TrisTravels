@@ -32,13 +32,12 @@ export function HomeHero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "22%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.06, reduce ? 1.06 : 1.2]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "18%"]);
 
   return (
     <section ref={ref} className="relative">
       <div className="relative flex h-[88vh] min-h-[600px] w-full items-center overflow-hidden">
-        <motion.div style={{ y, scale }} className="absolute inset-0 h-[120%] w-full">
+        <motion.div style={{ y }} className="absolute inset-0 h-[118%] w-full">
           {reduce ? (
             <Image
               src={media.heroPoster}
@@ -61,7 +60,6 @@ export function HomeHero() {
               aria-label="Scenic film of Meghalaya landscapes"
             >
               <source src={media.heroVideoMp4} type="video/mp4" />
-              <source src={media.heroVideoMov} type="video/quicktime" />
             </video>
           )}
         </motion.div>
