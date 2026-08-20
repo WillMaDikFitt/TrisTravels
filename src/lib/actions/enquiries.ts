@@ -1,8 +1,13 @@
 "use server";
 
 import { getAdminDb } from "@/lib/firebase/admin";
-import { memoryStore, uid } from "@/lib/store";
+import {
+  allowMemoryBackend,
+  memoryBackendWarning,
+  readFirestoreCollection,
+} from "@/lib/firebase/admin-read";
 import type { EnquiryRecord, EnquirySource } from "@/lib/types";
+import { memoryStore, uid } from "@/lib/store";
 
 export async function submitEnquiry(input: {
   source: EnquirySource;
@@ -47,12 +52,13 @@ export async function submitEnquiry(input: {
 }
 
 export async function listEnquiries(): Promise<EnquiryRecord[]> {
-  const db = getAdminDb();
-  if (db) {
-    const snap = await db.collection("enquiries").limit(200).get();
-    return snap.docs
-      .map((d) => d.data() as EnquiryRecord)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const rows = await readFirestoreCollection<EnquiryRecord>("enquiries");
+  if (rows) {
+    return rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+  if (!allowMemoryBackend()) {
+    console.error("listEnquiries:", memoryBackendWarning());
+    return [];
   }
   return memoryStore().enquiries;
 }

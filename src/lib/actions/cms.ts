@@ -21,7 +21,7 @@ export async function saveDocument(collection: string, id: string, data: Record<
     return { ok: true as const };
   } catch (err) {
     console.error("saveDocument failed:", err);
-    return { ok: false as const, error: "Could not save. Check Firebase admin keys on the server." };
+    return { ok: false as const, error: "Could not save. Ask your developer to check the live site connection." };
   }
 }
 
@@ -33,7 +33,7 @@ export async function deleteDocument(collection: string, id: string) {
     return { ok: true as const };
   } catch (err) {
     console.error("deleteDocument failed:", err);
-    return { ok: false as const, error: "Could not delete. Check Firebase admin keys on the server." };
+    return { ok: false as const, error: "Could not delete. Ask your developer to check the live site connection." };
   }
 }
 
@@ -67,15 +67,34 @@ export async function deleteClosure(id: string) {
 
 export async function listUsersAdmin() {
   const db = getAdminDb();
-  const auth = getAdminAuth();
-  if (!db || !auth) return { ok: false as const, users: [], error: SAVE_UNAVAILABLE };
+  if (!db) return { ok: false as const, users: [], error: SAVE_UNAVAILABLE };
 
-  const [profiles, authUsers] = await Promise.all([
-    db.collection("users").limit(200).get(),
-    auth.listUsers(200),
-  ]);
+  let authUsers: Awaited<ReturnType<NonNullable<ReturnType<typeof getAdminAuth>>["listUsers"]>>["users"] =
+    [];
+  const auth = getAdminAuth();
+  if (auth) {
+    try {
+      const listed = await auth.listUsers(200);
+      authUsers = listed.users;
+    } catch (err) {
+      console.error("listUsersAdmin auth.listUsers failed:", err);
+    }
+  }
+
+  let profiles;
+  try {
+    profiles = await db.collection("users").limit(200).get();
+  } catch (err) {
+    console.error("listUsersAdmin firestore users read failed:", err);
+    return {
+      ok: false as const,
+      users: [],
+      error: "Could not load travellers. The live site may not be fully connected yet — ask your developer to check the server setup.",
+    };
+  }
+
   const profileByUid = new Map(profiles.docs.map((doc) => [doc.id, doc.data()]));
-  const users = authUsers.users.map((user) => {
+  const users = authUsers.map((user) => {
     const profile = profileByUid.get(user.uid) as
       | { name?: string; email?: string; phone?: string; role?: UserRole; createdAt?: string }
       | undefined;
@@ -116,6 +135,7 @@ export async function listUsersAdmin() {
   return {
     ok: true as const,
     users: users.filter((user) => !isHiddenStudioTraveller(user)),
+    authPartial: authUsers.length === 0 && profiles.docs.length > 0,
   };
 }
 

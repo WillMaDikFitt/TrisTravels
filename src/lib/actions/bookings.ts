@@ -2,6 +2,12 @@
 
 import { findExperience, getSettings, listClosures } from "@/lib/data/repo";
 import { getAdminDb } from "@/lib/firebase/admin";
+import {
+  allowMemoryBackend,
+  memoryBackendWarning,
+  readFirestoreCollection,
+  readMemoryBookings,
+} from "@/lib/firebase/admin-read";
 import { quoteExperience } from "@/lib/pricing";
 import { memoryStore, uid } from "@/lib/store";
 import type { BookingRecord, BookingStatus } from "@/lib/types";
@@ -153,14 +159,15 @@ export async function confirmPayment(bookingId: string) {
 }
 
 export async function listBookings(): Promise<BookingRecord[]> {
-  const db = getAdminDb();
-  if (db) {
-    const snap = await db.collection("bookings").limit(200).get();
-    return snap.docs
-      .map((d) => expireIfNeeded(d.data() as BookingRecord))
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const rows = await readFirestoreCollection<BookingRecord>("bookings");
+  if (rows) {
+    return rows.map(expireIfNeeded).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
-  return memoryStore().bookings.map(expireIfNeeded);
+  if (!allowMemoryBackend()) {
+    console.error("listBookings:", memoryBackendWarning());
+    return [];
+  }
+  return readMemoryBookings((store) => store.bookings.map(expireIfNeeded));
 }
 
 export async function listBookingsForEmail(email: string): Promise<BookingRecord[]> {

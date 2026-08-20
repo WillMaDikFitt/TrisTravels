@@ -6,7 +6,7 @@ import { listEnquiries } from "@/lib/actions/enquiries";
 import { fetchStoriesAdmin } from "@/lib/actions/content-read";
 import type { BookingRecord, EnquiryRecord } from "@/lib/types";
 import type { Story } from "@/data/stories";
-import { AdminButton, PageHeader, Panel, StatCard } from "@/components/admin/ui";
+import { AdminButton, Notice, PageHeader, Panel, StatCard } from "@/components/admin/ui";
 import { formatINR, cn } from "@/lib/utils";
 
 function daysAgo(n: number) {
@@ -15,29 +15,45 @@ function daysAgo(n: number) {
   return d.toISOString().slice(0, 10);
 }
 
+function recordDay(iso?: string) {
+  return (iso || "").slice(0, 10);
+}
+
 export default function AdminReportsPage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [loadError, setLoadError] = useState("");
   const [from, setFrom] = useState(daysAgo(30));
   const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
-    listBookings().then(setBookings);
-    listEnquiries().then(setEnquiries);
-    fetchStoriesAdmin().then(setStories).catch(() => setStories([]));
+    Promise.all([listBookings(), listEnquiries(), fetchStoriesAdmin()])
+      .then(([nextBookings, nextEnquiries, nextStories]) => {
+        setBookings(nextBookings);
+        setEnquiries(nextEnquiries);
+        setStories(nextStories);
+        if (!nextBookings.length && !nextEnquiries.length) {
+          setLoadError(
+            "No bookings or enquiries were returned. If people have already submitted on the live site, ask your developer to check the live connection.",
+          );
+        }
+      })
+      .catch(() => {
+        setLoadError("Could not load report data from the server.");
+      });
   }, []);
 
   const inRange = useMemo(() => {
     return bookings.filter((b) => {
-      const day = b.date || b.createdAt.slice(0, 10);
+      const day = recordDay(b.createdAt) || recordDay(b.date);
       return day >= from && day <= to;
     });
   }, [bookings, from, to]);
 
   const enquiriesInRange = useMemo(() => {
     return enquiries.filter((e) => {
-      const day = e.createdAt.slice(0, 10);
+      const day = recordDay(e.createdAt);
       return day >= from && day <= to;
     });
   }, [enquiries, from, to]);
@@ -64,7 +80,7 @@ export default function AdminReportsPage() {
 
   const guestStories = enquiries.filter((e) => e.source === "story");
   const guestInRange = guestStories.filter((e) => {
-    const day = e.createdAt.slice(0, 10);
+    const day = recordDay(e.createdAt);
     return day >= from && day <= to;
   });
 
@@ -100,13 +116,19 @@ export default function AdminReportsPage() {
       <PageHeader
         eyebrow="System"
         title="Reports"
-        description="Lightweight ops snapshot for the selected period. Revenue is the sum of confirmed guest totals."
+        description="Counts use when a booking or enquiry was created, not the trip date. Revenue is the sum of confirmed guest totals in the selected period."
         actions={
           <AdminButton type="button" onClick={exportCsv}>
             Export bookings CSV
           </AdminButton>
         }
       />
+
+      {loadError && (
+        <div className="mb-6">
+          <Notice tone="warn">{loadError}</Notice>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-wrap gap-3">
         <label className="text-sm">
@@ -130,9 +152,9 @@ export default function AdminReportsPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Bookings in period" value={inRange.length} />
+        <StatCard label="Bookings in period" value={inRange.length} hint={`${bookings.length} total loaded`} />
         <StatCard label="Confirmed revenue" value={formatINR(revenue)} hint="Guest totals only" />
-        <StatCard label="Enquiries in period" value={enquiriesInRange.length} />
+        <StatCard label="Enquiries in period" value={enquiriesInRange.length} hint={`${enquiries.length} total loaded`} />
         <StatCard
           label="Guest stories"
           value={`${guestInRange.length} / ${stories.length}`}

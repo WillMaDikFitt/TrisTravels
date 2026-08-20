@@ -66,9 +66,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const { loading, isAdmin, configured, profile, logout, user } = useAuth();
-  const [health, setHealth] = useState<{ adminConfigured: boolean; adminConnected: boolean } | null>(
-    null,
-  );
+  const [health, setHealth] = useState<{
+    adminConfigured: boolean;
+    adminConnected: boolean;
+    adminError?: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchStudioHealth().then(setHealth);
@@ -207,13 +209,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         {!configured && (
           <p className="mx-4 mt-4 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 md:mx-8">
-            Studio is in preview mode — edits won’t be saved permanently until the site is fully connected.
+            Studio is in preview mode — changes won’t be saved permanently until the live site is fully connected.
           </p>
         )}
         {configured && health && !health.adminConfigured && (
           <p className="mx-4 mt-4 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 md:mx-8">
-            Saves won’t stick yet — add the Firebase admin keys in Vercel (project ID, client email, private key),
-            then redeploy.
+            Studio can’t load live travellers, bookings, or reports yet. Ask your developer to finish connecting
+            the live site, then redeploy.
+          </p>
+        )}
+        {configured && health?.adminConfigured && !health.adminConnected && (
+          <p className="mx-4 mt-4 rounded-xl bg-amber-50 px-4 py-2.5 text-sm text-amber-900 md:mx-8">
+            {health.adminError ||
+              "Studio can’t reach the live site records right now. Ask your developer to check the server connection."}
+          </p>
+        )}
+        {configured && health?.adminConnected && health.adminError && (
+          <p className="mx-4 mt-4 rounded-xl bg-[#f3efe8] px-4 py-2.5 text-sm text-[#5c6350] md:mx-8">
+            {health.adminError}
           </p>
         )}
         <header className="sticky top-0 z-30 hidden h-[4.5rem] items-center border-b border-[#ded9cd] bg-white/90 px-8 backdrop-blur-xl md:flex">

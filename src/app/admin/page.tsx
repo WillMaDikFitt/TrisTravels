@@ -8,6 +8,8 @@ import { Badge, PageHeader, Panel, StatCard, bookingTone } from "@/components/ad
 import { formatINR } from "@/lib/utils";
 import { nextOpenDeparture, seatsLeft } from "@/lib/journey-seats";
 
+export const dynamic = "force-dynamic";
+
 function startOfWeekISO() {
   const d = new Date();
   const day = d.getDay();

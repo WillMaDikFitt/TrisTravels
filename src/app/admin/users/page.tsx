@@ -5,7 +5,7 @@ import { listUsersAdmin, updateUserRole } from "@/lib/actions/cms";
 import { listBookings } from "@/lib/actions/bookings";
 import { listEnquiries } from "@/lib/actions/enquiries";
 import type { BookingRecord, EnquiryRecord, UserRole } from "@/lib/types";
-import { Badge, EmptyState, PageHeader, Panel, bookingTone, inputClass } from "@/components/admin/ui";
+import { Badge, EmptyState, Notice, PageHeader, Panel, bookingTone, inputClass } from "@/components/admin/ui";
 import { cn, formatINR } from "@/lib/utils";
 
 type Row = {
@@ -23,6 +23,7 @@ export default function AdminUsersPage() {
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [open, setOpen] = useState<Row | null>(null);
   const [loadError, setLoadError] = useState("");
+  const [loadWarning, setLoadWarning] = useState("");
 
   useEffect(() => {
     listUsersAdmin().then((result) => {
@@ -31,9 +32,18 @@ export default function AdminUsersPage() {
         return;
       }
       setUsers(result.users as Row[]);
+      if ("authPartial" in result && result.authPartial) {
+        setLoadWarning(
+          "Some signed-up travellers may not appear in this list yet. If someone is missing, contact your site developer.",
+        );
+      }
     });
-    listBookings().then(setBookings);
-    listEnquiries().then(setEnquiries);
+    listBookings()
+      .then(setBookings)
+      .catch(() => setLoadError((prev) => prev || "Could not load bookings for traveller details."));
+    listEnquiries()
+      .then(setEnquiries)
+      .catch(() => setLoadError((prev) => prev || "Could not load enquiries for traveller details."));
   }, []);
 
   const relatedBookings = useMemo(() => {
@@ -53,11 +63,16 @@ export default function AdminUsersPage() {
       <PageHeader
         eyebrow="People"
         title="Travellers"
-        description="Firebase accounts and their Studio roles. Change roles carefully — staff and admin can open Studio."
+        description="People who have signed up on the site. Give someone staff or admin access if they need to open Studio."
       />
       {loadError && (
-        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-[#5c4b18]">
-          Couldn’t load Firebase accounts. Add the Firebase Admin environment variables in Vercel, then redeploy.
+        <div className="mb-6">
+          <Notice tone="warn">{loadError}</Notice>
+        </div>
+      )}
+      {loadWarning && !loadError && (
+        <div className="mb-6">
+          <Notice tone="info">{loadWarning}</Notice>
         </div>
       )}
       <div className="grid gap-6">
@@ -108,9 +123,9 @@ export default function AdminUsersPage() {
                           setOpen((prev) => (prev?.uid === u.uid ? { ...prev, role } : prev));
                         }}
                       >
-                        <option value="traveller">traveller</option>
-                        <option value="staff">staff</option>
-                        <option value="admin">admin</option>
+                        <option value="traveller">Traveller</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
                       </select>
                     </td>
                   </tr>
@@ -121,7 +136,7 @@ export default function AdminUsersPage() {
         ) : (
           <EmptyState
             title="No travellers yet"
-            body="No Firebase Auth accounts have signed up yet."
+            body="No one has created an account on the site yet."
           />
         )}
 
