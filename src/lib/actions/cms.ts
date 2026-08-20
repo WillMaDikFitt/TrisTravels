@@ -70,29 +70,35 @@ export async function listUsersAdmin() {
   const db = getAdminDb();
   if (!db) return { ok: false as const, users: [], error: SAVE_UNAVAILABLE };
 
-  let authUsers: Awaited<ReturnType<NonNullable<ReturnType<typeof getAdminAuth>>["listUsers"]>>["users"] =
-    [];
   const auth = getAdminAuth();
-  if (auth) {
-    try {
-      const listed = await auth.listUsers(200);
-      authUsers = listed.users;
-    } catch (err) {
-      console.error("listUsersAdmin auth.listUsers failed:", err);
-    }
-  }
+  const [authResult, profilesResult] = await Promise.all([
+    auth
+      ? auth.listUsers(200).catch((err) => {
+          console.error("listUsersAdmin auth.listUsers failed:", err);
+          return null;
+        })
+      : Promise.resolve(null),
+    db
+      .collection("users")
+      .limit(200)
+      .get()
+      .catch((err) => {
+        console.error("listUsersAdmin firestore users read failed:", err);
+        return null;
+      }),
+  ]);
 
-  let profiles;
-  try {
-    profiles = await db.collection("users").limit(200).get();
-  } catch (err) {
-    console.error("listUsersAdmin firestore users read failed:", err);
+  if (!profilesResult) {
     return {
       ok: false as const,
       users: [],
-      error: "Could not load travellers. The live site may not be fully connected yet — ask your developer to check the server setup.",
+      error:
+        "Could not load travellers. The live site may not be fully connected yet — ask your developer to check the server setup.",
     };
   }
+
+  const authUsers = authResult?.users ?? [];
+  const profiles = profilesResult;
 
   const profileByUid = new Map(
     profiles.docs.map((doc) => [doc.id, sanitizeForClient(doc.data()) as Record<string, unknown>]),

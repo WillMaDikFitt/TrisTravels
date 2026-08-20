@@ -143,6 +143,14 @@ export function Notice({ children, tone = "info" }: { children: ReactNode; tone?
   return <p className={cn("rounded-xl px-4 py-3 text-sm", tones[tone])}>{children}</p>;
 }
 
+export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
+  return (
+    <div className="rounded-2xl border border-[#e4dfd4] bg-white px-6 py-14 text-center">
+      <p className="text-sm text-[#8a917c]">{label}</p>
+    </div>
+  );
+}
+
 export function EmptyState({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-[#d4cec0] px-6 py-14 text-center">

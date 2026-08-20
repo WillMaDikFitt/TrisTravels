@@ -6,7 +6,7 @@ import { listEnquiries } from "@/lib/actions/enquiries";
 import { fetchStoriesAdmin } from "@/lib/actions/content-read";
 import type { BookingRecord, EnquiryRecord } from "@/lib/types";
 import type { Story } from "@/data/stories";
-import { AdminButton, Notice, PageHeader, Panel, StatCard } from "@/components/admin/ui";
+import { AdminButton, LoadingBlock, Notice, PageHeader, Panel, StatCard } from "@/components/admin/ui";
 import { formatINR, cn } from "@/lib/utils";
 
 function daysAgo(n: number) {
@@ -23,28 +23,67 @@ export default function AdminReportsPage() {
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(true);
+  const [loadingEnquiries, setLoadingEnquiries] = useState(true);
+  const [loadingStories, setLoadingStories] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [from, setFrom] = useState(daysAgo(30));
   const [to, setTo] = useState(new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
-    Promise.all([listBookings(), listEnquiries(), fetchStoriesAdmin()])
-      .then(([nextBookings, nextEnquiries, nextStories]) => {
-        setBookings(nextBookings);
-        setEnquiries(nextEnquiries);
-        setStories(nextStories);
-        if (!nextBookings.length && !nextEnquiries.length) {
-          setLoadError(
-            "No bookings or enquiries showed up for this period yet. If people have already submitted on the live site, ask your developer to check the live connection.",
-          );
-        } else {
-          setLoadError("");
-        }
+    let cancelled = false;
+
+    setLoadingBookings(true);
+    listBookings()
+      .then((rows) => {
+        if (!cancelled) setBookings(rows);
       })
       .catch(() => {
-        setLoadError("Could not load report data from the server.");
+        if (!cancelled) setLoadError((prev) => prev || "Could not load bookings for reports.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingBookings(false);
       });
+
+    setLoadingEnquiries(true);
+    listEnquiries()
+      .then((rows) => {
+        if (!cancelled) setEnquiries(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError((prev) => prev || "Could not load enquiries for reports.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingEnquiries(false);
+      });
+
+    setLoadingStories(true);
+    fetchStoriesAdmin()
+      .then((rows) => {
+        if (!cancelled) setStories(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setStories([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingStories(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const loadingCore = loadingBookings || loadingEnquiries;
+
+  useEffect(() => {
+    if (loadingCore) return;
+    if (!bookings.length && !enquiries.length && !loadError.startsWith("Could not load")) {
+      setLoadError(
+        "No bookings or enquiries showed up for this period yet. If people have already submitted on the live site, ask your developer to check the live connection.",
+      );
+    }
+  }, [loadingCore, bookings.length, enquiries.length, loadError]);
 
   const inRange = useMemo(() => {
     return bookings.filter((b) => {
@@ -120,7 +159,7 @@ export default function AdminReportsPage() {
         title="Reports"
         description="Counts use when a booking or enquiry was created, not the trip date. Revenue is the sum of confirmed guest totals in the selected period."
         actions={
-          <AdminButton type="button" onClick={exportCsv}>
+          <AdminButton type="button" onClick={exportCsv} disabled={loadingBookings}>
             Export bookings CSV
           </AdminButton>
         }
@@ -153,69 +192,95 @@ export default function AdminReportsPage() {
         </label>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Bookings in period" value={inRange.length} hint={`${bookings.length} total loaded`} />
-        <StatCard label="Confirmed revenue" value={formatINR(revenue)} hint="Guest totals only" />
-        <StatCard label="Enquiries in period" value={enquiriesInRange.length} hint={`${enquiries.length} total loaded`} />
-        <StatCard
-          label="Guest stories"
-          value={`${guestInRange.length} / ${stories.length}`}
-          hint="Submitted in period / published journal"
-        />
-      </div>
+      {loadingCore && !bookings.length && !enquiries.length ? (
+        <LoadingBlock label="Loading report figures…" />
+      ) : (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label="Bookings in period"
+              value={loadingBookings ? "…" : inRange.length}
+              hint={loadingBookings ? "Loading…" : `${bookings.length} total loaded`}
+            />
+            <StatCard
+              label="Confirmed revenue"
+              value={loadingBookings ? "…" : formatINR(revenue)}
+              hint="Guest totals only"
+            />
+            <StatCard
+              label="Enquiries in period"
+              value={loadingEnquiries ? "…" : enquiriesInRange.length}
+              hint={loadingEnquiries ? "Loading…" : `${enquiries.length} total loaded`}
+            />
+            <StatCard
+              label="Guest stories"
+              value={
+                loadingEnquiries || loadingStories
+                  ? "…"
+                  : `${guestInRange.length} / ${stories.length}`
+              }
+              hint="Submitted in period / published journal"
+            />
+          </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <Panel>
-          <h2 className="font-display text-lg">Bookings by status</h2>
-          <table className="mt-4 w-full text-left text-sm">
-            <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-              <tr>
-                <th className="pb-2">Status</th>
-                <th className="pb-2 text-right">Bookings</th>
-              </tr>
-            </thead>
-            <tbody>
-            {Object.entries(byStatus).map(([status, count]) => (
-              <tr key={status} className="border-t border-[#f0ebe3]">
-                <td className="py-2 capitalize">{status}</td>
-                <td className="py-2 text-right font-medium">{count}</td>
-              </tr>
-            ))}
-            {!Object.keys(byStatus).length && (
-              <tr>
-                <td colSpan={2} className="py-4 text-[#8a917c]">No bookings in this range.</td>
-              </tr>
-            )}
-            </tbody>
-          </table>
-        </Panel>
-        <Panel>
-          <h2 className="font-display text-lg">Enquiries by source</h2>
-          <table className="mt-4 w-full text-left text-sm">
-            <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-              <tr>
-                <th className="pb-2">Source</th>
-                <th className="pb-2 text-right">Enquiries</th>
-              </tr>
-            </thead>
-            <tbody>
-            {Object.entries(bySource).map(([source, count]) => (
-              <tr key={source} className="border-t border-[#f0ebe3]">
-                <td className={cn("py-2 capitalize")}>
-                  {source === "story" ? "Guest story" : source.replace(/-/g, " ")}
-                </td>
-                <td className="py-2 text-right font-medium">{count}</td>
-              </tr>
-            ))}
-            {!Object.keys(bySource).length && (
-              <tr>
-                <td colSpan={2} className="py-4 text-[#8a917c]">No enquiries in this range.</td>
-              </tr>
-            )}
-            </tbody>
-          </table>
-        </Panel>
-      </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <Panel>
+              <h2 className="font-display text-lg">Bookings by status</h2>
+              <table className="mt-4 w-full text-left text-sm">
+                <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <tr>
+                    <th className="pb-2">Status</th>
+                    <th className="pb-2 text-right">Bookings</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(byStatus).map(([status, count]) => (
+                    <tr key={status} className="border-t border-[#f0ebe3]">
+                      <td className="py-2 capitalize">{status}</td>
+                      <td className="py-2 text-right font-medium">{count}</td>
+                    </tr>
+                  ))}
+                  {!Object.keys(byStatus).length && (
+                    <tr>
+                      <td colSpan={2} className="py-4 text-[#8a917c]">
+                        {loadingBookings ? "Loading…" : "No bookings in this range."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </Panel>
+            <Panel>
+              <h2 className="font-display text-lg">Enquiries by source</h2>
+              <table className="mt-4 w-full text-left text-sm">
+                <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <tr>
+                    <th className="pb-2">Source</th>
+                    <th className="pb-2 text-right">Enquiries</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(bySource).map(([source, count]) => (
+                    <tr key={source} className="border-t border-[#f0ebe3]">
+                      <td className={cn("py-2 capitalize")}>
+                        {source === "story" ? "Guest story" : source.replace(/-/g, " ")}
+                      </td>
+                      <td className="py-2 text-right font-medium">{count}</td>
+                    </tr>
+                  ))}
+                  {!Object.keys(bySource).length && (
+                    <tr>
+                      <td colSpan={2} className="py-4 text-[#8a917c]">
+                        {loadingEnquiries ? "Loading…" : "No enquiries in this range."}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </Panel>
+          </div>
+        </>
+      )}
     </div>
   );
 }

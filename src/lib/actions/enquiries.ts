@@ -5,6 +5,7 @@ import {
   allowMemoryBackend,
   memoryBackendWarning,
   readFirestoreCollection,
+  sanitizeForClient,
 } from "@/lib/firebase/admin-read";
 import type { EnquiryRecord, EnquirySource } from "@/lib/types";
 import { memoryStore, uid } from "@/lib/store";
@@ -69,8 +70,27 @@ export async function listEnquiries(): Promise<EnquiryRecord[]> {
 }
 
 export async function listEnquiriesForUser(email: string): Promise<EnquiryRecord[]> {
-  const all = await listEnquiries();
-  return all.filter((e) => e.email.toLowerCase() === email.toLowerCase());
+  const target = email.trim().toLowerCase();
+  if (!target) return [];
+  try {
+    const db = getAdminDb();
+    if (db) {
+      const exact = await db.collection("enquiries").where("email", "==", email.trim()).limit(20).get();
+      const fromExact = exact.docs
+        .map((doc) => sanitizeForClient({ id: doc.id, ...doc.data() }) as EnquiryRecord)
+        .filter((e) => e.email?.toLowerCase() === target);
+      if (fromExact.length) {
+        return fromExact
+          .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
+          .slice(0, 8);
+      }
+    }
+    const all = await listEnquiries();
+    return all.filter((e) => e.email.toLowerCase() === target).slice(0, 8);
+  } catch (err) {
+    console.error("listEnquiriesForUser failed:", err);
+    return [];
+  }
 }
 
 export async function updateEnquiryStatus(id: string, status: EnquiryRecord["status"]) {

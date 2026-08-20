@@ -7,6 +7,7 @@ import {
   memoryBackendWarning,
   readFirestoreCollection,
   readMemoryBookings,
+  sanitizeForClient,
 } from "@/lib/firebase/admin-read";
 import { quoteExperience } from "@/lib/pricing";
 import { memoryStore, uid } from "@/lib/store";
@@ -182,8 +183,32 @@ export async function listBookings(): Promise<BookingRecord[]> {
 }
 
 export async function listBookingsForEmail(email: string): Promise<BookingRecord[]> {
-  const all = await listBookings();
-  return all.filter((b) => b.customerEmail.toLowerCase() === email.toLowerCase());
+  const target = email.trim().toLowerCase();
+  if (!target) return [];
+  try {
+    const db = getAdminDb();
+    if (db) {
+      const exact = await db.collection("bookings").where("customerEmail", "==", email.trim()).limit(20).get();
+      const fromExact = exact.docs
+        .map((doc) => {
+          const raw = sanitizeForClient({ id: doc.id, ...doc.data() }) as BookingRecord;
+          return expireIfNeeded(raw);
+        })
+        .filter((b) => b.customerEmail?.toLowerCase() === target);
+      if (fromExact.length) {
+        return fromExact
+          .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
+          .slice(0, 8);
+      }
+    }
+    const all = await listBookings();
+    return all
+      .filter((b) => b.customerEmail.toLowerCase() === target)
+      .slice(0, 8);
+  } catch (err) {
+    console.error("listBookingsForEmail failed:", err);
+    return [];
+  }
 }
 
 export async function updateBookingStatus(id: string, status: BookingStatus) {
