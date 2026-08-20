@@ -28,27 +28,53 @@ async function writeBatchDocs(
 }
 
 export async function seedStudioDemo() {
-  const db = getAdminDb();
-  if (db) {
-    await writeBatchDocs(db, "bookings", DEMO_BOOKINGS);
-    await writeBatchDocs(db, "enquiries", DEMO_ENQUIRIES);
-    await writeBatchDocs(db, "closures", DEMO_CLOSURES);
-    await writeBatchDocs(db, "users", DEMO_USERS);
-    await db.collection("settings").doc(META_DOC).set(
-      {
-        seededAt: new Date().toISOString(),
+  try {
+    const db = getAdminDb();
+    if (db) {
+      await writeBatchDocs(db, "bookings", DEMO_BOOKINGS);
+      await writeBatchDocs(db, "enquiries", DEMO_ENQUIRIES);
+      await writeBatchDocs(db, "closures", DEMO_CLOSURES);
+      await writeBatchDocs(db, "users", DEMO_USERS);
+      await db.collection("settings").doc(META_DOC).set(
+        {
+          seededAt: new Date().toISOString(),
+          counts: {
+            bookings: DEMO_BOOKINGS.length,
+            enquiries: DEMO_ENQUIRIES.length,
+            closures: DEMO_CLOSURES.length,
+            users: DEMO_USERS.length,
+          },
+        },
+        { merge: true },
+      );
+      return {
+        ok: true as const,
+        mode: "firestore" as const,
         counts: {
           bookings: DEMO_BOOKINGS.length,
           enquiries: DEMO_ENQUIRIES.length,
           closures: DEMO_CLOSURES.length,
           users: DEMO_USERS.length,
         },
-      },
-      { merge: true },
-    );
+      };
+    }
+
+    const store = memoryStore();
+    store.bookings = [
+      ...DEMO_BOOKINGS,
+      ...store.bookings.filter((row) => !String(row.id).startsWith("demo_")),
+    ];
+    store.enquiries = [
+      ...DEMO_ENQUIRIES,
+      ...store.enquiries.filter((row) => !String(row.id).startsWith("demo_")),
+    ];
+    store.closures = [
+      ...DEMO_CLOSURES,
+      ...store.closures.filter((row) => !String(row.id).startsWith("demo_")),
+    ];
     return {
       ok: true as const,
-      mode: "firestore" as const,
+      mode: "memory" as const,
       counts: {
         bookings: DEMO_BOOKINGS.length,
         enquiries: DEMO_ENQUIRIES.length,
@@ -56,31 +82,10 @@ export async function seedStudioDemo() {
         users: DEMO_USERS.length,
       },
     };
+  } catch (err) {
+    console.error("seedStudioDemo failed:", err);
+    return { ok: false as const, error: "Could not prepare Studio sample data." };
   }
-
-  const store = memoryStore();
-  store.bookings = [
-    ...DEMO_BOOKINGS,
-    ...store.bookings.filter((row) => !String(row.id).startsWith("demo_")),
-  ];
-  store.enquiries = [
-    ...DEMO_ENQUIRIES,
-    ...store.enquiries.filter((row) => !String(row.id).startsWith("demo_")),
-  ];
-  store.closures = [
-    ...DEMO_CLOSURES,
-    ...store.closures.filter((row) => !String(row.id).startsWith("demo_")),
-  ];
-  return {
-    ok: true as const,
-    mode: "memory" as const,
-    counts: {
-      bookings: DEMO_BOOKINGS.length,
-      enquiries: DEMO_ENQUIRIES.length,
-      closures: DEMO_CLOSURES.length,
-      users: DEMO_USERS.length,
-    },
-  };
 }
 
 export async function clearStudioDemo() {

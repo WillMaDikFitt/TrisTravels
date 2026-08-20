@@ -17,7 +17,11 @@ import { experienceSlots } from "@/lib/experience-slots";
 import { findTransportVehicle, transportVehicleOptions } from "@/data/transport";
 
 function expireIfNeeded(row: BookingRecord): BookingRecord {
-  if (row.status === "hold" && row.expiresAt && new Date(row.expiresAt).getTime() < Date.now()) {
+  if (
+    row.status === "hold" &&
+    row.expiresAt &&
+    new Date(String(row.expiresAt)).getTime() < Date.now()
+  ) {
     return { ...row, status: "expired" };
   }
   return row;
@@ -159,15 +163,22 @@ export async function confirmPayment(bookingId: string) {
 }
 
 export async function listBookings(): Promise<BookingRecord[]> {
-  const rows = await readFirestoreCollection<BookingRecord>("bookings");
-  if (rows) {
-    return rows.map(expireIfNeeded).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }
-  if (!allowMemoryBackend()) {
-    console.error("listBookings:", memoryBackendWarning());
+  try {
+    const rows = await readFirestoreCollection<BookingRecord>("bookings");
+    if (rows) {
+      return rows
+        .map(expireIfNeeded)
+        .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+    }
+    if (!allowMemoryBackend()) {
+      console.error("listBookings:", memoryBackendWarning());
+      return [];
+    }
+    return readMemoryBookings((store) => store.bookings.map(expireIfNeeded));
+  } catch (err) {
+    console.error("listBookings failed:", err);
     return [];
   }
-  return readMemoryBookings((store) => store.bookings.map(expireIfNeeded));
 }
 
 export async function listBookingsForEmail(email: string): Promise<BookingRecord[]> {

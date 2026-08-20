@@ -117,16 +117,29 @@ function buildOverviewCharts(
 }
 
 export default async function AdminDashboard() {
-  let [bookings, enquiries, experiences, journeys] = await Promise.all([
-    listBookings(),
-    listEnquiries(),
-    listExperiences(),
-    listJourneys(),
-  ]);
+  let bookings: Awaited<ReturnType<typeof listBookings>> = [];
+  let enquiries: Awaited<ReturnType<typeof listEnquiries>> = [];
+  let experiences: Awaited<ReturnType<typeof listExperiences>> = [];
+  let journeys: Awaited<ReturnType<typeof listJourneys>> = [];
+
+  try {
+    [bookings, enquiries, experiences, journeys] = await Promise.all([
+      listBookings(),
+      listEnquiries(),
+      listExperiences(),
+      listJourneys(),
+    ]);
+  } catch (err) {
+    console.error("Admin overview load failed:", err);
+  }
 
   if (!bookings.length && !enquiries.length) {
-    await seedStudioDemo();
-    [bookings, enquiries] = await Promise.all([listBookings(), listEnquiries()]);
+    try {
+      await seedStudioDemo();
+      [bookings, enquiries] = await Promise.all([listBookings(), listEnquiries()]);
+    } catch (err) {
+      console.error("Admin overview demo seed failed:", err);
+    }
   }
 
   const needsConfirm = bookings.filter((b) => b.status === "requested" || b.status === "hold");

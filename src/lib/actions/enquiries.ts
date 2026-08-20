@@ -52,15 +52,20 @@ export async function submitEnquiry(input: {
 }
 
 export async function listEnquiries(): Promise<EnquiryRecord[]> {
-  const rows = await readFirestoreCollection<EnquiryRecord>("enquiries");
-  if (rows) {
-    return rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }
-  if (!allowMemoryBackend()) {
-    console.error("listEnquiries:", memoryBackendWarning());
+  try {
+    const rows = await readFirestoreCollection<EnquiryRecord>("enquiries");
+    if (rows) {
+      return rows.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+    }
+    if (!allowMemoryBackend()) {
+      console.error("listEnquiries:", memoryBackendWarning());
+      return [];
+    }
+    return memoryStore().enquiries;
+  } catch (err) {
+    console.error("listEnquiries failed:", err);
     return [];
   }
-  return memoryStore().enquiries;
 }
 
 export async function listEnquiriesForUser(email: string): Promise<EnquiryRecord[]> {

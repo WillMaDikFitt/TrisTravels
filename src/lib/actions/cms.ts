@@ -2,6 +2,7 @@
 
 import { getAdminDb } from "@/lib/firebase/admin";
 import { getAdminAuth } from "@/lib/firebase/admin";
+import { asIsoString, sanitizeForClient } from "@/lib/firebase/admin-read";
 import { memoryStore, uid } from "@/lib/store";
 import type { ClosureRecord, EnquiryRecord, PlatformSettings, UserRole } from "@/lib/types";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
@@ -93,7 +94,9 @@ export async function listUsersAdmin() {
     };
   }
 
-  const profileByUid = new Map(profiles.docs.map((doc) => [doc.id, doc.data()]));
+  const profileByUid = new Map(
+    profiles.docs.map((doc) => [doc.id, sanitizeForClient(doc.data()) as Record<string, unknown>]),
+  );
   const users = authUsers.map((user) => {
     const profile = profileByUid.get(user.uid) as
       | { name?: string; email?: string; phone?: string; role?: UserRole; createdAt?: string }
@@ -104,7 +107,7 @@ export async function listUsersAdmin() {
       email: profile?.email || user.email || "",
       phone: profile?.phone,
       role: profile?.role || "traveller",
-      createdAt: profile?.createdAt || user.metadata.creationTime || "",
+      createdAt: asIsoString(profile?.createdAt, user.metadata.creationTime || ""),
       profileMissing: !profile,
     };
   });
@@ -112,7 +115,7 @@ export async function listUsersAdmin() {
   const authUids = new Set(users.map((user) => user.uid));
   for (const doc of profiles.docs) {
     if (authUids.has(doc.id)) continue;
-    const profile = doc.data() as {
+    const profile = sanitizeForClient(doc.data()) as {
       name?: string;
       email?: string;
       phone?: string;
@@ -126,7 +129,7 @@ export async function listUsersAdmin() {
       email: profile.email || "",
       phone: profile.phone,
       role: profile.role || "traveller",
-      createdAt: profile.createdAt || "",
+      createdAt: asIsoString(profile.createdAt),
       profileMissing: false,
     });
   }

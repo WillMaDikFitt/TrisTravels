@@ -35,8 +35,10 @@ export default function AdminReportsPage() {
         setStories(nextStories);
         if (!nextBookings.length && !nextEnquiries.length) {
           setLoadError(
-            "No bookings or enquiries were returned. If people have already submitted on the live site, ask your developer to check the live connection.",
+            "No bookings or enquiries showed up for this period yet. If people have already submitted on the live site, ask your developer to check the live connection.",
           );
+        } else {
+          setLoadError("");
         }
       })
       .catch(() => {
