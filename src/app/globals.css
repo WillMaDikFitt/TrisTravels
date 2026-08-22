@@ -86,6 +86,7 @@
   --font-display: var(--font-syne);
   --font-sans: var(--font-manrope);
   --font-serif: var(--font-instrument);
+  --font-card-serif: var(--font-playfair);
 
   --spacing-container-max: 80rem;
   --spacing-margin-desktop: 4rem;

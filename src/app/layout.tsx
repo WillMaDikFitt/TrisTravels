@@ -1,4 +1,4 @@
-import { Instrument_Serif, Manrope, Syne } from "next/font/google";
+import { Instrument_Serif, Manrope, Playfair_Display, Syne } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -23,6 +23,14 @@ const instrument = Instrument_Serif({
   subsets: ["latin"],
   weight: ["400"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** High-contrast serif for curated journey cards (matches live TRIS package cards). */
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -54,7 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${instrument.variable} ${manrope.variable} h-full`}
+      className={`${syne.variable} ${instrument.variable} ${manrope.variable} ${playfair.variable} h-full`}
       data-scroll-behavior="smooth"
     >
       <body className="relative flex min-h-full flex-col antialiased">

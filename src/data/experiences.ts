@@ -82,7 +82,7 @@ export type Experience = {
 export const experiences: Experience[] = [
   {
     slug: "offbeat-living-root-bridge",
-    name: "Offbeat Living Root Bridge Trail",
+    name: "Root Bridge",
     tagline: "Up to six living bridges most travellers never reach — quiet paths, village stay energy.",
     category: "Adventure",
     tags: ["Community-Led", "Trek", "Fixed Departure"],
@@ -167,7 +167,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "double-decker-living-root-bridge",
-    name: "Double Decker Living Root Bridge",
+    name: "Double Decker",
     tagline: "Descend to Nongriat’s famous living architecture — grown across generations.",
     category: "Adventure",
     tags: ["Trek", "Heritage", "Nature"],
@@ -241,7 +241,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "mawsynram-river-trek",
-    name: "Mawsynram River Trek & Split Rock",
+    name: "Mawsynram Trek",
     tagline: "Rain, rivers, and canyon magic in the wettest place on earth.",
     category: "Adventure",
     tags: ["River", "Adventure", "Community-Led"],
@@ -319,7 +319,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "mawphlang-sacred-forest",
-    name: "Mawphlang Sacred Forest Walk",
+    name: "Sacred Forest",
     tagline: "Where stories live quietly — heritage protected for centuries.",
     category: "Culture & Heritage",
     tags: ["Culture", "Nature", "Slow"],
@@ -366,7 +366,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "umngot-dawki",
-    name: "Umngot River · Dawki",
+    name: "Umngot, Dawki",
     tagline: "Crystal-clear waters, border views, and boat time with local crews.",
     category: "Nature & Wildlife",
     tags: ["Water", "Family Friendly", "Sustainability Focus"],
@@ -418,7 +418,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "short-escape-sohra-day",
-    name: "Sohra Cliffs, Caves & Falls",
+    name: "Sohra Cliffs",
     tagline: "A customizable Sohra day — Nohkalikai Crest, caves, and waterfall country.",
     category: "Nature & Wildlife",
     tags: ["Sohra", "Viewpoints", "Caves"],
@@ -473,7 +473,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "krem-puri-cave",
-    name: "Krem Puri Cave Exploration",
+    name: "Krem Puri",
     tagline: "One of the world’s longest sandstone caves — cool air, silence, and deep time.",
     category: "Adventure",
     tags: ["Caves", "Geology", "Adventure"],
@@ -519,7 +519,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "mawlynnong-village-stay",
-    name: "Mawlynnong Village Immersion",
+    name: "Mawlynnong",
     tagline: "Asia’s cleanest village — overnight hosts, heritage walks, and quiet evenings.",
     category: "Food & Local Life",
     tags: ["Village", "Community-Led", "Family Friendly"],

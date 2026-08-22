@@ -26,7 +26,31 @@ export function clipClean(text: string, max: number) {
   return `${base}…`;
 }
 
+/** Hard one-line title cap (never exceeds max characters). */
+export function clipTitle(text: string, max: number) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max).replace(/\s+\S*$/u, "").replace(/[,:;–—\-·.]+$/u, "").trim();
+  const base = cut.length >= Math.min(8, max - 1) ? cut : clean.slice(0, Math.max(1, max - 1)).trim();
+  return `${base}…`;
+}
+
 const EASE = "ease-[cubic-bezier(0.22,_1,_0.36,_1)]";
+
+/** Shared type styles across listing cards (Playfair + Manrope). */
+export const CARD_TYPE = {
+  title:
+    "truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.4rem] font-medium leading-none text-white md:text-[1.65rem]",
+  titleCompact:
+    "truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-none text-white md:text-[1.5rem]",
+  price:
+    "font-[family-name:var(--font-playfair)] text-[1.25rem] font-medium leading-none text-white md:text-[1.45rem]",
+  label: "font-sans text-[10px] font-semibold tracking-[0.18em] uppercase",
+  body: "font-sans text-[13px] font-normal leading-snug text-white/90 md:text-[14px]",
+  meta: "font-sans text-[11px] font-normal text-white/55",
+  button:
+    "font-sans text-[10px] font-bold tracking-[0.14em] uppercase",
+};
 
 /** Shared image-forward card motion. */
 export const CARD_MOTION = {

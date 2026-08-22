@@ -92,15 +92,15 @@ function activityFor(priceFrom: number, days: number) {
 export const journeys: Journey[] = [
   {
     slug: "short-escape-sohra",
-    name: "Short Escape – Sohra",
+    name: "Sohra Escape",
     type: "curated",
     tagline:
-      "A short, stunning getaway into Sohra with customizable trekking options to waterfalls, caves, or living root bridges.",
+      "A nature-filled escape into Sohra, combining waterfalls, caves and Meghalaya’s iconic living root bridges.",
     days: 3,
     nights: 2,
     priceFrom: 12600,
     priceNote: "per person, based on a group of 4",
-    image: media.heroMist,
+    image: media.local.livingBridge,
     gallery: [media.local.cliffView, media.local.waterfallPool, media.local.livingBridge, media.local.valleyGreen],
     style: ["Nature", "Trek", "Sohra"],
     season: "October to April",
@@ -112,7 +112,7 @@ export const journeys: Journey[] = [
       "Flexible stays and vehicle options",
       "Local insights on routes most travellers miss",
     ],
-    experienceHighlights: ["Living Root Bridges", "Waterfalls", "Caves", "Laitlum Canyons"],
+    experienceHighlights: ["Living Root Bridges", "Waterfalls", "Caves", "Laitlum"],
     itinerary: [
       { day: 1, title: "Into Sohra", summary: "Arrive and settle; viewpoints and cliff light." },
       {
@@ -130,7 +130,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "mawphanlur-meadows-escape",
-    name: "Mawphanlur Meadows Escape",
+    name: "Mawphanlur Hills",
     type: "curated",
     tagline:
       "Off-grid highland getaway with sacred forest walk and Nongkhnum River Island soft hike.",
@@ -164,7 +164,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "mawsynram-adventures",
-    name: "Mawsynram Adventures",
+    name: "Mawsynram Escape",
     type: "curated",
     tagline:
       "Thrill-packed journey through Mawsynram & Mawlongbna with river trekking, caving, kayaking, and canyon hikes.",
@@ -202,7 +202,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "sohra-trekkers-delight",
-    name: "Sohra Trekkers Delight",
+    name: "Sohra Trekkers",
     type: "curated",
     tagline:
       "Quick nature escape into Sohra with caves, waterfalls and living root bridges — including a night in Nongriat homestay or camping.",
@@ -242,7 +242,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "meghalaya-escape-the-ordinary",
-    name: "Meghalaya: Escape the Ordinary",
+    name: "Meghalaya Escape",
     type: "curated",
     tagline:
       "Offbeat 6-day escape into waterfalls, camps, riverside camping, and village life across Meghalaya.",
@@ -279,7 +279,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "the-pine-and-the-river",
-    name: "The Pine & the River",
+    name: "Pine & the River",
     type: "curated",
     tagline:
       "Balanced trail from waterfalls and root bridges to sacred groves and riverside stays with treks and kayaking.",
@@ -316,7 +316,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "essence-of-meghalaya",
-    name: "Essence of Meghalaya",
+    name: "Meghalaya Essence",
     type: "curated",
     tagline:
       "A relaxed 6-day journey through Meghalaya’s must-sees — Shillong, Dawki, Mawlynnong, and Cherrapunjee — designed for comfort and ease.",
@@ -353,7 +353,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "wild-monsoon-trail",
-    name: "Wild Monsoon Trail",
+    name: "Monsoon Trail",
     type: "curated",
     tagline:
       "Offbeat monsoon adventure through sacred forests, root bridges, waterfalls, caves, and misty highlands.",
@@ -391,7 +391,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "kaziranga-to-khasi-hills",
-    name: "Kaziranga to Khasi Hills Escape",
+    name: "Kaziranga Escape",
     type: "curated",
     tagline:
       "Blend Kaziranga safaris with Meghalaya’s canyons, caves, waterfalls, and sacred forests at a gentle pace.",
@@ -515,7 +515,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "womens-soulful-escape",
-    name: "Women's Soulful Escape",
+    name: "Women's Escape",
     type: "small-group",
     tagline:
       "A ladies-only small-group journey — travel with safety, support, and your tribe across Meghalaya’s soulful route.",
@@ -558,7 +558,7 @@ export const journeys: Journey[] = [
   },
   {
     slug: "offbeat-living-root-bridge",
-    name: "Offbeat Living Root Bridge",
+    name: "Root Bridge Trail",
     type: "small-group",
     tagline:
       "For travellers who go beyond tourist paths — to feel the place, not just visit it. Up to six living bridges. One forest.",

@@ -138,10 +138,14 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
         <StaggerChildren
           key={`${type ?? "all"}-${activeStyle ?? "all"}-${duration ?? "all"}`}
           mode="mount"
-          className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
+          className={
+            type === "curated"
+              ? "mt-6 grid items-stretch gap-6 sm:grid-cols-2"
+              : "mt-6 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
+          }
         >
           {filtered.map((journey) => (
-            <StaggerItem key={journey.slug} className="h-full">
+            <StaggerItem key={journey.slug}>
               <JourneyCard journey={journey} variant="tile" />
             </StaggerItem>
           ))}

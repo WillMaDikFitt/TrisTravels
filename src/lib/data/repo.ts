@@ -55,6 +55,12 @@ function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, 
   for (const [key, value] of Object.entries(remote)) {
     if (key === "slug" || key === "id") continue;
     if (isEmptyOverlay(value)) continue;
+    // Seed catalogue titles stay authoritative so listing cards stay short & consistent.
+    // Admins can still rename via Studio once static seeds are cleared for that slug.
+    if (key === "name" && base && typeof (base as { name?: unknown }).name === "string") {
+      const seedName = String((base as { name: string }).name).trim();
+      if (seedName) continue;
+    }
     // Older seeded records can contain the stock placeholders used by the prototype.
     // Keep the curated local media from the static catalogue for those fields.
     if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;

@@ -3,18 +3,19 @@ import Link from "next/link";
 import type { Experience } from "@/data/experiences";
 import { formatINR, cn } from "@/lib/utils";
 import { WishlistButton } from "./WishlistButton";
-import { CARD_MOTION, HOVER_REVEAL, HOVER_REVEAL_INNER, clipClean } from "./cardText";
+import { CARD_MOTION, CARD_TYPE, HOVER_REVEAL, HOVER_REVEAL_INNER, clipClean, clipTitle } from "./cardText";
 
 type Props = {
   experience: Experience;
   className?: string;
 };
 
-const TITLE_MAX = 34;
+/** Keep experience titles on a single line on listing cards. */
+const TITLE_MAX = 14;
 const DESCRIPTION_MAX = 96;
 
 export function ExperienceCard({ experience, className }: Props) {
-  const title = clipClean(experience.name, TITLE_MAX);
+  const title = clipTitle(experience.name, TITLE_MAX);
   const description = clipClean(experience.tagline, DESCRIPTION_MAX);
   const highlights = (experience.highlights ?? [])
     .map((h) => h.replace(/\s+/g, " ").trim())
@@ -49,31 +50,31 @@ export function ExperienceCard({ experience, className }: Props) {
       <div className={CARD_MOTION.dim} />
 
       <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
-        <span className="rounded-full bg-black/40 px-3 py-1.5 text-[10px] font-semibold tracking-[0.12em] text-white uppercase backdrop-blur-sm">
+        <span className="rounded-full bg-black/40 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.12em] text-white uppercase backdrop-blur-sm">
           {experience.duration}
         </span>
         <WishlistButton slug={experience.slug} />
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-5 pt-16 pb-5 pointer-events-none">
-        <h3
-          className="truncate font-display text-[1.45rem] leading-tight text-white md:text-[1.55rem]"
-          title={experience.name}
-        >
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-5 pt-16 pb-5">
+        <h3 className={CARD_TYPE.titleCompact} title={experience.name}>
           {title}
         </h3>
 
-        {highlights && (
-          <p className="mt-2 line-clamp-2 text-sm leading-snug text-white/85">{highlights}</p>
-        )}
+        {highlights ? (
+          <p className={cn(CARD_TYPE.body, "mt-2 line-clamp-2 text-white/85")}>{highlights}</p>
+        ) : null}
 
         <div className={HOVER_REVEAL}>
           <div className={HOVER_REVEAL_INNER}>
             <div className="pt-3">
-              <p className="text-[11px] font-medium tracking-[0.08em] text-white/65 uppercase">
+              <p className={cn(CARD_TYPE.meta, "tracking-[0.08em] text-white/65 uppercase")}>
                 {experience.location}
               </p>
-              <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-white/75" title={experience.tagline}>
+              <p
+                className={cn(CARD_TYPE.body, "mt-1.5 line-clamp-2 leading-relaxed text-white/75")}
+                title={experience.tagline}
+              >
                 {description}
               </p>
             </div>
@@ -82,17 +83,18 @@ export function ExperienceCard({ experience, className }: Props) {
 
         <div className="mt-4 flex items-end justify-between gap-3 border-t border-white/20 pt-3.5">
           <div className="min-w-0">
-            <p className="whitespace-nowrap text-[0.95rem] font-semibold tracking-tight text-white">
-              <span className="mr-1.5 text-[10px] font-semibold tracking-[0.14em] text-white/55 uppercase">
-                From
-              </span>
-              {formatINR(experience.priceFrom)}
-              <span className="ml-1 text-[11px] font-medium text-white/60">/ person</span>
+            <p className="flex flex-wrap items-baseline gap-x-1.5">
+              <span className={cn(CARD_TYPE.label, "text-white/55")}>From</span>
+              <span className={CARD_TYPE.price}>{formatINR(experience.priceFrom)}</span>
+              <span className="font-sans text-[11px] font-medium text-white/60">/ person</span>
             </p>
           </div>
           <Link
             href={`/experiences/${experience.slug}/book`}
-            className="pointer-events-auto relative z-20 inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2.5 text-[10px] font-bold tracking-[0.12em] text-on-accent uppercase transition-[filter,transform] duration-300 ease-out hover:brightness-110"
+            className={cn(
+              "pointer-events-auto relative z-20 inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2.5 text-on-accent transition-[filter,transform] duration-300 ease-out hover:brightness-110",
+              CARD_TYPE.button,
+            )}
           >
             Book now
           </Link>
