@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Journey } from "@/data/journeys";
 import { getJourney as getStaticJourney } from "@/data/journeys";
+import {
+  DEFAULT_PACKAGE_GST_PERCENT,
+  DEFAULT_PACKAGE_STAYS,
+  DEFAULT_PACKAGE_VEHICLES,
+  DEFAULT_TRIS_SERVICE_PERCENT,
+  STAY_PREFERENCE_IDS,
+  STAY_PREFERENCE_META,
+} from "@/data/package-pricing";
 import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
@@ -27,9 +35,16 @@ function blank(): Journey {
     season: "",
     overview: "",
     highlights: [],
+    experienceHighlights: [],
     itinerary: [],
     stays: [],
     inclusions: [],
+    exclusions: [],
+    packagePricing: {
+      activityCostPerGuest: 0,
+      trisServicePercent: DEFAULT_TRIS_SERVICE_PERCENT,
+      gstPercent: DEFAULT_PACKAGE_GST_PERCENT,
+    },
     sourceUrl: "",
     status: "draft",
   };
@@ -40,6 +55,49 @@ const lines = (v: string) =>
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
+
+function readPackagePricing(fd: FormData, type: Journey["type"]): Journey["packagePricing"] {
+  if (type !== "curated") return undefined;
+  const vehicles: NonNullable<Journey["packagePricing"]>["vehicles"] = {};
+  for (const id of TRANSPORT_VEHICLE_IDS) {
+    const cost = Number(fd.get(`pkgVehicle_${id}_cost`) || "");
+    const capacity = Number(fd.get(`pkgVehicle_${id}_capacity`) || "");
+    if (Number.isFinite(cost) || Number.isFinite(capacity)) {
+      vehicles[id] = {
+        costPerDay: Number.isFinite(cost) && cost >= 0 ? Math.round(cost) : DEFAULT_PACKAGE_VEHICLES[id].costPerDay,
+        capacity:
+          Number.isFinite(capacity) && capacity > 0
+            ? Math.round(capacity)
+            : DEFAULT_PACKAGE_VEHICLES[id].capacity,
+      };
+    }
+  }
+  const stays: NonNullable<Journey["packagePricing"]>["stays"] = {};
+  for (const id of STAY_PREFERENCE_IDS) {
+    const roomCost = Number(fd.get(`pkgStay_${id}_room`) || "");
+    const mattress = Number(fd.get(`pkgStay_${id}_mattress`) || "");
+    if (Number.isFinite(roomCost) || Number.isFinite(mattress)) {
+      stays[id] = {
+        roomCost:
+          Number.isFinite(roomCost) && roomCost >= 0 ? Math.round(roomCost) : DEFAULT_PACKAGE_STAYS[id].roomCost,
+        extraMattressPerPerson:
+          Number.isFinite(mattress) && mattress >= 0
+            ? Math.round(mattress)
+            : DEFAULT_PACKAGE_STAYS[id].extraMattressPerPerson,
+      };
+    }
+  }
+  const activity = Number(fd.get("pkgActivityCost") || "");
+  const tris = Number(fd.get("pkgTrisPercent") || "");
+  const gst = Number(fd.get("pkgGstPercent") || "");
+  return {
+    vehicles: Object.keys(vehicles).length ? vehicles : undefined,
+    stays: Object.keys(stays).length ? stays : undefined,
+    activityCostPerGuest: Number.isFinite(activity) && activity >= 0 ? Math.round(activity) : undefined,
+    trisServicePercent: Number.isFinite(tris) && tris >= 0 ? tris : DEFAULT_TRIS_SERVICE_PERCENT,
+    gstPercent: Number.isFinite(gst) && gst >= 0 ? gst : DEFAULT_PACKAGE_GST_PERCENT,
+  };
+}
 
 export default function JourneyEditorPage() {
   const params = useParams<{ slug: string }>();
@@ -119,8 +177,11 @@ export default function JourneyEditorPage() {
             image: String(fd.get("image")),
             gallery: lines(String(fd.get("gallery") || "")),
             highlights: lines(String(fd.get("highlights") || "")),
+            experienceHighlights: lines(String(fd.get("experienceHighlights") || "")),
             stays: lines(String(fd.get("stays") || "")),
             inclusions: lines(String(fd.get("inclusions") || "")),
+            exclusions: lines(String(fd.get("exclusions") || "")),
+            packagePricing: readPackagePricing(fd, String(fd.get("type")) as Journey["type"]),
             nextDeparture: String(fd.get("nextDeparture") || ""),
             departures: String(fd.get("departures") || "")
               .split(",")
@@ -146,7 +207,7 @@ export default function JourneyEditorPage() {
             </Field>
             <Field label="Type">
               <select name="type" defaultValue={row.type} className={inputClass}>
-                <option value="curated">Curated (flexible / enquire)</option>
+                <option value="curated">Curated (Book now + Customise)</option>
                 <option value="small-group">Small group (fixed departure)</option>
               </select>
             </Field>
@@ -231,6 +292,105 @@ export default function JourneyEditorPage() {
               ))}
             </div>
           </div>
+          {row.type === "curated" && (
+            <div className="mt-6 border-t border-[#e4dfd4] pt-5">
+              <h3 className="font-display text-base text-[#2a2e1f]">Book now package costs (A–E)</h3>
+              <p className="mt-1 text-sm text-[#5c6350]">
+                A = vehicle/day × vehicles × days · B = stay cost × rooms + mattresses · C = guests × activity · D =
+                TRIS % of (A+B+C) · E = GST % of D
+              </p>
+              <div className="mt-4 grid gap-4 md:grid-cols-3">
+                <Field label="C · Activity cost per guest (₹)">
+                  <input
+                    name="pkgActivityCost"
+                    type="number"
+                    min="0"
+                    defaultValue={row.packagePricing?.activityCostPerGuest ?? ""}
+                    className={inputClass}
+                    placeholder="Per guest for whole journey"
+                  />
+                </Field>
+                <Field label="D · TRIS services %">
+                  <input
+                    name="pkgTrisPercent"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    defaultValue={row.packagePricing?.trisServicePercent ?? DEFAULT_TRIS_SERVICE_PERCENT}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="E · GST % of D">
+                  <input
+                    name="pkgGstPercent"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    defaultValue={row.packagePricing?.gstPercent ?? DEFAULT_PACKAGE_GST_PERCENT}
+                    className={inputClass}
+                  />
+                </Field>
+              </div>
+              <h4 className="mt-5 text-sm font-semibold text-[#2a2e1f]">A · Vehicle rates (₹ / day) & capacity</h4>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {TRANSPORT_VEHICLE_IDS.map((id) => {
+                  const rate = row.packagePricing?.vehicles?.[id] ?? DEFAULT_PACKAGE_VEHICLES[id];
+                  return (
+                    <div key={id} className="space-y-2 rounded-xl border border-[#e4dfd4] p-3">
+                      <p className="text-sm font-medium text-[#2a2e1f]">{TRANSPORT_VEHICLE_META[id].label}</p>
+                      <Field label="Cost / day">
+                        <input
+                          name={`pkgVehicle_${id}_cost`}
+                          type="number"
+                          min="0"
+                          defaultValue={rate.costPerDay}
+                          className={inputClass}
+                        />
+                      </Field>
+                      <Field label="Capacity">
+                        <input
+                          name={`pkgVehicle_${id}_capacity`}
+                          type="number"
+                          min="1"
+                          defaultValue={rate.capacity}
+                          className={inputClass}
+                        />
+                      </Field>
+                    </div>
+                  );
+                })}
+              </div>
+              <h4 className="mt-5 text-sm font-semibold text-[#2a2e1f]">B · Stay preference costs (₹ / journey)</h4>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {STAY_PREFERENCE_IDS.map((id) => {
+                  const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
+                  return (
+                    <div key={id} className="space-y-2 rounded-xl border border-[#e4dfd4] p-3">
+                      <p className="text-sm font-medium text-[#2a2e1f]">{STAY_PREFERENCE_META[id].label}</p>
+                      <Field label="Room cost">
+                        <input
+                          name={`pkgStay_${id}_room`}
+                          type="number"
+                          min="0"
+                          defaultValue={rate.roomCost}
+                          className={inputClass}
+                        />
+                      </Field>
+                      <Field label="Extra mattress / person">
+                        <input
+                          name={`pkgStay_${id}_mattress`}
+                          type="number"
+                          min="0"
+                          defaultValue={rate.extraMattressPerPerson}
+                          className={inputClass}
+                        />
+                      </Field>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="mt-4">
             <Field
               label="Seat tracking (small group)"
@@ -263,8 +423,17 @@ export default function JourneyEditorPage() {
           <Field label="Overview">
             <textarea name="overview" rows={5} defaultValue={row.overview} className={inputClass} />
           </Field>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <Field label="Highlights" hint="one per line">
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Field label="Experience highlights" hint="3–5 short labels for listing cards, one per line">
+              <textarea
+                name="experienceHighlights"
+                rows={6}
+                defaultValue={(row.experienceHighlights ?? []).join("\n")}
+                className={inputClass}
+                placeholder={"Living Root Bridges\nWaterfalls\nCaves"}
+              />
+            </Field>
+            <Field label="Detail highlights" hint="one per line">
               <textarea name="highlights" rows={6} defaultValue={row.highlights.join("\n")} className={inputClass} />
             </Field>
             <Field label="Stays" hint="one per line">
@@ -272,6 +441,16 @@ export default function JourneyEditorPage() {
             </Field>
             <Field label="Inclusions" hint="one per line">
               <textarea name="inclusions" rows={6} defaultValue={row.inclusions.join("\n")} className={inputClass} />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="Exclusions" hint="one per line — shown on the journey detail page">
+              <textarea
+                name="exclusions"
+                rows={4}
+                defaultValue={(row.exclusions ?? []).join("\n")}
+                className={inputClass}
+              />
             </Field>
           </div>
           <div className="mt-4">

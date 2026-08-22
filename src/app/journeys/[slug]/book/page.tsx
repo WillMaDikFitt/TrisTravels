@@ -1,30 +1,28 @@
 import Image from "next/image";
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { journeys } from "@/data/journeys";
 import { findJourney } from "@/lib/data/repo";
-import { JourneyEnquireFlow } from "@/components/enquiries/JourneyEnquireFlow";
+import { CuratedBookFlow } from "@/components/booking/CuratedBookFlow";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
-  return journeys.map((journey) => ({ slug: journey.slug }));
+  return journeys.filter((j) => j.type === "curated").map((journey) => ({ slug: journey.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const journey = await findJourney(slug);
-  if (!journey) return { title: "Enquire" };
-  return {
-    title: journey.type === "small-group" ? `Book · ${journey.name}` : `Customise · ${journey.name}`,
-  };
+  if (!journey) return { title: "Book" };
+  return { title: `Book · ${journey.name}` };
 }
 
-export default async function JourneyEnquirePage({ params }: Props) {
+export default async function JourneyBookPage({ params }: Props) {
   const { slug } = await params;
   const journey = await findJourney(slug);
   if (!journey) notFound();
-  const fixed = journey.type === "small-group";
+  if (journey.type !== "curated") redirect(`/journeys/${slug}/enquire`);
 
   return (
     <div className="bg-background">
@@ -42,12 +40,10 @@ export default async function JourneyEnquirePage({ params }: Props) {
         <div className="absolute inset-0 flex items-end">
           <div className="w-full px-margin-mobile pb-16 pt-8 md:px-margin-desktop md:pb-20">
             <div className="mx-auto max-w-container-max">
-              <p className="label-caps text-white/75">{fixed ? "Reservation" : "Customise"}</p>
+              <p className="label-caps text-white/75">Book now</p>
               <h1 className="mt-2 font-display text-3xl text-white md:text-4xl">{journey.name}</h1>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
-                {fixed
-                  ? "Choose your departure, travellers, stay, and transport preferences."
-                  : "Tell us how you’d like to shape this journey — dates, pace, stays, and anything special."}
+                Choose travellers, vehicle, and stay — your total calculates automatically from TRIS package rates.
               </p>
             </div>
           </div>
@@ -55,8 +51,8 @@ export default async function JourneyEnquirePage({ params }: Props) {
       </div>
 
       <div className="relative z-10 mx-auto -mt-8 max-w-container-max px-margin-mobile pb-16 md:-mt-10 md:px-margin-desktop md:pb-24">
-        <Suspense fallback={<p className="text-on-surface-variant">Loading form…</p>}>
-          <JourneyEnquireFlow journey={journey} />
+        <Suspense fallback={<p className="text-on-surface-variant">Loading booking…</p>}>
+          <CuratedBookFlow journey={journey} />
         </Suspense>
       </div>
     </div>

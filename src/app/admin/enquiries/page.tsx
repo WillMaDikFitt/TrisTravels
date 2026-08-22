@@ -165,7 +165,7 @@ export default function AdminEnquiriesPage() {
         )}
 
         {open && (
-          <Panel className="h-fit max-w-5xl space-y-4">
+          <Panel className="space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 {labels[open.source as Exclude<EnquirySource, "story">] ?? open.source}
@@ -192,7 +192,7 @@ export default function AdminEnquiriesPage() {
                   .map(([k, v]) => (
                     <div key={k} className="flex justify-between gap-3 border-t border-[#f0ebe3] pt-1">
                       <dt className="text-[#8a917c]">{k}</dt>
-                      <dd className="max-w-[60%] text-right break-words">
+                      <dd className="min-w-0 flex-1 text-right break-words">
                         {Array.isArray(v) ? v.join(", ") : String(v)}
                       </dd>
                     </div>

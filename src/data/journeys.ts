@@ -1,4 +1,11 @@
 import { media } from "./media";
+import type { CuratedPackagePricing } from "./package-pricing";
+import {
+  DEFAULT_PACKAGE_GST_PERCENT,
+  DEFAULT_PACKAGE_STAYS,
+  DEFAULT_PACKAGE_VEHICLES,
+  DEFAULT_TRIS_SERVICE_PERCENT,
+} from "./package-pricing";
 import type { TransportVehiclePrices } from "./transport";
 
 export type Journey = {
@@ -22,11 +29,17 @@ export type Journey = {
   style: string[];
   season: string;
   overview: string;
+  /** Longer detail-page highlights */
   highlights: string[];
+  /** Short 3–5 experience labels for curated listing cards */
+  experienceHighlights?: string[];
   itinerary: { day: number; title: string; summary: string }[];
   route?: string;
   stays: string[];
   inclusions: string[];
+  exclusions?: string[];
+  /** Editable A–E package costs for curated Book Now quotes */
+  packagePricing?: CuratedPackagePricing;
   nextDeparture?: string;
   /** Legacy free-text departure list */
   departures?: string[];
@@ -52,11 +65,28 @@ const packageInclusions = [
   "Hand-picked homestays, hotels & cosy cottages",
 ];
 
+const packageExclusions = [
+  "Flights and train tickets",
+  "Personal expenses & shopping",
+  "Travel insurance",
+  "Meals not mentioned in inclusions",
+  "Optional adventure add-ons not in the itinerary",
+];
+
 const fixedInclusions = [
   "Entry fees & guide at key locations",
   "Transport & local driver",
   "Breakfast, dinner & accommodation",
 ];
+
+/** Seed activity cost so a typical 4-guest sedan + 2-room homestay quote lands near priceFrom. */
+function activityFor(priceFrom: number, days: number) {
+  const vehicle = DEFAULT_PACKAGE_VEHICLES.sedan.costPerDay * days;
+  const rooms = DEFAULT_PACKAGE_STAYS.homestay.roomCost * 2;
+  const multiplier = 1 + (DEFAULT_TRIS_SERVICE_PERCENT / 100) * (1 + DEFAULT_PACKAGE_GST_PERCENT / 100);
+  const targetSubtotal = (priceFrom * 4) / multiplier;
+  return Math.max(0, Math.round((targetSubtotal - vehicle - rooms) / 4));
+}
 
 /** Listing data sourced from https://www.trismeghalaya.com/ (customizable packages + fixed departures). */
 export const journeys: Journey[] = [
@@ -82,6 +112,7 @@ export const journeys: Journey[] = [
       "Flexible stays and vehicle options",
       "Local insights on routes most travellers miss",
     ],
+    experienceHighlights: ["Living Root Bridges", "Waterfalls", "Caves", "Laitlum Canyons"],
     itinerary: [
       { day: 1, title: "Into Sohra", summary: "Arrive and settle; viewpoints and cliff light." },
       {
@@ -93,6 +124,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Hand-picked homestays, hotels & cosy cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(12600, 3) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -117,6 +150,7 @@ export const journeys: Journey[] = [
       "Sacred forest walk",
       "Quiet highland pacing",
     ],
+    experienceHighlights: ["River Island", "Valleys", "Village Stay", "Sacred Forest"],
     itinerary: [
       { day: 1, title: "Highlands arrival", summary: "Transfer into Mawphanlur country." },
       { day: 2, title: "Island & meadows", summary: "Nongkhnum soft hike and valley time." },
@@ -124,6 +158,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Village stay", "Hand-picked cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(11100, 3) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -148,6 +184,7 @@ export const journeys: Journey[] = [
       "Sacred forest & village stay",
       "Caving, kayaking & canyon hikes",
     ],
+    experienceHighlights: ["River Trekking", "Split Rock", "Caving", "Village Stay"],
     itinerary: [
       { day: 1, title: "Toward the rains", summary: "Sacred forest and transfer into Mawsynram." },
       {
@@ -159,6 +196,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Village homestay (Mawlongbna area)"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(14000, 3) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -183,6 +222,7 @@ export const journeys: Journey[] = [
       "Trek to the Double Decker living root bridges",
       "Nongriat homestay or camping night",
     ],
+    experienceHighlights: ["Mawmluh Caving", "Waterfalls", "Double Decker", "Nongriat Stay"],
     itinerary: [
       { day: 1, title: "Sohra arrival", summary: "Settle in; cliff and waterfall orientation." },
       { day: 2, title: "Caves & falls", summary: "Mawmluh caving and waterfall time." },
@@ -196,6 +236,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Sohra stay", "Nongriat homestay or camping"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(25990, 5) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -220,6 +262,7 @@ export const journeys: Journey[] = [
       "Hiking in the valleys of Mawphanlur",
       "Offbeat caves, clear rivers & waterfalls",
     ],
+    experienceHighlights: ["Nohkalikai Crest", "Riverside Camping", "Mawphanlur", "Caves"],
     itinerary: [
       { day: 1, title: "Arrive", summary: "Land and settle into the hills." },
       { day: 2, title: "Crests & cliffs", summary: "Nohkalikai Crest and Sohra light." },
@@ -230,6 +273,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Homestays", "Riverside camping", "Cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(22100, 6) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -254,6 +299,7 @@ export const journeys: Journey[] = [
       "Umngot river (Dawki)",
       "Waterfalls and sacred forest",
     ],
+    experienceHighlights: ["Amkoi", "Phephe Falls", "Dawki", "Sacred Forest"],
     itinerary: [
       { day: 1, title: "Arrival", summary: "Orient and rest." },
       { day: 2, title: "Falls day", summary: "Phephe and canyon country." },
@@ -264,6 +310,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Village stay", "Camping", "Riverside lodges"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(22300, 6) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -288,6 +336,7 @@ export const journeys: Journey[] = [
       "Living root bridge",
       "Sohra & Umngot river (Dawki)",
     ],
+    experienceHighlights: ["Shillong", "Mawlynnong", "Living Root Bridge", "Dawki"],
     itinerary: [
       { day: 1, title: "Shillong", summary: "Arrive and ease into the capital." },
       { day: 2, title: "Sohra", summary: "Cliffs, caves, and waterfall country." },
@@ -298,6 +347,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Hotels & cosy cottages", "Village stays"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(22250, 6) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -322,6 +373,7 @@ export const journeys: Journey[] = [
       "Mawphanlur & sacred forests",
       "Living root bridges and caves",
     ],
+    experienceHighlights: ["Hidden Waterfalls", "River Trekking", "Sacred Forests", "Root Bridges"],
     itinerary: [
       { day: 1, title: "Arrive in rain country", summary: "Settle in as weather sets the mood." },
       { day: 2, title: "Sacred forests", summary: "Grove walks with local interpretation." },
@@ -333,6 +385,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Homestays", "Highland cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(30150, 7) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -357,6 +411,7 @@ export const journeys: Journey[] = [
       "Living root bridges",
       "Umngot river (Dawki) & local Khasi cuisine",
     ],
+    experienceHighlights: ["Kaziranga Safari", "Sacred Forest", "Root Bridges", "Dawki"],
     itinerary: [
       { day: 1, title: "Arrive Assam", summary: "Settle near Kaziranga." },
       { day: 2, title: "Safari", summary: "Morning and evening wildlife drives." },
@@ -370,6 +425,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Safari lodge", "Homestays", "Hill cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(49350, 9) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -394,6 +451,7 @@ export const journeys: Journey[] = [
       "Valleys and Umngot river (Dawki)",
       "Living root bridges at a comfortable pace",
     ],
+    experienceHighlights: ["Sunset Cruise", "Sacred Forests", "Caves", "Root Bridges"],
     itinerary: [
       { day: 1, title: "Guwahati", summary: "Arrive; Brahmaputra sunset cruise." },
       { day: 2, title: "Into the hills", summary: "Transfer to Shillong / Sohra region." },
@@ -407,6 +465,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Comfort-forward hotels & cottages", "Selected homestays"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(38730, 9) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {
@@ -431,6 +491,7 @@ export const journeys: Journey[] = [
       "River trekking & offbeat caves",
       "Waterfalls, canyons, culture & tradition",
     ],
+    experienceHighlights: ["Offbeat Root Bridges", "Whistling Village", "River Trekking", "Caves"],
     itinerary: [
       { day: 1, title: "Arrive", summary: "Settle into Meghalaya time." },
       { day: 2, title: "City & hills", summary: "Shillong orientation." },
@@ -448,6 +509,8 @@ export const journeys: Journey[] = [
     ],
     stays: ["Homestays", "Village guesthouses", "Selected cottages"],
     inclusions: packageInclusions,
+    exclusions: packageExclusions,
+    packagePricing: { activityCostPerGuest: activityFor(68250, 13) },
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
   },
   {

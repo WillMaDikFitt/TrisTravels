@@ -516,11 +516,11 @@ export default function AdminAvailabilityPage() {
             {catalog.map((experience) => (
               <option key={experience.slug} value={experience.slug}>
                 {experience.name}
-              </option>
-            ))}
-          </select>
-        </Field>
-      </div>
+                  </option>
+                ))}
+              </select>
+              </Field>
+            </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
         <Panel>
@@ -531,19 +531,19 @@ export default function AdminAvailabilityPage() {
                 Orange = full day · Amber = some slots · Olive ring = selected
               </p>
             </div>
-            <div className="flex gap-2">
-              <AdminButton
-                type="button"
-                variant="ghost"
-                onClick={() =>
-                  setCursor((c) => {
-                    const d = new Date(c.y, c.m - 1, 1);
-                    return { y: d.getFullYear(), m: d.getMonth() };
-                  })
-                }
-              >
-                Prev
-              </AdminButton>
+              <div className="flex gap-2">
+                <AdminButton
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    setCursor((c) => {
+                      const d = new Date(c.y, c.m - 1, 1);
+                      return { y: d.getFullYear(), m: d.getMonth() };
+                    })
+                  }
+                >
+                  Prev
+                </AdminButton>
               <AdminButton
                 type="button"
                 variant="ghost"
@@ -554,53 +554,53 @@ export default function AdminAvailabilityPage() {
               >
                 Today
               </AdminButton>
-              <AdminButton
-                type="button"
-                variant="ghost"
-                onClick={() =>
-                  setCursor((c) => {
-                    const d = new Date(c.y, c.m + 1, 1);
-                    return { y: d.getFullYear(), m: d.getMonth() };
-                  })
-                }
-              >
-                Next
-              </AdminButton>
+                <AdminButton
+                  type="button"
+                  variant="ghost"
+                  onClick={() =>
+                    setCursor((c) => {
+                      const d = new Date(c.y, c.m + 1, 1);
+                      return { y: d.getFullYear(), m: d.getMonth() };
+                    })
+                  }
+                >
+                  Next
+                </AdminButton>
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold tracking-wider text-[#8a917c] uppercase">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold tracking-wider text-[#8a917c] uppercase">
             {WEEKDAYS.map((day) => (
               <div key={day} className="py-1">
                 {day}
-              </div>
-            ))}
-          </div>
-          <div className="mt-1 grid grid-cols-7 gap-1">
-            {cells.map((day, i) => {
-              if (!day) return <div key={`e-${i}`} className="aspect-square" />;
-              const iso = `${cursor.y}-${String(cursor.m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-              const blocked = dateIsClosed(iso, forExperience);
+                </div>
+              ))}
+            </div>
+            <div className="mt-1 grid grid-cols-7 gap-1">
+              {cells.map((day, i) => {
+                if (!day) return <div key={`e-${i}`} className="aspect-square" />;
+                const iso = `${cursor.y}-${String(cursor.m + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                const blocked = dateIsClosed(iso, forExperience);
               const partiallyBlocked =
                 !blocked && slots.some((time) => dateIsClosed(iso, forExperience, time));
-              const inPick = selectedDates.includes(iso);
-              const isEdge = iso === from || iso === (to || from);
-              return (
-                <button
-                  key={iso}
-                  type="button"
+                const inPick = selectedDates.includes(iso);
+                const isEdge = iso === from || iso === (to || from);
+                return (
+                  <button
+                    key={iso}
+                    type="button"
                   disabled={busy}
                   onClick={() => pickDay(iso)}
-                  className={cn(
-                    "aspect-square rounded-xl text-sm transition",
-                    blocked
-                      ? "bg-[#c2643a]/15 font-semibold text-[#8a3b1f] ring-1 ring-[#c2643a]/30"
+                    className={cn(
+                      "aspect-square rounded-xl text-sm transition",
+                      blocked
+                        ? "bg-[#c2643a]/15 font-semibold text-[#8a3b1f] ring-1 ring-[#c2643a]/30"
                       : partiallyBlocked
                         ? "bg-amber-50 font-semibold text-amber-800 ring-1 ring-amber-300"
                         : "bg-[#f7f4ee] text-[#2a2e1f] hover:bg-[#e4e8d4]",
-                    inPick && "bg-[#e4e8d4] font-semibold text-[#2a2e1f]",
-                    isEdge && "ring-2 ring-[#4a5a28]",
-                  )}
+                      inPick && "bg-[#e4e8d4] font-semibold text-[#2a2e1f]",
+                      isEdge && "ring-2 ring-[#4a5a28]",
+                    )}
                   title={
                     blocked
                       ? "Full day blocked — select to edit slots or clear"
@@ -608,17 +608,17 @@ export default function AdminAvailabilityPage() {
                         ? "Some slots blocked — select to edit"
                         : "Open"
                   }
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-        </Panel>
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          </Panel>
 
         <Panel className="h-fit">
           <div className="flex items-start justify-between gap-3">
-            <div>
+          <div>
               <p className="text-[11px] font-semibold tracking-[0.14em] text-[#6b734f] uppercase">
                 {editingId ? "Update block" : "Block / clear"}
               </p>
@@ -777,7 +777,7 @@ export default function AdminAvailabilityPage() {
                 ))}
               </div>
             )}
-          </div>
+                    </div>
 
           {overlappingBlocks.length > 0 && (
             <div className="mt-4 rounded-xl bg-[#f7f4ee] p-3">

@@ -149,11 +149,30 @@ export default async function JourneyDetailPage({ params }: Props) {
               </div>
             </section>
           </FadeIn>
+
+          {(journey.exclusions?.length ?? 0) > 0 && (
+            <FadeIn>
+              <section>
+                <p className="label-caps text-accent">Not included</p>
+                <h2 className="mt-2 font-display text-3xl text-primary">Exclusions</h2>
+                <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {journey.exclusions!.map((item) => (
+                    <li
+                      key={item}
+                      className="rounded-xl border border-outline-variant/25 bg-surface-container-low/50 px-4 py-3 text-sm text-on-surface-variant"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </FadeIn>
+          )}
         </div>
 
         <aside className="order-first h-fit rounded-3xl border border-outline-variant/30 bg-surface-container-lowest p-7 shadow-[0_18px_50px_rgba(42,46,31,0.10)] md:order-none md:self-start md:sticky md:top-[calc(var(--header-offset)+2.5rem)]">
           <p className="label-caps text-accent">
-            {journey.type === "small-group" ? "Reserve your place" : "Craft this journey"}
+            {journey.type === "small-group" ? "Reserve your place" : "Book or customise"}
           </p>
           <p className="mt-5 text-sm text-on-surface-variant">From</p>
           <p className="font-display text-3xl text-primary">{formatINR(journey.priceFrom)}</p>
@@ -178,7 +197,7 @@ export default async function JourneyDetailPage({ params }: Props) {
           <p className="mt-3 text-center text-xs text-on-surface-variant">
             {journey.type === "small-group"
               ? "Your seat is held provisionally while we confirm availability and payment."
-              : "Curated journeys are enquiry-led — we shape the details with you."}
+              : "Book now for an instant calculated quote, or customise if you want to reshape the journey."}
           </p>
         </aside>
       </div>

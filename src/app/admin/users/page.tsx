@@ -11,7 +11,6 @@ import {
   LoadingBlock,
   Notice,
   PageHeader,
-  Panel,
   bookingTone,
   inputClass,
 } from "@/components/admin/ui";
@@ -109,11 +108,11 @@ export default function AdminUsersPage() {
           <Notice tone="info">{loadWarning}</Notice>
         </div>
       )}
-      <div className="grid gap-6">
+      <div className="flex w-full min-w-0 flex-col gap-6">
         {loading ? (
           <LoadingBlock label="Loading travellers…" />
         ) : users.length ? (
-          <div className="overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+          <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 <tr>
@@ -174,7 +173,7 @@ export default function AdminUsersPage() {
         )}
 
         {open && (
-          <Panel className="h-fit max-w-5xl space-y-4">
+          <div className="w-full min-w-0 space-y-4 rounded-2xl border border-[#e4dfd4] bg-white p-5 shadow-[0_8px_24px_rgba(42,46,31,0.05)] md:p-6">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">Traveller</p>
               <h2 className="mt-1 font-display text-xl">{open.name || "—"}</h2>
@@ -187,75 +186,79 @@ export default function AdminUsersPage() {
               <p className="text-sm text-[#8a917c]">Loading bookings and enquiries…</p>
             ) : (
               <>
-                <div>
+                <div className="w-full min-w-0">
                   <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                     Recent bookings
                   </p>
-                  <table className="mt-2 w-full text-left text-sm">
-                    <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
-                      <tr>
-                        <th className="pb-1.5">Date</th>
-                        <th className="pb-1.5">Experience</th>
-                        <th className="pb-1.5">Status</th>
-                        <th className="pb-1.5 text-right">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {relatedBookings.map((b) => (
-                        <tr key={b.id} className="border-t border-[#f0ebe3]">
-                          <td className="py-2 text-[#5c6350]">{b.date}</td>
-                          <td className="py-2 font-medium">{b.experienceName}</td>
-                          <td className="py-2">
-                            <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
-                          </td>
-                          <td className="py-2 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
-                        </tr>
-                      ))}
-                      {!relatedBookings.length && (
+                  <div className="mt-2 w-full min-w-0 overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
                         <tr>
-                          <td colSpan={4} className="py-3 text-[#8a917c]">
-                            No bookings for this email.
-                          </td>
+                          <th className="pb-1.5">Date</th>
+                          <th className="pb-1.5">Experience</th>
+                          <th className="pb-1.5">Status</th>
+                          <th className="pb-1.5 text-right">Total</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {relatedBookings.map((b) => (
+                          <tr key={b.id} className="border-t border-[#f0ebe3]">
+                            <td className="py-2 text-[#5c6350]">{b.date}</td>
+                            <td className="py-2 font-medium">{b.experienceName}</td>
+                            <td className="py-2">
+                              <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
+                            </td>
+                            <td className="py-2 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
+                          </tr>
+                        ))}
+                        {!relatedBookings.length && (
+                          <tr>
+                            <td colSpan={4} className="py-3 text-[#8a917c]">
+                              No bookings for this email.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <div>
+                <div className="w-full min-w-0">
                   <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                     Recent enquiries
                   </p>
-                  <table className="mt-2 w-full text-left text-sm">
-                    <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
-                      <tr>
-                        <th className="pb-1.5">Source</th>
-                        <th className="pb-1.5">Preview</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {relatedEnquiries.map((e) => (
-                        <tr key={e.id} className="border-t border-[#f0ebe3]">
-                          <td className="py-2 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
-                            {e.source === "story" ? "Guest story" : e.source.replace(/-/g, " ")}
-                          </td>
-                          <td className="max-w-[12rem] py-2 text-[#5c6350]">
-                            <p className="line-clamp-2">{e.message}</p>
-                          </td>
-                        </tr>
-                      ))}
-                      {!relatedEnquiries.length && (
+                  <div className="mt-2 w-full min-w-0 overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
                         <tr>
-                          <td colSpan={2} className="py-3 text-[#8a917c]">
-                            No enquiries for this email.
-                          </td>
+                          <th className="pb-1.5">Source</th>
+                          <th className="pb-1.5">Preview</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {relatedEnquiries.map((e) => (
+                          <tr key={e.id} className="border-t border-[#f0ebe3]">
+                            <td className="py-2 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                              {e.source === "story" ? "Guest story" : e.source.replace(/-/g, " ")}
+                            </td>
+                            <td className="py-2 text-[#5c6350]">
+                              <p className="line-clamp-2">{e.message}</p>
+                            </td>
+                          </tr>
+                        ))}
+                        {!relatedEnquiries.length && (
+                          <tr>
+                            <td colSpan={2} className="py-3 text-[#8a917c]">
+                              No enquiries for this email.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </>
             )}
-          </Panel>
+          </div>
         )}
       </div>
     </div>

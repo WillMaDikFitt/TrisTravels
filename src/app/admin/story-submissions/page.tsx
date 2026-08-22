@@ -153,7 +153,7 @@ export default function AdminStorySubmissionsPage() {
         )}
 
         {open && (
-          <Panel className="h-fit max-w-5xl space-y-4">
+          <Panel className="space-y-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
                 Guest submission

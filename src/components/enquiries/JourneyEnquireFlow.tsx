@@ -87,11 +87,11 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
         phone,
         message:
           message ||
-          `${fixed ? "Seat reservation" : "Enquiry"} for ${journey.name}`,
+          `${fixed ? "Seat reservation" : "Customise request"} for ${journey.name}`,
         payload: {
           journeySlug: journey.slug,
           journeyName: journey.name,
-          bookingType: fixed ? "fixed-journey-reservation" : "curated-journey-enquiry",
+          bookingType: fixed ? "fixed-journey-reservation" : "curated-journey-customise",
           departureDate: fixed ? departureDate : preferredFrom,
           preferredFrom: fixed ? departureDate : preferredFrom,
           preferredTo: fixed ? departureDate : preferredTo,
@@ -128,12 +128,12 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
           <Check size={32} />
         </div>
         <h1 className="mt-6 font-display text-3xl text-primary">
-          {fixed ? "Reservation received" : "Enquiry sent"}
+          {fixed ? "Reservation received" : "Customise request sent"}
         </h1>
         <p className="mt-3 text-on-surface-variant">
           {fixed
             ? "We’ll confirm availability and payment next."
-            : "We’ll reply within 1–2 working days."}{" "}
+            : "We’ll reply within 1–2 working days with a tailored plan."}{" "}
           Ref {refId}.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -351,7 +351,7 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
                 Back
               </Button>
               <Button size="lg" onClick={submit} disabled={busy || !name || !email || !phone}>
-                {busy ? "Sending…" : fixed ? "Reserve your seat" : "Send enquiry"}
+                {busy ? "Sending…" : fixed ? "Reserve your seat" : "Send customise request"}
               </Button>
             </FlowActions>
           </div>
@@ -359,13 +359,20 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
       </FlowShell>
 
       <FlowSummary
-        eyebrow={fixed ? "Reservation summary" : "Enquiry summary"}
+        eyebrow={fixed ? "Reservation summary" : "Customise summary"}
         title={journey.name}
         subtitle={`${journey.days} Days / ${journey.nights} Nights`}
         footer={
-          <Link href={`/journeys/${journey.slug}`} className="text-sm font-semibold text-accent hover:underline">
-            ← View journey details
-          </Link>
+          <div className="space-y-2">
+            {!fixed && (
+              <Link href={`/journeys/${journey.slug}/book`} className="block text-sm font-semibold text-accent hover:underline">
+                Prefer a calculated quote? Book now →
+              </Link>
+            )}
+            <Link href={`/journeys/${journey.slug}`} className="block text-sm font-semibold text-accent hover:underline">
+              ← View journey details
+            </Link>
+          </div>
         }
       >
         <div className="mt-6 space-y-2 text-sm">
