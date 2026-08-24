@@ -44,7 +44,7 @@ export const CARD_TYPE = {
   titleCompact:
     "truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-none text-white md:text-[1.5rem]",
   price:
-    "font-[family-name:var(--font-playfair)] text-[1.25rem] font-medium leading-none text-white md:text-[1.45rem]",
+    "font-sans text-[1.2rem] font-semibold tracking-tight leading-none text-white md:text-[1.35rem]",
   label: "font-sans text-[10px] font-semibold tracking-[0.18em] uppercase",
   body: "font-sans text-[13px] font-normal leading-snug text-white/90 md:text-[14px]",
   meta: "font-sans text-[11px] font-normal text-white/55",

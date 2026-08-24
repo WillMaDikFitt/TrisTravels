@@ -46,7 +46,8 @@ export function ExperienceCard({ experience, className }: Props) {
         sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
         quality={85}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/15" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black from-10% via-black/70 via-45% to-black/20" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black via-black/50 to-transparent" />
       <div className={CARD_MOTION.dim} />
 
       <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
@@ -56,23 +57,25 @@ export function ExperienceCard({ experience, className }: Props) {
         <WishlistButton slug={experience.slug} />
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-5 pt-16 pb-5">
-        <h3 className={CARD_TYPE.titleCompact} title={experience.name}>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-5 pt-16 pb-5">
+        <h3 className={cn(CARD_TYPE.titleCompact, "[text-shadow:0_1px_14px_rgba(0,0,0,0.5)]")} title={experience.name}>
           {title}
         </h3>
 
         {highlights ? (
-          <p className={cn(CARD_TYPE.body, "mt-2 line-clamp-2 text-white/85")}>{highlights}</p>
+          <p className={cn(CARD_TYPE.body, "mt-2 line-clamp-2 text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.45)]")}>
+            {highlights}
+          </p>
         ) : null}
 
         <div className={HOVER_REVEAL}>
           <div className={HOVER_REVEAL_INNER}>
             <div className="pt-3">
-              <p className={cn(CARD_TYPE.meta, "tracking-[0.08em] text-white/65 uppercase")}>
+              <p className={cn(CARD_TYPE.meta, "tracking-[0.08em] text-white/75 uppercase")}>
                 {experience.location}
               </p>
               <p
-                className={cn(CARD_TYPE.body, "mt-1.5 line-clamp-2 leading-relaxed text-white/75")}
+                className={cn(CARD_TYPE.body, "mt-1.5 line-clamp-2 leading-relaxed text-white/85")}
                 title={experience.tagline}
               >
                 {description}
@@ -84,9 +87,9 @@ export function ExperienceCard({ experience, className }: Props) {
         <div className="mt-4 flex items-end justify-between gap-3 border-t border-white/20 pt-3.5">
           <div className="min-w-0">
             <p className="flex flex-wrap items-baseline gap-x-1.5">
-              <span className={cn(CARD_TYPE.label, "text-white/55")}>From</span>
+              <span className={cn(CARD_TYPE.label, "text-white")}>From</span>
               <span className={CARD_TYPE.price}>{formatINR(experience.priceFrom)}</span>
-              <span className="font-sans text-[11px] font-medium text-white/60">/ person</span>
+              <span className="font-sans text-[11px] font-medium text-white/80">/ person</span>
             </p>
           </div>
           <Link

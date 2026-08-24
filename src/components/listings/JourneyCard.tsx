@@ -14,6 +14,13 @@ type Props = {
 const CURATED_TITLE_MAX = 18;
 const FIXED_TITLE_MAX = 18;
 
+/**
+ * Curated listing layout switch.
+ * - "split": GetYourGuide-style — photo on top, content panel below (no text-on-image clash)
+ * - "overlay": previous full-bleed photo with bottom scrim (kept for easy revert)
+ */
+const CURATED_LAYOUT: "split" | "overlay" = "split";
+
 function experienceLine(journey: Journey) {
   const items = (journey.experienceHighlights?.length
     ? journey.experienceHighlights
@@ -36,6 +43,14 @@ export function JourneyCard({ journey, className, variant = "horizontal" }: Prop
 }
 
 function CuratedJourneyCard({ journey, className }: { journey: Journey; className?: string }) {
+  if (CURATED_LAYOUT === "overlay") {
+    return <CuratedOverlayCard journey={journey} className={className} />;
+  }
+  return <CuratedSplitCard journey={journey} className={className} />;
+}
+
+/** GetYourGuide-style: clear photo on top, readable content below. */
+function CuratedSplitCard({ journey, className }: { journey: Journey; className?: string }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
   const title = clipTitle(journey.name, CURATED_TITLE_MAX);
@@ -46,7 +61,110 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
   return (
     <article
       className={cn(
-        "group relative aspect-[5/4] overflow-hidden rounded-[1.75rem] bg-black",
+        "group flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest",
+        "border border-outline-variant/25",
+        "shadow-[0_14px_36px_-22px_rgba(42,46,31,0.35)]",
+        "transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,_1,_0.36,_1)]",
+        "hover:-translate-y-1 hover:shadow-[0_24px_48px_-22px_rgba(42,46,31,0.45)]",
+        className,
+      )}
+    >
+      <div className="relative aspect-[16/10] shrink-0 overflow-hidden">
+        <Link
+          href={`/journeys/${journey.slug}`}
+          aria-label={`View ${journey.name}`}
+          className="absolute inset-0 z-10"
+        />
+        <Image
+          src={image}
+          alt={journey.name}
+          fill
+          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
+          sizes="(max-width:640px) 100vw, 50vw"
+          quality={90}
+        />
+        <div className="absolute top-3.5 left-3.5 z-20">
+          <span className="inline-block rounded-full bg-primary px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-on-primary uppercase">
+            {duration}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col px-5 pt-4 pb-5 md:px-5 md:pb-5">
+        <h3
+          className="truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.45rem] font-medium leading-none text-primary md:text-[1.65rem]"
+          title={journey.name}
+        >
+          <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
+            {title}
+          </Link>
+        </h3>
+
+        {experience ? (
+          <div className="mt-3">
+            <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
+            <p className="mt-1 line-clamp-1 font-sans text-[13px] leading-snug text-on-surface md:text-[14px]">
+              {experience}
+            </p>
+            <div className="mt-2.5 h-px w-11 bg-primary/50" />
+          </div>
+        ) : null}
+
+        <p className="mt-3 line-clamp-2 font-sans text-[13px] leading-[1.55] text-on-surface-variant md:text-[14px]">
+          {description}
+        </p>
+
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/30 pt-4">
+          <div className="min-w-0">
+            <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>From</p>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span className="font-sans text-[1.25rem] font-semibold tracking-tight text-primary md:text-[1.4rem]">
+                {formatINR(price)}
+              </span>
+              <span className="font-sans text-[12px] font-normal text-on-surface-variant">/ person</span>
+            </p>
+            <p className="mt-1.5 font-sans text-[11px] text-on-surface-variant/80">Based on a group of 4</p>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+            <Link
+              href={`/journeys/${journey.slug}/book`}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+                CARD_TYPE.button,
+              )}
+            >
+              Book now <span aria-hidden>→</span>
+            </Link>
+            <Link
+              href={`/journeys/${journey.slug}/enquire`}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-on-primary transition hover:brightness-110",
+                CARD_TYPE.button,
+              )}
+            >
+              Customise <span aria-hidden>→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** Previous full-bleed overlay card — flip CURATED_LAYOUT to "overlay" to restore. */
+function CuratedOverlayCard({ journey, className }: { journey: Journey; className?: string }) {
+  const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
+  const price = Number(journey.priceFrom);
+  const title = clipTitle(journey.name, CURATED_TITLE_MAX);
+  const description = journey.tagline.replace(/\s+/g, " ").trim();
+  const experience = experienceLine(journey);
+  const duration = `${journey.days} days · ${journey.nights} nights`;
+
+  return (
+    <article
+      className={cn(
+        "group relative aspect-[1/1] overflow-hidden rounded-[1.75rem] bg-black",
         "shadow-[0_18px_44px_-22px_rgba(0,0,0,0.55)]",
         "transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,_1,_0.36,_1)]",
         "hover:-translate-y-1 hover:shadow-[0_28px_55px_-24px_rgba(0,0,0,0.6)]",
@@ -61,14 +179,17 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
         sizes="(max-width:640px) 100vw, 50vw"
         quality={90}
       />
-      {/* Reference overlay: solid black floor → mid fade → clear photo on top */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to top, #000 0%, #000 28%, rgba(0,0,0,0.72) 48%, rgba(0,0,0,0.28) 68%, transparent 82%)",
+            "linear-gradient(to top, #000 0%, #000 28%, rgba(0,0,0,0.92) 46%, rgba(0,0,0,0.72) 60%, rgba(0,0,0,0.35) 76%, rgba(0,0,0,0.1) 88%, transparent 100%)",
         }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black via-black/45 to-transparent"
       />
 
       <Link
@@ -84,19 +205,19 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
       </div>
 
       <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-5 md:px-6 md:pb-6">
-        <h3 className={CARD_TYPE.title} title={journey.name}>
+        <h3 className={cn(CARD_TYPE.title, "[text-shadow:0_1px_18px_rgba(0,0,0,0.55)]")} title={journey.name}>
           {title}
         </h3>
 
         {experience ? (
           <div className="mt-3">
             <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
-            <p className={cn(CARD_TYPE.body, "mt-1")}>{experience}</p>
+            <p className={cn(CARD_TYPE.body, "mt-1 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]")}>{experience}</p>
             <div className="mt-2.5 h-px w-11 bg-primary" />
           </div>
         ) : null}
 
-        <p className={cn(CARD_TYPE.body, "mt-3 max-w-[34rem] leading-[1.55] text-white/85")}>
+        <p className={cn(CARD_TYPE.body, "mt-3 max-w-[34rem] leading-[1.55] text-white/90")}>
           {description}
         </p>
 
@@ -104,12 +225,12 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
 
         <div className="mt-4 flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className={cn(CARD_TYPE.label, "text-primary")}>From</p>
+            <p className={cn(CARD_TYPE.label, "text-white")}>From</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
               <span className={CARD_TYPE.price}>{formatINR(price)}</span>
-              <span className="font-sans text-[12px] font-normal text-white/65">/ person</span>
+              <span className="font-sans text-[12px] font-normal text-white/80">/ person</span>
             </p>
-            <p className={cn(CARD_TYPE.meta, "mt-1.5 text-white/45")}>Based on a group of 4</p>
+            <p className={cn(CARD_TYPE.meta, "mt-1.5 text-white/70")}>Based on a group of 4</p>
           </div>
 
           <div className="pointer-events-auto relative z-20 flex shrink-0 gap-2">
@@ -179,7 +300,8 @@ function FixedJourneyCard({
         sizes={horizontal ? "(max-width:768px) 100vw, 50vw" : "(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"}
         quality={85}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/15" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black from-10% via-black/70 via-45% to-black/20" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black via-black/50 to-transparent" />
       <div className={CARD_MOTION.dim} />
 
       <div className="absolute top-3 left-3 z-20">
@@ -188,15 +310,17 @@ function FixedJourneyCard({
         </span>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-5 pt-16 pb-5 md:px-6 md:pb-6">
-        <h3 className={CARD_TYPE.titleCompact} title={journey.name}>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-5 pt-16 pb-5 md:px-6 md:pb-6">
+        <h3 className={cn(CARD_TYPE.titleCompact, "[text-shadow:0_1px_14px_rgba(0,0,0,0.5)]")} title={journey.name}>
           {title}
         </h3>
 
         {experience && (
           <div className="mt-2.5">
             <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
-            <p className={cn(CARD_TYPE.body, "mt-1 line-clamp-2")}>{experience}</p>
+            <p className={cn(CARD_TYPE.body, "mt-1 line-clamp-2 [text-shadow:0_1px_10px_rgba(0,0,0,0.45)]")}>
+              {experience}
+            </p>
           </div>
         )}
 
@@ -204,12 +328,12 @@ function FixedJourneyCard({
           <div className={HOVER_REVEAL_INNER}>
             <div className="pt-3">
               {journey.nextDeparture && (
-                <p className={cn(CARD_TYPE.meta, "mb-2 text-white/70")}>
-                  <span className="font-semibold tracking-[0.12em] text-white/55 uppercase">Next · </span>
+                <p className={cn(CARD_TYPE.meta, "mb-2 text-white/80")}>
+                  <span className="font-semibold tracking-[0.12em] text-white/70 uppercase">Next · </span>
                   {journey.nextDeparture}
                 </p>
               )}
-              <p className={cn(CARD_TYPE.body, "line-clamp-2 leading-relaxed text-white/75")} title={journey.tagline}>
+              <p className={cn(CARD_TYPE.body, "line-clamp-2 leading-relaxed text-white/85")} title={journey.tagline}>
                 {description}
               </p>
             </div>
@@ -218,9 +342,9 @@ function FixedJourneyCard({
 
         <div className="mt-4 border-t border-white/20 pt-3.5">
           <p className="flex flex-wrap items-baseline gap-x-1.5">
-            <span className={cn(CARD_TYPE.label, "mr-1 text-white/55")}>From</span>
+            <span className={cn(CARD_TYPE.label, "mr-1 text-white")}>From</span>
             <span className={CARD_TYPE.price}>{formatINR(price)}</span>
-            <span className="font-sans text-[11px] font-medium text-white/60">/ person</span>
+            <span className="font-sans text-[11px] font-medium text-white/80">/ person</span>
           </p>
           <div className="pointer-events-auto relative z-20 mt-3.5 flex gap-2">
             <Link
