@@ -85,8 +85,6 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
       : type === "small-group"
         ? "Join a set departure — filter by style and length."
         : "Curated packages and fixed departures — filter by style and length.";
-  const typeLabel = type === "curated" ? " · Curated" : type === "small-group" ? " · Fixed" : "";
-  const styleLabel = activeStyle ? ` · ${activeStyle}` : "";
 
   return (
     <>
@@ -94,7 +92,6 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
         eyebrow="Journeys"
         title={title}
         description={description}
-        countLabel={`${filtered.length} ${filtered.length === 1 ? "journey" : "journeys"}${typeLabel}${styleLabel}`}
         sidebar={
           <div className="space-y-6">
             <p className="label-caps text-accent">Filters</p>
@@ -140,8 +137,8 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
           mode="mount"
           className={
             type === "curated"
-              ? "mt-6 grid items-stretch gap-6 sm:grid-cols-2"
-              : "mt-6 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
+              ? "grid items-stretch gap-6 sm:grid-cols-2"
+              : "grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
           }
         >
           {filtered.map((journey) => (

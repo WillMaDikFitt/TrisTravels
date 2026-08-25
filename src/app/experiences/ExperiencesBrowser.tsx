@@ -39,7 +39,6 @@ export function ExperiencesBrowser({ experiences }: { experiences: Experience[] 
       eyebrow="Experiences"
       title="Days in the hills"
       description="Immersions from a few hours to a full day — filter by how the day feels."
-      countLabel={`${filtered.length} ${filtered.length === 1 ? "experience" : "experiences"}${category ? ` · ${category}` : ""}`}
       sidebar={
         <div className="space-y-6">
           <p className="label-caps text-accent">Filters</p>
@@ -87,7 +86,7 @@ export function ExperiencesBrowser({ experiences }: { experiences: Experience[] 
       <StaggerChildren
         key={`${category ?? "all"}-${difficulty ?? "all"}`}
         mode="mount"
-        className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
       >
         {filtered.map((exp) => (
           <StaggerItem key={exp.slug} className="h-full">

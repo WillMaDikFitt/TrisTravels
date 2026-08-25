@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Journey } from "@/data/journeys";
 import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
-import { CARD_MOTION, CARD_TYPE, HOVER_REVEAL, HOVER_REVEAL_INNER, clipClean, clipTitle } from "./cardText";
+import { CARD_TYPE, clipClean, clipTitle } from "./cardText";
 
 type Props = {
   journey: Journey;
@@ -262,7 +262,6 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
 function FixedJourneyCard({
   journey,
   className,
-  variant,
 }: {
   journey: Journey;
   className?: string;
@@ -270,93 +269,82 @@ function FixedJourneyCard({
 }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const horizontal = variant === "horizontal";
   const title = clipTitle(journey.name, FIXED_TITLE_MAX);
   const description = clipClean(journey.tagline, 96);
-  const experience = experienceLine(journey);
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
   return (
     <article
       className={cn(
-        "group relative overflow-hidden rounded-[1.5rem]",
-        "shadow-[0_16px_40px_-22px_rgba(42,46,31,0.5)]",
-        CARD_MOTION.shell,
-        horizontal ? "aspect-[16/10] md:aspect-[5/4]" : "aspect-[4/5]",
+        "group flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest",
+        "border border-outline-variant/25",
+        "shadow-[0_14px_36px_-22px_rgba(42,46,31,0.35)]",
+        "transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,_1,_0.36,_1)]",
+        "hover:-translate-y-1 hover:shadow-[0_24px_48px_-22px_rgba(42,46,31,0.45)]",
         className,
       )}
     >
-      <Link
-        href={`/journeys/${journey.slug}`}
-        aria-label={`View ${journey.name}`}
-        className="absolute inset-0 z-10"
-      />
-
-      <Image
-        src={image}
-        alt={journey.name}
-        fill
-        className={CARD_MOTION.image}
-        sizes={horizontal ? "(max-width:768px) 100vw, 50vw" : "(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"}
-        quality={85}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black from-10% via-black/70 via-45% to-black/20" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black via-black/50 to-transparent" />
-      <div className={CARD_MOTION.dim} />
-
-      <div className="absolute top-3 left-3 z-20">
-        <span className="rounded-full bg-black/40 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.12em] text-white uppercase backdrop-blur-sm">
-          {duration}
-        </span>
+      <div className="relative aspect-[16/10] shrink-0 overflow-hidden">
+        <Link
+          href={`/journeys/${journey.slug}`}
+          aria-label={`View ${journey.name}`}
+          className="absolute inset-0 z-10"
+        />
+        <Image
+          src={image}
+          alt={journey.name}
+          fill
+          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
+          sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
+          quality={85}
+        />
+        <div className="absolute top-3.5 left-3.5 z-20">
+          <span className="inline-block rounded-full bg-primary px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-on-primary uppercase">
+            {duration}
+          </span>
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-5 pt-16 pb-5 md:px-6 md:pb-6">
-        <h3 className={cn(CARD_TYPE.titleCompact, "[text-shadow:0_1px_14px_rgba(0,0,0,0.5)]")} title={journey.name}>
-          {title}
+      <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
+        <h3
+          className="truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-none text-primary md:text-[1.5rem]"
+          title={journey.name}
+        >
+          <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
+            {title}
+          </Link>
         </h3>
 
-        {experience && (
-          <div className="mt-2.5">
-            <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
-            <p className={cn(CARD_TYPE.body, "mt-1 line-clamp-2 [text-shadow:0_1px_10px_rgba(0,0,0,0.45)]")}>
-              {experience}
+        {journey.nextDeparture ? (
+          <p className="mt-2 font-sans text-[12px] text-on-surface-variant">
+            <span className="font-semibold tracking-[0.1em] uppercase">Next · </span>
+            {journey.nextDeparture}
+          </p>
+        ) : null}
+
+        <p className="mt-3 line-clamp-2 font-sans text-[13px] leading-[1.55] text-on-surface-variant md:text-[14px]">
+          {description}
+        </p>
+
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/30 pt-4">
+          <div className="min-w-0">
+            <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>From</p>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
+              <span className="font-sans text-[1.2rem] font-semibold tracking-tight text-primary md:text-[1.3rem]">
+                {formatINR(price)}
+              </span>
+              <span className="font-sans text-[12px] font-normal text-on-surface-variant">/ person</span>
             </p>
           </div>
-        )}
-
-        <div className={HOVER_REVEAL}>
-          <div className={HOVER_REVEAL_INNER}>
-            <div className="pt-3">
-              {journey.nextDeparture && (
-                <p className={cn(CARD_TYPE.meta, "mb-2 text-white/80")}>
-                  <span className="font-semibold tracking-[0.12em] text-white/70 uppercase">Next · </span>
-                  {journey.nextDeparture}
-                </p>
-              )}
-              <p className={cn(CARD_TYPE.body, "line-clamp-2 leading-relaxed text-white/85")} title={journey.tagline}>
-                {description}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 border-t border-white/20 pt-3.5">
-          <p className="flex flex-wrap items-baseline gap-x-1.5">
-            <span className={cn(CARD_TYPE.label, "mr-1 text-white")}>From</span>
-            <span className={CARD_TYPE.price}>{formatINR(price)}</span>
-            <span className="font-sans text-[11px] font-medium text-white/80">/ person</span>
-          </p>
-          <div className="pointer-events-auto relative z-20 mt-3.5 flex gap-2">
-            <Link
-              href={`/journeys/${journey.slug}/enquire`}
-              className={cn(
-                "inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-on-accent transition-[filter,transform] duration-300 ease-out hover:brightness-110",
-                CARD_TYPE.button,
-              )}
-            >
-              Book now
-            </Link>
-          </div>
+          <Link
+            href={`/journeys/${journey.slug}/enquire`}
+            className={cn(
+              "inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+              CARD_TYPE.button,
+            )}
+          >
+            Book now
+          </Link>
         </div>
       </div>
     </article>

@@ -38,7 +38,6 @@ export function DestinationsPageClient({ items }: { items: Destination[] }) {
         eyebrow="Destinations"
         title="Places beyond the guidebook"
         description="Find a region, pick a place, then open experiences or craft a route around it."
-        countLabel={`${filtered.length} ${filtered.length === 1 ? "place" : "places"}${region ? ` · ${region}` : ""}`}
         sidebar={
           <div className="space-y-6">
             <p className="label-caps text-accent">Filters</p>
@@ -86,7 +85,7 @@ export function DestinationsPageClient({ items }: { items: Destination[] }) {
           <StaggerChildren
             key={`${region ?? "all"}-${query.trim().toLowerCase()}`}
             mode="mount"
-            className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3"
+            className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
           >
             {filtered.map((d) => (
               <StaggerItem key={d.slug} className="h-full">

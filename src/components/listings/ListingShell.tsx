@@ -43,7 +43,6 @@ export function ListingShell({
   title,
   description,
   sidebar,
-  countLabel,
   children,
   footer,
 }: {
@@ -51,7 +50,6 @@ export function ListingShell({
   title: string;
   description?: string;
   sidebar: React.ReactNode;
-  countLabel: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
@@ -64,12 +62,11 @@ export function ListingShell({
           {description ? (
             <p className="mt-2 max-w-2xl text-sm text-on-surface-variant">{description}</p>
           ) : null}
-          <div className="mt-8 grid gap-8 lg:grid-cols-[16rem_1fr]">
+          <div className="mt-8 grid items-start gap-8 lg:grid-cols-[16rem_1fr]">
             <aside className="h-fit rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 lg:sticky lg:top-[calc(var(--header-offset)+1rem)]">
               {sidebar}
             </aside>
-            <div>
-              <p className="text-sm text-on-surface-variant">{countLabel}</p>
+            <div className="min-w-0">
               {children}
               {footer}
             </div>

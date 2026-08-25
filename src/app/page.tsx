@@ -6,14 +6,12 @@ import { FadeIn, SlideIn, StaggerChildren, StaggerItem } from "@/components/moti
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeFaq } from "@/components/home/HomeFaq";
 import { CtaBand } from "@/components/ui/CtaBand";
-import { experiences } from "@/data/experiences";
 import { stories } from "@/data/stories";
 import { media } from "@/data/media";
 import { RecognitionLogos } from "@/components/brand/BrandLogo";
-import { ExperienceCard } from "@/components/listings/ExperienceCard";
 import { StoryCard } from "@/components/listings/StoryCard";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
-import { listExperiences, listStories } from "@/lib/data/repo";
+import { listStories } from "@/lib/data/repo";
 
 const typeVisuals: Record<string, string> = {
   adventure: media.heroRoots,
@@ -25,10 +23,7 @@ const typeVisuals: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const allExperiences = await listExperiences().catch(() => experiences);
   const allStories = await listStories().catch(() => stories);
-  const [lead, ...rest] = allExperiences;
-  const featuredRest = rest.slice(0, 2);
 
   return (
     <>
@@ -142,28 +137,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {lead && (
-        <section className="bg-surface py-16 md:py-24">
-          <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-            <FadeIn>
-              <div className="ink-rule" />
-              <p className="label-caps mt-4 text-accent">Bookable now</p>
-              <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-                <h2 className="font-display text-3xl text-primary md:text-5xl">Featured experiences</h2>
-                <Link href="/experiences" className="label-caps mb-1 inline-flex items-center gap-2 text-primary">
-                  All experiences <ArrowRight size={16} />
-                </Link>
-              </div>
-            </FadeIn>
-            <div className="mt-12 grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {[lead, ...featuredRest].map((exp) => (
-                <ExperienceCard key={exp.slug} experience={exp} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       <section className="relative overflow-hidden bg-primary-container py-24 text-center text-primary-fixed md:py-32">
         <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">

@@ -37,40 +37,50 @@ function Counter({
   return (
     <div
       className={cn(
-        "flex items-center justify-between rounded-2xl border border-outline-variant/30 bg-surface-container-lowest",
-        compact ? "p-3" : "p-4",
+        "flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest",
+        compact ? "gap-2 p-2.5" : "p-4",
       )}
     >
-      <div className={cn("flex items-center", compact ? "gap-2" : "gap-3")}>
+      <div className={cn("min-w-0 flex items-center", compact ? "gap-1.5" : "gap-3")}>
         {!compact && (
           <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary-container text-primary">
             <UsersRound size={17} />
           </span>
         )}
-        <div>
-          <p className="text-sm font-semibold text-primary">{label}</p>
-          <p className="mt-0.5 text-[11px] text-on-surface-variant">{note}</p>
+        <div className="min-w-0">
+          <p className={cn("font-semibold text-primary", compact ? "text-xs" : "text-sm")}>{label}</p>
+          <p className={cn("text-on-surface-variant", compact ? "mt-0 text-[10px] leading-tight" : "mt-0.5 text-[11px]")}>
+            {note}
+          </p>
         </div>
       </div>
-      <div className="flex items-center gap-2.5">
+      <div className={cn("flex shrink-0 items-center", compact ? "gap-1.5" : "gap-2.5")}>
         <button
           type="button"
           aria-label={`Remove one ${label.toLowerCase()}`}
           disabled={value <= min}
           onClick={() => onChange(value - 1)}
-          className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary transition hover:border-primary hover:bg-secondary-container disabled:cursor-not-allowed disabled:opacity-30"
+          className={cn(
+            "grid place-items-center rounded-full border border-outline-variant/50 text-primary transition hover:border-primary hover:bg-secondary-container disabled:cursor-not-allowed disabled:opacity-30",
+            compact ? "h-7 w-7" : "h-8 w-8",
+          )}
         >
-          <Minus size={14} />
+          <Minus size={compact ? 12 : 14} />
         </button>
-        <span className="w-5 text-center text-sm font-bold text-primary">{value}</span>
+        <span className={cn("text-center font-bold text-primary", compact ? "w-4 text-xs" : "w-5 text-sm")}>
+          {value}
+        </span>
         <button
           type="button"
           aria-label={`Add one ${label.toLowerCase()}`}
           disabled={value >= max}
           onClick={() => onChange(value + 1)}
-          className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary transition hover:border-primary hover:bg-secondary-container disabled:cursor-not-allowed disabled:opacity-30"
+          className={cn(
+            "grid place-items-center rounded-full border border-outline-variant/50 text-primary transition hover:border-primary hover:bg-secondary-container disabled:cursor-not-allowed disabled:opacity-30",
+            compact ? "h-7 w-7" : "h-8 w-8",
+          )}
         >
-          <Plus size={14} />
+          <Plus size={compact ? 12 : 14} />
         </button>
       </div>
     </div>
@@ -91,12 +101,12 @@ export function GuestCompositionFields({
   const remainingForKids = Math.max(0, maxGuests - adults);
 
   return (
-    <div className={cn("space-y-3", compact && "space-y-2.5")}>
-      <div className={cn("grid gap-3", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
+    <div className={cn("space-y-3", compact && "space-y-2")}>
+      <div className={cn("grid gap-2.5", compact ? "grid-cols-2" : "gap-3 sm:grid-cols-2")}>
         <Counter
           compact={compact}
           label="Adults"
-          note="18 years and above"
+          note={compact ? "18+" : "18 years and above"}
           value={adults}
           min={Math.max(1, minGuests - children)}
           max={Math.max(1, maxGuests - children)}
@@ -105,7 +115,7 @@ export function GuestCompositionFields({
         <Counter
           compact={compact}
           label="Children"
-          note="17 years and under"
+          note={compact ? "0–17" : "17 years and under"}
           value={children}
           min={0}
           max={remainingForKids}

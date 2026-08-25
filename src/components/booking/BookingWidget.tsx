@@ -93,140 +93,113 @@ export function BookingWidget({ experience, compact }: Props) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[1.5rem] border border-outline-variant/30 bg-surface-container-lowest shadow-[0_16px_40px_rgba(42,46,31,0.08)]",
-        compact
-          ? "p-4"
-          : "z-20 flex max-h-[calc(100svh-var(--header-offset)-1.5rem)] flex-col",
+        "overflow-hidden rounded-[1.35rem] border border-outline-variant/30 bg-surface-container-lowest shadow-[0_16px_40px_rgba(42,46,31,0.08)]",
+        "p-3.5 md:p-4",
       )}
     >
-      <div className={cn(compact ? "" : "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4 pb-2")}>
-        <p className="label-caps text-accent">From</p>
-        <p className="mt-1 font-display text-2xl leading-tight text-primary">
-          {formatINR(adultRate(experience))}
-          <span className="text-sm font-normal text-on-surface-variant"> / adult</span>
-        </p>
-        <p className="mt-1 text-xs text-on-surface-variant">
-          Children {formatINR(childRate(experience))} each · max {experience.maxGuests} guests
-        </p>
-
-        <div className="mt-4 space-y-3">
-          <FormInput
-            label="Date"
-            name="widget-date"
-            type="date"
-            min={earliest}
-            value={date}
-            onChange={setDate}
-            required
-          />
-          <p
-            className={cn(
-              "text-[11px] leading-snug",
-              selectedSlotClosed || !instant ? "text-accent" : "text-on-surface-variant",
-            )}
-          >
-            {fullyClosed
-              ? "All slots are closed or sold out on this date."
-              : selectedSlotClosed
-                ? "This slot is unavailable. Choose another time."
-                : instant
-                  ? `${BOOKING_NOTICE_DAYS}+ days ahead — book online now.`
-                  : `Within ${BOOKING_NOTICE_DAYS} days — we’ll confirm availability first.`}
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="label-caps text-accent">From</p>
+          <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
+            {formatINR(adultRate(experience))}
+            <span className="text-[12px] font-normal text-on-surface-variant"> / adult</span>
           </p>
-
-          <div>
-            <p className="text-[13px] font-semibold text-primary">Start time</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {slots.map((time) => {
-                const unavailable = dateIsClosed(date, closures, time);
-                return (
-                  <button
-                    key={time}
-                    type="button"
-                    disabled={unavailable}
-                    onClick={() => setSlot(time)}
-                    className={cn(
-                      "rounded-xl border px-2.5 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-35",
-                      slot === time
-                        ? "border-primary bg-primary text-on-primary"
-                        : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/40",
-                    )}
-                  >
-                    {time}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <GuestCompositionFields
-            compact
-            adults={adults}
-            children={children}
-            childAges={childAges}
-            maxGuests={experience.maxGuests}
-            minGuests={minGuests}
-            onAdults={syncAdults}
-            onChildren={syncChildren}
-            onChildAge={(index, age) =>
-              setChildAges((prev) => prev.map((value, i) => (i === index ? age : value)))
-            }
-          />
-
-          {experience.transportAvailable && (
-            <TransportVehicleFields
-              compact
-              options={vehicles}
-              enabled={transportation}
-              vehicleId={vehicleId}
-              note={experience.transportNote}
-              onEnabled={setTransportation}
-              onVehicle={setVehicleId}
-            />
-          )}
         </div>
-
-        <div className="mt-4 space-y-1.5 border-t border-outline-variant/25 pt-3 text-sm">
-          {adults > 0 && (
-            <div className="flex justify-between text-on-surface-variant">
-              <span>
-                Adults × {adults}
-              </span>
-              <span>{formatINR(adultRate(experience) * adults)}</span>
-            </div>
-          )}
-          {children > 0 && (
-            <div className="flex justify-between text-on-surface-variant">
-              <span>
-                Children × {children}
-              </span>
-              <span>{formatINR(childRate(experience) * children)}</span>
-            </div>
-          )}
-          {transportation && selectedVehicle ? (
-            <div className="flex justify-between text-on-surface-variant">
-              <span>{selectedVehicle.label}</span>
-              <span>{formatINR(selectedVehicle.price)}</span>
-            </div>
-          ) : null}
-          <div className="flex justify-between border-t border-outline-variant/20 pt-2 font-semibold text-primary">
-            <span>{instant ? "Total" : "Estimated total"}</span>
-            <span>{formatINR(total)}</span>
-          </div>
-        </div>
+        <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
+          Child {formatINR(childRate(experience))} · max {experience.maxGuests}
+        </p>
       </div>
 
-      <div
-        className={cn(
-          "bg-surface-container-lowest",
-          compact ? "mt-3 pt-3" : "shrink-0 border-t border-outline-variant/20 px-4 pt-3 pb-4",
+      <div className="mt-3 space-y-2.5">
+        <FormInput
+          label="Date"
+          name="widget-date"
+          type="date"
+          min={earliest}
+          value={date}
+          onChange={setDate}
+          required
+        />
+        <p
+          className={cn(
+            "text-[10px] leading-snug",
+            selectedSlotClosed || !instant ? "text-accent" : "text-on-surface-variant",
+          )}
+        >
+          {fullyClosed
+            ? "All slots closed on this date."
+            : selectedSlotClosed
+              ? "This slot is unavailable."
+              : instant
+                ? `${BOOKING_NOTICE_DAYS}+ days ahead — book online.`
+                : `Within ${BOOKING_NOTICE_DAYS} days — request first.`}
+        </p>
+
+        <div>
+          <p className="text-xs font-semibold text-primary">Start time</p>
+          <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+            {slots.map((time) => {
+              const unavailable = dateIsClosed(date, closures, time);
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  disabled={unavailable}
+                  onClick={() => setSlot(time)}
+                  className={cn(
+                    "rounded-lg border px-1 py-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-35",
+                    slot === time
+                      ? "border-primary bg-primary text-on-primary"
+                      : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/40",
+                  )}
+                >
+                  {time}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <GuestCompositionFields
+          compact
+          adults={adults}
+          children={children}
+          childAges={childAges}
+          maxGuests={experience.maxGuests}
+          minGuests={minGuests}
+          onAdults={syncAdults}
+          onChildren={syncChildren}
+          onChildAge={(index, age) =>
+            setChildAges((prev) => prev.map((value, i) => (i === index ? age : value)))
+          }
+        />
+
+        {experience.transportAvailable && (
+          <TransportVehicleFields
+            compact
+            options={vehicles}
+            enabled={transportation}
+            vehicleId={vehicleId}
+            note={experience.transportNote}
+            onEnabled={setTransportation}
+            onVehicle={setVehicleId}
+          />
         )}
-      >
+      </div>
+
+      <div className="mt-3 flex items-center justify-between border-t border-outline-variant/25 pt-2.5">
+        <span className="text-xs font-semibold text-primary">{instant ? "Total" : "Estimate"}</span>
+        <span className="font-sans text-[1.05rem] font-semibold tracking-tight text-primary">
+          {formatINR(total)}
+        </span>
+      </div>
+
+      <div className="mt-2.5">
         <Button onClick={startBooking} className="w-full" size="md" disabled={selectedSlotClosed || fullyClosed}>
           {instant ? "Continue to book" : "Request to book"}
         </Button>
-        <p className="mt-2 text-center text-[11px] text-on-surface-variant">
-          {instant ? "Secure hold · confirmation by email" : "We’ll confirm within 24 hours"}
+        <p className="mt-1.5 text-center text-[10px] text-on-surface-variant">
+          {instant ? "Secure hold · email confirmation" : "We confirm within 24 hours"}
         </p>
       </div>
     </div>
