@@ -5,6 +5,7 @@ import { StoryCard } from "@/components/listings/StoryCard";
 import { ShareStoryForm } from "@/components/stories/ShareStoryForm";
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { CtaBand } from "@/components/ui/CtaBand";
+import { ScrollToHash } from "@/components/navigation/ScrollToHash";
 
 export const metadata = { title: "Your Stories" };
 export const revalidate = 60;
@@ -14,6 +15,7 @@ export default async function StoriesPage() {
 
   return (
     <div className="bg-surface text-foreground">
+      <ScrollToHash />
       <section className="relative overflow-hidden px-margin-mobile pt-[calc(var(--header-offset)+2.5rem)] pb-12 md:px-margin-desktop md:pb-16">
         <div
           aria-hidden
