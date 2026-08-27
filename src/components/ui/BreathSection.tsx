@@ -25,22 +25,27 @@ export function BreathSection({
 
   return (
     <section className={cn("bg-surface", padding, className)}>
-      <FadeIn className="mx-auto max-w-4xl px-margin-mobile text-center md:px-margin-desktop">
-        <div className="mx-auto ink-rule" />
-        {eyebrow && <p className="label-caps mt-4 text-accent">{eyebrow}</p>}
-        <h2 className="mt-3 font-display text-3xl tracking-tight text-pretty text-primary md:text-5xl">
+      <FadeIn className="mx-auto max-w-3xl px-margin-mobile text-center md:px-margin-desktop">
+        {eyebrow ? <p className="label-caps text-highlight">{eyebrow}</p> : null}
+        <h2
+          className={cn(
+            "font-[family-name:var(--font-playfair)] text-[1.75rem] leading-tight font-medium text-pretty text-primary",
+            "md:text-[2.15rem] lg:text-[2.35rem]",
+            eyebrow ? "mt-3" : "mt-0",
+          )}
+        >
           {title}
         </h2>
-        {body && (
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-on-surface-variant md:text-lg">
+        {body ? (
+          <p className="mx-auto mt-3 max-w-xl text-[0.95rem] leading-relaxed text-on-surface-variant md:text-base">
             {body}
           </p>
-        )}
-        {cta && (
-          <Button href={cta.href} variant="ghost" className="mt-8">
+        ) : null}
+        {cta ? (
+          <Button href={cta.href} size="lg" className="mt-8">
             {cta.label}
           </Button>
-        )}
+        ) : null}
       </FadeIn>
     </section>
   );

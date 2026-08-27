@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const fieldClass =
-  "mt-2 min-h-12 w-full rounded-xl border border-outline-variant/45 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface shadow-[0_1px_0_rgba(42,46,31,0.03)] outline-none transition placeholder:text-on-surface-variant/45 hover:border-outline focus:border-accent focus:ring-4 focus:ring-accent/15";
+  "mt-2 min-h-12 w-full rounded-xl border border-outline-variant/45 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface shadow-[0_1px_0_rgba(42,46,31,0.03)] outline-none transition placeholder:text-on-surface-variant/45 hover:border-outline focus:border-primary focus:ring-4 focus:ring-primary/10";
 
 export function FieldLabel({
   children,
@@ -67,14 +67,14 @@ export function FormInput({
   const locked = Boolean(readOnly || disabled);
   return (
     <div className={cn("block", className)}>
-      <FieldLabel htmlFor={id} hint={required && !locked ? undefined : hint}>
+      <FieldLabel htmlFor={id} hint={locked ? hint : required ? undefined : hint}>
         {label}
-        {required && !locked ? <span className="text-accent"> *</span> : null}
+        {required && !locked ? <span className="text-highlight"> *</span> : null}
         {!required && !hint && !locked ? (
           <span className="ml-1.5 text-xs font-normal text-on-surface-variant">(optional)</span>
         ) : null}
       </FieldLabel>
-      {hint && (required || locked) ? (
+      {hint && required && !locked ? (
         <p className="mt-1 text-xs text-on-surface-variant">{hint}</p>
       ) : null}
       <input
@@ -127,7 +127,7 @@ export function FormTextarea({
     <div className={cn("block", className)}>
       <FieldLabel htmlFor={id}>
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
+        {required ? <span className="text-highlight"> *</span> : null}
       </FieldLabel>
       <textarea
         id={id}
@@ -173,7 +173,7 @@ export function FormSelect({
     <div className={cn("block", className)}>
       <FieldLabel htmlFor={id}>
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
+        {required ? <span className="text-highlight"> *</span> : null}
       </FieldLabel>
       <select
         id={id}
@@ -264,7 +264,7 @@ export function FormCheckboxGroup({
     <fieldset>
       <legend className="text-sm font-medium text-primary">
         {label}
-        {required ? <span className="text-accent"> *</span> : null}
+        {required ? <span className="text-highlight"> *</span> : null}
       </legend>
       {hint ? <p className="mt-1 text-xs text-on-surface-variant">{hint}</p> : null}
       <div
@@ -284,7 +284,7 @@ export function FormCheckboxGroup({
               type="checkbox"
               name={name}
               value={option}
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline-variant text-primary focus:ring-accent"
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline-variant text-primary focus:ring-primary/20"
             />
             <span>{option}</span>
           </label>

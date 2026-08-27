@@ -125,7 +125,7 @@ export function ShareStoryForm() {
           type="file"
           accept="image/jpeg,image/png,image/webp,image/heic"
           multiple
-          className="mt-2 block w-full text-sm text-on-surface-variant file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-4 file:py-2 file:text-xs file:font-bold file:tracking-wider file:text-on-accent file:uppercase"
+          className="mt-2 block w-full text-sm text-on-surface-variant file:mr-3 file:rounded-full file:border-0 file:bg-cta file:px-4 file:py-2 file:text-xs file:font-bold file:tracking-wider file:text-on-cta file:uppercase"
           onChange={(e) => {
             const next = [...(e.target.files ?? [])].slice(0, MAX_FILES).map((f) => ({
               name: f.name,

@@ -1,56 +1,69 @@
 @import "tailwindcss";
 
 /*
-  Public site: warm cream ground (#f7f4ee) + deep olive type.
-  Dark olive bands (primary-container) stay for contrast sections and photo overlays.
+  TRIS colour system
+  Header / dark bands: #364037
+  Page background:     #E8EBDD
+  Cards / surfaces:    #F8F6F1
+  Headings:            #1F4E3D
+  Body text:           #26352B
+  Primary CTA:         #364037
+  Labels / highlights: #7AA35A
 */
 :root {
-  --background: #f7f4ee;
-  --foreground: #2a2e1f;
-  --surface: #f7f4ee;
-  --surface-dim: #efeae1;
-  --surface-container: #efeae1;
-  --surface-container-low: #f3efe8;
-  --surface-container-high: #e8e2d6;
-  --surface-container-highest: #e0d9cb;
-  --surface-container-lowest: #ffffff;
-  --on-surface: #2a2e1f;
-  --on-surface-variant: #5c6350;
+  --background: #e8ebdd;
+  --foreground: #26352b;
+  --surface: #e8ebdd;
+  --surface-dim: #dde1d0;
+  --surface-container: #e2e6d6;
+  --surface-container-low: #e8ebdd;
+  --surface-container-high: #d5dac6;
+  --surface-container-highest: #c9cfb8;
+  --surface-container-lowest: #f8f6f1;
+  --on-surface: #26352b;
+  --on-surface-variant: #4a5a50;
 
-  --primary: #4a5a28;
-  --on-primary: #f7f4ee;
-  --primary-container: #3d4a28;
-  --on-primary-container: #eaf0d0;
-  --primary-fixed: #f7f4ee;
-  --primary-fixed-dim: #e4e8d4;
+  --primary: #1f4e3d;
+  --on-primary: #f8f6f1;
+  --primary-container: #364037;
+  --on-primary-container: #e8ebdd;
+  --primary-fixed: #f8f6f1;
+  --primary-fixed-dim: #e8ebdd;
 
-  --secondary: #2a2e1f;
-  --on-secondary: #f7f4ee;
-  --secondary-container: #e4e8d4;
-  --on-secondary-container: #2a2e1f;
+  --secondary: #1f4e3d;
+  --on-secondary: #f8f6f1;
+  --secondary-container: #e8ebdd;
+  --on-secondary-container: #1f4e3d;
 
-  --accent: #c2643a;
-  --on-accent: #f7f4ee;
+  --cta: #364037;
+  --on-cta: #f8f6f1;
 
-  --outline: #8a917c;
-  --outline-variant: #d4cec0;
-  --inverse-surface: #2a2e1f;
-  --inverse-on-surface: #f7f4ee;
-  --glass-nav-bg: rgba(247, 244, 238, 0.92);
-  --shadow-ambient: 0 14px 36px rgba(42, 46, 31, 0.08);
-  --header-offset: 4.5rem;
+  --highlight: #7aa35a;
+  --on-highlight: #f8f6f1;
+
+  /* Alias for older classnames — same as highlight, never terracotta */
+  --accent: #7aa35a;
+  --on-accent: #f8f6f1;
+
+  --outline: #7a8a7e;
+  --outline-variant: #c5cbb8;
+  --inverse-surface: #364037;
+  --inverse-on-surface: #f8f6f1;
+  --glass-nav-bg: rgba(54, 64, 55, 0.96);
+  --shadow-ambient: 0 14px 36px rgba(54, 64, 55, 0.1);
+  --header-offset: 5.5rem;
   color-scheme: light;
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-offset: 5rem;
+    --header-offset: 6rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --header-offset: 5.25rem;
+    --header-offset: 6.25rem;
   }
 }
 
@@ -76,6 +89,10 @@
   --color-on-secondary: var(--on-secondary);
   --color-secondary-container: var(--secondary-container);
   --color-on-secondary-container: var(--on-secondary-container);
+  --color-cta: var(--cta);
+  --color-on-cta: var(--on-cta);
+  --color-highlight: var(--highlight);
+  --color-on-highlight: var(--on-highlight);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
   --color-outline: var(--outline);
@@ -85,7 +102,7 @@
 
   --font-display: var(--font-syne);
   --font-sans: var(--font-manrope);
-  --font-serif: var(--font-instrument);
+  --font-serif: var(--font-playfair);
   --font-card-serif: var(--font-playfair);
 
   --spacing-container-max: 80rem;
@@ -109,8 +126,8 @@
   }
 
   ::selection {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--highlight);
+    color: var(--on-highlight);
   }
 
   img {
@@ -124,10 +141,10 @@
   }
 
   .glass-panel {
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(248, 246, 241, 0.86);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(42, 46, 31, 0.08);
+    border: 1px solid rgba(54, 64, 55, 0.08);
   }
 
   .glass-nav {
@@ -165,7 +182,7 @@
   .ink-rule {
     height: 2px;
     width: 2.5rem;
-    background: var(--accent);
+    background: var(--highlight);
   }
 
   .watermark {
@@ -175,7 +192,30 @@
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 0.85;
-    color: rgba(42, 46, 31, 0.06);
+    color: rgba(31, 78, 61, 0.07);
+  }
+}
+
+/* Homepage: one section in view at a time */
+html.home-snap {
+  scroll-snap-type: y mandatory;
+  scroll-padding-top: 0;
+}
+
+html.home-snap .home-snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Footer is outside main — still a snap stop so it remains reachable */
+html.home-snap footer {
+  scroll-snap-align: end;
+  scroll-snap-stop: always;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.home-snap {
+    scroll-snap-type: none;
   }
 }
 

@@ -34,7 +34,7 @@ export function CraftCard({ product, className }: Props) {
           />
         </div>
         {product.bestSeller && (
-          <span className="absolute top-5 left-5 w-fit rounded-full bg-[#f7f4ee]/95 px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-secondary uppercase">
+          <span className="absolute top-5 left-5 w-fit rounded-full bg-surface-container-lowest/95 px-2.5 py-1 text-[9px] font-bold tracking-[0.12em] text-secondary uppercase">
             Featured
           </span>
         )}

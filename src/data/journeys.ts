@@ -7,6 +7,8 @@ import {
   DEFAULT_TRIS_SERVICE_PERCENT,
 } from "./package-pricing";
 import type { TransportVehiclePrices } from "./transport";
+import { CURATED_JOURNEY_PATCHES } from "./curated-itineraries";
+import { FIXED_DEPARTURE_PATCHES } from "./fixed-departures";
 
 export type Journey = {
   slug: string;
@@ -33,7 +35,15 @@ export type Journey = {
   highlights: string[];
   /** Short 3–5 experience labels for curated listing cards */
   experienceHighlights?: string[];
-  itinerary: { day: number; title: string; summary: string }[];
+  itinerary: {
+    day: number;
+    title: string;
+    summary: string;
+    activities?: string;
+    meals?: string;
+    trekDifficulty?: string;
+    overnight?: string;
+  }[];
   route?: string;
   stays: string[];
   inclusions: string[];
@@ -52,6 +62,13 @@ export type Journey = {
     note?: string;
   }[];
   groupSize?: string;
+  /** Soft constraints shown on the journey detail glance box */
+  notSuitableFor?: string[];
+  /** Fixed departure catalogue id e.g. FD:01 */
+  idCode?: string;
+  startingPoint?: string;
+  tourHighlights?: string[];
+  whyTitle?: string;
   status?: "draft" | "active" | "hidden";
   sourceUrl: string;
 };
@@ -89,7 +106,7 @@ function activityFor(priceFrom: number, days: number) {
 }
 
 /** Listing data sourced from https://www.trismeghalaya.com/ (customizable packages + fixed departures). */
-export const journeys: Journey[] = [
+const journeySeeds: Journey[] = [
   {
     slug: "short-escape-sohra",
     name: "Sohra Escape",
@@ -517,43 +534,52 @@ export const journeys: Journey[] = [
     slug: "womens-soulful-escape",
     name: "Women's Escape",
     type: "small-group",
-    tagline:
-      "A ladies-only small-group journey — travel with safety, support, and your tribe across Meghalaya’s soulful route.",
+    tagline: "Where Sisterhood Meets the Spirit of the Hills",
     days: 7,
     nights: 6,
     priceFrom: 38299,
     image: media.departures,
     gallery: [media.local.ridgeLight, media.local.groupTrail, media.local.raksan07, media.local.tishu03],
-    style: ["Women-only", "Small group", "Culture"],
-    season: "Multiple dates",
-    overview:
-      "Some journeys are better shared. Just show up with your curiosity — we’ll handle the rest. Built-in sisterhood, local hosts, and a route from Guwahati through Shillong, Laitlum, Phe Phe, Krangshuri, Dawki, Mawlynnong, Mawsynram, and back.",
-    highlights: [
-      "Ladies-only small group (4–10)",
-      "Dates, stays & plans already sorted",
-      "Rooted in culture, led by locals",
-      "Share costs, not experiences — upgrades on request",
-    ],
-    itinerary: [
-      { day: 1, title: "Guwahati → Shillong", summary: "Arrive and settle with the group." },
-      { day: 2, title: "Laitlum & Phe Phe", summary: "Canyons and waterfall country." },
-      { day: 3, title: "Krangshuri", summary: "Blue waters and slow sightseeing." },
-      { day: 4, title: "Dawki", summary: "Umngot river and border views." },
-      { day: 5, title: "Mawlynnong", summary: "Village stay in Asia’s cleanest village." },
-      { day: 6, title: "Mawsynram", summary: "Wettest-place atmosphere and local hosts." },
-      { day: 7, title: "Shillong → Guwahati", summary: "Return and farewell." },
-    ],
-    route:
-      "Guwahati → Shillong → Laitlum → Phe Phe → Krangshuri → Dawki → Mawlynnong → Mawsynram → Shillong → Guwahati",
-    stays: ["Shared quality stays", "Village accommodations"],
+    style: ["Women-only", "Small group", "Sisterhood"],
+    season: "Multiple dates · Oct–Dec",
+    overview: "Ladies-only small-group journey across Meghalaya.",
+    highlights: [],
+    itinerary: [],
+    stays: ["Cottage, guest house & homestays"],
     inclusions: fixedInclusions,
+    exclusions: packageExclusions,
     nextDeparture: "Multiple dates — seats limited",
-    groupSize: "4–10 persons",
-    departureSeats: [
-      { date: "2026-09-12", seats: 10, held: 1, booked: 4, note: "Guwahati start" },
-      { date: "2026-10-17", seats: 10, held: 0, booked: 2, note: "" },
-      { date: "2026-11-14", seats: 10, held: 2, booked: 0, note: "" },
+    groupSize: "4–10 max",
+    departureSeats: [],
+    sourceUrl: "https://www.trismeghalaya.com/fixed-departures",
+  },
+  {
+    slug: "blossoms-and-beyond",
+    name: "Blossoms & Beyond",
+    type: "small-group",
+    tagline: "Cherry Blossoms, Waterfalls & Wilderness",
+    days: 8,
+    nights: 7,
+    priceFrom: 38999,
+    image: media.local.meadowWalk,
+    gallery: [
+      media.local.forestLight,
+      media.local.waterfallPool,
+      media.local.livingBridge,
+      media.local.riverStones,
+      media.local.groupTrail,
     ],
+    style: ["Festival", "Small group", "Nature"],
+    season: "Cherry blossom season · November",
+    overview: "Cherry blossoms, sacred groves, waterfalls and festival energy.",
+    highlights: [],
+    itinerary: [],
+    stays: ["Shillong, Cherrapunjee & Dawki riverside"],
+    inclusions: fixedInclusions,
+    exclusions: packageExclusions,
+    nextDeparture: "13 Nov 2026",
+    groupSize: "4–10 max",
+    departureSeats: [],
     sourceUrl: "https://www.trismeghalaya.com/fixed-departures",
   },
   {
@@ -570,14 +596,12 @@ export const journeys: Journey[] = [
     style: ["Roots", "Small group", "Offbeat"],
     season: "Weekly Mondays · 12 Jan 2026 — 6 Apr 2026",
     overview:
-      "Root Trails is designed for travellers who want Meghalaya beyond the postcard route. Stay in a village, walk quiet forest paths, and visit living root bridges most travellers never reach. Groups stay small — 4 to 10 — so experiences stay personal, safe, and open to connection. Day 1 is easy and scenic (Laitlum, Krangshuri, Dawki, Mawlynnong overnight). Day 2 is the offbeat Rangthylliang–Mawkyrnot root bridge trail.",
+      "Root Trails is designed for travellers who want Meghalaya beyond the postcard route. Stay in a village, walk quiet forest paths, and visit living root bridges most travellers never reach.",
     highlights: [
       "Laitlum Canyons, Krangshuri Falls & Dawki",
-      "Overnight village homestay at Mawlynnong (double-sharing)",
-      "Moderate trek (3–4 hrs) — up to six offbeat living root bridges",
+      "Overnight village homestay at Mawlynnong",
+      "Moderate trek — up to six offbeat living root bridges",
       "Guided village walk + heritage house visit",
-      "Pack-your-own-lunch village style",
-      "Direct community-supporting experience",
     ],
     itinerary: [
       {
@@ -607,6 +631,63 @@ export const journeys: Journey[] = [
       "https://www.trismeghalaya.com/fixed-departures/rooted-trails%3A-the-offbeat-living-root-bridge-experience",
   },
 ];
+
+function applyCuratedPatch(journey: Journey): Journey {
+  const patch = CURATED_JOURNEY_PATCHES[journey.slug];
+  if (!patch) return journey;
+  const next: Journey = {
+    ...journey,
+    name: patch.name,
+    tagline: patch.tagline,
+    overview: patch.overview,
+    days: patch.days,
+    nights: patch.nights,
+    route: patch.route,
+    stays: patch.stays,
+    experienceHighlights: patch.experienceHighlights,
+    highlights: patch.highlights,
+    itinerary: patch.itinerary,
+  };
+  if (journey.packagePricing) {
+    next.packagePricing = {
+      ...journey.packagePricing,
+      activityCostPerGuest: activityFor(journey.priceFrom, patch.days),
+    };
+  }
+  return next;
+}
+
+function applyFixedPatch(journey: Journey): Journey {
+  const patch = FIXED_DEPARTURE_PATCHES[journey.slug];
+  if (!patch) return journey;
+  return {
+    ...journey,
+    idCode: patch.idCode,
+    name: patch.name,
+    tagline: patch.tagline,
+    overview: patch.overview,
+    whyTitle: patch.whyTitle,
+    days: patch.days,
+    nights: patch.nights,
+    priceFrom: patch.priceFrom,
+    startingPoint: patch.startingPoint,
+    groupSize: patch.groupSize,
+    season: patch.season,
+    style: patch.style,
+    route: patch.route,
+    tourHighlights: patch.tourHighlights,
+    highlights: patch.tourHighlights,
+    itinerary: patch.itinerary,
+    inclusions: patch.inclusions,
+    exclusions: patch.exclusions,
+    departureSeats: patch.departureSeats,
+    nextDeparture: patch.nextDeparture,
+  };
+}
+
+export const journeys: Journey[] = journeySeeds.map((j) =>
+  j.type === "small-group" ? applyFixedPatch(j) : applyCuratedPatch(j),
+);
 
 export function getJourney(slug: string) {
   return journeys.find((j) => j.slug === slug);

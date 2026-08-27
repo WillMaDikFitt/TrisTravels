@@ -1,5 +1,11 @@
 import type { Experience } from "@/data/experiences";
 import type { Journey } from "@/data/journeys";
+import {
+  normalizePackageTransportId,
+  packageTransportMeta,
+  toLegacyTransportId,
+  type PackageTransportId,
+} from "@/data/journey-options";
 import type { TransportVehicleId } from "@/data/transport";
 import {
   DEFAULT_PACKAGE_GST_PERCENT,
@@ -11,6 +17,18 @@ import {
 } from "@/data/package-pricing";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import type { PlatformSettings } from "@/lib/types";
+
+/** Day-rate multipliers vs the legacy tempo rate for larger vehicle options. */
+const PACKAGE_TRANSPORT_RATE_SCALE: Record<PackageTransportId, number> = {
+  sedan: 1,
+  suv: 1,
+  innova: 1,
+  tempo10: 0.92,
+  tempo12: 1,
+  tempo15: 1.12,
+  urbania10: 1.18,
+  urbania12: 1.32,
+};
 
 type StaffRule = {
   minGuests: number;
@@ -56,7 +74,7 @@ export function quoteExperience(
 }
 
 export type CuratedQuoteInput = {
-  vehicleId: TransportVehicleId;
+  vehicleId: PackageTransportId | TransportVehicleId;
   vehicleCount: number;
   stayPreference: StayPreferenceId;
   rooms: number;
@@ -71,7 +89,7 @@ export type CuratedQuote = {
   totalGuests: number;
   days: number;
   nights: number;
-  vehicleId: TransportVehicleId;
+  vehicleId: PackageTransportId;
   vehicleLabel: string;
   vehicleCount: number;
   vehicleCapacity: number;
@@ -92,6 +110,10 @@ export type CuratedQuote = {
   gst: number;
   subtotalABC: number;
   total: number;
+  /** 50% advance payable at booking */
+  advanceAmount: number;
+  /** Remaining 50% due before travel */
+  balanceAmount: number;
   perPerson: number;
   trisServicePercent: number;
   gstPercent: number;
@@ -116,14 +138,20 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
   const pricing = journey.packagePricing ?? {};
   const vehicles = resolvePackageVehicles(pricing.vehicles);
   const stays = resolvePackageStays(pricing.stays);
-  const vehicle = vehicles[input.vehicleId] ?? vehicles.sedan;
-  const stay = stays[input.stayPreference] ?? stays.homestay;
+  const packageVehicleId = normalizePackageTransportId(input.vehicleId);
+  const transportMeta = packageTransportMeta(packageVehicleId);
+  const legacyVehicleId = toLegacyTransportId(packageVehicleId);
+  const vehicle = vehicles[legacyVehicleId] ?? vehicles.sedan;
+  const stay = stays[input.stayPreference] ?? stays.barefoot ?? stays.homestay;
   const vehicleCount = Math.max(1, Math.round(input.vehicleCount));
   const rooms = Math.max(1, Math.round(input.rooms));
   const extraMattresses = Math.max(0, Math.round(input.extraMattresses));
-  const capacity = Math.max(1, vehicle.capacity);
+  const capacity = Math.max(1, transportMeta.maxGuests);
   const minVehiclesRequired = minVehiclesForGuests(totalGuests, capacity);
   const capacityOk = totalGuests <= capacity * vehicleCount;
+  const dayRate = Math.round(
+    vehicle.costPerDay * (PACKAGE_TRANSPORT_RATE_SCALE[packageVehicleId] ?? 1),
+  );
 
   const activityCostPerGuest =
     pricing.activityCostPerGuest != null && Number.isFinite(pricing.activityCostPerGuest)
@@ -140,21 +168,16 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
       ? Math.max(0, pricing.gstPercent)
       : DEFAULT_PACKAGE_GST_PERCENT;
 
-  const vehicleCost = Math.round(vehicle.costPerDay * vehicleCount * days);
+  const vehicleCost = Math.round(dayRate * vehicleCount * days);
   const roomCost = Math.round(stay.roomCost * rooms + stay.extraMattressPerPerson * extraMattresses);
   const activityCost = Math.round(activityCostPerGuest * totalGuests);
   const subtotalABC = vehicleCost + roomCost + activityCost;
   const trisService = Math.round((subtotalABC * trisServicePercent) / 100);
   const gst = Math.round((trisService * gstPercent) / 100);
   const total = vehicleCost + roomCost + activityCost + trisService + gst;
+  const advanceAmount = Math.round(total * 0.5);
+  const balanceAmount = total - advanceAmount;
   const perPerson = totalGuests > 0 ? Math.round(total / totalGuests) : total;
-
-  const vehicleLabels: Record<TransportVehicleId, string> = {
-    sedan: "Sedan",
-    suv: "SUV",
-    innova: "Innova / Crystal",
-    tempo: "Tempo traveller",
-  };
 
   return {
     adults,
@@ -162,8 +185,8 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
     totalGuests,
     days,
     nights,
-    vehicleId: input.vehicleId,
-    vehicleLabel: vehicleLabels[input.vehicleId] ?? input.vehicleId,
+    vehicleId: packageVehicleId,
+    vehicleLabel: `${transportMeta.label} (Max ${transportMeta.maxGuests})`,
     vehicleCount,
     vehicleCapacity: capacity,
     capacityOk,
@@ -178,6 +201,8 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
     gst,
     subtotalABC,
     total,
+    advanceAmount,
+    balanceAmount,
     perPerson,
     trisServicePercent,
     gstPercent,

@@ -1,105 +1,217 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import type { Story } from "@/data/stories";
 import { cn } from "@/lib/utils";
 
 type Props = {
   story: Story;
+  /** featured = large journal lead; list = journal rows; tile = postcard / sticky-note */
+  variant?: "featured" | "list" | "tile";
+  /** @deprecated use variant="featured" */
   featured?: boolean;
+  /** For tile variant: stagger postcard tilt / tape position */
+  tiltIndex?: number;
+  /** Denser postcard — for viewport-fit home section */
+  compact?: boolean;
   className?: string;
 };
 
-export function StoryCard({ story, featured, className }: Props) {
-  const dateLabel = new Date(story.date).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = false, className }: Props) {
+  const mode = variant ?? (featured ? "featured" : "list");
 
-  if (featured) {
+  if (mode === "featured") {
     return (
-      <Link
-        href={`/stories/${story.slug}`}
-        className={cn("group relative block overflow-hidden rounded-[2rem]", className)}
+      <article
+        className={cn(
+          "overflow-hidden rounded-[1.75rem] border border-outline-variant/25 bg-surface-container-lowest",
+          className,
+        )}
       >
-        <div className="relative aspect-[16/10] md:aspect-[21/9]">
-          <Image
-            src={story.image}
-            alt={story.title}
-            fill
-            className="object-cover transition duration-700 group-hover:scale-105"
-            sizes="100vw"
-            quality={90}
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/25" />
-          <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
-            <div className="flex items-center gap-3 text-[11px] font-bold tracking-[0.14em] text-white/80 uppercase">
-              <span>Featured</span>
-              <span className="h-px w-8 bg-white/60" />
-              <span className="text-white/70">{story.category}</span>
-            </div>
-            <h2 className="mt-4 max-w-3xl font-display text-3xl leading-tight text-white md:text-5xl">
+        <Link href={`/stories/${story.slug}`} className="group block md:grid md:grid-cols-2">
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[22rem]">
+            <Image
+              src={story.image}
+              alt=""
+              fill
+              className="object-cover transition duration-700 group-hover:scale-[1.02]"
+              sizes="(max-width:768px) 100vw, 50vw"
+              quality={90}
+              priority
+            />
+          </div>
+          <div className="flex flex-col justify-center px-6 py-8 md:px-10 md:py-12">
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-highlight uppercase">
+              Written by
+            </p>
+            <p className="mt-1 text-sm text-on-surface-variant">{story.author}</p>
+            <h2 className="mt-5 font-[family-name:var(--font-playfair)] text-2xl leading-snug text-primary md:text-3xl lg:text-[2.15rem]">
               {story.title}
             </h2>
-            <p className="mt-3 max-w-2xl text-base text-white/80 md:text-lg">{story.excerpt}</p>
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-white/65">
-                {story.author} · {dateLabel}
-              </p>
-              <span className="inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-white uppercase">
-                Read story <ArrowUpRight size={14} />
-              </span>
-            </div>
+            <p className="mt-4 max-w-xl text-[0.95rem] leading-relaxed text-on-surface-variant md:text-base">
+              {story.excerpt}
+            </p>
+            <span className="mt-8 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-primary uppercase transition group-hover:gap-3">
+              Read story <span aria-hidden>→</span>
+            </span>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </article>
+    );
+  }
+
+  if (mode === "tile") {
+    const tilts = [
+      "-rotate-[1.75deg] hover:rotate-0",
+      "rotate-[1.5deg] hover:rotate-0",
+      "-rotate-[0.75deg] hover:rotate-0",
+    ] as const;
+    const tapes = [
+      "left-1/2 -translate-x-1/2 rotate-[-2deg] bg-[#d4c4a8]/90",
+      "left-[18%] rotate-[6deg] bg-[#c5d4b8]/90",
+      "right-[16%] left-auto rotate-[-5deg] bg-[#dcc9b4]/90",
+    ] as const;
+    const tilt = tilts[Math.abs(tiltIndex) % tilts.length];
+    const tape = tapes[Math.abs(tiltIndex) % tapes.length];
+
+    return (
+      <article
+        className={cn(
+          "relative h-full origin-center transition duration-500 ease-out",
+          tilt,
+          className,
+        )}
+      >
+        {/* Washi / masking tape */}
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute -top-2 z-20 h-7 w-[4.5rem] rounded-[1px] shadow-sm",
+            tape,
+          )}
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(255,255,255,0.18) 6px, rgba(255,255,255,0.18) 7px)",
+          }}
+        />
+
+        <Link
+          href={`/stories/${story.slug}`}
+          className={cn(
+            "group relative flex h-full flex-col rounded-[4px] border border-[#e4ddd0] bg-[#f7f3ea] shadow-[0_12px_28px_rgba(54,64,55,0.12),0_2px_6px_rgba(54,64,55,0.06)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(54,64,55,0.16)]",
+            compact ? "p-2.5 pb-3" : "p-3 pb-4",
+          )}
+        >
+          {/* Soft paper grain */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[4px] opacity-[0.35] mix-blend-multiply"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 20% 20%, rgba(54,64,55,0.04) 0.6px, transparent 0.7px), radial-gradient(circle at 80% 60%, rgba(54,64,55,0.03) 0.5px, transparent 0.6px)",
+              backgroundSize: "7px 7px, 9px 9px",
+            }}
+          />
+
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-[2px] border border-[#e8e2d6] bg-[#ebe6dc] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]",
+              compact ? "aspect-[16/11]" : "aspect-[5/4]",
+            )}
+          >
+            <Image
+              src={story.image}
+              alt=""
+              fill
+              className="object-cover transition duration-700 group-hover:scale-[1.04]"
+              sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
+              quality={80}
+            />
+          </div>
+
+          <div className={cn("relative flex flex-1 flex-col px-1.5", compact ? "mt-2.5" : "mt-4")}>
+            <p
+              className={cn(
+                "font-[family-name:var(--font-playfair)] italic text-primary/80",
+                compact ? "text-[0.85rem]" : "text-[0.95rem]",
+              )}
+            >
+              {story.author}
+            </p>
+            <h3
+              className={cn(
+                "font-[family-name:var(--font-playfair)] leading-snug text-primary",
+                compact
+                  ? "mt-1 line-clamp-2 text-[1.05rem] md:text-[1.1rem]"
+                  : "mt-2 text-[1.2rem] md:text-[1.3rem]",
+              )}
+            >
+              {story.title}
+            </h3>
+            <p
+              className={cn(
+                "flex-1 text-[0.82rem] leading-relaxed text-on-surface-variant",
+                compact ? "mt-1.5 line-clamp-2" : "mt-2 line-clamp-3",
+              )}
+            >
+              {story.excerpt}
+            </p>
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 border-b border-primary/30 pb-0.5 text-[11px] font-bold tracking-[0.14em] text-primary uppercase transition group-hover:border-primary group-hover:gap-2.5",
+                compact ? "mt-2.5" : "mt-4",
+              )}
+            >
+              Read story <span aria-hidden>→</span>
+            </span>
+          </div>
+
+          {/* Folded corner */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute right-0 bottom-0 h-0 w-0 border-b-[18px] border-l-[18px] border-b-transparent border-l-[#e8e0d2] opacity-80"
+          />
+        </Link>
+      </article>
     );
   }
 
   return (
-    <Link
-      href={`/stories/${story.slug}`}
+    <article
       className={cn(
-        "group flex h-full min-h-[22rem] flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest transition duration-300",
-        "hover:-translate-y-1 hover:shadow-ambient",
+        "border-b border-outline-variant/30 py-8 last:border-b-0 md:py-10",
         className,
       )}
     >
-      <div className="relative aspect-[16/10] shrink-0 overflow-hidden">
-        <Image
-          src={story.image}
-          alt={story.title}
-          fill
-          className="object-cover transition duration-700 group-hover:scale-105"
-          sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
-          quality={80}
-        />
-        <div className="absolute top-3 left-3 rounded-full bg-accent px-2.5 py-1 text-[10px] font-bold tracking-[0.12em] text-on-accent uppercase">
-          {story.category}
-        </div>
-      </div>
-      <div className="flex flex-1 flex-col p-4 md:p-5">
-        <div className="ink-rule mb-3" />
-        <h3 className="line-clamp-2 min-h-[3rem] font-display text-lg leading-snug text-secondary transition group-hover:text-accent">
-          {story.title}
-        </h3>
-        <p className="mt-2 line-clamp-3 min-h-[4.25rem] flex-1 text-sm leading-relaxed text-on-surface-variant">
-          {story.excerpt}
-        </p>
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-outline-variant/20 pt-4 text-xs text-on-surface-variant">
-          <span className="line-clamp-1">
-            {story.author}
-            <span className="mx-1.5 text-outline-variant">·</span>
-            {dateLabel}
+      <Link
+        href={`/stories/${story.slug}`}
+        className="group grid gap-6 md:grid-cols-[minmax(0,1fr)_14rem] md:items-start md:gap-10"
+      >
+        <div className="order-2 min-w-0 md:order-1">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-highlight uppercase">
+            Written by
+          </p>
+          <p className="mt-1 text-sm text-on-surface-variant">{story.author}</p>
+          <h3 className="mt-4 font-[family-name:var(--font-playfair)] text-xl leading-snug text-primary transition group-hover:text-primary/85 md:text-2xl">
+            {story.title}
+          </h3>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-on-surface-variant md:text-[0.95rem]">
+            {story.excerpt}
+          </p>
+          <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-primary uppercase transition group-hover:gap-3">
+            Read story <span aria-hidden>→</span>
           </span>
-          <ArrowUpRight
-            size={14}
-            className="shrink-0 text-accent transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        </div>
+        <div className="relative order-1 aspect-[16/10] overflow-hidden rounded-2xl md:order-2 md:aspect-[5/4]">
+          <Image
+            src={story.image}
+            alt=""
+            fill
+            className="object-cover transition duration-700 group-hover:scale-[1.03]"
+            sizes="(max-width:768px) 100vw, 224px"
+            quality={80}
           />
         </div>
-      </div>
-    </Link>
+      </Link>
+    </article>
   );
 }

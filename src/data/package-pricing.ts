@@ -1,6 +1,14 @@
 import type { TransportVehicleId } from "./transport";
 
-export type StayPreferenceId = "homestay" | "hotel" | "boutique" | "resort" | "camping";
+export type StayPreferenceId =
+  | "homestay"
+  | "hotel"
+  | "boutique"
+  | "resort"
+  | "camping"
+  | "barefoot"
+  | "signature"
+  | "offbeat";
 
 export type PackageVehicleRate = {
   /** Cost for one vehicle for one day */
@@ -31,11 +39,24 @@ export const STAY_PREFERENCE_META: Record<
   StayPreferenceId,
   { label: string; hint: string }
 > = {
-  homestay: { label: "Homestay", hint: "Village hosts & local homes" },
-  hotel: { label: "Hotel", hint: "Comfortable standard hotels" },
-  boutique: { label: "Boutique", hint: "Character stays & cottages" },
-  resort: { label: "Resort", hint: "Full-service resort comfort" },
-  camping: { label: "Camping", hint: "Tents & riverside camps" },
+  homestay: { label: "Barefoot Stays", hint: "Good value, genuine local character" },
+  hotel: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  boutique: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  resort: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  camping: { label: "Offbeat Stays", hint: "Quieter locations, slower pace" },
+  barefoot: { label: "Barefoot Stays", hint: "Good value, genuine local character" },
+  signature: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  offbeat: { label: "Offbeat Stays", hint: "Quieter locations, slower pace" },
+};
+
+/** Public stay styles shown in the book flow (maps onto pricing keys). */
+export const BOOKING_STAY_STYLE_IDS = ["barefoot", "signature", "offbeat"] as const;
+export type BookingStayStyleId = (typeof BOOKING_STAY_STYLE_IDS)[number];
+
+export const BOOKING_STAY_TO_RATE_KEY: Record<BookingStayStyleId, StayPreferenceId> = {
+  barefoot: "homestay",
+  signature: "boutique",
+  offbeat: "camping",
 };
 
 export const STAY_PREFERENCE_IDS = Object.keys(STAY_PREFERENCE_META) as StayPreferenceId[];
@@ -53,6 +74,9 @@ export const DEFAULT_PACKAGE_STAYS: Record<StayPreferenceId, PackageStayRate> = 
   boutique: { roomCost: 9000, extraMattressPerPerson: 2400 },
   resort: { roomCost: 12000, extraMattressPerPerson: 3000 },
   camping: { roomCost: 3000, extraMattressPerPerson: 1000 },
+  barefoot: { roomCost: 5000, extraMattressPerPerson: 1600 },
+  signature: { roomCost: 9000, extraMattressPerPerson: 2400 },
+  offbeat: { roomCost: 3000, extraMattressPerPerson: 1000 },
 };
 
 export const DEFAULT_TRIS_SERVICE_PERCENT = 10;
@@ -78,6 +102,21 @@ export function resolvePackageStays(
     boutique: { ...DEFAULT_PACKAGE_STAYS.boutique, ...override?.boutique },
     resort: { ...DEFAULT_PACKAGE_STAYS.resort, ...override?.resort },
     camping: { ...DEFAULT_PACKAGE_STAYS.camping, ...override?.camping },
+    barefoot: {
+      ...DEFAULT_PACKAGE_STAYS.barefoot,
+      ...override?.barefoot,
+      ...override?.homestay,
+    },
+    signature: {
+      ...DEFAULT_PACKAGE_STAYS.signature,
+      ...override?.signature,
+      ...override?.boutique,
+    },
+    offbeat: {
+      ...DEFAULT_PACKAGE_STAYS.offbeat,
+      ...override?.offbeat,
+      ...override?.camping,
+    },
   };
 }
 

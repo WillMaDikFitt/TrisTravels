@@ -11,7 +11,7 @@ type Props = {
   variant?: "horizontal" | "tile";
 };
 
-const CURATED_TITLE_MAX = 18;
+const CURATED_TITLE_MAX = 42;
 const FIXED_TITLE_MAX = 18;
 
 /**
@@ -84,15 +84,24 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
           quality={90}
         />
         <div className="absolute top-3.5 left-3.5 z-20">
-          <span className="inline-block rounded-full bg-primary px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-on-primary uppercase">
+          <span className="inline-block rounded-full bg-surface-container-lowest/95 px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">
             {duration}
           </span>
         </div>
+        <Link
+          href={`/journeys/${journey.slug}`}
+          className={cn(
+            "absolute right-3.5 bottom-3.5 z-20 inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta shadow-[0_8px_20px_rgba(54,64,55,0.28)] transition hover:brightness-110",
+            CARD_TYPE.button,
+          )}
+        >
+          View journey <span aria-hidden>→</span>
+        </Link>
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5 md:px-5 md:pb-5">
         <h3
-          className="truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.45rem] font-medium leading-none text-primary md:text-[1.65rem]"
+          className="line-clamp-2 font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-snug text-primary md:text-[1.5rem]"
           title={journey.name}
         >
           <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
@@ -100,9 +109,15 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
           </Link>
         </h3>
 
+        {journey.route ? (
+          <p className="mt-2 line-clamp-2 font-sans text-[12px] leading-snug text-on-surface-variant/90 md:text-[13px]">
+            {journey.route}
+          </p>
+        ) : null}
+
         {experience ? (
           <div className="mt-3">
-            <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
+            <p className={cn(CARD_TYPE.label, "text-highlight")}>Experiences</p>
             <p className="mt-1 line-clamp-1 font-sans text-[13px] leading-snug text-on-surface md:text-[14px]">
               {experience}
             </p>
@@ -114,7 +129,7 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
           {description}
         </p>
 
-        <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/30 pt-4">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-3 border-t border-outline-variant/30 pt-4">
           <div className="min-w-0">
             <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>From</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
@@ -125,25 +140,24 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
             </p>
             <p className="mt-1.5 font-sans text-[11px] text-on-surface-variant/80">Based on a group of 4</p>
           </div>
-
-          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
             <Link
               href={`/journeys/${journey.slug}/book`}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+                "inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta transition hover:brightness-110",
                 CARD_TYPE.button,
               )}
             >
-              Book now <span aria-hidden>→</span>
+              Book now
             </Link>
             <Link
               href={`/journeys/${journey.slug}/enquire`}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-on-primary transition hover:brightness-110",
+                "inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 px-4 py-2.5 text-primary transition hover:border-primary/40",
                 CARD_TYPE.button,
               )}
             >
-              Customise <span aria-hidden>→</span>
+              Customise
             </Link>
           </div>
         </div>
@@ -199,7 +213,7 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
       />
 
       <div className="absolute top-5 left-5 z-20 md:top-6 md:left-6">
-        <span className="inline-block rounded-full bg-primary px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-on-primary uppercase">
+        <span className="inline-block rounded-full bg-surface-container-lowest/95 px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">
           {duration}
         </span>
       </div>
@@ -211,7 +225,7 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
 
         {experience ? (
           <div className="mt-3">
-            <p className={cn(CARD_TYPE.label, "text-accent")}>Experiences</p>
+            <p className={cn(CARD_TYPE.label, "text-highlight")}>Experiences</p>
             <p className={cn(CARD_TYPE.body, "mt-1 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]")}>{experience}</p>
             <div className="mt-2.5 h-px w-11 bg-primary" />
           </div>
@@ -237,7 +251,7 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
             <Link
               href={`/journeys/${journey.slug}/book`}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+                "inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta transition hover:brightness-110",
                 CARD_TYPE.button,
               )}
             >
@@ -246,7 +260,7 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
             <Link
               href={`/journeys/${journey.slug}/enquire`}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-on-primary transition hover:brightness-110",
+                "inline-flex items-center gap-1.5 rounded-full border border-primary bg-surface-container-lowest px-4 py-2.5 text-primary transition hover:bg-surface",
                 CARD_TYPE.button,
               )}
             >
@@ -299,10 +313,19 @@ function FixedJourneyCard({
           quality={85}
         />
         <div className="absolute top-3.5 left-3.5 z-20">
-          <span className="inline-block rounded-full bg-primary px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-on-primary uppercase">
+          <span className="inline-block rounded-full bg-surface-container-lowest/95 px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">
             {duration}
           </span>
         </div>
+        <Link
+          href={`/journeys/${journey.slug}`}
+          className={cn(
+            "absolute right-3.5 bottom-3.5 z-20 inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta shadow-[0_8px_20px_rgba(54,64,55,0.28)] transition hover:brightness-110",
+            CARD_TYPE.button,
+          )}
+        >
+          View journey <span aria-hidden>→</span>
+        </Link>
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
@@ -339,7 +362,7 @@ function FixedJourneyCard({
           <Link
             href={`/journeys/${journey.slug}/enquire`}
             className={cn(
-              "inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+              "inline-flex shrink-0 items-center justify-center rounded-full bg-cta px-4 py-2.5 text-on-cta transition hover:brightness-110",
               CARD_TYPE.button,
             )}
           >

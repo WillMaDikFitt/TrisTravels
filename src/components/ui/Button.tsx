@@ -13,16 +13,19 @@ type ButtonProps = {
 };
 
 const variants = {
-  primary: "bg-accent text-on-accent shadow-sm hover:-translate-y-0.5 hover:brightness-110 hover:shadow-md",
-  secondary: "bg-secondary text-on-secondary hover:-translate-y-0.5 hover:brightness-95 hover:shadow-md",
-  ghost: "border border-secondary/30 text-secondary hover:-translate-y-0.5 hover:bg-secondary/10",
-  text: "bg-transparent text-primary hover:text-accent",
+  primary:
+    "bg-cta text-on-cta shadow-sm hover:-translate-y-0.5 hover:brightness-110 hover:shadow-md",
+  secondary:
+    "border border-primary bg-surface-container-lowest text-primary hover:-translate-y-0.5 hover:bg-surface-container-lowest/90 hover:shadow-md",
+  ghost:
+    "border border-primary/35 bg-transparent text-primary hover:-translate-y-0.5 hover:bg-primary/5",
+  text: "bg-transparent text-primary hover:text-highlight",
 };
 
 const sizes = {
-  sm: "h-9 px-4 text-xs",
-  md: "h-10 px-6 text-xs",
-  lg: "h-12 px-8 text-sm",
+  sm: "h-9 min-h-9 px-4 text-[11px] tracking-[0.12em]",
+  md: "h-11 min-h-11 px-6 text-[12px] tracking-[0.12em]",
+  lg: "h-12 min-h-12 px-7 text-[12px] tracking-[0.14em] md:px-8",
 };
 
 export function Button({
@@ -36,7 +39,7 @@ export function Button({
   disabled,
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full font-bold uppercase tracking-[0.12em] transition-[transform,background-color,color,filter,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:translate-y-0 active:scale-[0.98] disabled:opacity-50 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+    "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold uppercase tracking-[0.12em] transition-[transform,background-color,color,filter,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:translate-y-0 active:scale-[0.98] disabled:opacity-50 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
     variants[variant],
     sizes[size],
     className,

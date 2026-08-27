@@ -43,11 +43,20 @@ export function ExperienceCard({ experience, className }: Props) {
           quality={85}
         />
         <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
-          <span className="rounded-full bg-primary px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.12em] text-on-primary uppercase">
+          <span className="rounded-full bg-surface-container-lowest/95 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.12em] text-primary uppercase">
             {experience.duration}
           </span>
           <WishlistButton slug={experience.slug} tone="on-light" />
         </div>
+        <Link
+          href={`/experiences/${experience.slug}`}
+          className={cn(
+            "absolute right-3.5 bottom-3.5 z-20 inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta shadow-[0_8px_20px_rgba(54,64,55,0.28)] transition hover:brightness-110",
+            CARD_TYPE.button,
+          )}
+        >
+          View experience <span aria-hidden>→</span>
+        </Link>
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
@@ -77,7 +86,7 @@ export function ExperienceCard({ experience, className }: Props) {
           <Link
             href={`/experiences/${experience.slug}/book`}
             className={cn(
-              "inline-flex shrink-0 items-center justify-center rounded-full bg-accent px-4 py-2.5 text-on-accent transition hover:brightness-110",
+              "inline-flex shrink-0 items-center justify-center rounded-full bg-cta px-4 py-2.5 text-on-cta transition hover:brightness-110",
               CARD_TYPE.button,
             )}
           >

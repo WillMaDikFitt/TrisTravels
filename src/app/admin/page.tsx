@@ -204,8 +204,8 @@ export default async function AdminDashboard() {
   return (
     <div>
       <PageHeader
-        eyebrow="Today"
-        title="What needs you"
+        eyebrow="Dashboard"
+        title="Admin dashboard"
         description="Confirm bookings, clear the inbox, and keep an eye on this week’s departures."
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

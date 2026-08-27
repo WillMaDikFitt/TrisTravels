@@ -28,6 +28,38 @@ export const DEFAULT_SETTINGS = {
   holdMinutes: 30,
   serviceFeePercent: 5,
   gstPercent: 18,
+  impact: [
+    {
+      id: "partners",
+      value: "100+",
+      label: "Local Partners Empowered",
+      description: "Local hosts, guides, drivers, and experience providers driving meaningful change.",
+    },
+    {
+      id: "travellers",
+      value: "200+",
+      label: "Travellers Connected",
+      description: "People who chose to travel deeper and connect with Meghalaya beyond the usual.",
+    },
+    {
+      id: "stays",
+      value: "50+",
+      label: "Authentic Stays & Experiences Supported",
+      description: "Homestays and local experiences that keep hospitality rooted in the community.",
+    },
+    {
+      id: "guides",
+      value: "20+",
+      label: "Local Guides Onboarded",
+      description: "Trained and supported local guides sharing stories, culture and hidden places.",
+    },
+    {
+      id: "artisans",
+      value: "10+",
+      label: "Artisans Supported",
+      description: "Local artisans and craftspeople whose skills and traditions are kept alive through travel.",
+    },
+  ],
 };
 
 export function dateIsClosed(

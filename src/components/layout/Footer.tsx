@@ -17,75 +17,72 @@ const columns = [
       { href: "/destinations", label: "Destinations" },
       { href: "/artisans", label: "Crafts" },
       { href: "/stories", label: "Stories" },
+      { href: "/about", label: "Our Story" },
     ],
   },
   {
     title: "TRIS",
     links: [
-      { href: "/about", label: "About TRIS" },
       { href: "/partner", label: "Partner with Us" },
       { href: "/contact", label: "Contact" },
-      { href: "/login", label: "Log in / Sign up" },
+      { href: "/terms", label: "Terms & Conditions" },
+      { href: "/terms/fixed-departures", label: "Fixed Departure Terms" },
     ],
   },
 ];
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-outline-variant/20 bg-surface pt-12 pb-8 md:pt-16 md:pb-10 lg:pt-20">
-      <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
+    <footer className="relative overflow-hidden border-t border-outline-variant/20 bg-surface pt-10 pb-6 md:pt-12 md:pb-7">
       <div className="relative z-10 mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10 lg:max-w-md lg:flex-col lg:gap-0">
-            <div className="mx-auto max-w-sm text-center md:mx-0 md:text-left">
-              <Link href="/" className="inline-block">
-                <BrandLogo
-                  on="light"
-                  size="lg"
-                  className="mx-auto h-28 w-auto sm:h-32 md:mx-0 md:h-28 lg:h-32"
-                />
-              </Link>
-              <p className="mt-4 text-xs leading-relaxed text-on-surface-variant md:mt-5 md:text-sm">
-                Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
-                stronger.
-              </p>
-            </div>
-
-            <div className="text-center md:ml-auto md:shrink-0 md:text-right lg:hidden">
-              <p className="label-caps text-accent">Proudly recognized by</p>
-              <RecognitionLogos
-                compact
-                className="mt-3 justify-center md:mt-4 md:justify-end"
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+          <div className="mx-auto max-w-sm text-center md:mx-0 md:text-left lg:max-w-md">
+            <Link href="/" className="inline-block">
+              <BrandLogo
+                on="light"
+                size="lg"
+                className="mx-auto h-24 w-auto sm:h-28 md:mx-0 md:h-24 lg:h-28"
               />
-            </div>
+            </Link>
+            <p className="mt-3 text-xs leading-relaxed text-on-surface-variant md:text-sm">
+              Community-rooted journeys across Meghalaya — authentic experiences that leave hosts
+              stronger.
+            </p>
           </div>
 
-          <div className="grid flex-1 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 sm:gap-x-8 lg:max-w-xl lg:justify-self-end">
+          <div className="md:hidden">
+            <p className="label-caps text-center text-highlight">Proudly recognized by</p>
+            <RecognitionLogos compact className="mt-2 justify-center" />
+          </div>
+
+          <div className="grid grid-cols-2 items-stretch gap-x-8 gap-y-6 sm:grid-cols-3 sm:gap-x-10">
             {columns.map((col) => (
-              <div key={col.title} className="flex flex-col gap-2.5">
-                <span className="label-caps mb-1 text-primary">{col.title}</span>
-                {col.links.map((link) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="text-sm text-on-surface-variant transition hover:text-primary"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              <div key={col.title} className="flex flex-col gap-2">
+                <span className="label-caps text-primary">{col.title}</span>
+                <div className="mt-auto flex flex-col gap-2">
+                  {col.links.map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-sm text-on-surface-variant transition hover:text-primary"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-10 border-t border-outline-variant/20 pt-5 md:mt-12 md:pt-6">
-          <p className="text-center text-xs text-on-surface-variant/60 sm:text-sm md:text-right lg:hidden">
+        <div className="mt-6 border-t border-outline-variant/20 pt-4 md:mt-7 md:pt-5">
+          <p className="text-center text-xs text-on-surface-variant/60 sm:text-sm md:hidden">
             © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.
           </p>
-          <div className="hidden items-end justify-between gap-8 lg:flex">
+          <div className="hidden items-end justify-between gap-8 md:flex">
             <div>
-              <p className="label-caps text-accent">Proudly recognized by</p>
-              <RecognitionLogos compact className="mt-3 justify-start" />
+              <p className="label-caps text-highlight">Proudly recognized by</p>
+              <RecognitionLogos compact className="mt-2 justify-start" />
             </div>
             <p className="shrink-0 text-sm text-on-surface-variant/60">
               © {new Date().getFullYear()} TRIS Meghalaya Travels. All rights reserved.

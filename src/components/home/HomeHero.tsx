@@ -3,27 +3,8 @@
 import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { Compass, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { media } from "@/data/media";
-
-const stats = [
-  {
-    icon: Compass,
-    title: "Curated experiences",
-    detail: "Six immersive styles—adventure, nature, food, culture, wellness, and craft.",
-  },
-  {
-    icon: Heart,
-    title: "Warm hospitality",
-    detail: "Shared meals, open homes, and genuine, heartfelt care.",
-  },
-  {
-    icon: Users,
-    title: "Local Khasi guides",
-    detail: "Community-led days with guides who know the trails, villages, and stories.",
-  },
-];
 
 export function HomeHero() {
   const ref = useRef<HTMLElement>(null);
@@ -32,11 +13,11 @@ export function HomeHero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "18%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "14%"]);
 
   return (
-    <section ref={ref} className="relative">
-      <div className="relative flex h-[88vh] min-h-[600px] w-full items-center overflow-hidden">
+    <section ref={ref} className="home-snap-section relative">
+      <div className="relative flex h-[100svh] min-h-[640px] w-full items-center overflow-hidden">
         <motion.div style={{ y }} className="absolute inset-0 h-[118%] w-full">
           {reduce ? (
             <Image
@@ -63,13 +44,12 @@ export function HomeHero() {
             </video>
           )}
         </motion.div>
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/15 to-black/55" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.32)_0%,rgba(0,0,0,0)_62%)]" />
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
 
-        <div className="relative z-10 w-full px-margin-mobile pt-[var(--header-offset)] pb-16 md:px-margin-desktop">
+        <div className="relative z-10 w-full px-margin-mobile pt-[var(--header-offset)] pb-20 md:px-margin-desktop md:pb-24">
           <motion.div
-            className="mx-auto flex max-w-4xl flex-col items-center text-center"
+            className="mx-auto flex w-full max-w-4xl flex-col items-center text-center"
             initial={reduce ? false : "hidden"}
             animate="visible"
             variants={{
@@ -83,9 +63,9 @@ export function HomeHero() {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-[clamp(2.75rem,8vw,6rem)] leading-[0.95] font-bold tracking-[-0.03em] text-balance text-white text-shadow-subtle"
+              className="font-display whitespace-nowrap text-[clamp(2rem,6.5vw,5rem)] leading-[1.02] font-bold tracking-[-0.025em] text-white text-shadow-subtle"
             >
-              Explore the unseen
+              Experience the unseen.
             </motion.h1>
             <motion.p
               variants={{
@@ -93,10 +73,21 @@ export function HomeHero() {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 max-w-xl text-base leading-relaxed text-pretty text-white/85 md:text-lg"
+              className="mt-4 font-[family-name:var(--font-playfair)] text-[clamp(1.25rem,2.8vw,1.85rem)] leading-snug text-white/95"
             >
-              Community-rooted days in Meghalaya — living bridges, kitchens, mist, and people who host
-              like family.
+              Travel your way, with us.
+            </motion.p>
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 18 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5 max-w-xl text-sm leading-relaxed text-pretty text-white/85 md:text-base"
+            >
+              Community-rooted, authentic, and deeply personal journeys in Meghalaya.
+              <br />
+              Travel that feels like coming home — and leaves communities stronger.
             </motion.p>
             <motion.div
               variants={{
@@ -104,33 +95,25 @@ export function HomeHero() {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-10"
+              className="mt-9 flex flex-wrap items-center justify-center gap-3"
             >
-              <Button href="/experiences">Explore experiences</Button>
+              <Button
+                href="/craft-my-journey"
+                size="lg"
+                className="bg-white text-primary shadow-sm hover:bg-white/95 hover:brightness-100 hover:shadow-md"
+              >
+                Craft my journey
+              </Button>
+              <Button
+                href="/experiences"
+                size="lg"
+                variant="ghost"
+                className="border-white/70 text-white hover:border-white hover:bg-white/10"
+              >
+                Explore experiences
+              </Button>
             </motion.div>
           </motion.div>
-        </div>
-      </div>
-
-      <div className="relative z-20 mx-auto -mt-10 max-w-container-max px-margin-mobile md:-mt-12 md:px-margin-desktop">
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-[#f7f4ee] shadow-[0_18px_50px_rgba(42,46,31,0.12)] sm:grid-cols-3">
-          {stats.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <div
-                key={s.title}
-                className={`flex flex-col justify-center px-5 py-5 md:px-7 md:py-6 ${i > 0 ? "border-t border-[#e4dfd4] sm:border-t-0 sm:border-l" : ""}`}
-              >
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Icon size={18} strokeWidth={1.75} aria-hidden />
-                </div>
-                <p className="font-display text-xl leading-snug text-primary md:text-2xl">{s.title}</p>
-                <p className="mt-2 min-h-[2.5rem] text-xs leading-snug text-on-surface-variant md:min-h-[2.75rem] md:text-sm">
-                  {s.detail}
-                </p>
-              </div>
-            );
-          })}
         </div>
       </div>
     </section>

@@ -9,19 +9,25 @@ import {
   seedStudioDemo,
 } from "@/lib/actions/studio-demo";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
-import type { PlatformSettings } from "@/lib/types";
+import type { ImpactStat, PlatformSettings } from "@/lib/types";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
+  const [impact, setImpact] = useState<ImpactStat[]>(DEFAULT_SETTINGS.impact);
   const [note, setNote] = useState("");
+  const [impactNote, setImpactNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [impactBusy, setImpactBusy] = useState(false);
   const [demoBusy, setDemoBusy] = useState(false);
   const [demoNote, setDemoNote] = useState("");
   const [demoSeeded, setDemoSeeded] = useState(false);
 
   useEffect(() => {
-    fetchSettingsAdmin().then(setSettings);
+    fetchSettingsAdmin().then((next) => {
+      setSettings(next);
+      setImpact(next.impact?.length ? next.impact : DEFAULT_SETTINGS.impact);
+    });
     getStudioDemoStatus().then((status) => setDemoSeeded(status.seeded));
   }, []);
 
@@ -30,7 +36,7 @@ export default function AdminSettingsPage() {
       <PageHeader
         eyebrow="System"
         title="Settings"
-        description="How far ahead guests can book online, how long a hold lasts, and fee maths for staff. Guests only ever see the total."
+        description="Booking rules, fee maths, and About-page impact numbers you can update anytime."
       />
       <form
         key={`${settings.minAdvanceDays}-${settings.holdMinutes}-${settings.serviceFeePercent}-${settings.gstPercent}`}
@@ -39,6 +45,8 @@ export default function AdminSettingsPage() {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);
           const next: PlatformSettings = {
+            ...settings,
+            impact,
             minAdvanceDays: Number(fd.get("minAdvanceDays")),
             holdMinutes: Number(fd.get("holdMinutes")),
             serviceFeePercent: Number(fd.get("serviceFeePercent")),
@@ -99,6 +107,80 @@ export default function AdminSettingsPage() {
           {busy ? "Saving…" : "Save settings"}
         </AdminButton>
       </form>
+
+      <Panel className="mt-10 max-w-3xl space-y-5">
+        <div>
+          <h2 className="font-display text-lg text-[#2a2e1f]">About — Our Impact</h2>
+          <p className="mt-1 text-sm text-[#5c6350]">
+            Numbers and labels on the About page. Update these as partnerships and travellers grow.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {impact.map((stat, index) => (
+            <div
+              key={stat.id}
+              className="grid gap-3 rounded-xl border border-[#e4dfd4] bg-white p-4 sm:grid-cols-2"
+            >
+              <Field label="Value">
+                <input
+                  className={inputClass}
+                  value={stat.value}
+                  onChange={(e) => {
+                    const next = [...impact];
+                    next[index] = { ...stat, value: e.target.value };
+                    setImpact(next);
+                  }}
+                />
+              </Field>
+              <Field label="Label">
+                <input
+                  className={inputClass}
+                  value={stat.label}
+                  onChange={(e) => {
+                    const next = [...impact];
+                    next[index] = { ...stat, label: e.target.value };
+                    setImpact(next);
+                  }}
+                />
+              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Description">
+                  <textarea
+                    className={`${inputClass} min-h-[4.5rem]`}
+                    value={stat.description}
+                    onChange={(e) => {
+                      const next = [...impact];
+                      next[index] = { ...stat, description: e.target.value };
+                      setImpact(next);
+                    }}
+                  />
+                </Field>
+              </div>
+            </div>
+          ))}
+        </div>
+        {impactNote && (
+          <Notice tone={impactNote.includes("saved") ? "ok" : "warn"}>{impactNote}</Notice>
+        )}
+        <AdminButton
+          type="button"
+          disabled={impactBusy}
+          onClick={async () => {
+            setImpactBusy(true);
+            const next: PlatformSettings = { ...settings, impact };
+            const res = await saveSettings(next);
+            setImpactBusy(false);
+            if (res.ok) {
+              setSettings(next);
+              setImpactNote("Impact numbers saved.");
+            } else {
+              setImpactNote(res.error ?? "Could not save impact.");
+            }
+          }}
+        >
+          {impactBusy ? "Saving…" : "Save impact numbers"}
+        </AdminButton>
+      </Panel>
 
       <Panel className="mt-8 max-w-xl space-y-4">
         <div>

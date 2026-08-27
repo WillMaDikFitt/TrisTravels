@@ -84,11 +84,19 @@ export type ClosureRecord = {
   soldOut?: boolean;
 };
 
+export type ImpactStat = {
+  id: string;
+  value: string;
+  label: string;
+  description: string;
+};
+
 export type PlatformSettings = {
   minAdvanceDays: number;
   holdMinutes: number;
   serviceFeePercent: number;
   gstPercent: number;
+  impact: ImpactStat[];
 };
 
 export type JourneyDepartureSeat = {

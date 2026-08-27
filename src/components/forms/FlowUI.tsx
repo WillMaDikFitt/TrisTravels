@@ -28,7 +28,7 @@ export function FlowSteps({
                 className={cn(
                   "relative z-10 grid h-8 w-8 place-items-center rounded-full border text-xs font-bold transition",
                   complete && "border-primary bg-primary text-on-primary",
-                  active && "border-accent bg-accent text-on-accent ring-4 ring-accent/10",
+                  active && "border-primary-container bg-primary-container text-on-primary-container ring-4 ring-primary/15",
                   !complete &&
                     !active &&
                     "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
@@ -81,7 +81,7 @@ export function FlowHeading({
 }) {
   return (
     <header className="mb-8">
-      <p className="label-caps text-accent">{eyebrow}</p>
+      <p className="label-caps text-highlight">{eyebrow}</p>
       <h1 className="mt-2 max-w-2xl font-display text-2xl leading-tight text-primary md:text-3xl">
         {title}
       </h1>
@@ -116,7 +116,7 @@ export function FieldGroup({
 
 export function FlowActions({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-8 flex flex-col-reverse gap-3 border-t border-outline-variant/25 pt-6 sm:flex-row sm:items-center sm:justify-end">
+    <div className="mt-8 flex flex-col-reverse gap-3 border-t border-outline-variant/25 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       {children}
     </div>
   );
@@ -136,8 +136,8 @@ export function FlowSummary({
   footer?: React.ReactNode;
 }) {
   return (
-    <aside className="h-fit overflow-hidden rounded-[1.75rem] border border-outline-variant/25 bg-surface-container-lowest shadow-[0_16px_45px_rgba(42,46,31,0.08)] lg:sticky lg:top-[calc(var(--header-offset)+2rem)]">
-      <div className="bg-primary px-6 py-6 text-on-primary">
+    <aside className="h-fit self-start overflow-hidden rounded-[1.75rem] border border-outline-variant/25 bg-surface-container-lowest shadow-[0_16px_45px_rgba(42,46,31,0.08)] lg:sticky lg:top-[calc(var(--header-offset)+0.5rem)]">
+      <div className="bg-primary-container px-6 py-5 text-on-primary-container">
         <p className="label-caps text-white/65">{eyebrow}</p>
         <h2 className="mt-2 font-display text-xl leading-snug">{title}</h2>
         {subtitle ? <p className="mt-2 text-xs leading-relaxed text-white/65">{subtitle}</p> : null}
@@ -160,9 +160,13 @@ export function FlowSummary({
 
 export function SecureNote({ request }: { request?: boolean }) {
   return (
-    <p className="flex items-center gap-2 text-xs text-on-surface-variant">
-      <LockKeyhole size={13} className="text-primary" />
-      {request ? "No payment is taken until availability is confirmed." : "Secure checkout follows your review."}
+    <p className="flex min-w-0 flex-1 items-start gap-2 text-xs text-on-surface-variant sm:max-w-md sm:items-center">
+      <LockKeyhole size={13} className="mt-0.5 shrink-0 text-primary sm:mt-0" />
+      <span>
+        {request
+          ? "50% to confirm. 50% before you travel. Pay 50% at booking, with the remaining balance due 20 days before your journey."
+          : "Secure checkout follows your review."}
+      </span>
     </p>
   );
 }

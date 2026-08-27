@@ -17,7 +17,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   if (isAdmin) {
-    return <div className="min-h-full bg-[#f7f4ee]">{children}</div>;
+    return <div className="min-h-full bg-surface">{children}</div>;
   }
 
   return (

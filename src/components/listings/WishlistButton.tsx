@@ -25,7 +25,7 @@ export function WishlistButton({ slug, className, tone = "on-dark" }: Props) {
       className={cn(
         "inline-flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition",
         active
-          ? "border-accent bg-accent text-on-accent"
+          ? "border-highlight bg-highlight text-on-highlight"
           : tone === "on-light"
             ? "border-primary/20 bg-white text-primary shadow-sm hover:border-primary/40"
             : "border-white/30 bg-black/40 text-white hover:bg-black/55",

@@ -210,7 +210,14 @@ export async function getSettings(): Promise<PlatformSettings> {
   if (db) {
     try {
       const doc = await db.collection("settings").doc("platform").get();
-      if (doc.exists) return { ...DEFAULT_SETTINGS, ...(doc.data() as Partial<PlatformSettings>) };
+      if (doc.exists) {
+        const data = doc.data() as Partial<PlatformSettings>;
+        return {
+          ...DEFAULT_SETTINGS,
+          ...data,
+          impact: data.impact?.length ? data.impact : DEFAULT_SETTINGS.impact,
+        };
+      }
     } catch (err) {
       console.error("Firestore read failed (settings/platform):", err);
     }

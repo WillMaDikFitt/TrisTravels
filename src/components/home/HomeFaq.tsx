@@ -32,7 +32,7 @@ export function HomeFaq() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">
             <div className="ink-rule" />
-            <p className="label-caps mt-4 text-accent">Good to know</p>
+            <p className="label-caps mt-4 text-highlight">Good to know</p>
             <h2 className="mt-3 font-display text-3xl text-primary md:text-5xl">
               Questions before you go
             </h2>

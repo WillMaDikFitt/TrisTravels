@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { TRIS_LOGO_ON_DARK, TRIS_LOGO_ON_LIGHT } from "@/components/brand/BrandLogo";
+import { TRIS_LOGO_ON_DARK } from "@/components/brand/BrandLogo";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -81,18 +81,14 @@ function isMoreActive(pathname: string) {
   return moreHrefs.some((href) => pathMatches(pathname, href));
 }
 
-function navLinkClass(solid: boolean, active: boolean) {
+function navLinkClass(active: boolean) {
   return cn(
-    "inline-flex h-9 items-center whitespace-nowrap border-b-2 px-2.5 text-[11px] font-bold tracking-[0.08em] uppercase transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-    active
-      ? "border-accent text-accent"
-      : !solid
-        ? "border-transparent text-white/80 hover:text-white"
-        : "border-transparent text-on-surface-variant hover:text-primary",
+    "inline-flex h-11 items-center whitespace-nowrap px-2.5 text-[12px] font-bold tracking-[0.1em] uppercase transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    active ? "text-white" : "text-white/65 hover:text-white",
   );
 }
 
-function MoreMenu({ solid }: { solid: boolean }) {
+function MoreMenu() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const active = isMoreActive(pathname);
@@ -109,7 +105,7 @@ function MoreMenu({ solid }: { solid: boolean }) {
     >
       <button
         type="button"
-        className={navLinkClass(solid, active)}
+        className={navLinkClass(active)}
         aria-expanded={open}
         aria-haspopup="true"
         aria-current={active ? "true" : undefined}
@@ -128,12 +124,12 @@ function MoreMenu({ solid }: { solid: boolean }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.18 }}
-            className="absolute top-full left-1/2 z-[80] mt-4 w-max min-w-[20rem] -translate-x-1/2 rounded-2xl border border-outline-variant/20 bg-[#f7f4ee] p-5 shadow-[0_18px_50px_rgba(42,46,31,0.14)]"
+            className="absolute top-full left-1/2 z-[80] mt-4 w-max min-w-[20rem] -translate-x-1/2 rounded-2xl border border-outline-variant/25 bg-surface-container-lowest p-5 shadow-[0_18px_50px_rgba(54,64,55,0.18)]"
           >
             <div className="flex gap-10">
               {moreGroups.map((group) => (
                 <div key={group.label}>
-                  <p className="label-caps text-accent">{group.label}</p>
+                  <p className="label-caps text-highlight">{group.label}</p>
                   <div className="mt-3 space-y-1">
                     {group.links
                       .filter((link) => link.href !== "/partner")
@@ -141,7 +137,7 @@ function MoreMenu({ solid }: { solid: boolean }) {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block rounded-xl px-3 py-2.5 transition hover:bg-white"
+                        className="block rounded-xl px-3 py-2.5 transition hover:bg-surface"
                       >
                         <span className="block text-sm font-semibold text-primary">{link.title}</span>
                         <span className="mt-0.5 block text-xs text-on-surface-variant">{link.tag}</span>
@@ -158,26 +154,26 @@ function MoreMenu({ solid }: { solid: boolean }) {
   );
 }
 
-function DesktopNav({ solid }: { solid: boolean }) {
+function DesktopNav() {
   const pathname = usePathname();
   const journeyType = useSearchParams().get("type");
 
   return (
-    <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
+    <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:gap-2 lg:flex">
       {offeringLinks.map((item) => {
         const active = isOfferingActive(item.match, pathname, journeyType);
         return (
           <Link
             key={item.label}
             href={item.href}
-            className={navLinkClass(solid, active)}
+            className={navLinkClass(active)}
             aria-current={active ? "page" : undefined}
           >
             {item.label}
           </Link>
         );
       })}
-      <MoreMenu solid={solid} />
+      <MoreMenu />
     </nav>
   );
 }
@@ -186,21 +182,42 @@ export function Header() {
   const pathname = usePathname();
   const { user, profile, logout, isAdmin } = useAuth();
   const reduceMotion = useReducedMotion();
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
   const isHome = pathname === "/";
+  const [scrolled, setScrolled] = useState(!isHome);
+  const [hidden, setHidden] = useState(false);
+  const [open, setOpen] = useState(false);
+  const lastY = useRef(0);
 
   useEffect(() => {
+    lastY.current = window.scrollY;
     const onScroll = () => {
-      setScrolled((current) => (current ? window.scrollY > 12 : window.scrollY > 32));
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+
+      if (!isHome) {
+        setScrolled(true);
+      } else {
+        setScrolled((current) => (current ? y > 24 : y > 48));
+      }
+
+      if (open || y < 48) {
+        setHidden(false);
+      } else if (delta > 6 && y > 80) {
+        setHidden(true);
+      } else if (delta < -6) {
+        setHidden(false);
+      }
+
+      lastY.current = y;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isHome, open]);
 
   useEffect(() => {
     setOpen(false);
+    setHidden(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -213,6 +230,7 @@ export function Header() {
 
   useEffect(() => {
     if (!open) return;
+    setHidden(false);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -220,80 +238,83 @@ export function Header() {
     };
   }, [open]);
 
-  const solid = scrolled || !isHome || open;
+  const solid = !isHome || scrolled || open;
 
   return (
-    <header className="fixed top-0 z-[70] w-full">
+    <header
+      className={cn(
+        "fixed top-0 z-[70] w-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        hidden && !open ? "-translate-y-full" : "translate-y-0",
+        reduceMotion && "transition-none",
+      )}
+    >
       <div
         className={cn(
           "transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
           solid
-            ? "border-b border-outline-variant/25 bg-surface-container-lowest shadow-[0_8px_30px_rgba(42,46,31,0.07)]"
-            : "bg-transparent",
+            ? "border-b border-white/10 bg-primary-container shadow-[0_8px_28px_rgba(38,53,43,0.18)]"
+            : "border-b border-transparent bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-[4.5rem] max-w-container-max items-center justify-between gap-4 px-margin-mobile md:h-[5rem] md:px-margin-desktop lg:h-[5.25rem] lg:gap-6">
+        <div className="flex h-[5.5rem] w-full items-center justify-between gap-4 px-4 md:h-24 md:px-6 lg:h-[6.25rem] lg:gap-8 lg:px-8 xl:px-10">
           <Link
             href="/"
             className="relative z-10 flex shrink-0 items-center"
             aria-label="TRIS Travels home"
           >
-            <span className="relative block h-14 w-14 md:h-16 md:w-16 lg:h-[4.25rem] lg:w-[4.25rem]">
+            <span className="relative block h-[4.25rem] w-[4.25rem] md:h-[4.75rem] md:w-[4.75rem] lg:h-[5.5rem] lg:w-[5.5rem]">
               <Image
                 src={TRIS_LOGO_ON_DARK}
                 alt="TRIS Travels"
                 fill
                 priority
                 unoptimized
-                className={cn(
-                  "object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  solid ? "opacity-0" : "opacity-100",
-                )}
-              />
-              <Image
-                src={TRIS_LOGO_ON_LIGHT}
-                alt=""
-                fill
-                priority
-                unoptimized
-                aria-hidden
-                className={cn(
-                  "object-contain transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  solid ? "opacity-100" : "opacity-0",
-                )}
+                className="object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]"
               />
             </span>
           </Link>
 
           <Suspense fallback={<nav className="hidden lg:flex" aria-hidden />}>
-            <DesktopNav solid={solid} />
+            <DesktopNav />
           </Suspense>
 
-          <div className="flex h-9 shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {user ? (
               <div className="hidden items-center gap-2 lg:flex">
                 {isAdmin && (
-                  <Button href="/admin" size="sm">
+                  <Button
+                    href="/admin"
+                    size="sm"
+                    variant="secondary"
+                    className="border-white/35 bg-transparent text-white hover:bg-white/10"
+                  >
                     Studio
                   </Button>
                 )}
-                <Button href="/account" size="sm">
+                <Button
+                  href="/account"
+                  size="sm"
+                  variant="secondary"
+                  className="border-white/35 bg-transparent text-white hover:bg-white/10"
+                >
                   {profile?.name?.split(" ")[0] || "Account"}
                 </Button>
               </div>
             ) : (
               <div className="max-lg:hidden">
-                <Button href="/login" size="sm">
+                <Button
+                  href="/login"
+                  size="sm"
+                  variant="secondary"
+                  className="border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10"
+                >
                   Log in / Sign up
                 </Button>
               </div>
             )}
             <button
               type="button"
-              className={cn(
-                "rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:ring-primary lg:hidden",
-                !solid ? "text-white" : "text-primary",
-              )}
+              className="rounded-full p-2 text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/60 lg:hidden"
               aria-label={open ? "Close menu" : "Menu"}
               aria-expanded={open}
               onClick={() => setOpen((value) => !value)}
@@ -307,7 +328,7 @@ export function Header() {
                   transition={{ duration: 0.18 }}
                   className="block"
                 >
-                  {open ? <X size={22} /> : <Menu size={22} />}
+                  {open ? <X size={24} /> : <Menu size={24} />}
                 </motion.span>
               </AnimatePresence>
             </button>
@@ -321,7 +342,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
             transition={{ duration: reduceMotion ? 0.01 : 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 bottom-0 top-14 z-[70] overflow-y-auto bg-[#f7f4ee] px-margin-mobile py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-16 lg:hidden"
+            className="fixed inset-x-0 bottom-0 top-[5.5rem] z-[70] overflow-y-auto bg-surface px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-24 lg:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
@@ -357,12 +378,12 @@ export function Header() {
               )}
             </div>
 
-            <section className="rounded-2xl border border-outline-variant/25 bg-white p-4 shadow-[0_8px_24px_rgba(42,46,31,0.04)]">
+            <section className="rounded-2xl border border-outline-variant/25 bg-surface-container-lowest p-4 shadow-[0_8px_24px_rgba(54,64,55,0.06)]">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <p className="label-caps text-accent">Experiences</p>
+                <p className="label-caps text-highlight">Experiences</p>
                 <Link
                   href="/experiences"
-                  className="text-[11px] font-bold tracking-[0.12em] text-accent uppercase"
+                  className="text-[11px] font-bold tracking-[0.12em] text-highlight uppercase"
                 >
                   Browse all
                 </Link>
@@ -372,7 +393,7 @@ export function Header() {
                   <Link
                     key={category.id}
                     href={`/experiences?type=${category.slug}`}
-                    className="rounded-xl bg-surface-container-low px-3 py-2.5 text-sm font-medium text-secondary transition active:bg-secondary-container"
+                    className="rounded-xl bg-surface px-3 py-2.5 text-sm font-medium text-secondary transition active:bg-secondary-container"
                   >
                     {category.id}
                   </Link>
@@ -380,8 +401,8 @@ export function Header() {
               </div>
             </section>
 
-            <section className="mt-4 rounded-2xl border border-outline-variant/25 bg-white p-4 shadow-[0_8px_24px_rgba(42,46,31,0.04)]">
-              <p className="label-caps text-accent">Journeys</p>
+            <section className="mt-4 rounded-2xl border border-outline-variant/25 bg-surface-container-lowest p-4 shadow-[0_8px_24px_rgba(54,64,55,0.06)]">
+              <p className="label-caps text-highlight">Journeys</p>
               <div className="mt-1 divide-y divide-outline-variant/20">
                 {journeyLinks.map((item) => (
                   <Link
@@ -393,7 +414,7 @@ export function Header() {
                       <span className="block font-medium text-primary">{item.title}</span>
                       <span className="mt-0.5 block text-xs text-on-surface-variant">{item.tag}</span>
                     </span>
-                    <ArrowRight size={16} className="shrink-0 text-accent" />
+                    <ArrowRight size={16} className="shrink-0 text-highlight" />
                   </Link>
                 ))}
               </div>
@@ -402,9 +423,9 @@ export function Header() {
             {moreGroups.map((group) => (
               <section
                 key={group.label}
-                className="mt-4 overflow-hidden rounded-2xl border border-outline-variant/25 bg-white shadow-[0_8px_24px_rgba(42,46,31,0.04)]"
+                className="mt-4 overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_8px_24px_rgba(54,64,55,0.06)]"
               >
-                <p className="label-caps px-4 pt-4 text-accent">{group.label}</p>
+                <p className="label-caps px-4 pt-4 text-highlight">{group.label}</p>
                 {group.links.map((item) => (
                   <Link
                     key={item.href}
@@ -415,7 +436,7 @@ export function Header() {
                       <span className="block font-display text-lg text-primary">{item.title}</span>
                       <span className="mt-0.5 block text-xs text-on-surface-variant">{item.tag}</span>
                     </span>
-                    <ArrowRight size={16} className="shrink-0 text-accent" />
+                    <ArrowRight size={16} className="shrink-0 text-highlight" />
                   </Link>
                 ))}
               </section>

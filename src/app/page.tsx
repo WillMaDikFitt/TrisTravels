@@ -1,14 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ArrowRight, Backpack, CalendarDays, Compass, HandHeart, Leaf, MapPinned, Users } from "lucide-react";
 import { FadeIn, SlideIn, StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeFaq } from "@/components/home/HomeFaq";
+import { HomeSnapRoot } from "@/components/home/HomeSnapRoot";
+import { WhyTrisTestimonials } from "@/components/home/WhyTrisTestimonials";
 import { CtaBand } from "@/components/ui/CtaBand";
 import { stories } from "@/data/stories";
 import { media } from "@/data/media";
-import { RecognitionLogos } from "@/components/brand/BrandLogo";
 import { StoryCard } from "@/components/listings/StoryCard";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { listStories } from "@/lib/data/repo";
@@ -26,209 +26,291 @@ export default async function HomePage() {
   const allStories = await listStories().catch(() => stories);
 
   return (
-    <>
+    <HomeSnapRoot>
       <HomeHero />
 
-      <section className="relative overflow-hidden bg-surface pt-12 pb-16 md:pt-16 md:pb-24">
-        <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <p className="watermark pointer-events-none absolute top-0 left-0 text-[18vw] leading-none md:text-[8.5rem]">
-            MEGHALAYA
-          </p>
-          <FadeIn className="relative">
-            <div className="ink-rule" />
-            <p className="label-caps mt-4 text-accent">How you travel</p>
-            <h2 className="mt-3 font-display text-3xl text-secondary md:text-5xl">
-              Four ways to travel with us
+      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center bg-surface py-14 md:py-20">
+        <div className="mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <FadeIn className="mx-auto max-w-4xl text-center">
+            <p className="text-[11px] font-semibold tracking-[0.22em] text-highlight uppercase md:text-xs">
+              Four ways to travel with TRIS
+            </p>
+            <h2 className="mt-4 font-display text-[clamp(1.5rem,3.2vw,2.65rem)] leading-tight whitespace-nowrap text-primary max-[420px]:whitespace-normal">
+              Choose the way that suits you best
             </h2>
           </FadeIn>
 
-          <div className="relative mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerChildren className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {[
               {
                 href: "/experiences",
-                image: media.heroRoots,
-                alt: "Living root bridge experience in Meghalaya",
                 title: "Experiences",
-                body: "A few hours to a full day — clear prices, real dates.",
+                body: "Discover a few hours or a full day through something local and meaningful.",
+                cta: "Explore experiences",
+                Icon: Backpack,
+                iconBg: "bg-secondary-container",
+                iconColor: "text-primary",
+                ctaColor: "text-primary",
               },
               {
                 href: "/journeys?type=curated",
-                image: media.packages,
-                alt: "Curated journeys through Meghalaya",
-                title: "Curated journeys",
-                body: "Shape dates, stays, and pace with a planner.",
+                title: "Curated Journeys",
+                body: "Thoughtfully designed journeys with room to make them your own.",
+                cta: "Explore journeys",
+                Icon: MapPinned,
+                iconBg: "bg-[#f0ddd0]",
+                iconColor: "text-accent",
+                ctaColor: "text-accent",
               },
               {
                 href: "/journeys?type=small-group",
-                image: media.departures,
-                alt: "Fixed journey departure in Meghalaya",
-                title: "Fixed journeys",
-                body: "Fixed departures. Show up with curiosity.",
+                title: "Fixed Journeys",
+                body: "Ready-to-go journeys with set dates and itineraries.",
+                cta: "View fixed departures",
+                Icon: CalendarDays,
+                iconBg: "bg-[#dde5d6]",
+                iconColor: "text-primary",
+                ctaColor: "text-primary",
               },
               {
                 href: "/craft-my-journey",
-                image: media.craft,
-                alt: "Craft a personal Meghalaya journey",
-                title: "Craft my journey",
-                body: "Send a brief — we design the route around you.",
+                title: "Craft My Journey",
+                body: "Tell us what you want, and we'll build the journey around you.",
+                cta: "Start planning",
+                Icon: Compass,
+                iconBg: "bg-[#e4e8d8]",
+                iconColor: "text-primary",
+                ctaColor: "text-primary",
               },
-            ].map((card, index) => (
-              <Link
-                key={card.href}
-                href={card.href}
-                className="group relative min-h-[22rem] overflow-hidden rounded-[1.75rem] shadow-[0_16px_40px_rgba(42,46,31,0.12)] md:min-h-[26rem]"
-              >
-                <Image
-                  src={card.image}
-                  alt={card.alt}
-                  fill
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="(max-width:1024px) 50vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className="font-display text-sm leading-none font-semibold text-white/60">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="h-px flex-1 bg-white/25 transition-colors duration-500 group-hover:bg-accent" />
-                  </div>
-                  <h3 className="flex min-h-[2.2em] items-end font-display text-[1.6rem] leading-[1.1] text-balance md:text-[1.8rem]">
+            ].map((card) => (
+              <StaggerItem key={card.href}>
+                <Link
+                  href={card.href}
+                  className="group flex h-full flex-col items-center rounded-2xl border border-outline-variant/25 bg-surface-container-lowest px-6 py-9 text-center shadow-[0_8px_28px_rgba(54,64,55,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(54,64,55,0.1)]"
+                >
+                  <span
+                    className={`flex h-14 w-14 items-center justify-center rounded-full ${card.iconBg}`}
+                  >
+                    <card.Icon className={`h-6 w-6 ${card.iconColor}`} strokeWidth={1.5} />
+                  </span>
+                  <h3 className="mt-6 font-display text-xl text-primary md:text-[1.35rem]">
                     {card.title}
                   </h3>
-                  <p className="mt-2.5 min-h-[2.75rem] max-w-[19rem] text-sm leading-relaxed text-pretty text-white/85">
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-on-surface-variant">
                     {card.body}
                   </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
-        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <div className="ink-rule" />
-          <p className="label-caps mt-4 text-primary-fixed/70">Experience types</p>
-          <h2 className="mt-3 font-display text-3xl md:text-5xl">Pick how a day should feel</h2>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-[1.75rem] bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {EXPERIENCE_CATEGORIES.map((c, i) => (
-              <Link
-                key={c.id}
-                href={`/experiences?type=${c.slug}`}
-                className="group relative flex min-h-[220px] flex-col justify-between overflow-hidden bg-[#323628] p-6 transition hover:bg-[#3a4030]"
-              >
-                <Image
-                  src={typeVisuals[c.slug] ?? media.forest}
-                  alt=""
-                  fill
-                  className="object-cover opacity-0 transition duration-500 group-hover:opacity-35"
-                  sizes="33vw"
-                />
-                <span className="relative z-10 font-serif text-3xl text-primary-fixed/65">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="relative z-10 mt-8">
-                  <h3 className="font-display text-2xl">{c.id}</h3>
-                  <p className="mt-2 text-sm text-primary-fixed/70">{c.blurb}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-primary-container py-24 text-center text-primary-fixed md:py-32">
-        <div className="relative mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-serif text-[7rem] leading-none text-primary-fixed/15 md:-top-10 md:text-[10rem]">
-            “
-          </span>
-          <FadeIn className="relative mx-auto max-w-3xl pt-10 md:pt-14">
-            <p className="label-caps text-primary-fixed/70">Guest highlight</p>
-            <blockquote className="mt-6 font-serif text-3xl leading-snug italic md:text-4xl">
-              Wholesome service from planning to the end of the trip. Recommend TRIS to anyone new to
-              the North East.
-            </blockquote>
-            <p className="mt-8 text-sm tracking-wide text-primary-fixed/70">Dr. Suresh Kumar · Chennai</p>
-          </FadeIn>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-[#2a2e1f] py-16 text-primary-fixed md:py-24">
-        <div className="mx-auto grid max-w-container-max items-center gap-10 px-margin-mobile md:grid-cols-12 md:gap-12 md:px-margin-desktop">
-          <div className="md:col-span-5">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
-              <Image src={media.aboutPortrait} alt="The heart behind TRIS" fill className="object-cover" sizes="40vw" />
-            </div>
-          </div>
-          <SlideIn from="right" className="md:col-span-7">
-            <p className="label-caps text-primary-fixed/70">Our story</p>
-            <h2 className="mt-3 font-display text-3xl md:text-5xl">The heart behind TRIS</h2>
-            <blockquote className="mt-6 border-l-2 border-primary-fixed/35 pl-5 font-serif text-xl leading-relaxed italic text-primary-fixed/90 md:text-2xl">
-              Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally caring.
-            </blockquote>
-            <p className="mt-6 text-base leading-relaxed text-primary-fixed/75 md:text-lg">
-              Born in Mairang, she didn’t speak the language of business. TRIS is a promise to carry her spirit
-              through every homestay, meal, guide, and journey we craft for you.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-2">
-              {["Community-first", "Slow travel", "Gives back"].map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold tracking-wide text-primary-fixed/80"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <Link
-              href="/about"
-              className="group mt-10 inline-flex items-center gap-3 rounded-full border border-accent bg-accent px-7 py-3.5 text-xs font-bold tracking-[0.14em] text-on-accent uppercase shadow-[0_10px_28px_rgba(0,0,0,0.22)] transition hover:brightness-110"
-            >
-              Read our story
-              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-            </Link>
-          </SlideIn>
-        </div>
-      </section>
-
-      <section className="bg-surface-container-low py-16 md:py-24">
-        <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <FadeIn>
-            <div className="ink-rule" />
-            <p className="label-caps mt-4 text-accent">Journal</p>
-            <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-3xl text-primary md:text-5xl">Stories from the hills</h2>
-              <Link href="/stories" className="label-caps mb-1 hidden items-center gap-2 text-primary md:inline-flex">
-                Read all <ArrowRight size={16} />
-              </Link>
-            </div>
-          </FadeIn>
-          <StaggerChildren className="mt-12 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {allStories.slice(0, 3).map((s) => (
-              <StaggerItem key={s.slug} className="h-full">
-                <StoryCard story={s} />
+                  <span
+                    className={`mt-6 inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.14em] uppercase ${card.ctaColor}`}
+                  >
+                    {card.cta}
+                    <ArrowRight
+                      size={14}
+                      className="transition duration-300 group-hover:translate-x-0.5"
+                    />
+                  </span>
+                </Link>
               </StaggerItem>
             ))}
           </StaggerChildren>
         </div>
       </section>
 
-      <HomeFaq />
-
-      <CtaBand
-        eyebrow="Ready when you are"
-        title="Start with a day, or a full journey"
-        body="Book an experience online, join a small-group date, or send a brief and we’ll shape the week."
-        primary={{ href: "/experiences", label: "Browse experiences" }}
-        secondary={{ href: "/craft-my-journey", label: "Craft my journey" }}
-      />
-
-      <section className="bg-surface px-margin-mobile py-14 text-center md:px-margin-desktop md:py-16">
-        <p className="label-caps text-accent">Recognitions</p>
-        <p className="mt-3 font-display text-2xl text-primary md:text-3xl">Meghalaya Tourism & NIDHI</p>
-        <RecognitionLogos className="mt-10" />
+      <section className="home-snap-section flex min-h-[100svh] flex-col justify-center bg-primary-container py-14 text-primary-fixed md:py-20">
+        <div className="mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <div className="ink-rule" />
+          <p className="label-caps mt-4 text-highlight">Experience types</p>
+          <h2 className="mt-3 font-display text-3xl md:text-5xl">Pick how a day should feel</h2>
+          <div className="mt-10 grid gap-px overflow-hidden rounded-[1.75rem] bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+            {EXPERIENCE_CATEGORIES.map((c, i) => (
+              <Link
+                key={c.id}
+                href={`/experiences?type=${c.slug}`}
+                className="group relative flex min-h-[200px] flex-col justify-between overflow-hidden p-6 md:min-h-[220px]"
+              >
+                <Image
+                  src={typeVisuals[c.slug] ?? media.forest}
+                  alt=""
+                  fill
+                  className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                  sizes="33vw"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
+                />
+                <span className="relative z-10 font-[family-name:var(--font-playfair)] text-3xl text-white/70">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="relative z-10 mt-8">
+                  <h3 className="font-display text-2xl text-white drop-shadow-sm">{c.id}</h3>
+                  <p className="mt-2 text-sm text-white/85">{c.blurb}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
-    </>
+
+      <WhyTrisTestimonials />
+
+      <section className="home-snap-section relative flex min-h-[100svh] overflow-hidden bg-surface-container-lowest md:h-[100svh] md:max-h-[100svh]">
+        <div className="mx-auto grid h-full w-full max-w-container-max md:grid-cols-12">
+          <div className="relative hidden min-h-0 md:col-span-5 md:block">
+            <Image
+              src={media.aboutPortrait}
+              alt="Mei-ieid — the heart behind TRIS"
+              fill
+              className="object-cover"
+              sizes="42vw"
+              priority={false}
+            />
+          </div>
+
+          <div className="relative flex min-h-0 flex-col justify-center px-margin-mobile py-10 md:col-span-7 md:px-10 md:py-8 lg:px-14 xl:px-16">
+            {/* Mobile image strip */}
+            <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden md:hidden">
+              <Image
+                src={media.aboutPortrait}
+                alt="Mei-ieid — the heart behind TRIS"
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
+            </div>
+
+            <SlideIn from="right">
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.2em] text-on-surface-variant uppercase">
+                  Our story
+                </p>
+                <span className="mt-1.5 block h-px w-10 bg-on-surface-variant/50" />
+              </div>
+
+              <h2 className="mt-4 font-[family-name:var(--font-playfair)] text-[clamp(1.85rem,3.2vw,2.75rem)] leading-[1.08] text-primary">
+                The heart behind TRIS{" "}
+                <Leaf
+                  aria-hidden
+                  className="ml-1 inline-block h-5 w-5 -translate-y-0.5 text-highlight md:h-6 md:w-6"
+                  strokeWidth={1.5}
+                />
+              </h2>
+
+              <p className="mt-3 max-w-xl font-[family-name:var(--font-playfair)] text-base leading-snug text-highlight italic md:text-lg">
+                Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally
+                caring.
+              </p>
+
+              <div className="mt-4 max-w-xl space-y-3 text-sm leading-relaxed text-on-surface md:text-[0.95rem] md:leading-[1.65]">
+                <p>
+                  Born in Mairang, she didn&apos;t speak the language of business.{" "}
+                  <span className="font-semibold text-primary">
+                    TRIS is our promise to carry her spirit forward
+                  </span>{" "}
+                  through every homestay, meal, guide and journey we craft.
+                </p>
+                <p>
+                  We create journeys that go beyond sightseeing — connecting you more deeply with the
+                  people, culture and landscapes of Meghalaya.
+                </p>
+              </div>
+
+              <div className="mt-6 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-stretch sm:divide-x sm:divide-outline-variant/40">
+                {[
+                  { label: "Community first", Icon: Users },
+                  { label: "Slow travel", Icon: Leaf },
+                  { label: "Gives back", Icon: HandHeart },
+                ].map(({ label, Icon }) => (
+                  <div
+                    key={label}
+                    className="flex flex-1 items-center gap-2.5 sm:flex-col sm:justify-center sm:gap-2 sm:px-3 sm:text-center"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 text-primary">
+                      <Icon className="h-4 w-4" strokeWidth={1.5} />
+                    </span>
+                    <span className="text-xs font-medium text-primary md:text-sm">{label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href="/about"
+                className="group mt-6 inline-flex w-fit items-center gap-2.5 rounded-lg bg-cta px-6 py-3 text-xs font-bold tracking-[0.14em] text-on-cta uppercase transition hover:brightness-110"
+              >
+                Read our story
+                <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+              </Link>
+            </SlideIn>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-surface py-10 md:h-[100svh] md:max-h-[100svh] md:py-8">
+        {/* Soft pinboard wash */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.45]"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at 20% 30%, rgba(122,163,90,0.12), transparent 45%), radial-gradient(ellipse at 80% 70%, rgba(54,64,55,0.06), transparent 40%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.2]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(54,64,55,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(54,64,55,0.04) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+
+        <div className="relative mx-auto flex w-full max-w-container-max flex-col justify-center px-margin-mobile md:px-margin-desktop">
+          <FadeIn>
+            <div className="ink-rule" />
+            <p className="label-caps mt-3 text-highlight">Journal</p>
+            <div className="mt-1.5 flex flex-wrap items-end justify-between gap-3">
+              <h2 className="font-[family-name:var(--font-playfair)] text-[clamp(1.85rem,3.2vw,2.75rem)] text-primary">
+                Stories from the hills
+              </h2>
+              <Link
+                href="/stories"
+                className="label-caps mb-1 hidden items-center gap-2 text-primary md:inline-flex"
+              >
+                Read all <ArrowRight size={16} />
+              </Link>
+            </div>
+            <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
+              Notes pinned from travellers, guides and friends — pick one up and read.
+            </p>
+          </FadeIn>
+          <StaggerChildren className="mt-8 grid items-stretch gap-6 pt-1 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3 lg:gap-8">
+            {allStories.slice(0, 3).map((s, i) => (
+              <StaggerItem key={s.slug} className="h-full px-0.5 pt-1">
+                <StoryCard story={s} variant="tile" tiltIndex={i} compact />
+              </StaggerItem>
+            ))}
+          </StaggerChildren>
+          <div className="mt-6 text-center md:hidden">
+            <Link
+              href="/stories"
+              className="label-caps inline-flex items-center gap-2 text-primary"
+            >
+              Read all <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="home-snap-section flex min-h-[100svh] flex-col justify-center">
+        <HomeFaq />
+        <CtaBand
+          eyebrow="Ready when you are"
+          title="Start with a day, or a full journey"
+          body="Book an experience online, join a small-group date, or send a brief and we’ll shape the week."
+          primary={{ href: "/experiences", label: "Browse experiences" }}
+          secondary={{ href: "/craft-my-journey", label: "Craft my journey" }}
+        />
+      </div>
+    </HomeSnapRoot>
   );
 }
