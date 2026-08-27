@@ -30,12 +30,16 @@ const sizes = {
   lg: "h-12 min-h-12 px-7 text-[12px] tracking-[0.14em] md:px-8",
 };
 
-function scrollToHash(hash: string) {
-  const id = hash.replace(/^#/, "");
-  if (!id) return;
-  requestAnimationFrame(() => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+/** First hash segment only — avoids `#share#share` from stacked handlers. */
+function parseHashHref(href: string) {
+  const i = href.indexOf("#");
+  if (i < 0) return { path: href, hashId: "" };
+  const path = href.slice(0, i) || "";
+  const hashId = href
+    .slice(i + 1)
+    .split("#")
+    .find(Boolean) ?? "";
+  return { path, hashId };
 }
 
 export function Button({
@@ -56,32 +60,34 @@ export function Button({
   );
 
   if (href) {
-    const hashIndex = href.indexOf("#");
-    const hash = hashIndex >= 0 ? href.slice(hashIndex + 1) : "";
-    const pathOnly = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
+    const { path, hashId } = parseHashHref(href);
+
+    // Native <a> for hash targets — Next <Link> can stack fragments (#share#share)
+    if (hashId) {
+      const cleanHref = `${path || ""}#${hashId}`;
+      return (
+        <a
+          href={cleanHref}
+          className={classes}
+          onClick={(e) => {
+            onClick?.();
+            const targetPath = path || window.location.pathname;
+            if (targetPath !== window.location.pathname) return;
+
+            e.preventDefault();
+            window.history.replaceState(null, "", `${targetPath}#${hashId}`);
+            document
+              .getElementById(hashId)
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        >
+          {children}
+        </a>
+      );
+    }
 
     return (
-      <Link
-        href={href}
-        className={classes}
-        onClick={(e) => {
-          onClick?.();
-          if (!hash || typeof window === "undefined") return;
-
-          const current = window.location.pathname;
-          const samePage = !pathOnly || pathOnly === current;
-
-          if (samePage) {
-            e.preventDefault();
-            window.history.pushState(null, "", `#${hash}`);
-            scrollToHash(hash);
-            return;
-          }
-
-          // After client navigation to another route with a hash
-          window.setTimeout(() => scrollToHash(hash), 150);
-        }}
-      >
+      <Link href={href} className={classes} onClick={onClick}>
         {children}
       </Link>
     );

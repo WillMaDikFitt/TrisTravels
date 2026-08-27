@@ -3,16 +3,24 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-/** Scroll to `#hash` after App Router navigations (Next Link often skips this). */
+/** Scroll to `#hash` after load; also repair doubled fragments like `#share#share`. */
 export function ScrollToHash() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const hash = window.location.hash.replace(/^#/, "");
-    if (!hash) return;
+    const raw = window.location.hash.replace(/^#/, "");
+    if (!raw) return;
+
+    const hashId = raw.split("#").find(Boolean);
+    if (!hashId) return;
+
+    // Normalize #share#share → #share
+    if (raw !== hashId) {
+      window.history.replaceState(null, "", `${pathname}#${hashId}`);
+    }
 
     const scroll = () => {
-      const el = document.getElementById(hash);
+      const el = document.getElementById(hashId);
       if (!el) return false;
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       return true;
