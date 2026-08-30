@@ -19,7 +19,7 @@ export function AccordionItem({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 py-4 text-left"
+        className="flex w-full items-center justify-between gap-3 py-3 text-left"
         aria-expanded={open}
       >
         <span className="font-[family-name:var(--font-playfair)] text-lg text-primary md:text-xl">
@@ -30,7 +30,7 @@ export function AccordionItem({
           className={cn("shrink-0 text-primary transition-transform", open && "rotate-180")}
         />
       </button>
-      {open ? <div className="pb-5 text-sm leading-relaxed text-on-surface-variant">{children}</div> : null}
+      {open ? <div className="pb-3.5 text-sm leading-relaxed text-on-surface-variant">{children}</div> : null}
     </div>
   );
 }

@@ -115,7 +115,7 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
           <div
             className={cn(
               "relative overflow-hidden rounded-[2px] border border-[#e8e2d6] bg-[#ebe6dc] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]",
-              compact ? "aspect-[16/11]" : "aspect-[5/4]",
+              compact ? "aspect-[2/1]" : "aspect-[5/4]",
             )}
           >
             <Image

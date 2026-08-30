@@ -185,7 +185,7 @@ export function toLegacyTransportId(id: PackageTransportId): TransportVehicleId 
   return "tempo";
 }
 
-export type StayStyleId = "barefoot" | "signature" | "offbeat";
+export type StayStyleId = "barefoot" | "signature" | "offbeat" | "luxury" | "flexible";
 
 export type StayStyleMeta = {
   id: StayStyleId;
@@ -252,19 +252,57 @@ export const STAY_STYLES: StayStyleMeta[] = [
       "Stay away from the crowds. Thoughtfully chosen stays in quieter locations with a simple, authentic and immersive local experience.",
     images: [media.forest, media.trail, media.heroMist, media.canopy, media.cliffs],
   },
+  {
+    id: "luxury",
+    label: "Luxury Stays",
+    short:
+      "Upscale accommodations offering top-notch comfort, premium locations, personalized service, fine dining, and modern amenities.",
+    bestFor: "Travellers seeking elevated comfort and a polished stay.",
+    think: "I want a lavish, relaxing stay with premium amenities.",
+    expect: [
+      "Premium locations and polished service",
+      "Higher comfort and modern amenities",
+      "Fine dining options where available",
+      "A more elevated, restful travel pace",
+    ],
+    learnIntro:
+      "Luxury Stays are upscale accommodations offering top-notch comfort, premium locations, personalized service, fine dining, and modern amenities.",
+    images: [media.packages, media.aboutPortrait, media.rideAlt, media.heroMist, media.water],
+  },
+  {
+    id: "flexible",
+    label: "I’m Flexible",
+    short:
+      "You’re open to any type of accommodation based on availability, value, and location — we’ll recommend what fits your style and budget.",
+    bestFor: "Travellers happy for us to mix stay types to suit the route and budget.",
+    think: "I’m open — recommend what works best for the journey.",
+    expect: [
+      "Stay mix based on route and availability",
+      "Balanced value and comfort",
+      "Options confirmed before you travel",
+    ],
+    learnIntro:
+      "You’re open to any type of accommodation based on availability, value, and location. This option allows us to recommend the best available stay that fits your overall travel style and budget.",
+    images: [media.kitchen, media.packages, media.forest, media.canopy, media.craft],
+  },
 ];
 
 export const STAY_STYLE_IDS = STAY_STYLES.map((s) => s.id);
+
+/** Stay styles used in curated online booking (priced catalogue). */
+export const BOOKING_STAY_STYLE_IDS = ["barefoot", "signature", "offbeat"] as const;
 
 export function stayStyleMeta(id: string) {
   return STAY_STYLES.find((s) => s.id === id) ?? STAY_STYLES[0];
 }
 
-/** Map legacy stay preference ids onto the three stay styles. */
+/** Map legacy stay preference ids onto stay styles. */
 export function normalizeStayStyleId(id: string): StayStyleId {
   if (id === "barefoot" || id === "homestay" || id === "camping") return "barefoot";
   if (id === "signature" || id === "hotel" || id === "boutique" || id === "resort") return "signature";
   if (id === "offbeat") return "offbeat";
+  if (id === "luxury") return "luxury";
+  if (id === "flexible") return "flexible";
   return "barefoot";
 }
 

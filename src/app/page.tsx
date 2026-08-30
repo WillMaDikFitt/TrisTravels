@@ -29,18 +29,31 @@ export default async function HomePage() {
     <HomeSnapRoot>
       <HomeHero />
 
-      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center bg-surface py-14 md:py-20">
-        <div className="mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
+      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-10 md:py-12">
+        <Image
+          src="/images/choose-section-bg.jpg"
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          quality={90}
+          priority
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[#e8ebdd]/55"
+        />
+        <div className="relative mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
           <FadeIn className="mx-auto max-w-4xl text-center">
             <p className="text-[11px] font-semibold tracking-[0.22em] text-highlight uppercase md:text-xs">
               Four ways to travel with TRIS
             </p>
-            <h2 className="mt-4 font-display text-[clamp(1.5rem,3.2vw,2.65rem)] leading-tight whitespace-nowrap text-primary max-[420px]:whitespace-normal">
+            <h2 className="mt-3 font-display text-[clamp(1.5rem,3.2vw,2.65rem)] leading-tight whitespace-nowrap text-primary max-[420px]:whitespace-normal">
               Choose the way that suits you best
             </h2>
           </FadeIn>
 
-          <StaggerChildren className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <StaggerChildren className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {[
               {
                 href: "/experiences",
@@ -86,7 +99,7 @@ export default async function HomePage() {
               <StaggerItem key={card.href}>
                 <Link
                   href={card.href}
-                  className="group flex h-full flex-col items-center rounded-2xl border border-outline-variant/25 bg-surface-container-lowest px-6 py-9 text-center shadow-[0_8px_28px_rgba(54,64,55,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(54,64,55,0.1)]"
+                  className="group flex h-full flex-col items-center rounded-2xl border border-outline-variant/30 bg-surface-container-lowest px-5 py-7 text-center shadow-[0_10px_32px_rgba(54,64,55,0.1)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(54,64,55,0.14)]"
                 >
                   <span
                     className={`flex h-14 w-14 items-center justify-center rounded-full ${card.iconBg}`}
@@ -115,17 +128,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-snap-section flex min-h-[100svh] flex-col justify-center bg-primary-container py-14 text-primary-fixed md:py-20">
-        <div className="mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
-          <div className="ink-rule" />
-          <p className="label-caps mt-4 text-highlight">Experience types</p>
-          <h2 className="mt-3 font-display text-3xl md:text-5xl">Pick how a day should feel</h2>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-[1.75rem] bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="home-snap-section flex h-[100svh] max-h-[100svh] flex-col overflow-hidden bg-primary-container text-primary-fixed">
+        <div className="mx-auto flex h-full w-full max-w-container-max flex-col px-margin-mobile py-5 md:px-margin-desktop md:py-6 lg:py-7">
+          <div className="shrink-0">
+            <div className="ink-rule" />
+            <p className="label-caps mt-2 text-highlight">Experience types</p>
+            <h2 className="mt-1.5 font-[family-name:var(--font-playfair)] text-[clamp(1.55rem,2.8vw,2.4rem)] leading-tight font-semibold tracking-[-0.02em]">
+              Pick how a day should feel
+            </h2>
+            <p className="mt-1 max-w-xl font-[family-name:var(--font-manrope)] text-sm text-primary-fixed/75">
+              From adventure to quiet moments, choose the kind of day that speaks to you.
+            </p>
+          </div>
+          <div className="mt-4 grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:mt-5 lg:grid-cols-3 lg:gap-3.5">
             {EXPERIENCE_CATEGORIES.map((c, i) => (
               <Link
                 key={c.id}
                 href={`/experiences?type=${c.slug}`}
-                className="group relative flex min-h-[200px] flex-col justify-between overflow-hidden p-6 md:min-h-[220px]"
+                className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
               >
                 <Image
                   src={typeVisuals[c.slug] ?? media.forest}
@@ -138,12 +158,16 @@ export default async function HomePage() {
                   aria-hidden
                   className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
                 />
-                <span className="relative z-10 font-[family-name:var(--font-playfair)] text-3xl text-white/70">
+                <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <div className="relative z-10 mt-8">
-                  <h3 className="font-display text-2xl text-white drop-shadow-sm">{c.id}</h3>
-                  <p className="mt-2 text-sm text-white/85">{c.blurb}</p>
+                <div className="relative z-10 mt-auto">
+                  <h3 className="font-[family-name:var(--font-playfair)] text-[1.1rem] leading-tight text-white drop-shadow-sm sm:text-[1.25rem] lg:text-[1.4rem]">
+                    {c.id}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.7rem] leading-snug text-white/85 sm:text-[0.8rem] lg:text-[0.85rem]">
+                    {c.blurb}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -153,9 +177,26 @@ export default async function HomePage() {
 
       <WhyTrisTestimonials />
 
-      <section className="home-snap-section relative flex min-h-[100svh] overflow-hidden bg-surface-container-lowest md:h-[100svh] md:max-h-[100svh]">
-        <div className="mx-auto grid h-full w-full max-w-container-max md:grid-cols-12">
-          <div className="relative hidden min-h-0 md:col-span-5 md:block">
+      <section className="home-snap-section relative flex min-h-[100svh] items-center overflow-hidden py-10 md:py-12">
+        <Image
+          src={media.aboutSectionBg}
+          alt=""
+          fill
+          className="object-cover object-[center_bottom]"
+          sizes="100vw"
+          quality={90}
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#f8f6f1]/78" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse 70% 80% at 78% 50%, rgba(248,246,241,0.92) 0%, transparent 70%), radial-gradient(ellipse 50% 70% at 20% 50%, rgba(248,246,241,0.35) 0%, transparent 65%)",
+          }}
+        />
+        <div className="relative mx-auto grid w-full max-w-container-max md:grid-cols-12 md:items-stretch">
+          <div className="relative z-10 hidden min-h-0 md:col-span-5 md:block">
             <Image
               src={media.aboutPortrait}
               alt="Mei-ieid — the heart behind TRIS"
@@ -166,7 +207,7 @@ export default async function HomePage() {
             />
           </div>
 
-          <div className="relative flex min-h-0 flex-col justify-center px-margin-mobile py-10 md:col-span-7 md:px-10 md:py-8 lg:px-14 xl:px-16">
+          <div className="relative z-10 flex flex-col justify-center px-margin-mobile py-2 md:col-span-7 md:px-10 lg:px-14 xl:px-16">
             {/* Mobile image strip */}
             <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden md:hidden">
               <Image
@@ -179,6 +220,7 @@ export default async function HomePage() {
             </div>
 
             <SlideIn from="right">
+              <div className="rounded-2xl bg-surface-container-lowest/92 px-5 py-6 shadow-[0_12px_36px_rgba(54,64,55,0.06)] backdrop-blur-[2px] md:bg-transparent md:px-0 md:py-0 md:shadow-none md:backdrop-blur-none">
               <div>
                 <p className="text-[11px] font-semibold tracking-[0.2em] text-on-surface-variant uppercase">
                   Our story
@@ -224,7 +266,7 @@ export default async function HomePage() {
                     key={label}
                     className="flex flex-1 items-center gap-2.5 sm:flex-col sm:justify-center sm:gap-2 sm:px-3 sm:text-center"
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 text-primary">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-surface-container-lowest/80 text-primary">
                       <Icon className="h-4 w-4" strokeWidth={1.5} />
                     </span>
                     <span className="text-xs font-medium text-primary md:text-sm">{label}</span>
@@ -239,6 +281,7 @@ export default async function HomePage() {
                 Read our story
                 <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
               </Link>
+              </div>
             </SlideIn>
           </div>
         </div>
@@ -301,9 +344,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="home-snap-section flex min-h-[100svh] flex-col justify-center">
+      <div className="home-snap-section flex h-[100svh] max-h-[100svh] flex-col overflow-hidden">
         <HomeFaq />
+      </div>
+
+      <div className="home-snap-section flex min-h-[100svh] flex-col justify-center">
         <CtaBand
+          className="border-t border-outline-variant/20 py-8 md:py-10"
           eyebrow="Ready when you are"
           title="Start with a day, or a full journey"
           body="Book an experience online, join a small-group date, or send a brief and we’ll shape the week."

@@ -146,7 +146,9 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
                   ))}
                 </div>
                 <p className="mt-6 font-[family-name:var(--font-playfair)] text-xl italic text-primary md:text-2xl">
-                  {FIXED_LISTING_INTRO.closing}
+                  Just show up with your curiosity —
+                  <br />
+                  we&apos;ll handle the rest.
                 </p>
               </div>
 

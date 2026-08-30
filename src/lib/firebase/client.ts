@@ -1,7 +1,13 @@
 "use client";
 
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  getAuth,
+  GoogleAuthProvider,
+  initializeAuth,
+  type Auth,
+} from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { isFirebaseClientConfigured } from "./config";
 
@@ -30,7 +36,15 @@ export function getClientAuth() {
   if (auth) return auth;
   const firebaseApp = getFirebaseApp();
   if (!firebaseApp) return null;
-  auth = getAuth(firebaseApp);
+  try {
+    // localStorage persistence avoids IndexedDB "Database is closing/hidden" during
+    // tab hide, OAuth popups, and Next.js fast refresh.
+    auth = initializeAuth(firebaseApp, {
+      persistence: browserLocalPersistence,
+    });
+  } catch {
+    auth = getAuth(firebaseApp);
+  }
   return auth;
 }
 

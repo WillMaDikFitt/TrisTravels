@@ -331,7 +331,8 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
                   type="email"
                   value={email}
                   onChange={setEmail}
-                  required
+                  required={!fixed}
+                  hint={fixed ? "Optional" : undefined}
                   autoComplete="email"
                 />
                 <FormInput
@@ -350,8 +351,18 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
               <Button variant="text" onClick={() => setStep(1)}>
                 Back
               </Button>
-              <Button size="lg" onClick={submit} disabled={busy || !name || !email || !phone}>
-                {busy ? "Sending…" : fixed ? "Reserve your seat" : "Send customise request"}
+              <Button
+                size="lg"
+                onClick={submit}
+                disabled={
+                  busy ||
+                  !name ||
+                  !phone ||
+                  (!fixed && !email) ||
+                  (Boolean(email.trim()) && !email.includes("@"))
+                }
+              >
+                {busy ? "Sending…" : fixed ? "Reserve my seat" : "Send customise request"}
               </Button>
             </FlowActions>
           </div>

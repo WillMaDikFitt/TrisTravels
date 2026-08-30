@@ -15,7 +15,7 @@ export function JourneyEnquire({
     return (
       <div id="enquire" className="mt-6 scroll-mt-header space-y-3">
         <Button className="w-full" href={`/journeys/${journeySlug}/enquire`}>
-          Register now
+          Reserve my seat
         </Button>
         <Button
           className="w-full"

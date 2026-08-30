@@ -51,19 +51,19 @@
   --inverse-on-surface: #f8f6f1;
   --glass-nav-bg: rgba(54, 64, 55, 0.96);
   --shadow-ambient: 0 14px 36px rgba(54, 64, 55, 0.1);
-  --header-offset: 5.5rem;
+  --header-offset: 5.75rem;
   color-scheme: light;
 }
 
 @media (min-width: 768px) {
   :root {
-    --header-offset: 6rem;
+    --header-offset: 6.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --header-offset: 6.25rem;
+    --header-offset: 6.75rem;
   }
 }
 

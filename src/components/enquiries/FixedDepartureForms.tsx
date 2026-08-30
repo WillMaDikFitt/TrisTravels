@@ -48,7 +48,7 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
 
   const valid =
     name.trim() &&
-    email.includes("@") &&
+    (!email.trim() || email.includes("@")) &&
     phone.trim().length >= 8 &&
     cityCountry.trim() &&
     Number(adults) >= 1 &&
@@ -68,6 +68,11 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
           We&apos;ll get back to you with the details. Ref {refId}.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          {journey.paymentLink ? (
+            <Button href={journey.paymentLink} size="lg">
+              Pay now
+            </Button>
+          ) : null}
           <Button href={`/journeys/${journey.slug}`}>Back to journey</Button>
           <Button href="/journeys?type=small-group" variant="ghost">
             All fixed departures
@@ -78,9 +83,9 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
   }
 
   return (
-    <FlowShell steps={["Join the group"]} current={0}>
+    <FlowShell steps={["Reserve my seat"]} current={0}>
       <FlowHeading
-        eyebrow="Register now"
+        eyebrow="Reserve my seat"
         title="Join the group"
         body="This form secures your spot provisionally. Final confirmation follows availability check and advance payment."
       />
@@ -97,7 +102,7 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
               name,
               email,
               phone,
-              message: notes || `Register for ${journey.name}`,
+              message: notes || `Reserve seat for ${journey.name}`,
               payload: {
                 journeySlug: journey.slug,
                 journeyName: journey.name,
@@ -148,10 +153,10 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
               label="Email address"
               name="email"
               type="email"
-              required
               value={email}
               onChange={setEmail}
               autoComplete="email"
+              hint="Optional"
             />
             <FormInput
               label="Phone / WhatsApp"
@@ -315,7 +320,7 @@ export function FixedRegisterForm({ journey }: { journey: Journey }) {
             From {formatINR(journey.priceFrom)} / person · {journey.groupSize}
           </p>
           <Button type="submit" size="lg" disabled={busy || !valid}>
-            {busy ? "Sending…" : "Submit"}
+            {busy ? "Sending…" : "Reserve my seat"}
           </Button>
         </FlowActions>
       </form>
@@ -345,7 +350,10 @@ export function FixedCustomiseForm({ journey }: { journey: Journey }) {
   }, [profile]);
 
   const valid =
-    name.trim() && email.includes("@") && phone.trim().length >= 8 && dream.trim().length > 10;
+    name.trim() &&
+    (!email.trim() || email.includes("@")) &&
+    phone.trim().length >= 8 &&
+    dream.trim().length > 10;
 
   if (done) {
     return (
@@ -424,9 +432,9 @@ export function FixedCustomiseForm({ journey }: { journey: Journey }) {
               label="Email"
               name="email"
               type="email"
-              required
               value={email}
               onChange={setEmail}
+              hint="Optional"
             />
             <FormInput
               label="Phone (with country code)"

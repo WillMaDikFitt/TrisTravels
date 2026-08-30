@@ -43,44 +43,42 @@ export function BrandLogo({
 export function RecognitionLogos({
   className,
   compact,
+  align = "center",
 }: {
   className?: string;
   compact?: boolean;
+  /** Footer uses end alignment so both marks share a baseline */
+  align?: "center" | "end";
 }) {
+  const logoHeight = compact ? "h-10" : "h-16";
+  const meghalayaWidth = compact ? "w-[7.5rem] md:w-32 lg:w-36" : "w-52";
+  const nidhiWidth = compact ? "w-[5.5rem] md:w-24 lg:w-28" : "w-48";
+
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-6 md:gap-5 lg:gap-10",
+        "flex flex-nowrap items-end gap-5 md:gap-6",
+        align === "end" ? "justify-end" : "justify-center",
         className,
       )}
     >
-      <div
-        className={cn(
-          "relative",
-          compact ? "h-9 w-28 md:h-8 md:w-24 lg:h-12 lg:w-40" : "h-16 w-52",
-        )}
-      >
+      <div className={cn("relative shrink-0", logoHeight, meghalayaWidth)}>
         <Image
           src={MEGHALAYA_SRC}
           alt="Meghalaya Tourism"
           fill
           unoptimized
-          className="object-contain"
+          className="object-contain object-bottom"
           sizes="220px"
         />
       </div>
-      <div
-        className={cn(
-          "relative",
-          compact ? "h-10 w-24 md:h-8 md:w-20 lg:h-14 lg:w-36" : "h-[4.5rem] w-48",
-        )}
-      >
+      <div className={cn("relative shrink-0", logoHeight, nidhiWidth)}>
         <Image
           src={NIDHI_SRC}
           alt="NIDHI — National Integrated Database of Hospitality Industry"
           fill
           unoptimized
-          className="object-contain"
+          className="object-contain object-bottom"
           sizes="220px"
         />
       </div>

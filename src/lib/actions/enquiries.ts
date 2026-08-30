@@ -10,6 +10,18 @@ import {
 import type { EnquiryRecord, EnquirySource } from "@/lib/types";
 import { memoryStore, uid } from "@/lib/store";
 
+/** Firestore rejects `undefined` field values — strip before write. */
+function stripUndefined<T>(value: T): T {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map((item) => stripUndefined(item)) as T;
+  const out: Record<string, unknown> = {};
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (nested === undefined) continue;
+    out[key] = stripUndefined(nested);
+  }
+  return out as T;
+}
+
 export async function submitEnquiry(input: {
   source: EnquirySource;
   name: string;
@@ -23,31 +35,46 @@ export async function submitEnquiry(input: {
     if (!input.name.trim() || !input.message.trim()) {
       return { ok: false as const, error: "Name and message are required" };
     }
-    if (!input.email.includes("@") && !input.phone?.trim()) {
+    const email = input.email.trim();
+    const phone = input.phone?.trim() || undefined;
+    if (!email.includes("@") && !phone) {
       return { ok: false as const, error: "Add an email or phone so we can reply" };
     }
 
-    const record: EnquiryRecord = {
+    const record: EnquiryRecord = stripUndefined({
       id: uid("enq"),
       source: input.source,
       name: input.name.trim(),
-      email: input.email.trim(),
-      phone: input.phone,
+      email: email.includes("@") ? email : "",
+      phone,
       message: input.message.trim(),
       payload: input.payload,
-      status: "new",
+      status: "new" as const,
       createdAt: new Date().toISOString(),
       uid: input.uid,
-    };
+    });
 
     const db = getAdminDb();
     if (db) {
-      await db.collection("enquiries").doc(record.id).set(record);
-    } else {
+      try {
+        await db.collection("enquiries").doc(record.id).set(record);
+      } catch (err) {
+        console.error("submitEnquiry firestore write failed:", err);
+        if (allowMemoryBackend()) {
+          memoryStore().enquiries.unshift(record);
+          return { ok: true as const, id: record.id };
+        }
+        return { ok: false as const, error: "Could not send just now. Try again." };
+      }
+    } else if (allowMemoryBackend()) {
       memoryStore().enquiries.unshift(record);
+    } else {
+      console.error("submitEnquiry:", memoryBackendWarning());
+      return { ok: false as const, error: "Could not send just now. Try again." };
     }
     return { ok: true as const, id: record.id };
-  } catch {
+  } catch (err) {
+    console.error("submitEnquiry failed:", err);
     return { ok: false as const, error: "Could not send just now. Try again." };
   }
 }

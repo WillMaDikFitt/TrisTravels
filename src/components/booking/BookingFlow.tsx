@@ -33,6 +33,8 @@ import {
   SecureNote,
 } from "@/components/forms/FlowUI";
 
+const GST_RATE = 0.05;
+
 function parseAges(raw: string | null, count: number) {
   if (!raw || count <= 0) return [] as number[];
   const parsed = raw
@@ -51,18 +53,17 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     [experience.transportPrice, experience.transportVehicles],
   );
   const minGuests = experience.minGuests ?? 1;
-  const initialChildren = Math.max(0, Number(search.get("children") ?? 0));
-  const fallbackGuests = Number(search.get("guests") ?? Math.max(minGuests, 2));
+  const initialChildren = Math.max(0, Number(search.get("children") || 0));
   const initialAdults = Math.max(
     1,
-    Number(search.get("adults") ?? Math.max(1, fallbackGuests - initialChildren)),
+    Number(search.get("adults") || Math.max(minGuests, 1)),
   );
 
   const [step, setStep] = useState(0);
-  const [slot, setSlot] = useState(search.get("slot") || slots[0]);
-  const [date, setDate] = useState(search.get("date") || daysFromNow(BOOKING_NOTICE_DAYS));
+  const [slot, setSlot] = useState(search.get("slot") || "");
+  const [date, setDate] = useState(search.get("date") || "");
   const [adults, setAdults] = useState(
-    Math.min(experience.maxGuests, Math.max(1, Number(search.get("adults") ?? initialAdults))),
+    Math.min(experience.maxGuests, Math.max(1, initialAdults)),
   );
   const [children, setChildren] = useState(
     Math.min(experience.maxGuests - 1, initialChildren),
@@ -70,10 +71,11 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const [childAges, setChildAges] = useState<number[]>(
     parseAges(search.get("childAges"), initialChildren),
   );
-  const [transportation, setTransportation] = useState(
-    search.get("transport") === "1" && Boolean(experience.transportAvailable),
+  const [transportation, setTransportation] = useState(search.get("transport") === "1");
+  const [vehicleId, setVehicleId] = useState<string>(search.get("vehicle") || "");
+  const [vehicleCount, setVehicleCount] = useState(
+    Math.max(1, Number(search.get("vehicles") || 1)),
   );
-  const [vehicleId, setVehicleId] = useState<string>(search.get("vehicle") || vehicles[0]?.id || "sedan");
   const [name, setName] = useState(profile?.name ?? "");
   const [email, setEmail] = useState(profile?.email ?? user?.email ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
@@ -87,23 +89,24 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   useEffect(() => {
     fetchClosuresForExperience(experience.slug).then(setClosures).catch(() => setClosures([]));
   }, [experience.slug]);
+
   const [done, setDone] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [booking, setBooking] = useState<BookingRecord | null>(null);
 
-  const requestMode =
-    search.get("request") === "1" || (date ? !isInstantBookingDate(date) : false);
+  const requestMode = date ? !isInstantBookingDate(date) : true;
 
-  const steps = requestMode
-    ? ["Details", "Contact", "Submit request"]
-    : ["Details", "Contact", "Pay"];
+  const steps = ["Details", "Contact"];
 
   const guests = adults + children;
-  const selectedVehicle = vehicles.find((v) => v.id === vehicleId) ?? vehicles[0];
-  const transportFee = transportation ? selectedVehicle?.price ?? 0 : 0;
+  const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
   const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
-  const total = guestSubtotal + transportFee;
+  const transportFee =
+    transportation && selectedVehicle ? selectedVehicle.price * vehicleCount : 0;
+  const subtotal = guestSubtotal + transportFee;
+  const gst = Math.round(subtotal * GST_RATE);
+  const gross = subtotal + gst;
 
   const syncChildren = (next: number) => {
     const capped = Math.min(next, Math.max(0, experience.maxGuests - adults));
@@ -123,11 +126,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
 
   const detailsReady =
     Boolean(date) &&
+    Boolean(slot) &&
     !dateIsClosed(date, closures, slot) &&
     guests >= minGuests &&
     guests <= experience.maxGuests &&
     (children === 0 || childAges.length === children) &&
     (!transportation || Boolean(vehicleId));
+
+  const contactReady = Boolean(name.trim() && phone.trim() && (!email.trim() || email.includes("@")));
 
   const persist = async () => {
     const result = await createBooking({
@@ -138,12 +144,12 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       children,
       childAges: children > 0 ? childAges : undefined,
       customerName: name,
-      customerEmail: email,
+      customerEmail: email.trim() || "not-provided@trismeghalaya.com",
       customerPhone: phone,
       uid: user?.uid,
       request: requestMode,
       transportation,
-      transportVehicle: transportation ? vehicleId : undefined,
+      transportVehicle: transportation && vehicleId ? vehicleId : undefined,
     });
     if (!result.ok) {
       setError(result.error);
@@ -154,17 +160,16 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   };
 
   const finishRequest = async () => {
+    if (!contactReady) return;
     setPaying(true);
     setError("");
     const rec = await persist();
     setPaying(false);
-    if (rec) {
-      setDone(true);
-      setStep(2);
-    }
+    if (rec) setDone(true);
   };
 
   const finishPay = async () => {
+    if (!contactReady) return;
     setPaying(true);
     setError("");
     try {
@@ -172,7 +177,6 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       if (!rec) return;
       await confirmPayment(rec.id);
       setDone(true);
-      setStep(2);
     } catch {
       setError("Payment simulation failed. Try again.");
     } finally {
@@ -187,18 +191,18 @@ export function BookingFlow({ experience }: { experience: Experience }) {
           <Check size={32} />
         </div>
         <h1 className="mt-6 font-display text-3xl text-primary">
-          {requestMode ? "Request received" : "Booking reserved"}
+          {requestMode ? "Enquiry received" : "Booking reserved"}
         </h1>
         <p className="mt-3 text-on-surface-variant">
           {requestMode ? (
             <>
-              Request for <strong>{experience.name}</strong> on {date}. Dates within{" "}
-              {BOOKING_NOTICE_DAYS} days need confirmation — ref {booking.id}.
+              Availability enquiry for <strong>{experience.name}</strong> on {date}. Dates within{" "}
+              {BOOKING_NOTICE_DAYS} days need confirmation — we&apos;ll contact you. Ref {booking.id}.
             </>
           ) : (
             <>
-              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Your
-              place is held — ref {booking.id}.
+              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Your place is
+              held — ref {booking.id}.
             </>
           )}
         </p>
@@ -215,10 +219,10 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   return (
     <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
       <FlowShell steps={steps} current={step}>
-        {requestMode && (
+        {date && requestMode && (
           <p className="mb-7 rounded-2xl border border-primary/25 bg-secondary-container/60 px-4 py-3 text-sm leading-relaxed text-secondary">
-            This date is within {BOOKING_NOTICE_DAYS} days — submit a request and we’ll confirm
-            availability.
+            This date is within {BOOKING_NOTICE_DAYS} days — use Enquire availability and we&apos;ll
+            confirm with you.
           </p>
         )}
 
@@ -227,11 +231,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
             <FlowHeading
               eyebrow="Trip details"
               title="Choose your date and travellers"
-              body="Tell us who is joining. Child ages and transport choices update your total automatically."
+              body="Pick a date 5+ days ahead to book online, or enquire for closer dates."
             />
 
             <div className="space-y-4">
-              <FieldGroup title="Date & travellers" body={`This experience hosts up to ${experience.maxGuests} guests.`}>
+              <FieldGroup
+                title="Date & travellers"
+                body={`This experience hosts up to ${experience.maxGuests} guests.`}
+              >
                 <div className="space-y-5">
                   <FormInput
                     label="Experience date"
@@ -242,28 +249,28 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     onChange={setDate}
                     required
                   />
-                <GuestCompositionFields
-                  adults={adults}
-                  children={children}
-                  childAges={childAges}
-                  maxGuests={experience.maxGuests}
-                  minGuests={minGuests}
-                  onAdults={syncAdults}
-                  onChildren={syncChildren}
-                  onChildAge={(index, age) =>
-                    setChildAges((prev) => prev.map((value, i) => (i === index ? age : value)))
-                  }
-                />
+                  <GuestCompositionFields
+                    adults={adults}
+                    children={children}
+                    childAges={childAges}
+                    maxGuests={experience.maxGuests}
+                    minGuests={minGuests}
+                    onAdults={syncAdults}
+                    onChildren={syncChildren}
+                    onChildAge={(index, age) =>
+                      setChildAges((prev) => prev.map((value, i) => (i === index ? age : value)))
+                    }
+                  />
                 </div>
               </FieldGroup>
 
-              <FieldGroup title="Start time" body="Unavailable times are disabled automatically.">
+              <FieldGroup title="Start time" body="Unavailable times are disabled.">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {slots.map((s) => (
                     <button
                       key={s}
                       type="button"
-                      disabled={dateIsClosed(date, closures, s)}
+                      disabled={!date || dateIsClosed(date, closures, s)}
                       onClick={() => setSlot(s)}
                       className={cn(
                         "rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:border-outline-variant/20 disabled:bg-surface-container disabled:text-on-surface-variant/40",
@@ -279,27 +286,40 @@ export function BookingFlow({ experience }: { experience: Experience }) {
               </FieldGroup>
 
               {experience.transportAvailable && (
-                <FieldGroup title="Getting there" body="Optional private transport can be added to this booking.">
+                <FieldGroup
+                  title="Getting there"
+                  body="Optional private transport — four vehicle types, same as our curated journeys."
+                >
                   <TransportVehicleFields
                     options={vehicles}
                     enabled={transportation}
                     vehicleId={vehicleId}
+                    vehicleCount={vehicleCount}
                     note={experience.transportNote}
-                    onEnabled={setTransportation}
+                    onEnabled={(v) => {
+                      setTransportation(v);
+                      if (!v) setVehicleId("");
+                    }}
                     onVehicle={setVehicleId}
+                    onVehicleCount={setVehicleCount}
                   />
                 </FieldGroup>
               )}
             </div>
 
-            {dateIsClosed(date, closures) && (
+            {date && dateIsClosed(date, closures) && (
               <p className="mt-4 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
                 This date is fully unavailable. Please choose another date.
               </p>
             )}
             <FlowActions>
               <SecureNote request={requestMode} />
-              <Button className="sm:ml-auto" size="lg" onClick={() => setStep(1)} disabled={!detailsReady}>
+              <Button
+                className="sm:ml-auto"
+                size="lg"
+                onClick={() => setStep(1)}
+                disabled={!detailsReady}
+              >
                 Continue to contact
               </Button>
             </FlowActions>
@@ -310,20 +330,28 @@ export function BookingFlow({ experience }: { experience: Experience }) {
           <div>
             <FlowHeading
               eyebrow="Contact details"
-              title="Where should we send your confirmation?"
-              body="We’ll only use these details for this booking and essential trip updates."
+              title="Where should we reach you?"
+              body="We’ll use these details for this booking and essential trip updates."
             />
             <FieldGroup title="Lead traveller">
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormInput className="sm:col-span-2" label="Full name" name="name" value={name} onChange={setName} required autoComplete="name" />
+                <FormInput
+                  className="sm:col-span-2"
+                  label="Full name"
+                  name="name"
+                  value={name}
+                  onChange={setName}
+                  required
+                  autoComplete="name"
+                />
                 <FormInput
                   label="Email address"
                   name="email"
                   type="email"
                   value={email}
                   onChange={setEmail}
-                  required
                   autoComplete="email"
+                  hint="Optional"
                 />
                 <FormInput
                   label="Mobile number"
@@ -336,57 +364,22 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 />
               </div>
             </FieldGroup>
+            {error && <p className="mt-3 text-sm text-primary">{error}</p>}
             <FlowActions>
               <Button variant="text" onClick={() => setStep(0)}>
                 Back
               </Button>
-              <Button size="lg" onClick={() => setStep(2)} disabled={!name || !email || !phone}>
-                {requestMode ? "Review request" : "Review booking"}
-              </Button>
-            </FlowActions>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <FlowHeading
-              eyebrow="Final check"
-              title={requestMode ? "Review your request" : "Review your booking"}
-              body="Please check the details below before continuing."
-            />
-            <div className="space-y-3 rounded-2xl border border-outline-variant/25 bg-surface-container-low/65 p-5 text-sm md:p-6">
-              <Row label="Experience" value={experience.name} />
-              <Row label="Date" value={date} />
-              <Row label="Time" value={slot} />
-              <Row label="Adults" value={String(adults)} />
-              {children > 0 && (
-                <Row
-                  label="Children"
-                  value={`${children} · ages ${childAges.join(", ")}`}
-                />
-              )}
-              {transportation && selectedVehicle && (
-                <Row
-                  label="Transportation"
-                  value={`${selectedVehicle.label} · ${formatINR(selectedVehicle.price)}`}
-                />
-              )}
-              <Row label="Guest name" value={name} />
-              <div className="border-t border-outline-variant/30 pt-3">
-                <Row label={requestMode ? "Estimated total" : "Total payable"} value={formatINR(total)} bold />
-              </div>
-            </div>
-            {error && <p className="mt-3 text-sm text-primary">{error}</p>}
-            <FlowActions>
-              <Button variant="text" onClick={() => setStep(1)}>
-                Back
-              </Button>
               {requestMode ? (
-                <Button size="lg" onClick={finishRequest} disabled={paying}>
-                  {paying ? "Submitting…" : "Submit request"}
+                <Button size="lg" onClick={() => void finishRequest()} disabled={paying || !contactReady}>
+                  {paying ? "Submitting…" : "Enquire availability"}
                 </Button>
               ) : (
-                <Button size="lg" onClick={finishPay} disabled={paying} className="gap-2">
+                <Button
+                  size="lg"
+                  onClick={() => void finishPay()}
+                  disabled={paying || !contactReady}
+                  className="gap-2"
+                >
                   <CreditCard size={16} />
                   {paying ? "Processing…" : "Confirm & pay"}
                 </Button>
@@ -397,26 +390,42 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       </FlowShell>
 
       <FlowSummary
-        eyebrow={requestMode ? "Request summary" : "Booking summary"}
+        eyebrow={requestMode ? "Enquiry summary" : "Booking summary"}
         title={experience.name}
         subtitle={`${experience.location} · ${experience.duration}`}
         footer={
-          <Link href={`/experiences/${experience.slug}`} className="text-sm font-semibold text-accent hover:underline">
+          <Link
+            href={`/experiences/${experience.slug}`}
+            className="text-sm font-semibold text-accent hover:underline"
+          >
             ← View experience details
           </Link>
         }
       >
         <div className="mt-6 space-y-2 text-sm">
+          {date ? <Row label="Date" value={date} /> : null}
+          {slot ? <Row label="Time" value={slot} /> : null}
           <Row label={`Adults × ${adults}`} value={formatINR(adultRate(experience) * adults)} />
           {children > 0 && (
-            <Row label={`Children × ${children}`} value={formatINR(childRate(experience) * children)} />
+            <Row
+              label={`Children × ${children}`}
+              value={formatINR(childRate(experience) * children)}
+            />
           )}
-          {transportation && selectedVehicle && (
-            <Row label={selectedVehicle.label} value={formatINR(selectedVehicle.price)} />
-          )}
-          <div className="mt-4 border-t border-outline-variant/25 pt-4">
-            <Row label={requestMode ? "Estimated total" : "Total"} value={formatINR(total)} bold />
+          {transportation && selectedVehicle ? (
+            <Row
+              label={`Transport · ${selectedVehicle.label}${vehicleCount > 1 ? ` × ${vehicleCount}` : ""}`}
+              value={formatINR(transportFee)}
+            />
+          ) : null}
+          <div className="mt-3 border-t border-outline-variant/25 pt-3">
+            <Row label="Subtotal" value={formatINR(subtotal)} />
+            <Row label="GST (5%)" value={formatINR(gst)} />
+            <div className="mt-2">
+              <Row label="Gross total" value={formatINR(gross)} bold />
+            </div>
           </div>
+          {name ? <Row label="Guest" value={name} /> : null}
         </div>
       </FlowSummary>
     </div>

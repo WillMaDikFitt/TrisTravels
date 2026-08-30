@@ -353,7 +353,9 @@ export function FormSuccess({
     <div
       className={cn(
         "flex items-center justify-center",
-        compact ? "py-4" : "min-h-[70vh] px-margin-mobile pt-header pb-20",
+        compact
+          ? "py-4"
+          : "px-6 pt-[calc(var(--header-offset)+2.5rem)] pb-14 sm:px-8 md:px-12 md:pt-[calc(var(--header-offset)+3.5rem)] md:pb-16",
       )}
     >
       <div
@@ -361,11 +363,11 @@ export function FormSuccess({
           "w-full text-center",
           compact
             ? "max-w-none py-2"
-            : "max-w-md rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-8 shadow-ambient md:p-10",
+            : "max-w-lg rounded-[1.75rem] border border-outline-variant/25 bg-surface-container-lowest px-7 py-9 shadow-ambient sm:px-10 sm:py-10 md:px-12 md:py-11",
         )}
       >
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-primary">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-primary">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M5 12.5l4.5 4.5L19 7.5"
               stroke="currentColor"
@@ -375,9 +377,17 @@ export function FormSuccess({
             />
           </svg>
         </div>
-        <h1 className="mt-6 font-display text-3xl text-primary">{title}</h1>
-        <p className="mt-3 text-on-surface-variant">{body}</p>
-        {children ? <div className="mt-8">{children}</div> : null}
+        <h1 className="mt-5 font-display text-[1.85rem] leading-tight text-primary md:mt-6 md:text-3xl">
+          {title}
+        </h1>
+        <p className="mx-auto mt-3 max-w-sm text-[0.95rem] leading-relaxed text-on-surface-variant md:mt-3.5 md:text-base">
+          {body}
+        </p>
+        {children ? (
+          <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
+            {children}
+          </div>
+        ) : null}
       </div>
     </div>
   );

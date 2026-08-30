@@ -304,7 +304,7 @@ export const FIXED_LISTING_INTRO = {
     "Our fixed departure tours are more than just set schedule. They're thoughtfully crafted group experiences — some made especially for women, others for seasonal festivals or themed adventures.",
     "You'll join a small group of like-hearted travelers, discover Meghalaya through local stories, and enjoy the comfort of a well-planned itinerary — all without the stress of planning it yourself.",
   ],
-  closing: "Just show up with your curiosity — we'll handle the rest.",
+  closing: "Just show up with your curiosity —\nwe'll handle the rest.",
   whyTitle: "Why You'll Love Fixed Departures",
   why: [
     { title: "Just Show Up", body: "Dates, stays, and plans? Already sorted", icon: "calendar" },

@@ -2,7 +2,7 @@
 
 import { Check, Minus, Plus, UsersRound, CarFront } from "lucide-react";
 import { FormInput } from "@/components/ui/Form";
-import { formatINR, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { TransportVehicleOption } from "@/data/transport";
 
 type GuestFieldsProps = {
@@ -41,7 +41,7 @@ function Counter({
         compact ? "gap-2 p-2.5" : "p-4",
       )}
     >
-      <div className={cn("min-w-0 flex items-center", compact ? "gap-1.5" : "gap-3")}>
+      <div className={cn("flex min-w-0 items-center", compact ? "gap-1.5" : "gap-3")}>
         {!compact && (
           <span className="grid h-10 w-10 place-items-center rounded-full bg-secondary-container text-primary">
             <UsersRound size={17} />
@@ -49,7 +49,12 @@ function Counter({
         )}
         <div className="min-w-0">
           <p className={cn("font-semibold text-primary", compact ? "text-xs" : "text-sm")}>{label}</p>
-          <p className={cn("text-on-surface-variant", compact ? "mt-0 text-[10px] leading-tight" : "mt-0.5 text-[11px]")}>
+          <p
+            className={cn(
+              "text-on-surface-variant",
+              compact ? "mt-0 text-[10px] leading-tight" : "mt-0.5 text-[11px]",
+            )}
+          >
             {note}
           </p>
         </div>
@@ -148,9 +153,11 @@ type TransportFieldsProps = {
   options: TransportVehicleOption[];
   enabled: boolean;
   vehicleId: string;
+  vehicleCount?: number;
   note?: string;
   onEnabled: (v: boolean) => void;
   onVehicle: (id: string) => void;
+  onVehicleCount?: (n: number) => void;
   compact?: boolean;
 };
 
@@ -158,13 +165,13 @@ export function TransportVehicleFields({
   options,
   enabled,
   vehicleId,
+  vehicleCount = 1,
   note,
   onEnabled,
   onVehicle,
+  onVehicleCount,
   compact,
 }: TransportFieldsProps) {
-  const selected = options.find((o) => o.id === vehicleId) ?? options[0];
-
   return (
     <div className={cn("space-y-2", !compact && "space-y-3")}>
       <label
@@ -185,7 +192,7 @@ export function TransportVehicleFields({
         <span className="min-w-0 flex-1">
           <span className="font-medium">Add transportation</span>
           <span className="mt-0.5 block text-xs text-on-surface-variant">
-            Choose a vehicle — price updates with your selection
+            Choose a vehicle type for your group
             {note ? ` · ${note}` : ""}
           </span>
         </span>
@@ -223,7 +230,9 @@ export function TransportVehicleFields({
                   )}
                 >
                   <p className="text-xs font-semibold">{option.label}</p>
-                  <p className="mt-0.5 text-[10px] text-on-surface-variant">{formatINR(option.price)}</p>
+                  <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-on-surface-variant">
+                    {option.seats}
+                  </p>
                 </button>
               );
             })}
@@ -256,15 +265,40 @@ export function TransportVehicleFields({
                   </span>
                   <p className="text-sm font-semibold">{option.label}</p>
                   <p className="mt-0.5 text-xs text-on-surface-variant">{option.seats}</p>
-                  <p className="mt-3 font-display text-lg">{formatINR(option.price)}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                    {option.summary}
+                  </p>
                 </button>
               );
             })}
           </div>
         ))}
 
-      {enabled && compact && selected ? (
-        <p className="text-[10px] text-on-surface-variant">{selected.seats}</p>
+      {enabled && onVehicleCount ? (
+        <div className="flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3">
+          <span className="text-sm font-medium text-primary">Number of vehicles</span>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              aria-label="Fewer vehicles"
+              disabled={vehicleCount <= 1}
+              onClick={() => onVehicleCount(vehicleCount - 1)}
+              className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+            >
+              <Minus size={14} />
+            </button>
+            <span className="w-5 text-center text-sm font-bold text-primary">{vehicleCount}</span>
+            <button
+              type="button"
+              aria-label="More vehicles"
+              disabled={vehicleCount >= 10}
+              onClick={() => onVehicleCount(vehicleCount + 1)}
+              className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+        </div>
       ) : null}
     </div>
   );

@@ -88,27 +88,29 @@ export default async function AboutPage() {
 
   return (
     <div className="bg-surface text-foreground">
-      {/* Hero — brand + portrait as one composition */}
-      <section className="relative min-h-[min(88vh,52rem)] overflow-hidden pt-header">
+      {/* Hero — shorter, left fade only */}
+      <section className="relative min-h-[min(58vh,28rem)] overflow-hidden pt-header md:min-h-[min(62vh,32rem)]">
         <Image
           src={media.aboutPortrait}
           alt="Mei-ieid — the heart behind TRIS"
           fill
           priority
-          className="object-cover object-[center_28%]"
+          className="rounded-none object-cover object-[center_28%] md:rounded-none"
           sizes="100vw"
           quality={92}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#364037]/95 via-[#364037]/55 to-[#364037]/25" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#364037]/75 via-[#364037]/25 to-transparent" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-[#364037]/88 via-[#364037]/45 to-transparent"
+        />
 
-        <div className="relative mx-auto flex min-h-[min(88vh,52rem)] w-full max-w-container-max items-end px-margin-mobile pb-14 md:px-margin-desktop md:pb-20">
+        <div className="relative mx-auto flex min-h-[min(58vh,28rem)] w-full max-w-container-max items-end px-margin-mobile pb-10 md:min-h-[min(62vh,32rem)] md:px-margin-desktop md:pb-14">
           <FadeIn className="max-w-xl text-white">
             <p className="label-caps text-highlight">Our story</p>
             <h1
               className={cn(
                 serif,
-                "mt-4 text-[clamp(2.6rem,5vw,4.25rem)] leading-[1.05] font-medium text-balance",
+                "mt-3 text-[clamp(2.25rem,4.5vw,3.75rem)] leading-[1.05] font-medium text-balance",
               )}
             >
               At the soul of TRIS Travels
@@ -116,7 +118,7 @@ export default async function AboutPage() {
             <p
               className={cn(
                 serif,
-                "mt-4 text-[clamp(1.25rem,2.5vw,1.75rem)] leading-snug text-white/85 italic",
+                "mt-3 text-[clamp(1.15rem,2.2vw,1.55rem)] leading-snug text-white/85 italic",
               )}
             >
               is Mei-ieid, my grandmother.
@@ -125,17 +127,17 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Story narrative */}
-      <section className="mx-auto w-full max-w-container-max space-y-20 px-margin-mobile py-16 md:space-y-28 md:px-margin-desktop md:py-24">
+      {/* Story narrative — tighter gaps, rounded images */}
+      <section className="mx-auto w-full max-w-container-max space-y-12 px-margin-mobile py-12 md:space-y-16 md:px-margin-desktop md:py-16">
         {storyMoments.map((moment) => (
           <div
             key={moment.alt}
             className={cn(
-              "grid items-center gap-8 md:grid-cols-12 md:gap-12 lg:gap-16",
+              "grid items-center gap-6 md:grid-cols-12 md:gap-10 lg:gap-12",
               moment.flip && "md:[&>*:first-child]:order-2",
             )}
           >
-            <div className="relative aspect-[16/11] overflow-hidden md:col-span-7">
+            <div className="relative aspect-[16/11] overflow-hidden rounded-2xl md:col-span-7">
               <Image
                 src={moment.image}
                 alt={moment.alt}
@@ -158,7 +160,9 @@ export default async function AboutPage() {
               <p
                 className={cn(
                   "leading-[1.75] text-on-surface-variant",
-                  moment.lead ? "mt-4 text-[0.95rem] md:text-base" : cn(serif, "text-[1.2rem] leading-snug text-primary md:text-[1.35rem]"),
+                  moment.lead
+                    ? "mt-4 text-[0.95rem] md:text-base"
+                    : cn(serif, "text-[1.2rem] leading-snug text-primary md:text-[1.35rem]"),
                 )}
               >
                 {moment.body}
@@ -169,9 +173,9 @@ export default async function AboutPage() {
       </section>
 
       {/* Ways we travel */}
-      <section className="border-y border-outline-variant/25 bg-surface-container-lowest/60 px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+      <section className="border-y border-outline-variant/25 bg-surface-container-lowest/60 px-margin-mobile py-14 md:px-margin-desktop md:py-16">
         <div className="mx-auto w-full max-w-container-max">
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-end">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-14">
             <div className="lg:col-span-5">
               <p className="label-caps text-highlight">How we travel</p>
               <p
@@ -195,7 +199,7 @@ export default async function AboutPage() {
             </ul>
           </div>
 
-          <div className="mt-14 grid gap-10 border-t border-outline-variant/30 pt-12 md:grid-cols-3 md:gap-8">
+          <div className="mt-12 grid gap-10 border-t border-outline-variant/30 pt-10 md:grid-cols-3 md:gap-8">
             {heartbeat.map(({ text, Icon, ...rest }) => (
               <div
                 key={text}
@@ -221,8 +225,8 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Our values — filmstrip guideposts */}
-      <section className="relative overflow-hidden px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+      {/* Our values — one connected composition */}
+      <section className="relative overflow-hidden px-margin-mobile py-14 md:px-margin-desktop md:py-20">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.5]"
@@ -234,81 +238,77 @@ export default async function AboutPage() {
 
         <div className="relative mx-auto w-full max-w-container-max">
           <div className="ink-rule" />
-          <div className="mt-5 grid gap-6 md:grid-cols-12 md:items-end md:gap-10">
-            <div className="md:col-span-7">
-              <p className="label-caps text-highlight">Our values</p>
-              <h2
-                className={cn(
-                  serif,
-                  "mt-3 text-[clamp(1.9rem,3.5vw,2.85rem)] leading-tight font-medium text-primary",
-                )}
-              >
-                What guides the way we travel
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm leading-relaxed text-on-surface-variant md:col-span-5 md:justify-self-end md:text-right">
-              Three commitments we return to on every route we craft — with hosts, guides, and guests alike.
+          <div className="mt-5 max-w-2xl">
+            <p className="label-caps text-highlight">Our values</p>
+            <h2
+              className={cn(
+                serif,
+                "mt-3 text-[clamp(1.9rem,3.5vw,2.85rem)] leading-tight font-medium text-primary",
+              )}
+            >
+              What guides the way we travel
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-on-surface-variant md:text-base">
+              Three commitments we return to on every route — read as one guide, not three separate cards.
             </p>
           </div>
 
-          {/* Continuous photo strip */}
-          <StaggerChildren className="mt-12 grid gap-3 sm:grid-cols-3 sm:gap-2 md:mt-16 md:gap-3">
-            {values.map((value) => (
-              <StaggerItem key={value.n} className="group relative">
-                <div className="relative aspect-[4/5] overflow-hidden sm:aspect-[3/4]">
-                  <Image
-                    src={value.image}
-                    alt={value.title}
-                    fill
-                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
-                    sizes="(max-width:640px) 100vw, 33vw"
-                    quality={88}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#364037]/80 via-[#364037]/15 to-transparent" />
-                  <p
-                    className={cn(
-                      serif,
-                      "absolute bottom-4 left-4 text-[3.25rem] leading-none text-white/25 md:bottom-5 md:left-5 md:text-[3.75rem]",
-                    )}
-                    aria-hidden
-                  >
-                    {value.n}
-                  </p>
-                </div>
+          <StaggerChildren className="mt-10 overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_36px_rgba(54,64,55,0.06)] md:mt-12">
+            {values.map((value, index) => (
+              <StaggerItem key={value.n}>
+                <article
+                  className={cn(
+                    "grid gap-0 md:grid-cols-12",
+                    index > 0 && "border-t border-outline-variant/25",
+                  )}
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden md:col-span-5 md:aspect-auto md:min-h-[14rem]">
+                    <Image
+                      src={value.image}
+                      alt={value.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width:768px) 100vw, 42vw"
+                      quality={88}
+                    />
+                    <p
+                      className={cn(
+                        serif,
+                        "absolute bottom-3 left-3 text-4xl leading-none text-white/35 md:bottom-4 md:left-4",
+                      )}
+                      aria-hidden
+                    >
+                      {value.n}
+                    </p>
+                  </div>
+                  <div className="flex flex-col justify-center px-5 py-5 md:col-span-7 md:px-8 md:py-7">
+                    <p className="text-[11px] font-bold tracking-[0.16em] text-highlight uppercase">
+                      {value.n}
+                    </p>
+                    <h3
+                      className={cn(
+                        serif,
+                        "mt-2 text-[1.35rem] leading-tight text-primary md:text-[1.55rem]",
+                      )}
+                    >
+                      {value.title}
+                    </h3>
+                    <p className={cn(serif, "mt-1.5 text-[0.95rem] leading-snug text-primary/75 italic")}>
+                      {value.tagline}
+                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-on-surface-variant md:text-[0.95rem]">
+                      {value.body}
+                    </p>
+                  </div>
+                </article>
               </StaggerItem>
             ))}
           </StaggerChildren>
-
-          {/* Aligned manifesto under each frame */}
-          <div className="mt-8 grid gap-10 border-t border-outline-variant/30 pt-8 sm:grid-cols-3 sm:gap-6 md:mt-10 md:gap-8 md:pt-10">
-            {values.map((value) => (
-              <article key={value.title} className="flex flex-col">
-                <p className="text-[11px] font-bold tracking-[0.16em] text-highlight uppercase">
-                  {value.n}
-                </p>
-                <h3
-                  className={cn(
-                    serif,
-                    "mt-3 text-[1.45rem] leading-tight text-primary md:text-[1.65rem]",
-                  )}
-                >
-                  {value.title}
-                </h3>
-                <p className={cn(serif, "mt-2 text-[0.95rem] leading-snug text-primary/75 italic")}>
-                  {value.tagline}
-                </p>
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-on-surface-variant md:text-[0.95rem]">
-                  {value.body}
-                </p>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* Our impact */}
       {impact.length > 0 ? (
-        <section className="border-t border-outline-variant/25 bg-primary-container px-margin-mobile py-16 text-on-primary-container md:px-margin-desktop md:py-20">
+        <section className="border-t border-outline-variant/25 bg-primary-container px-margin-mobile py-14 text-on-primary-container md:px-margin-desktop md:py-16">
           <div className="mx-auto w-full max-w-container-max">
             <p className="label-caps text-highlight">Our impact</p>
             <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -325,7 +325,7 @@ export default async function AboutPage() {
               </p>
             </div>
 
-            <dl className="mt-12 grid gap-x-8 gap-y-10 border-t border-on-primary-container/15 pt-10 sm:grid-cols-2 lg:grid-cols-5">
+            <dl className="mt-10 grid gap-x-8 gap-y-8 border-t border-on-primary-container/15 pt-8 sm:grid-cols-2 lg:grid-cols-5">
               {impact.map((stat) => (
                 <div key={stat.id}>
                   <dt className="sr-only">{stat.label}</dt>
@@ -349,6 +349,7 @@ export default async function AboutPage() {
 
       <CtaBand
         tone="light"
+        className="py-10 md:py-12"
         eyebrow="Travel with us"
         title="Experience the unseen"
         body="Book a day in the hills — or partner with TRIS if you host, guide, or run a stay."

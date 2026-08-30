@@ -24,6 +24,7 @@ import {
   PACKAGE_TRANSPORT,
   packageTransportMeta,
   STAY_STYLES,
+  BOOKING_STAY_STYLE_IDS,
   stayStyleMeta,
   type PackageTransportId,
   type StayStyleId,
@@ -113,7 +114,10 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
     [],
   );
   const stayOptions = useMemo(
-    () => STAY_STYLES.map((s) => ({ value: s.id, label: s.label })),
+    () =>
+      STAY_STYLES.filter((s) =>
+        (BOOKING_STAY_STYLE_IDS as readonly string[]).includes(s.id),
+      ).map((s) => ({ value: s.id, label: s.label })),
     [],
   );
 

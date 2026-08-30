@@ -87,9 +87,9 @@ export function DestinationsPageClient({ items }: { items: Destination[] }) {
             mode="mount"
             className="grid items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3"
           >
-            {filtered.map((d) => (
+            {filtered.map((d, i) => (
               <StaggerItem key={d.slug} className="h-full">
-                <DestinationCard destination={d} />
+                <DestinationCard destination={d} index={i} />
               </StaggerItem>
             ))}
           </StaggerChildren>

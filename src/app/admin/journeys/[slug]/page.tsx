@@ -17,7 +17,8 @@ import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
-import { formatDepartureSeats, parseDepartureSeats, seatsLeft } from "@/lib/journey-seats";
+import { parseDepartureSeats } from "@/lib/journey-seats";
+import { DepartureSeatsCalendar } from "@/components/admin/DepartureSeatsCalendar";
 import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 function blank(): Journey {
@@ -191,7 +192,19 @@ export default function JourneyEditorPage() {
             groupSize: String(fd.get("groupSize") || ""),
             itinerary,
             status: String(fd.get("status") || "active") as Journey["status"],
+            paymentLink: String(fd.get("paymentLink") || "").trim() || undefined,
           };
+          // Prefer earliest calendar date as next-departure label when blank
+          if (!next.nextDeparture && next.departureSeats?.length) {
+            const soonest = [...next.departureSeats].sort((a, b) => a.date.localeCompare(b.date))[0];
+            if (soonest) {
+              next.nextDeparture = new Date(`${soonest.date}T12:00:00`).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              });
+            }
+          }
           setBusy(true);
           const res = await saveDocument("journeys", nextSlug, next as unknown as Record<string, unknown>);
           setBusy(false);
@@ -206,7 +219,18 @@ export default function JourneyEditorPage() {
               <input name="name" required defaultValue={row.name} className={inputClass} />
             </Field>
             <Field label="Type">
-              <select name="type" defaultValue={row.type} className={inputClass}>
+              <select
+                name="type"
+                value={row.type}
+                onChange={(e) =>
+                  setRow((prev) =>
+                    prev
+                      ? { ...prev, type: e.target.value as Journey["type"] }
+                      : prev,
+                  )
+                }
+                className={inputClass}
+              >
                 <option value="curated">Curated (Book now + Customise)</option>
                 <option value="small-group">Small group (fixed departure)</option>
               </select>
@@ -245,9 +269,23 @@ export default function JourneyEditorPage() {
             <Field label="Next departure label" hint="shown on public cards">
               <input name="nextDeparture" defaultValue={row.nextDeparture ?? ""} className={inputClass} />
             </Field>
-            <Field label="Simple departure dates" hint="comma-separated, for public cards">
-              <input name="departures" defaultValue={(row.departures ?? []).join(", ")} className={inputClass} />
+            <Field
+              label="Payment link / raise payment"
+              hint="Paste a Razorpay payment link (or UPI/bank URL). Shown as Pay now on the journey page and after Reserve my seat."
+            >
+              <input
+                name="paymentLink"
+                type="url"
+                placeholder="https://razorpay.me/… or payment page URL"
+                defaultValue={row.paymentLink ?? ""}
+                className={inputClass}
+              />
             </Field>
+            {row.type !== "small-group" ? (
+              <Field label="Simple departure dates" hint="comma-separated, for public cards">
+                <input name="departures" defaultValue={(row.departures ?? []).join(", ")} className={inputClass} />
+              </Field>
+            ) : null}
           </div>
           <div className="mt-6 border-t border-[#e4dfd4] pt-5">
             <h3 className="font-display text-base text-[#2a2e1f]">Transportation</h3>
@@ -391,33 +429,20 @@ export default function JourneyEditorPage() {
               </div>
             </div>
           )}
-          <div className="mt-4">
-            <Field
-              label="Seat tracking (small group)"
-              hint="One departure per line: date|total seats|held|booked|optional note"
-            >
-              <textarea
-                name="departureSeats"
-                rows={6}
-                defaultValue={formatDepartureSeats(row.departureSeats)}
-                placeholder={"2026-09-12|10|1|4|Guwahati start"}
-                className={inputClass}
-              />
-            </Field>
-            {(row.departureSeats?.length ?? 0) > 0 && (
-              <ul className="mt-3 space-y-1 text-sm text-[#5c6350]">
-                {row.departureSeats!.map((d) => (
-                  <li key={d.date}>
-                    {d.date}: {seatsLeft(d)} seats left
-                    <span className="text-[#8a917c]">
-                      {" "}
-                      ({d.booked} booked · {d.held} held · {d.seats} total)
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {row.type === "small-group" ? (
+            <div className="mt-6 border-t border-[#e4dfd4] pt-5">
+              <h3 className="font-display text-base text-[#2a2e1f]">Fixed departure calendar</h3>
+              <p className="mt-1 text-sm text-[#5c6350]">
+                Select multiple departure days on the calendar. Set seats, held, and booked for each date.
+              </p>
+              <div className="mt-4">
+                <DepartureSeatsCalendar
+                  key={`${row.slug}-${(row.departureSeats ?? []).map((d) => d.date).join(",")}`}
+                  initial={row.departureSeats}
+                />
+              </div>
+            </div>
+          ) : null}
         </Panel>
         <Panel>
           <Field label="Overview">

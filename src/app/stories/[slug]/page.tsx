@@ -66,12 +66,6 @@ export default async function StoryPage({ params }: Props) {
             quality={90}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-black/25" />
-          <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-5 md:px-margin-desktop md:pb-6">
-            <div className="mx-auto flex max-w-container-max items-end justify-between gap-4">
-              <p className="label-caps text-white/90 drop-shadow-sm">Journal</p>
-              <p className="label-caps text-white/70 drop-shadow-sm">{story.category}</p>
-            </div>
-          </div>
         </div>
       </header>
 

@@ -29,6 +29,7 @@ import {
   type PackageTransportId,
   type StayStyleId,
 } from "@/data/journey-options";
+import { site } from "@/data/site";
 import { cn, daysFromNow } from "@/lib/utils";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 
@@ -58,6 +59,13 @@ const STAY_FEATURES = [
   { icon: HeartHandshake, label: "Community-First stays" },
 ] as const;
 
+const SUMMARY_POINTS = [
+  "Choose your preferred dates, transport type, stay preference, and what you’d love to include.",
+  "We design a personalised Meghalaya journey around your pace, interests, and budget.",
+  "Transparent planning — we confirm stays, routes, and inclusions before you travel.",
+  "Community-rooted experiences that leave hosts stronger and you with a deeper connection.",
+] as const;
+
 type FormState = {
   name: string;
   email: string;
@@ -70,14 +78,9 @@ type FormState = {
   food: string;
   include: string;
   budgetPerPerson: string;
+  notSuitableFor: string;
   notes: string;
 };
-
-function addDays(iso: string, days: number) {
-  const d = new Date(`${iso}T12:00:00`);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
-}
 
 function PillRow({
   label,
@@ -128,39 +131,42 @@ export default function CraftMyJourneyPage() {
   const [sending, setSending] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
   const [learnTab, setLearnTab] = useState<PackageLearnTab>("stay");
-  const [vehicleId, setVehicleId] = useState<PackageTransportId>("sedan");
-  const [stayStyle, setStayStyle] = useState<StayStyleId>("barefoot");
-  const [form, setForm] = useState<FormState>(() => {
-    const start = daysFromNow(7);
-    return {
-      name: "",
-      email: "",
-      phone: "",
-      adults: "2",
-      children: "0",
-      childAges: "",
-      start,
-      end: addDays(start, 5),
-      food: "No preference",
-      include: "",
-      budgetPerPerson: "",
-      notes: "",
-    };
+  const [vehicleId, setVehicleId] = useState<PackageTransportId | "">("");
+  const [stayStyle, setStayStyle] = useState<StayStyleId | "">("");
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    phone: "",
+    adults: "",
+    children: "",
+    childAges: "",
+    start: "",
+    end: "",
+    food: "",
+    include: "",
+    budgetPerPerson: "",
+    notSuitableFor: "",
+    notes: "",
   });
 
-  const transportMeta = packageTransportMeta(vehicleId);
-  const stayMeta = stayStyleMeta(stayStyle);
+  const transportMeta = vehicleId ? packageTransportMeta(vehicleId) : null;
+  const stayMeta = stayStyle ? stayStyleMeta(stayStyle) : null;
 
   const transportOptions = useMemo(
-    () =>
-      PACKAGE_TRANSPORT.map((t) => ({
+    () => [
+      { value: "", label: "Select vehicle type" },
+      ...PACKAGE_TRANSPORT.map((t) => ({
         value: t.id,
         label: `${t.label} (Max ${t.maxGuests})`,
       })),
+    ],
     [],
   );
   const stayOptions = useMemo(
-    () => STAY_STYLES.map((s) => ({ value: s.id, label: s.label })),
+    () => [
+      { value: "", label: "Select stay style" },
+      ...STAY_STYLES.map((s) => ({ value: s.id, label: s.label })),
+    ],
     [],
   );
 
@@ -170,25 +176,31 @@ export default function CraftMyJourneyPage() {
 
   const step0Valid =
     Boolean(form.name.trim()) &&
-    form.email.trim().includes("@") &&
     form.phone.trim().length >= 8 &&
     Number(form.adults) > 0 &&
     Number(form.children) >= 0 &&
-    (Number(form.children) === 0 || Boolean(form.childAges.trim()));
+    (Number(form.children) === 0 || Boolean(form.childAges.trim())) &&
+    (!form.email.trim() || form.email.trim().includes("@"));
 
-  const step1Valid = Boolean(form.start && form.end && form.end >= form.start && vehicleId && stayStyle);
+  const step1Valid = Boolean(
+    form.start &&
+      form.end &&
+      form.end >= form.start &&
+      vehicleId &&
+      stayStyle,
+  );
 
   const canSubmit = step0Valid && step1Valid;
 
   async function handleSubmit() {
-    if (!canSubmit || sending) return;
+    if (!canSubmit || sending || !vehicleId || !stayStyle || !transportMeta || !stayMeta) return;
     setSending(true);
     setSubmitError("");
     try {
       const res = await submitEnquiry({
         source: "craft-my-journey",
         name: form.name,
-        email: form.email,
+        email: form.email.trim(),
         phone: form.phone,
         message: form.include || form.notes || "Craft My Journey brief",
         payload: {
@@ -201,15 +213,17 @@ export default function CraftMyJourneyPage() {
           vehicleLabel: transportMeta.label,
           stayStyle,
           stayLabel: stayMeta.label,
-          food: form.food,
-          include: form.include,
-          budgetPerPerson: form.budgetPerPerson,
-          notes: form.notes,
+          food: form.food || "No preference",
+          include: form.include || "",
+          budgetPerPerson: form.budgetPerPerson || "",
+          notSuitableFor: form.notSuitableFor || "",
+          notes: form.notes || "",
         },
       });
       if (!res.ok) setSubmitError(res.error);
       else setSent(true);
-    } catch {
+    } catch (err) {
+      console.error("craft submit:", err);
       setSubmitError("Could not send. Try again.");
     } finally {
       setSending(false);
@@ -223,12 +237,17 @@ export default function CraftMyJourneyPage() {
           title="Request received"
           body="A TRIS planner will review your enquiry and follow up personally — usually within 1–2 working days."
         >
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button href="/journeys?type=curated">Browse curated journeys</Button>
-            <Button href="/" variant="ghost">
-              Back home
+          {site.craftPaymentLink ? (
+            <Button href={site.craftPaymentLink} size="lg">
+              Pay planning deposit (Razorpay)
             </Button>
-          </div>
+          ) : null}
+          <Button href="/journeys?type=curated" size="lg">
+            Browse curated journeys
+          </Button>
+          <Button href="/" variant="ghost" size="lg">
+            Back home
+          </Button>
         </FormSuccess>
       </div>
     );
@@ -236,7 +255,7 @@ export default function CraftMyJourneyPage() {
 
   return (
     <div className="bg-surface text-foreground">
-      <section className="border-b border-outline-variant/25 bg-primary-container px-margin-mobile pt-[calc(var(--header-offset)+2.75rem)] pb-14 text-on-primary-container md:px-margin-desktop md:pb-16">
+      <section className="border-b border-outline-variant/25 bg-primary-container px-margin-mobile pt-[calc(var(--header-offset)+2.75rem)] pb-10 text-on-primary-container md:px-margin-desktop md:pb-12">
         <div className="mx-auto w-full max-w-container-max text-center">
           <h1 className="font-[family-name:var(--font-playfair)] text-4xl tracking-tight md:text-5xl lg:text-[3.4rem]">
             Craft my journey.
@@ -245,13 +264,13 @@ export default function CraftMyJourneyPage() {
             It&apos;s as easy as 1, 2, 3!
           </p>
 
-          <ol className="mx-auto mt-10 grid max-w-5xl gap-6 text-left md:grid-cols-3 md:gap-8">
+          <ol className="mx-auto mt-8 grid max-w-5xl gap-5 text-center md:grid-cols-3 md:gap-8">
             {INTRO_STEPS.map((item) => (
-              <li key={item.n} className="flex gap-4 md:flex-col md:gap-3">
+              <li key={item.n} className="flex flex-col items-center gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-highlight text-sm font-bold text-on-highlight">
                   {item.n}
                 </span>
-                <div>
+                <div className="max-w-xs">
                   <p className="text-[11px] font-bold tracking-[0.14em] text-highlight uppercase">
                     Step {item.n}
                   </p>
@@ -263,7 +282,25 @@ export default function CraftMyJourneyPage() {
             ))}
           </ol>
 
-          <Button href="#craft-form" className="mt-10" size="lg">
+          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-white/15 bg-white/5 px-5 py-5 text-left md:px-7 md:py-6">
+            <p className="label-caps text-highlight">Summary</p>
+            <p className="mt-2 font-[family-name:var(--font-playfair)] text-xl text-on-primary-container md:text-2xl">
+              Short on time? We shape the journey — you choose the details.
+            </p>
+            <ul className="mt-4 space-y-2.5">
+              {SUMMARY_POINTS.map((point) => (
+                <li
+                  key={point}
+                  className="flex gap-2.5 text-sm leading-relaxed text-on-primary-container/85"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-highlight" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Button href="#craft-form" className="mt-8" size="lg">
             Craft my journey
           </Button>
         </div>
@@ -271,7 +308,7 @@ export default function CraftMyJourneyPage() {
 
       <section
         id="craft-form"
-        className="scroll-mt-header mx-auto w-full max-w-6xl px-margin-mobile py-14 md:px-margin-desktop md:py-20"
+        className="scroll-mt-header mx-auto w-full max-w-6xl px-margin-mobile py-10 md:px-margin-desktop md:py-14"
       >
         <FadeIn>
           <FlowShell steps={[...FLOW_STEPS]} current={step}>
@@ -299,11 +336,11 @@ export default function CraftMyJourneyPage() {
                         label="Email"
                         name="email"
                         type="email"
-                        required
                         autoComplete="email"
                         placeholder="you@email.com"
                         value={form.email}
                         onChange={(v) => setField("email", v)}
+                        hint="Optional"
                       />
                       <FormInput
                         label="Mobile / WhatsApp"
@@ -323,20 +360,22 @@ export default function CraftMyJourneyPage() {
                       <FormInput
                         label="Adults"
                         name="adults"
-                        type="number"
-                        min={1}
+                        type="text"
+                        inputMode="numeric"
                         required
+                        placeholder="e.g. 2"
                         value={form.adults}
-                        onChange={(v) => setField("adults", v)}
+                        onChange={(v) => setField("adults", v.replace(/[^\d]/g, ""))}
                       />
                       <FormInput
                         label="Children"
                         name="children"
-                        type="number"
-                        min={0}
+                        type="text"
+                        inputMode="numeric"
                         required
+                        placeholder="e.g. 0"
                         value={form.children}
-                        onChange={(v) => setField("children", v)}
+                        onChange={(v) => setField("children", v.replace(/[^\d]/g, ""))}
                       />
                     </div>
                     {Number(form.children) > 0 ? (
@@ -368,7 +407,7 @@ export default function CraftMyJourneyPage() {
                 <FlowHeading
                   eyebrow="Step 2 of 3"
                   title="Shape the trip"
-                  body="Dates, transport, and stay style — same choices as our curated journeys."
+                  body="Dates, transport, and stay style — choose what fits you."
                 />
                 <div className="space-y-4">
                   <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
@@ -385,7 +424,7 @@ export default function CraftMyJourneyPage() {
                             setForm((prev) => ({
                               ...prev,
                               start: v,
-                              end: prev.end < v ? addDays(v, 3) : prev.end,
+                              end: prev.end && prev.end < v ? v : prev.end,
                             }));
                           }}
                         />
@@ -419,31 +458,33 @@ export default function CraftMyJourneyPage() {
                         required
                         options={transportOptions}
                         value={vehicleId}
-                        onChange={(v) => setVehicleId(v as PackageTransportId)}
+                        onChange={(v) => setVehicleId(v as PackageTransportId | "")}
                       />
 
-                      <div className="mt-4 flex gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-3">
-                        <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-surface-container">
-                          <Image
-                            src={transportMeta.images[0]}
-                            alt=""
-                            fill
-                            className="object-cover"
-                            sizes="112px"
-                          />
+                      {transportMeta ? (
+                        <div className="mt-4 flex gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-3">
+                          <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-surface-container">
+                            <Image
+                              src={transportMeta.images[0]}
+                              alt=""
+                              fill
+                              className="object-cover"
+                              sizes="112px"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-primary">
+                              {transportMeta.label}{" "}
+                              <span className="font-normal text-on-surface-variant">
+                                · Max {transportMeta.maxGuests}
+                              </span>
+                            </p>
+                            <p className="mt-1 line-clamp-2 text-sm text-on-surface-variant">
+                              {transportMeta.summary}
+                            </p>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-primary">
-                            {transportMeta.label}{" "}
-                            <span className="font-normal text-on-surface-variant">
-                              · Max {transportMeta.maxGuests}
-                            </span>
-                          </p>
-                          <p className="mt-1 line-clamp-2 text-sm text-on-surface-variant">
-                            {transportMeta.summary}
-                          </p>
-                        </div>
-                      </div>
+                      ) : null}
 
                       <button
                         type="button"
@@ -464,18 +505,20 @@ export default function CraftMyJourneyPage() {
                         required
                         options={stayOptions}
                         value={stayStyle}
-                        onChange={(v) => setStayStyle(v as StayStyleId)}
+                        onChange={(v) => setStayStyle(v as StayStyleId | "")}
                       />
 
-                      <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
-                        <p className="font-medium text-primary">{stayMeta.label}</p>
-                        <p className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">
-                          {stayMeta.short}
-                        </p>
-                        <p className="mt-2 text-xs font-medium text-primary/80">
-                          Best for: {stayMeta.bestFor}
-                        </p>
-                      </div>
+                      {stayMeta ? (
+                        <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
+                          <p className="font-medium text-primary">{stayMeta.label}</p>
+                          <p className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">
+                            {stayMeta.short}
+                          </p>
+                          <p className="mt-2 text-xs font-medium text-primary/80">
+                            Best for: {stayMeta.bestFor}
+                          </p>
+                        </div>
+                      ) : null}
 
                       <ul className="mt-4 grid gap-2 sm:grid-cols-3">
                         {STAY_FEATURES.map(({ icon: Icon, label }) => (
@@ -520,8 +563,8 @@ export default function CraftMyJourneyPage() {
                   title="Preferences & budget"
                   body="The more you share, the better we can shape the journey."
                 />
-                <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-                  <FieldGroup title="What to include">
+                <div className="grid gap-4 sm:grid-cols-2 lg:gap-5">
+                  <FieldGroup title="Your brief">
                     <FormTextarea
                       label="What would you like to include?"
                       name="include"
@@ -532,35 +575,38 @@ export default function CraftMyJourneyPage() {
                     />
                   </FieldGroup>
 
-                  <div className="space-y-4">
-                    <FieldGroup
-                      title="Budget"
-                      body="This helps us shape the journey around what feels comfortable for you."
-                    >
-                      <FormInput
-                        label="Budget per person (₹)"
-                        name="budgetPerPerson"
-                        type="number"
-                        min={0}
-                        step={500}
-                        placeholder="Amount in ₹"
-                        value={form.budgetPerPerson}
-                        onChange={(v) => setField("budgetPerPerson", v)}
-                        hint="Optional"
-                      />
-                    </FieldGroup>
+                  <FieldGroup title="Budget">
+                    <FormTextarea
+                      label="Budget per person (₹)"
+                      name="budgetPerPerson"
+                      rows={5}
+                      value={form.budgetPerPerson}
+                      onChange={(v) => setField("budgetPerPerson", v)}
+                      placeholder="Open amount in ₹ — e.g. 25000. Optional."
+                    />
+                  </FieldGroup>
 
-                    <FieldGroup title="Anything else?">
-                      <FormTextarea
-                        label="Notes"
-                        name="notes"
-                        rows={3}
-                        placeholder="Accessibility, celebrations, must-avoids…"
-                        value={form.notes}
-                        onChange={(v) => setField("notes", v)}
-                      />
-                    </FieldGroup>
-                  </div>
+                  <FieldGroup title="Not suitable for">
+                    <FormTextarea
+                      label="Anything this journey should avoid?"
+                      name="notSuitableFor"
+                      rows={5}
+                      placeholder="e.g. long treks, early starts, high altitudes, spicy food…"
+                      value={form.notSuitableFor}
+                      onChange={(v) => setField("notSuitableFor", v)}
+                    />
+                  </FieldGroup>
+
+                  <FieldGroup title="Additional requests">
+                    <FormTextarea
+                      label="Anything else we should consider?"
+                      name="notes"
+                      rows={5}
+                      placeholder="Do you have any additional request or preference we should consider"
+                      value={form.notes}
+                      onChange={(v) => setField("notes", v)}
+                    />
+                  </FieldGroup>
                 </div>
 
                 {submitError ? (
@@ -573,9 +619,25 @@ export default function CraftMyJourneyPage() {
                   <Button variant="ghost" size="lg" onClick={() => setStep(1)}>
                     Back
                   </Button>
-                  <Button size="lg" disabled={sending || !canSubmit} onClick={() => void handleSubmit()}>
-                    {sending ? "Sending…" : "Craft my journey"}
-                  </Button>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    {site.craftPaymentLink ? (
+                      <Button
+                        href={site.craftPaymentLink}
+                        size="lg"
+                        variant="ghost"
+                        className="border border-primary/30"
+                      >
+                        Pay with Razorpay
+                      </Button>
+                    ) : null}
+                    <Button
+                      size="lg"
+                      disabled={sending || !canSubmit}
+                      onClick={() => void handleSubmit()}
+                    >
+                      {sending ? "Sending…" : "Craft my journey"}
+                    </Button>
+                  </div>
                 </FlowActions>
               </div>
             ) : null}
@@ -587,10 +649,10 @@ export default function CraftMyJourneyPage() {
         open={learnOpen}
         onClose={() => setLearnOpen(false)}
         initialTab={learnTab}
-        stayId={stayStyle}
-        vehicleId={vehicleId}
-        onStayChange={setStayStyle}
-        onVehicleChange={setVehicleId}
+        stayId={stayStyle || "barefoot"}
+        vehicleId={vehicleId || "sedan"}
+        onStayChange={(id) => setStayStyle(id)}
+        onVehicleChange={(id) => setVehicleId(id)}
       />
     </div>
   );

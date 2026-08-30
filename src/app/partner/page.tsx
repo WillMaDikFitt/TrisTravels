@@ -46,16 +46,16 @@ export default function PartnerPage() {
 
       <section
         id="partner-form"
-        className="scroll-mt-header mx-auto grid max-w-container-max gap-10 px-margin-mobile py-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.7fr)] lg:gap-12 md:px-margin-desktop md:py-16"
+        className="scroll-mt-header mx-auto grid max-w-container-max gap-8 px-margin-mobile py-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)] lg:items-start lg:gap-10 md:px-margin-desktop md:py-12"
       >
         <FadeIn>
           <PartnerRegistrationForm onSuccess={() => setSent(true)} />
         </FadeIn>
 
-        <div className="space-y-5 lg:sticky lg:top-36 lg:self-start">
-          <div className="rounded-2xl border border-outline-variant/25 bg-surface-container-low p-6">
+        <aside className="space-y-3 lg:sticky lg:top-[calc(var(--header-offset)+1rem)] lg:self-start">
+          <div className="rounded-2xl border border-outline-variant/25 bg-surface-container-low px-5 py-4">
             <p className="label-caps text-accent">Who can register</p>
-            <ul className="mt-4 space-y-2.5 text-sm text-on-surface-variant">
+            <ul className="mt-3 space-y-1.5 text-[0.8125rem] leading-snug text-on-surface-variant">
               <li>· Homestays & accommodation</li>
               <li>· Drivers & transport</li>
               <li>· Adventure activity providers</li>
@@ -64,17 +64,17 @@ export default function PartnerPage() {
               <li>· Cultural experiences & guides</li>
             </ul>
           </div>
-          <div className="rounded-2xl border border-outline-variant/25 bg-surface-container-low p-6">
+          <div className="rounded-2xl border border-outline-variant/25 bg-surface-container-low px-5 py-4">
             <p className="label-caps text-accent">What happens next</p>
-            <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+            <p className="mt-2 text-[0.8125rem] leading-relaxed text-on-surface-variant">
               We review every registration. If there is a fit, we follow up to learn more — this does
               not guarantee bookings.
             </p>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-            <Image src={media.craft} alt="Local partners" fill className="object-cover" sizes="30vw" />
+          <div className="relative hidden aspect-[16/10] overflow-hidden rounded-2xl lg:block">
+            <Image src={media.craft} alt="Local partners" fill className="object-cover" sizes="28vw" />
           </div>
-        </div>
+        </aside>
       </section>
 
       <CtaBand

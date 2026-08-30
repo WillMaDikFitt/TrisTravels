@@ -31,7 +31,7 @@ export function ShareStoryForm() {
 
   return (
     <form
-      className="space-y-5"
+      className="space-y-4 md:space-y-5"
       onSubmit={async (e) => {
         e.preventDefault();
         setError("");
@@ -92,18 +92,18 @@ export function ShareStoryForm() {
         setSent(true);
       }}
     >
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
         <FormInput label="Your name" name="name" required autoComplete="name" />
         <FormInput label="Email" name="email" type="email" required autoComplete="email" />
+        <FormInput label="Phone" name="phone" type="tel" autoComplete="tel" hint="If you’d rather we WhatsApp" />
       </div>
-      <FormInput label="Phone" name="phone" type="tel" autoComplete="tel" hint="If you’d rather we WhatsApp" />
       <FormInput
         label="Story title"
         name="title"
         required
         placeholder="A few words that hold the memory"
       />
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-5">
         <FormInput label="Where in Meghalaya" name="place" placeholder="Sohra, Dawki, Mawlynnong…" />
         <FormInput label="When you travelled" name="travelled" placeholder="March 2026" />
       </div>
@@ -111,7 +111,7 @@ export function ShareStoryForm() {
         label="Your story"
         name="story"
         required
-        rows={8}
+        rows={6}
         placeholder="What stayed with you — a host, a meal, the rain, a path…"
       />
 

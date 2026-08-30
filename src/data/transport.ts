@@ -6,6 +6,8 @@ export type TransportVehicleOption = {
   seats: string;
   /** Absolute price for the transfer; falls back from a base rate when not set on the listing. */
   price: number;
+  /** Short description shown in booking UI (no price). */
+  summary: string;
 };
 
 export type TransportVehiclePrices = Partial<Record<TransportVehicleId, number>>;
@@ -19,12 +21,32 @@ const DEFAULT_MULTIPLIERS: Record<TransportVehicleId, number> = {
 
 export const TRANSPORT_VEHICLE_META: Record<
   TransportVehicleId,
-  { label: string; seats: string }
+  { label: string; seats: string; summary: string }
 > = {
-  sedan: { label: "Sedan", seats: "Up to 3 travellers" },
-  suv: { label: "SUV", seats: "Up to 5 travellers" },
-  innova: { label: "Innova / Crystal", seats: "Up to 6 travellers" },
-  tempo: { label: "Tempo traveller", seats: "7–12 travellers" },
+  sedan: {
+    label: "Sedan",
+    seats: "Up to 3 travellers",
+    summary:
+      "A comfortable option for smaller groups, sedans offer good legroom, air conditioning and a smooth ride on highways and hilly roads.",
+  },
+  suv: {
+    label: "SUV",
+    seats: "Up to 5 travellers",
+    summary:
+      "A practical option for small groups, SUVs offer a comfortable cabin, good ground clearance and flexibility for Meghalaya’s hilly roads.",
+  },
+  innova: {
+    label: "Innova / Crystal",
+    seats: "Up to 6 travellers",
+    summary:
+      "A spacious and comfortable option for families and small groups — generous cabin space and a smooth ride for longer journeys.",
+  },
+  tempo: {
+    label: "Tempo traveller",
+    seats: "7–12 travellers",
+    summary:
+      "A popular option for medium to large groups — spacious seating, air conditioning, and good luggage storage.",
+  },
 };
 
 export const TRANSPORT_VEHICLE_IDS = Object.keys(TRANSPORT_VEHICLE_META) as TransportVehicleId[];
@@ -43,7 +65,9 @@ export function transportVehicleOptions(
         : Math.round(safeBase * DEFAULT_MULTIPLIERS[id]);
     return {
       id,
-      ...TRANSPORT_VEHICLE_META[id],
+      label: TRANSPORT_VEHICLE_META[id].label,
+      seats: TRANSPORT_VEHICLE_META[id].seats,
+      summary: TRANSPORT_VEHICLE_META[id].summary,
       price,
     };
   });

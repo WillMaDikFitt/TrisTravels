@@ -45,6 +45,11 @@ function configuredAdminEmails() {
     .filter(Boolean);
 }
 
+function isTransientDbError(err: unknown) {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.includes("closing/hidden") || msg.includes("Failed to execute 'transaction'");
+}
+
 async function ensureProfile(user: User): Promise<UserProfile> {
   const db = getClientDb();
   const fallback: UserProfile = {
@@ -149,7 +154,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const updated = { ...profile, wishlist: next };
         setProfile(updated);
         const db = getClientDb();
-        if (db) await setDoc(doc(db, "users", user.uid), { wishlist: next }, { merge: true });
+        if (db) {
+          try {
+            await setDoc(doc(db, "users", user.uid), { wishlist: next }, { merge: true });
+          } catch (err) {
+            if (!isTransientDbError(err)) throw err;
+          }
+        }
       },
       async updateAccount(data) {
         if (!user || !profile) throw new Error("Please log in");
@@ -160,7 +171,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const updated = { ...profile, name: data.name, phone: data.phone };
         setProfile(updated);
         const db = getClientDb();
-        if (db) await setDoc(doc(db, "users", user.uid), { name: data.name, phone: data.phone }, { merge: true });
+        if (db) {
+          try {
+            await setDoc(
+              doc(db, "users", user.uid),
+              { name: data.name, phone: data.phone },
+              { merge: true },
+            );
+          } catch (err) {
+            if (!isTransientDbError(err)) throw err;
+          }
+        }
       },
     }),
     [user, profile, loading, configured],

@@ -64,18 +64,38 @@ export function WhyTrisTestimonials() {
   };
 
   return (
-    <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center bg-surface py-16 md:py-20">
-      <div className="mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
+    <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-12 md:py-14">
+      <Image
+        src={media.faqSectionBg}
+        alt=""
+        fill
+        className="object-cover object-center"
+        sizes="100vw"
+        quality={90}
+      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#E8EBDD]/72" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 70% 55% at 50% 20%, rgba(248,246,241,0.55), transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-[clamp(2.5rem,5vw,3.75rem)] leading-none text-primary">
+          <div className="ink-rule mx-auto" />
+          <p className="label-caps mt-3 text-highlight">Travellers</p>
+          <h2 className="mt-2 font-[family-name:var(--font-playfair)] text-[clamp(2.25rem,4.5vw,3.35rem)] leading-tight text-primary">
             Why TRIS
           </h2>
-          <p className="mt-4 text-sm leading-relaxed text-on-surface-variant md:text-base">
-            Testimonials from travellers who&apos;ve experienced Meghalaya with us
+          <p className="mt-3 text-sm leading-relaxed text-on-surface-variant md:text-base">
+            Notes from travellers who&apos;ve experienced Meghalaya with us
           </p>
         </div>
 
-        <div className="relative mt-12 md:mt-14">
+        <div className="relative mt-10 md:mt-12">
           <div
             ref={scrollerRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-6 [&::-webkit-scrollbar]:hidden"
@@ -85,14 +105,14 @@ export function WhyTrisTestimonials() {
                 key={item.name}
                 data-testimonial-card
                 className={cn(
-                  "flex w-[min(85vw,22rem)] shrink-0 snap-start flex-col rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-7 shadow-[0_10px_32px_rgba(54,64,55,0.07)] sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3rem)/3)]",
+                  "flex w-[min(85vw,22rem)] shrink-0 snap-start flex-col rounded-2xl border border-outline-variant/25 bg-surface-container-lowest/95 p-7 shadow-[0_10px_28px_rgba(54,64,55,0.06)] backdrop-blur-[2px] sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-3rem)/3)]",
                   i % 3 === 1 && "md:rotate-[0.35deg]",
                   i % 3 === 2 && "md:-rotate-[0.3deg]",
                 )}
               >
                 <span
                   aria-hidden
-                  className="font-[family-name:var(--font-playfair)] text-5xl leading-none text-highlight/80 select-none"
+                  className="font-[family-name:var(--font-playfair)] text-5xl leading-none text-highlight/75 select-none"
                 >
                   “
                 </span>
@@ -117,7 +137,7 @@ export function WhyTrisTestimonials() {
               type="button"
               onClick={() => scrollByCard(-1)}
               aria-label="Previous testimonials"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/25 text-primary transition hover:bg-primary hover:text-on-primary"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/25 text-primary transition hover:border-primary hover:bg-primary hover:text-on-primary"
             >
               <ChevronLeft size={20} />
             </button>
@@ -125,7 +145,7 @@ export function WhyTrisTestimonials() {
               type="button"
               onClick={() => scrollByCard(1)}
               aria-label="Next testimonials"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/25 text-primary transition hover:bg-primary hover:text-on-primary"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/25 text-primary transition hover:border-primary hover:bg-primary hover:text-on-primary"
             >
               <ChevronRight size={20} />
             </button>

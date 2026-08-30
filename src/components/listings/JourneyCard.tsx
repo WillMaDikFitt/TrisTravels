@@ -366,7 +366,7 @@ function FixedJourneyCard({
               CARD_TYPE.button,
             )}
           >
-            Book now
+            Reserve my seat
           </Link>
         </div>
       </div>

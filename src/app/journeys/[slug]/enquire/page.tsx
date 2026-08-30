@@ -56,14 +56,14 @@ export default async function JourneyEnquirePage({ params, searchParams }: Props
           <div className="w-full px-margin-mobile pb-16 pt-8 md:px-margin-desktop md:pb-20">
             <div className="mx-auto max-w-container-max">
               <p className="label-caps text-white/75">
-                {fixed ? (customise ? "Customise" : "Register now") : "Customise"}
+                {fixed ? (customise ? "Customise" : "Reserve my seat") : "Customise"}
               </p>
               <h1 className="mt-2 font-display text-3xl text-white md:text-4xl">{journey.name}</h1>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
                 {fixed
                   ? customise
                     ? "Tell us what you’re dreaming of — we’ll tailor it just for you."
-                    : "Limited spots. Register to secure your place provisionally."
+                    : "Limited spots. Reserve your seat provisionally — we’ll confirm availability and payment next."
                   : "Tell us how you’d like to shape this journey — dates, pace, stays, and anything special."}
               </p>
             </div>

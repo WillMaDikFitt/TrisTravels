@@ -3,7 +3,7 @@ import Link from "next/link";
 import { journeys } from "@/data/journeys";
 import { findJourney } from "@/lib/data/repo";
 import { detailImages } from "@/data/media";
-import { formatINR, cn } from "@/lib/utils";
+import { formatINR } from "@/lib/utils";
 import { FadeIn } from "@/components/motion/Motion";
 import { DetailGallery } from "@/components/detail/DetailGallery";
 import { Button } from "@/components/ui/Button";
@@ -113,7 +113,7 @@ export default async function JourneyDetailPage({ params }: Props) {
       </div>
 
       <div className="mx-auto grid max-w-container-max gap-12 px-margin-mobile py-12 md:grid-cols-[minmax(0,1fr)_320px] md:px-margin-desktop md:py-16 lg:gap-14">
-        <div className="min-w-0 space-y-14">
+        <div className="min-w-0 space-y-10">
           {isFixed ? (
             <FadeIn>
               <section>
@@ -155,86 +155,40 @@ export default async function JourneyDetailPage({ params }: Props) {
               <h2 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl text-primary md:text-3xl">
                 Your itinerary
               </h2>
-              {isFixed ? (
-                <div className="mt-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest px-5 md:px-6">
-                  {journey.itinerary.map((day, index) => (
-                    <AccordionItem
-                      key={day.day}
-                      title={`Day ${day.day}: ${day.title}`}
-                      defaultOpen={index === 0}
-                    >
-                      {day.activities ? (
-                        <p className="mb-2 font-medium text-primary/85">
-                          Visits / activities:{" "}
-                          <span className="font-normal text-on-surface-variant">{day.activities}</span>
-                        </p>
-                      ) : null}
-                      <p>{day.summary}</p>
-                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
-                        {day.trekDifficulty ? (
-                          <span>
-                            <span className="text-primary">Trek:</span> {day.trekDifficulty}
-                          </span>
-                        ) : null}
-                        {day.meals ? (
-                          <span>
-                            <span className="text-primary">Meals:</span> {day.meals}
-                          </span>
-                        ) : null}
-                        {day.overnight ? (
-                          <span>
-                            <span className="text-primary">Overnight:</span> {day.overnight}
-                          </span>
-                        ) : null}
-                      </div>
-                    </AccordionItem>
-                  ))}
-                </div>
-              ) : (
-                <ol className="relative mt-8 border-l border-outline-variant/40">
-                  {journey.itinerary.map((day, index) => (
-                    <li
-                      key={day.day}
-                      className={cn(
-                        "relative border-b border-outline-variant/20 py-6 pl-8 last:border-b-0",
-                        index === 0 && "pt-0",
-                      )}
-                    >
-                      <span className="absolute top-7 left-0 h-2.5 w-2.5 -translate-x-[5.5px] rounded-full bg-primary first:top-1" />
-                      <p className="text-[11px] font-bold tracking-[0.14em] text-highlight uppercase">
-                        Day {String(day.day).padStart(2, "0")}
+              <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest px-4 md:px-5">
+                {journey.itinerary.map((day, index) => (
+                  <AccordionItem
+                    key={day.day}
+                    title={`Day ${day.day}: ${day.title}`}
+                    defaultOpen={index === 0}
+                  >
+                    {day.activities ? (
+                      <p className="mb-2 font-medium text-primary/85">
+                        Visits / activities:{" "}
+                        <span className="font-normal text-on-surface-variant">{day.activities}</span>
                       </p>
-                      <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-xl text-primary">
-                        {day.title}
-                      </h3>
-                      {day.activities ? (
-                        <p className="mt-2 text-sm font-medium text-primary/85">
-                          Visits / activities:{" "}
-                          <span className="font-normal text-on-surface-variant">{day.activities}</span>
-                        </p>
+                    ) : null}
+                    <p>{day.summary}</p>
+                    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+                      {day.trekDifficulty ? (
+                        <span>
+                          <span className="text-primary">Trek:</span> {day.trekDifficulty}
+                        </span>
                       ) : null}
-                      <p className="mt-2 leading-relaxed text-on-surface-variant">{day.summary}</p>
-                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-on-surface-variant">
-                        {day.trekDifficulty ? (
-                          <span>
-                            <span className="text-primary">Trek:</span> {day.trekDifficulty}
-                          </span>
-                        ) : null}
-                        {day.meals ? (
-                          <span>
-                            <span className="text-primary">Meals:</span> {day.meals}
-                          </span>
-                        ) : null}
-                        {day.overnight ? (
-                          <span>
-                            <span className="text-primary">Overnight:</span> {day.overnight}
-                          </span>
-                        ) : null}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              )}
+                      {day.meals ? (
+                        <span>
+                          <span className="text-primary">Meals:</span> {day.meals}
+                        </span>
+                      ) : null}
+                      {day.overnight ? (
+                        <span>
+                          <span className="text-primary">Overnight:</span> {day.overnight}
+                        </span>
+                      ) : null}
+                    </div>
+                  </AccordionItem>
+                ))}
+              </div>
             </section>
           </FadeIn>
 
@@ -356,7 +310,7 @@ export default async function JourneyDetailPage({ params }: Props) {
                       : `/journeys/${journey.slug}/book`
                   }
                 >
-                  {isFixed ? "Register now" : "Let the adventure begin"}
+                  {isFixed ? "Reserve my seat" : "Let the adventure begin"}
                 </Button>
                 {isFixed ? (
                   <Button
@@ -399,6 +353,16 @@ export default async function JourneyDetailPage({ params }: Props) {
               {journey.nextDeparture}
             </p>
           ) : null}
+          {journey.paymentLink ? (
+            <a
+              href={journey.paymentLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-cta text-[12px] font-bold tracking-[0.14em] text-on-cta uppercase transition hover:brightness-110"
+            >
+              Pay now
+            </a>
+          ) : null}
           <JourneyEnquire
             journeyName={journey.name}
             journeySlug={journey.slug}
@@ -408,13 +372,16 @@ export default async function JourneyDetailPage({ params }: Props) {
           <p className="mt-4 text-center text-xs leading-relaxed text-on-surface-variant">
             {isFixed
               ? "Your seat is held provisionally while we confirm availability and advance payment."
-              : "50% to confirm. 50% before you travel."}
+              : journey.paymentLink
+                ? "Pay via the link above, or enquire if you need a custom quote."
+                : "50% to confirm. 50% before you travel."}
           </p>
         </aside>
       </div>
 
       <CtaBand
         tone="light"
+        className="py-8 md:py-10"
         eyebrow="Keep exploring"
         title="Browse more journeys"
         primary={{

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { ContactDock } from "./ContactDock";
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -27,6 +28,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
+      <ContactDock />
     </>
   );
 }

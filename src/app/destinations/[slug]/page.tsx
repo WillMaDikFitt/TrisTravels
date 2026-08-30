@@ -4,14 +4,15 @@ import { notFound } from "next/navigation";
 import { Check, MapPin } from "lucide-react";
 import { destinations } from "@/data/destinations";
 import { findDestination, findExperience, findJourney } from "@/lib/data/repo";
-import { media } from "@/data/media";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/Motion";
-import { PageHero, FullBleedParallax } from "@/components/motion/FullBleedParallax";
 import { BreathSection } from "@/components/ui/BreathSection";
 import { ExperienceCard } from "@/components/listings/ExperienceCard";
+import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
+
+const serif = "font-[family-name:var(--font-playfair)]";
 
 export function generateStaticParams() {
   return destinations.map((d) => ({ slug: d.slug }));
@@ -35,64 +36,140 @@ export default async function DestinationDetailPage({ params }: Props) {
     await Promise.all((dest.relatedJourneySlugs ?? []).map((s) => findJourney(s)))
   ).filter((j): j is NonNullable<typeof j> => Boolean(j));
 
+  const storyImage = dest.image;
+  const gallery = dest.gallery.filter((src) => src !== storyImage);
+
   return (
-    <div className="bg-background">
-      <PageHero
-        src={dest.image}
-        alt={dest.name}
-        compact
-        eyebrow="Destination"
-        title={dest.name}
-        body={dest.tagline}
-        primaryCta={{ href: "/craft-my-journey", label: "Plan around this place" }}
-        secondaryCta={{ href: "/destinations", label: "All destinations" }}
-      />
-
-      <div className="border-b border-outline-variant/20 bg-surface-container-low">
-        <div className="mx-auto flex max-w-container-max flex-wrap items-center gap-3 px-margin-mobile py-4 md:px-margin-desktop">
-          <span className="inline-flex items-center gap-1.5 text-sm text-primary">
-            <MapPin size={16} className="text-accent" />
-            {dest.region}
-          </span>
-        </div>
-      </div>
-
-      <div className="mx-auto grid max-w-container-max gap-12 px-margin-mobile py-12 md:grid-cols-[1fr_320px] md:gap-14 md:px-margin-desktop md:py-16">
-        <div className="space-y-12">
+    <div className="bg-surface text-foreground">
+      {/* Title only — no top hero image / no top CTA */}
+      <header className="border-b border-outline-variant/20 px-margin-mobile pt-[calc(var(--header-offset)+2.5rem)] pb-10 md:px-margin-desktop md:pb-12">
+        <div className="mx-auto max-w-container-max">
           <FadeIn>
-            <p className="text-lg leading-relaxed text-on-surface-variant">{dest.overview}</p>
-            {dest.interestingFact && (
-              <p className="mt-6 rounded-2xl border border-outline-variant/25 bg-surface-container-low p-5 text-sm text-on-surface-variant">
-                <span className="label-caps text-primary">Interesting fact</span>
-                <span className="mt-2 block">{dest.interestingFact}</span>
-              </p>
-            )}
+            <p className="label-caps text-highlight">Destination</p>
+            <h1
+              className={cn(
+                serif,
+                "mt-3 max-w-3xl text-[clamp(2.35rem,5vw,3.75rem)] leading-[1.08] font-medium text-primary",
+              )}
+            >
+              {dest.name}
+            </h1>
+            <p className={cn(serif, "mt-3 max-w-2xl text-xl leading-snug text-primary/75 italic md:text-2xl")}>
+              {dest.tagline}
+            </p>
+            <p className="mt-5 inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
+              <MapPin size={15} className="text-highlight" />
+              {dest.region}
+            </p>
           </FadeIn>
+        </div>
+      </header>
 
+      {/* Wider story */}
+      <section className="px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+        <div className="mx-auto max-w-container-max">
           <FadeIn>
-            <h2 className="font-display text-2xl text-primary">Highlights</h2>
-            <ul className="mt-5 space-y-3">
+            <p className="mx-auto max-w-3xl text-lg leading-[1.8] text-on-surface-variant md:max-w-4xl md:text-xl md:leading-[1.75]">
+              {dest.overview}
+            </p>
+            {dest.interestingFact ? (
+              <p className="mx-auto mt-8 max-w-3xl border-l-2 border-highlight/70 pl-5 text-base leading-relaxed text-primary md:max-w-4xl md:pl-6 md:text-lg">
+                <span className="label-caps text-highlight">Interesting fact</span>
+                <span className="mt-2 block font-normal text-on-surface-variant">
+                  {dest.interestingFact}
+                </span>
+              </p>
+            ) : null}
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Highlights + CTAs (formerly sidebar) */}
+      <section className="border-y border-outline-variant/20 bg-surface-container-low/40 px-margin-mobile py-12 md:px-margin-desktop md:py-14">
+        <div className="mx-auto max-w-container-max">
+          <FadeIn>
+            <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>Highlights</h2>
+            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:gap-x-10">
               {dest.highlights.map((h) => (
-                <li key={h} className="flex gap-2 text-on-surface-variant">
-                  <Check className="mt-0.5 shrink-0 text-accent" size={18} />
-                  {h}
+                <li key={h} className="flex gap-3 text-on-surface-variant md:text-[1.05rem]">
+                  <Check className="mt-1 shrink-0 text-highlight" size={18} />
+                  <span className="leading-relaxed">{h}</span>
                 </li>
               ))}
             </ul>
-          </FadeIn>
 
-          {dest.gallery.length > 0 && (
+            <div className="mt-10 flex flex-col gap-6 border-t border-outline-variant/30 pt-8 lg:flex-row lg:items-end lg:justify-between">
+              <dl className="grid flex-1 gap-4 sm:grid-cols-3 sm:gap-6">
+                <div>
+                  <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                    From Shillong
+                  </dt>
+                  <dd className={cn(serif, "mt-1 text-xl text-primary")}>{dest.distances.shillong}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                    Guwahati Airport
+                  </dt>
+                  <dd className={cn(serif, "mt-1 text-xl text-primary")}>
+                    {dest.distances.guwahatiAirport}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                    Umroi Airport
+                  </dt>
+                  <dd className={cn(serif, "mt-1 text-xl text-primary")}>
+                    {dest.distances.umroiAirport}
+                  </dd>
+                </div>
+              </dl>
+              <div className="flex flex-wrap gap-3">
+                <Button href="/craft-my-journey" size="lg">
+                  Include in my journey
+                </Button>
+                <Button href="/destinations" size="lg" variant="ghost">
+                  Keep exploring
+                </Button>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Large fuller image after highlights */}
+      <section className="px-margin-mobile py-10 md:px-margin-desktop md:py-14">
+        <div className="mx-auto max-w-container-max">
+          <FadeIn>
+            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:aspect-[21/9] md:rounded-3xl">
+              <Image
+                src={storyImage}
+                alt={dest.name}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                quality={90}
+                priority
+              />
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {(gallery.length > 0 || relatedExperiences.length > 0 || relatedJourneys.length > 0) && (
+        <div className="mx-auto max-w-container-max space-y-14 px-margin-mobile pb-14 md:space-y-16 md:px-margin-desktop md:pb-16">
+          {gallery.length > 0 && (
             <FadeIn>
-              <h2 className="font-display text-2xl text-primary">Atmosphere</h2>
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {dest.gallery.map((src, i) => (
-                  <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-xl">
+              <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>Atmosphere</h2>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-4">
+                {gallery.map((src, i) => (
+                  <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                     <Image
                       src={src}
                       alt={`${dest.name} ${i + 1}`}
                       fill
                       className="object-cover"
-                      sizes="(max-width:768px) 100vw, 25vw"
+                      sizes="(max-width:768px) 100vw, 33vw"
+                      quality={90}
                     />
                   </div>
                 ))}
@@ -102,7 +179,7 @@ export default async function DestinationDetailPage({ params }: Props) {
 
           {relatedExperiences.length > 0 && (
             <FadeIn>
-              <h2 className="font-display text-2xl text-primary">Experiences nearby</h2>
+              <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>Experiences nearby</h2>
               <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-2">
                 {relatedExperiences.map(
                   (exp) => exp && <ExperienceCard key={exp.slug} experience={exp} />,
@@ -113,15 +190,17 @@ export default async function DestinationDetailPage({ params }: Props) {
 
           {relatedJourneys.length > 0 && (
             <FadeIn>
-              <h2 className="font-display text-2xl text-primary">Journeys that pass through</h2>
-              <ul className="mt-4 space-y-2">
+              <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>
+                Journeys that pass through
+              </h2>
+              <ul className="mt-5 space-y-3">
                 {relatedJourneys.map(
                   (j) =>
                     j && (
                       <li key={j.slug}>
                         <Link
                           href={`/journeys/${j.slug}`}
-                          className="text-primary underline-offset-2 hover:underline"
+                          className="text-lg text-primary underline-offset-4 hover:underline"
                         >
                           {j.name}
                         </Link>
@@ -132,54 +211,10 @@ export default async function DestinationDetailPage({ params }: Props) {
             </FadeIn>
           )}
         </div>
-
-        <aside className="md:self-start">
-          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-ambient">
-            <h2 className="font-display text-xl text-primary">Distance</h2>
-            <dl className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">From Shillong</dt>
-                <dd className="font-medium text-secondary">{dest.distances.shillong}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">Guwahati Airport</dt>
-                <dd className="font-medium text-secondary">{dest.distances.guwahatiAirport}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-on-surface-variant">Umroi Airport</dt>
-                <dd className="font-medium text-secondary">{dest.distances.umroiAirport}</dd>
-              </div>
-            </dl>
-            <Button href="/craft-my-journey" className="mt-6 w-full" size="md">
-              Include in my journey
-            </Button>
-            <p className="mt-3 text-center text-[11px] text-on-surface-variant">
-              Sourced from{" "}
-              <a
-                href={dest.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-accent underline-offset-2 hover:underline"
-              >
-                trismeghalaya.com
-              </a>
-            </p>
-          </div>
-        </aside>
-      </div>
-
-      <FullBleedParallax
-        src={media.heroMist}
-        alt="Meghalaya hills"
-        eyebrow="Keep exploring"
-        title="Turn this place into a day"
-        body="Book a nearby experience — or craft a multi-day route around it."
-        height="md"
-        align="center"
-      />
+      )}
 
       <BreathSection
-        size="md"
+        size="sm"
         eyebrow="Keep exploring"
         title="More destinations across Meghalaya"
         cta={{ href: "/destinations", label: "All destinations" }}

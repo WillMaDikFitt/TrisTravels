@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { TRIS_LOGO_ON_DARK } from "@/components/brand/BrandLogo";
+import { TRIS_LOGO_ON_DARK, TRIS_LOGO_ON_LIGHT } from "@/components/brand/BrandLogo";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -81,14 +81,20 @@ function isMoreActive(pathname: string) {
   return moreHrefs.some((href) => pathMatches(pathname, href));
 }
 
-function navLinkClass(active: boolean) {
+function navLinkClass(active: boolean, onLight = false) {
   return cn(
-    "inline-flex h-11 items-center whitespace-nowrap px-2.5 text-[12px] font-bold tracking-[0.1em] uppercase transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-    active ? "text-white" : "text-white/65 hover:text-white",
+    "inline-flex h-11 items-center whitespace-nowrap px-2.5 text-[13px] font-bold tracking-[0.1em] uppercase transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] xl:px-3 xl:text-[14px]",
+    onLight
+      ? active
+        ? "text-[#1F4E3D]"
+        : "text-[#1F4E3D]/85 hover:text-[#1F4E3D]"
+      : active
+        ? "text-white"
+        : "text-white/65 hover:text-white",
   );
 }
 
-function MoreMenu() {
+function MoreMenu({ onLight = false }: { onLight?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const active = isMoreActive(pathname);
@@ -105,7 +111,7 @@ function MoreMenu() {
     >
       <button
         type="button"
-        className={navLinkClass(active)}
+        className={navLinkClass(active, onLight)}
         aria-expanded={open}
         aria-haspopup="true"
         aria-current={active ? "true" : undefined}
@@ -154,7 +160,7 @@ function MoreMenu() {
   );
 }
 
-function DesktopNav() {
+function DesktopNav({ onLight = false }: { onLight?: boolean }) {
   const pathname = usePathname();
   const journeyType = useSearchParams().get("type");
 
@@ -166,14 +172,14 @@ function DesktopNav() {
           <Link
             key={item.label}
             href={item.href}
-            className={navLinkClass(active)}
+            className={navLinkClass(active, onLight)}
             aria-current={active ? "page" : undefined}
           >
             {item.label}
           </Link>
         );
       })}
-      <MoreMenu />
+      <MoreMenu onLight={onLight} />
     </nav>
   );
 }
@@ -239,6 +245,8 @@ export function Header() {
   }, [open]);
 
   const solid = !isHome || scrolled || open;
+  const logoSrc = solid ? TRIS_LOGO_ON_DARK : TRIS_LOGO_ON_LIGHT;
+  const onLight = !solid;
 
   return (
     <header
@@ -256,26 +264,30 @@ export function Header() {
             : "border-b border-transparent bg-transparent",
         )}
       >
-        <div className="flex h-[5.5rem] w-full items-center justify-between gap-4 px-4 md:h-24 md:px-6 lg:h-[6.25rem] lg:gap-8 lg:px-8 xl:px-10">
+        <div className="flex h-[5.75rem] w-full items-center justify-between gap-4 px-5 md:h-[6.5rem] md:px-8 lg:h-[6.75rem] lg:gap-8 lg:px-10 xl:px-12">
           <Link
             href="/"
-            className="relative z-10 flex shrink-0 items-center"
+            className="relative z-10 flex shrink-0 items-center pt-1 md:pt-1.5 md:pl-1"
             aria-label="TRIS Travels home"
           >
-            <span className="relative block h-[4.25rem] w-[4.25rem] md:h-[4.75rem] md:w-[4.75rem] lg:h-[5.5rem] lg:w-[5.5rem]">
+            <span className="relative block h-[4.75rem] w-[4.75rem] overflow-hidden md:h-[5.35rem] md:w-[5.35rem] lg:h-[6.15rem] lg:w-[6.15rem]">
               <Image
-                src={TRIS_LOGO_ON_DARK}
+                src={logoSrc}
                 alt="TRIS Travels"
                 fill
                 priority
                 unoptimized
-                className="object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]"
+                className={cn(
+                  "object-contain",
+                  /* Light (black) asset has more transparent padding — scale to match cream mark */
+                  onLight ? "scale-[1.22]" : "drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]",
+                )}
               />
             </span>
           </Link>
 
           <Suspense fallback={<nav className="hidden lg:flex" aria-hidden />}>
-            <DesktopNav />
+            <DesktopNav onLight={onLight} />
           </Suspense>
 
           <div className="flex shrink-0 items-center gap-2">
@@ -286,7 +298,11 @@ export function Header() {
                     href="/admin"
                     size="sm"
                     variant="secondary"
-                    className="border-white/35 bg-transparent text-white hover:bg-white/10"
+                    className={
+                      onLight
+                        ? "border-primary/35 bg-transparent text-primary hover:bg-primary/5"
+                        : "border-white/35 bg-transparent text-white hover:bg-white/10"
+                    }
                   >
                     Studio
                   </Button>
@@ -295,7 +311,11 @@ export function Header() {
                   href="/account"
                   size="sm"
                   variant="secondary"
-                  className="border-white/35 bg-transparent text-white hover:bg-white/10"
+                  className={
+                    onLight
+                      ? "border-primary/35 bg-transparent text-primary hover:bg-primary/5"
+                      : "border-white/35 bg-transparent text-white hover:bg-white/10"
+                  }
                 >
                   {profile?.name?.split(" ")[0] || "Account"}
                 </Button>
@@ -306,7 +326,11 @@ export function Header() {
                   href="/login"
                   size="sm"
                   variant="secondary"
-                  className="border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10"
+                  className={
+                    onLight
+                      ? "border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/5"
+                      : "border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10"
+                  }
                 >
                   Log in / Sign up
                 </Button>
@@ -314,7 +338,12 @@ export function Header() {
             )}
             <button
               type="button"
-              className="rounded-full p-2 text-white transition-colors focus-visible:ring-2 focus-visible:ring-white/60 lg:hidden"
+              className={cn(
+                "rounded-full p-2 transition-colors focus-visible:ring-2 lg:hidden",
+                onLight
+                  ? "text-primary focus-visible:ring-primary/40"
+                  : "text-white focus-visible:ring-white/60",
+              )}
               aria-label={open ? "Close menu" : "Menu"}
               aria-expanded={open}
               onClick={() => setOpen((value) => !value)}
@@ -342,7 +371,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
             transition={{ duration: reduceMotion ? 0.01 : 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 bottom-0 top-[5.5rem] z-[70] overflow-y-auto bg-surface px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-24 lg:hidden"
+            className="fixed inset-x-0 bottom-0 top-[5.75rem] z-[70] overflow-y-auto bg-surface px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-[6.5rem] lg:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
