@@ -27,13 +27,13 @@ import {
   BOOKING_STAY_STYLE_IDS,
   stayStyleMeta,
   type PackageTransportId,
-  type StayStyleId,
 } from "@/data/journey-options";
 import { PackageOptionsModal, type PackageLearnTab } from "@/components/booking/PackageOptionLearn";
 import {
   minVehiclesForGuests,
   suggestedExtraMattresses,
   suggestedRooms,
+  type BookingStayStyleId,
 } from "@/data/package-pricing";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 import { quoteCuratedPackage } from "@/lib/pricing";
@@ -62,7 +62,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const [children, setChildren] = useState(0);
   const [vehicleId, setVehicleId] = useState<PackageTransportId>("sedan");
   const [vehicleCount, setVehicleCount] = useState(1);
-  const [stayStyle, setStayStyle] = useState<StayStyleId>("barefoot");
+  const [stayStyle, setStayStyle] = useState<BookingStayStyleId>("barefoot");
   const [rooms, setRooms] = useState(2);
   const [extraMattresses, setExtraMattresses] = useState(0);
   const [preferredFrom, setPreferredFrom] = useState("");
@@ -386,7 +386,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                     required
                     options={stayOptions}
                     value={stayStyle}
-                    onChange={(v) => setStayStyle(v as StayStyleId)}
+                    onChange={(v) => setStayStyle(v as BookingStayStyleId)}
                   />
 
                   <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
@@ -647,7 +647,11 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         initialTab={learnTab}
         stayId={stayStyle}
         vehicleId={vehicleId}
-        onStayChange={setStayStyle}
+        onStayChange={(id) => {
+          if ((BOOKING_STAY_STYLE_IDS as readonly string[]).includes(id)) {
+            setStayStyle(id as BookingStayStyleId);
+          }
+        }}
         onVehicleChange={(id) => {
           setVehicleId(id);
           setVehicleCountTouched(false);
