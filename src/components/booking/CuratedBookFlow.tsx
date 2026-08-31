@@ -31,12 +31,16 @@ import {
 import { PackageOptionsModal, type PackageLearnTab } from "@/components/booking/PackageOptionLearn";
 import {
   minVehiclesForGuests,
-  suggestedExtraMattresses,
-  suggestedRooms,
   type BookingStayStyleId,
 } from "@/data/package-pricing";
+import { CHILD_AGE_SELECT_OPTIONS, isValidChildAge } from "@/data/child-ages";
 import { submitEnquiry } from "@/lib/actions/enquiries";
+import {
+  previewDiscountedTotal,
+  recordAdvancePaidAndNotify,
+} from "@/lib/actions/payments";
 import { quoteCuratedPackage } from "@/lib/pricing";
+import { site } from "@/data/site";
 import { formatINR, cn } from "@/lib/utils";
 
 const steps = ["Transport", "Stay", "Confirm"];
@@ -46,7 +50,6 @@ const STAY_FEATURES = [
   { icon: ShieldCheck, label: "Quality & Comfort" },
   { icon: HeartHandshake, label: "Community-First stays" },
 ] as const;
-
 function rangeOptions(from: number, to: number, labelFn?: (n: number) => string) {
   return Array.from({ length: to - from + 1 }, (_, i) => {
     const n = from + i;
@@ -54,16 +57,55 @@ function rangeOptions(from: number, to: number, labelFn?: (n: number) => string)
   });
 }
 
+function minOnlineStartDate() {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + CURATED_ONLINE_BOOK_DAYS);
+  return d.toISOString().slice(0, 10);
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
+function loadRazorpayScript() {
+  return new Promise<boolean>((resolve) => {
+    if (typeof window === "undefined") {
+      resolve(false);
+      return;
+    }
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existing) {
+      existing.addEventListener("load", () => resolve(true));
+      existing.addEventListener("error", () => resolve(false));
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const { user, profile } = useAuth();
+  const dateMin = useMemo(() => minOnlineStartDate(), []);
 
   const [step, setStep] = useState(0);
-  const [adults, setAdults] = useState(4);
+  const [adults, setAdults] = useState<number | "">("");
   const [children, setChildren] = useState(0);
-  const [vehicleId, setVehicleId] = useState<PackageTransportId>("sedan");
-  const [vehicleCount, setVehicleCount] = useState(1);
-  const [stayStyle, setStayStyle] = useState<BookingStayStyleId>("barefoot");
-  const [rooms, setRooms] = useState(2);
+  const [childAges, setChildAges] = useState<number[]>([]);
+  const [vehicleId, setVehicleId] = useState<PackageTransportId | "">("");
+  const [vehicleCount, setVehicleCount] = useState<number | "">("");
+  const [stayStyle, setStayStyle] = useState<BookingStayStyleId | "">("");
+  const [rooms, setRooms] = useState<number | "">("");
   const [extraMattresses, setExtraMattresses] = useState(0);
   const [preferredFrom, setPreferredFrom] = useState("");
   const [preferredTo, setPreferredTo] = useState("");
@@ -71,53 +113,81 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const [email, setEmail] = useState(profile?.email ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
   const [message, setMessage] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [discountNote, setDiscountNote] = useState("");
+  const [discountBusy, setDiscountBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [refId, setRefId] = useState("");
-  const [roomsTouched, setRoomsTouched] = useState(false);
-  const [mattressTouched, setMattressTouched] = useState(false);
-  const [vehicleCountTouched, setVehicleCountTouched] = useState(false);
+  const [paid, setPaid] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
   const [learnTab, setLearnTab] = useState<PackageLearnTab>("stay");
 
-  const totalGuests = adults + children;
-  const transportMeta = packageTransportMeta(vehicleId);
+  const adultCount = typeof adults === "number" ? adults : 0;
+  const roomCount = typeof rooms === "number" ? rooms : 0;
+  const vehicleCountNum = typeof vehicleCount === "number" ? vehicleCount : 0;
+  const totalGuests = adultCount + children;
+  const transportMeta = packageTransportMeta(vehicleId || "sedan");
   const capacity = transportMeta.maxGuests;
-  const minVehicles = minVehiclesForGuests(totalGuests, capacity);
+  const minVehicles = minVehiclesForGuests(Math.max(totalGuests, 1), capacity);
   const onlineBookOk = !preferredFrom || canBookCuratedOnline(preferredFrom);
-  const stayMeta = stayStyleMeta(stayStyle);
+  const stayMeta = stayStyleMeta(stayStyle || "barefoot");
+  const selectionsReady = Boolean(
+    adultCount >= 1 && vehicleId && vehicleCountNum >= 1 && stayStyle && roomCount >= 1,
+  );
 
-  const adultOptions = useMemo(() => rangeOptions(1, 20, (n) => `${n} adult${n === 1 ? "" : "s"}`), []);
+  const adultOptions = useMemo(
+    () => [
+      { value: "", label: "Select adults" },
+      ...rangeOptions(1, 20, (n) => `${n} adult${n === 1 ? "" : "s"}`),
+    ],
+    [],
+  );
   const childOptions = useMemo(
     () =>
-      rangeOptions(0, Math.max(0, 20 - adults), (n) =>
+      rangeOptions(0, Math.max(0, 20 - Math.max(adultCount, 1)), (n) =>
         n === 0 ? "No children" : `${n} child${n === 1 ? "" : "ren"}`,
       ),
-    [adults],
+    [adultCount],
   );
   const vehicleCountOptions = useMemo(
-    () => rangeOptions(minVehicles, 10, (n) => `${n} vehicle${n === 1 ? "" : "s"}`),
-    [minVehicles],
+    () => [
+      { value: "", label: "Select vehicles" },
+      ...rangeOptions(1, 10, (n) => `${n} vehicle${n === 1 ? "" : "s"}`),
+    ],
+    [],
   );
-  const roomOptions = useMemo(() => rangeOptions(1, 20, (n) => `${n} room${n === 1 ? "" : "s"}`), []);
+  const roomOptions = useMemo(
+    () => [
+      { value: "", label: "Select rooms" },
+      ...rangeOptions(1, 20, (n) => `${n} room${n === 1 ? "" : "s"}`),
+    ],
+    [],
+  );
   const mattressOptions = useMemo(
     () => rangeOptions(0, 20, (n) => (n === 0 ? "None" : `${n} mattress${n === 1 ? "" : "es"}`)),
     [],
   );
   const transportOptions = useMemo(
-    () =>
-      PACKAGE_TRANSPORT.map((t) => ({
+    () => [
+      { value: "", label: "Select vehicle type" },
+      ...PACKAGE_TRANSPORT.map((t) => ({
         value: t.id,
         label: `${t.label} (Max ${t.maxGuests})`,
       })),
+    ],
     [],
   );
   const stayOptions = useMemo(
-    () =>
-      STAY_STYLES.filter((s) =>
+    () => [
+      { value: "", label: "Select stay style" },
+      ...STAY_STYLES.filter((s) =>
         (BOOKING_STAY_STYLE_IDS as readonly string[]).includes(s.id),
       ).map((s) => ({ value: s.id, label: s.label })),
+    ],
     [],
   );
 
@@ -128,16 +198,13 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   }, [profile]);
 
   useEffect(() => {
-    if (!vehicleCountTouched) setVehicleCount(minVehicles);
-  }, [minVehicles, vehicleCountTouched]);
-
-  useEffect(() => {
-    if (!roomsTouched) setRooms(suggestedRooms(totalGuests));
-  }, [totalGuests, roomsTouched]);
-
-  useEffect(() => {
-    if (!mattressTouched) setExtraMattresses(suggestedExtraMattresses(totalGuests, rooms));
-  }, [totalGuests, rooms, mattressTouched]);
+    setChildAges((prev) => {
+      if (children <= 0) return [];
+      const next = prev.slice(0, children);
+      while (next.length < children) next.push(NaN);
+      return next;
+    });
+  }, [children]);
 
   useEffect(() => {
     if (!preferredFrom) {
@@ -147,32 +214,188 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
     setPreferredTo(journeyEndDate(preferredFrom, journey.nights));
   }, [preferredFrom, journey.nights]);
 
-  const quote = useMemo(
-    () =>
-      quoteCuratedPackage(journey, {
-        vehicleId,
-        vehicleCount,
-        stayPreference: stayStyle,
-        rooms,
-        extraMattresses,
-        adults,
-        children,
-      }),
-    [journey, vehicleId, vehicleCount, stayStyle, rooms, extraMattresses, adults, children],
-  );
+  const quote = useMemo(() => {
+    if (!selectionsReady || !vehicleId || !stayStyle) return null;
+    return quoteCuratedPackage(journey, {
+      vehicleId,
+      vehicleCount: Math.max(vehicleCountNum, minVehicles),
+      stayPreference: stayStyle,
+      rooms: roomCount,
+      extraMattresses,
+      adults: adultCount,
+      children,
+    });
+  }, [
+    journey,
+    selectionsReady,
+    vehicleId,
+    vehicleCountNum,
+    minVehicles,
+    stayStyle,
+    roomCount,
+    extraMattresses,
+    adultCount,
+    children,
+  ]);
 
-  const syncAdults = (next: number) => {
-    const capped = Math.min(Math.max(1, next), 20);
-    const nextChildren = Math.min(children, Math.max(0, 20 - capped));
-    setAdults(capped);
-    setChildren(nextChildren);
+  const priced = useMemo(() => {
+    if (!quote) return null;
+    if (discountPercent <= 0) {
+      return {
+        total: quote.total,
+        advanceAmount: quote.advanceAmount,
+        balanceAmount: quote.balanceAmount,
+        saved: 0,
+      };
+    }
+    const total = Math.round(quote.total * (1 - discountPercent / 100));
+    const advanceAmount = Math.round(total * 0.5);
+    return {
+      total,
+      advanceAmount,
+      balanceAmount: total - advanceAmount,
+      saved: quote.total - total,
+    };
+  }, [quote, discountPercent]);
+
+  const capacityOk = quote?.capacityOk ?? true;
+  const childAgesComplete =
+    children === 0 || (childAges.length === children && childAges.every(isValidChildAge));
+
+  const canLeaveVehicle =
+    adultCount >= 1 && Boolean(vehicleId) && vehicleCountNum >= 1 && capacityOk && childAgesComplete;
+  const canLeaveStay = Boolean(stayStyle) && roomCount >= 1 && Boolean(preferredFrom) && onlineBookOk;
+
+  const saveEnquiry = async (paymentExtra?: Record<string, string | number>) => {
+    const res = await submitEnquiry({
+      source: "journey",
+      name,
+      email,
+      phone,
+      message: message || `Book now — 50% advance for ${journey.name}`,
+      payload: {
+        journeySlug: journey.slug,
+        journeyName: journey.name,
+        bookingType: "curated-package-booking",
+        paymentPlan: "50-advance-50-balance",
+        preferredFrom,
+        preferredTo: preferredTo || preferredFrom,
+        adults: adultCount,
+        children,
+        childAges: children > 0 ? childAges.map(String) : [],
+        totalTravellers: totalGuests,
+        vehicleId: vehicleId || "",
+        transportVehicle: quote?.vehicleLabel || "",
+        vehicleCount: vehicleCountNum,
+        stayPreference: stayMeta.label,
+        stayStyle: stayStyle || "",
+        rooms: roomCount,
+        extraMattresses,
+        estimatedTotal: priced?.total ?? quote?.total ?? 0,
+        advanceAmount: priced?.advanceAmount ?? quote?.advanceAmount ?? 0,
+        balanceAmount: priced?.balanceAmount ?? quote?.balanceAmount ?? 0,
+        balanceDueDaysBeforeTravel: CURATED_BALANCE_DUE_DAYS,
+        pricePerPerson: quote?.perPerson ?? 0,
+        discountCode: discountCode.trim().toUpperCase(),
+        discountPercent,
+        paymentLink: journey.paymentLink || "",
+        ...paymentExtra,
+      },
+      uid: user?.uid,
+    });
+    return res;
   };
 
-  const canLeaveVehicle = quote.capacityOk && adults >= 1;
-  const canLeaveStay = rooms >= 1 && Boolean(preferredFrom);
+  const openRazorpayCheckout = async (enquiryId: string) => {
+    if (!priced) return { paid: false as const };
+    const orderRes = await fetch("/api/razorpay/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amountInr: priced.advanceAmount,
+        receipt: enquiryId,
+        notes: {
+          journeySlug: journey.slug,
+          enquiryId,
+        },
+      }),
+    });
+    const order = (await orderRes.json()) as {
+      ok?: boolean;
+      configured?: boolean;
+      orderId?: string;
+      amount?: number;
+      currency?: string;
+      keyId?: string;
+      error?: string;
+    };
+
+    if (!orderRes.ok || !order.ok || !order.orderId || !order.keyId) {
+      if (order.configured === false || orderRes.status === 503) {
+        return { paid: false as const, needsLink: true as const };
+      }
+      throw new Error(order.error || "Could not start payment");
+    }
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded || !window.Razorpay) {
+      throw new Error("Could not load Razorpay Checkout");
+    }
+
+    return new Promise<{ paid: boolean; paymentId?: string; orderId?: string }>((resolve, reject) => {
+      const rzp = new window.Razorpay!({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency || "INR",
+        name: "TRIS Travels",
+        description: `50% advance — ${journey.name}`,
+        order_id: order.orderId,
+        prefill: {
+          name,
+          email,
+          contact: phone,
+        },
+        theme: { color: "#364037" },
+        handler: async (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) => {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            });
+            const verified = (await verifyRes.json()) as { ok?: boolean };
+            if (!verifyRes.ok || !verified.ok) {
+              reject(new Error("Payment verification failed"));
+              return;
+            }
+            resolve({
+              paid: true,
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+            });
+          } catch (err) {
+            reject(err);
+          }
+        },
+        modal: {
+          ondismiss: () => resolve({ paid: false }),
+        },
+      });
+      rzp.open();
+    });
+  };
 
   const submit = async () => {
-    if (!quote.capacityOk) {
+    if (!quote || !priced || !termsAccepted) return;
+    if (!capacityOk) {
       setError(`Add enough vehicles — max ${capacity} guests per ${quote.vehicleLabel}.`);
       return;
     }
@@ -182,48 +405,69 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
       );
       return;
     }
+    if (!childAgesComplete) {
+      setError("Please select an age for each child.");
+      return;
+    }
+
     setBusy(true);
     setError("");
     try {
-      const res = await submitEnquiry({
-        source: "journey",
-        name,
-        email,
-        phone,
-        message: message || `Book now — 50% advance for ${journey.name}`,
-        payload: {
-          journeySlug: journey.slug,
-          journeyName: journey.name,
-          bookingType: "curated-package-booking",
-          paymentPlan: "50-advance-50-balance",
-          preferredFrom,
-          preferredTo: preferredTo || preferredFrom,
-          adults,
-          children,
-          totalTravellers: totalGuests,
-          vehicleId,
-          transportVehicle: quote.vehicleLabel,
-          vehicleCount,
-          stayPreference: stayMeta.label,
-          stayStyle,
-          rooms,
-          extraMattresses,
-          estimatedTotal: quote.total,
-          advanceAmount: quote.advanceAmount,
-          balanceAmount: quote.balanceAmount,
-          balanceDueDaysBeforeTravel: CURATED_BALANCE_DUE_DAYS,
-          pricePerPerson: quote.perPerson,
-        },
-        uid: user?.uid,
-      });
+      const res = await saveEnquiry();
       if (!res.ok) {
         setError(res.error);
         return;
       }
+
+      let paymentOk = false;
+      let paymentId = "";
+      let orderId = "";
+
+      if (site.razorpayKeyId) {
+        try {
+          const pay = await openRazorpayCheckout(res.id);
+          if ("needsLink" in pay && pay.needsLink) {
+            // Fall through to payment link
+          } else if (pay.paid) {
+            paymentOk = true;
+            paymentId = pay.paymentId || "";
+            orderId = pay.orderId || "";
+            await saveEnquiry({
+              paymentStatus: "advance-paid",
+              razorpayPaymentId: paymentId,
+              razorpayOrderId: orderId,
+              enquiryRef: res.id,
+            });
+            await recordAdvancePaidAndNotify({
+              enquiryId: res.id,
+              paymentId,
+              orderId,
+            });
+          } else {
+            setRefId(res.id);
+            setDone(true);
+            setPaid(false);
+            return;
+          }
+        } catch (err) {
+          console.error(err);
+          // Fall through to link / enquiry success
+        }
+      }
+
+      if (!paymentOk && journey.paymentLink) {
+        setRefId(res.id);
+        setDone(true);
+        setPaid(false);
+        window.open(journey.paymentLink, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       setRefId(res.id);
+      setPaid(paymentOk);
       setDone(true);
     } catch {
-      setError("Could not send. Try again.");
+      setError("Could not complete booking. Try again.");
     } finally {
       setBusy(false);
     }
@@ -235,17 +479,39 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-primary">
           <Check size={32} />
         </div>
-        <h1 className="mt-6 font-display text-3xl text-primary">Advance request received</h1>
+        <h1 className="mt-6 font-display text-3xl text-primary">
+          {paid ? "Booking confirmed" : "Booking request received"}
+        </h1>
         <p className="mt-3 text-on-surface-variant">
-          We&apos;ll confirm next steps for your 50% advance shortly. Ref {refId}.
+          {paid
+            ? "Your 50% advance is received. We’ll send confirmation details shortly."
+            : "We’ve saved your booking. Complete the advance payment if a payment window opened, or we’ll share next steps shortly."}{" "}
+          Ref {refId}.
         </p>
-        <p className="mt-4 font-display text-2xl text-primary">{formatINR(quote.advanceAmount)}</p>
-        <p className="text-sm text-on-surface-variant">
-          of {formatINR(quote.total)} total (incl. GST) · {totalGuests} travellers
-        </p>
+        {quote ? (
+          <>
+            <p className="mt-4 font-display text-2xl font-semibold text-primary">
+              {formatINR(priced?.advanceAmount ?? quote.advanceAmount)}
+            </p>
+            <p className="text-sm text-on-surface-variant">
+              advance of {formatINR(priced?.total ?? quote.total)} total (incl. GST) · {totalGuests}{" "}
+              travellers
+            </p>
+          </>
+        ) : null}
         <p className="mt-3 text-xs text-on-surface-variant">
           50% to confirm. Remaining balance due {CURATED_BALANCE_DUE_DAYS} days before travel.
         </p>
+        {!paid && journey.paymentLink ? (
+          <a
+            href={journey.paymentLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-cta px-6 text-[12px] font-bold tracking-[0.14em] text-on-cta uppercase"
+          >
+            Pay advance now
+          </a>
+        ) : null}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button href={`/journeys/${journey.slug}`}>Back to journey</Button>
           <Button href="/account" variant="ghost">
@@ -259,7 +525,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   return (
     <>
       <div className="mx-auto grid max-w-6xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <FlowShell steps={steps} current={step}>
+        <FlowShell steps={steps} current={step} onStepClick={(i) => setStep(i)}>
           {step === 0 && (
             <div>
               <FlowHeading
@@ -275,8 +541,16 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       name="adults"
                       required
                       options={adultOptions}
-                      value={String(adults)}
-                      onChange={(v) => syncAdults(Number(v) || 1)}
+                      value={adults === "" ? "" : String(adults)}
+                      onChange={(v) => {
+                        if (!v) {
+                          setAdults("");
+                          return;
+                        }
+                        const next = Math.min(Math.max(1, Number(v) || 1), 20);
+                        setAdults(next);
+                        setChildren((c) => Math.min(c, Math.max(0, 20 - next)));
+                      }}
                     />
                     <FormSelect
                       label="Children"
@@ -286,7 +560,40 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       onChange={(v) => setChildren(Math.max(0, Number(v) || 0))}
                     />
                   </div>
-                  <p className="mt-2 text-xs text-on-surface-variant">Children: ages 2–8</p>
+                  {children > 0 ? (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {Array.from({ length: children }, (_, index) => (
+                        <FormSelect
+                          key={index}
+                          label={`Child ${index + 1} age`}
+                          name={`child-age-${index}`}
+                          required
+                          options={[
+                            { value: "", label: "Select age" },
+                            ...CHILD_AGE_SELECT_OPTIONS.map((o) => ({
+                              value: o.value,
+                              label: o.label,
+                            })),
+                          ]}
+                          value={
+                            Number.isFinite(childAges[index]) ? String(childAges[index]) : ""
+                          }
+                          onChange={(v) => {
+                            const age = v === "" ? NaN : Number(v);
+                            setChildAges((prev) => {
+                              const next = [...prev];
+                              next[index] = age;
+                              return next;
+                            });
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-on-surface-variant">
+                      Children: ages under 1 (−1) to 9 years
+                    </p>
+                  )}
                 </FieldGroup>
 
                 <FieldGroup title="Vehicle">
@@ -298,8 +605,8 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       options={transportOptions}
                       value={vehicleId}
                       onChange={(v) => {
-                        setVehicleId(v as PackageTransportId);
-                        setVehicleCountTouched(false);
+                        setVehicleId((v || "") as PackageTransportId | "");
+                        setVehicleCount("");
                       }}
                     />
                     <FormSelect
@@ -307,41 +614,46 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       name="vehicleCount"
                       required
                       options={vehicleCountOptions}
-                      value={String(vehicleCount)}
+                      value={vehicleCount === "" ? "" : String(vehicleCount)}
                       onChange={(v) => {
-                        setVehicleCountTouched(true);
-                        setVehicleCount(Math.max(minVehicles, Math.min(10, Number(v) || minVehicles)));
+                        if (!v) {
+                          setVehicleCount("");
+                          return;
+                        }
+                        setVehicleCount(Math.max(1, Math.min(10, Number(v) || 1)));
                       }}
                     />
                   </div>
 
-                  <div className="mt-4 flex gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-3">
-                    <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-surface-container">
-                      <Image
-                        src={transportMeta.images[0]}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="112px"
-                      />
+                  {vehicleId ? (
+                    <div className="mt-4 flex gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-3">
+                      <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-surface-container">
+                        <Image
+                          src={transportMeta.images[0]}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="112px"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-primary">
+                          {transportMeta.label}{" "}
+                          <span className="font-normal text-on-surface-variant">
+                            · Max {transportMeta.maxGuests}
+                          </span>
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-sm text-on-surface-variant">
+                          {transportMeta.summary}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-primary">
-                        {transportMeta.label}{" "}
-                        <span className="font-normal text-on-surface-variant">
-                          · Max {transportMeta.maxGuests}
-                        </span>
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-sm text-on-surface-variant">
-                        {transportMeta.summary}
-                      </p>
-                    </div>
-                  </div>
+                  ) : null}
 
-                  {!quote.capacityOk && (
+                  {quote && !quote.capacityOk && (
                     <p className="mt-3 text-sm text-red-700">
-                      Too many guests for {vehicleCount} × {quote.vehicleLabel} (max{" "}
-                      {capacity * vehicleCount}). Increase vehicles or choose a larger vehicle.
+                      Too many guests for {vehicleCountNum} × {quote.vehicleLabel} (max{" "}
+                      {capacity * vehicleCountNum}). Increase vehicles or choose a larger vehicle.
                     </p>
                   )}
 
@@ -386,18 +698,20 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                     required
                     options={stayOptions}
                     value={stayStyle}
-                    onChange={(v) => setStayStyle(v as BookingStayStyleId)}
+                    onChange={(v) => setStayStyle((v || "") as BookingStayStyleId | "")}
                   />
 
-                  <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
-                    <p className="font-medium text-primary">{stayMeta.label}</p>
-                    <p className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">
-                      {stayMeta.short}
-                    </p>
-                    <p className="mt-2 text-xs font-medium text-primary/80">
-                      Best for: {stayMeta.bestFor}
-                    </p>
-                  </div>
+                  {stayStyle ? (
+                    <div className="mt-4 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-4">
+                      <p className="font-medium text-primary">{stayMeta.label}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-on-surface-variant">
+                        {stayMeta.short}
+                      </p>
+                      <p className="mt-2 text-xs font-medium text-primary/80">
+                        Best for: {stayMeta.bestFor}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <ul className="mt-4 grid gap-3 sm:grid-cols-3">
                     {STAY_FEATURES.map(({ icon: Icon, label }) => (
@@ -430,21 +744,15 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       name="rooms"
                       required
                       options={roomOptions}
-                      value={String(rooms)}
-                      onChange={(v) => {
-                        setRoomsTouched(true);
-                        setRooms(Math.max(1, Number(v) || 1));
-                      }}
+                      value={rooms === "" ? "" : String(rooms)}
+                      onChange={(v) => setRooms(v ? Math.max(1, Number(v) || 1) : "")}
                     />
                     <FormSelect
                       label="Extra mattresses"
                       name="extraMattresses"
                       options={mattressOptions}
                       value={String(extraMattresses)}
-                      onChange={(v) => {
-                        setMattressTouched(true);
-                        setExtraMattresses(Math.max(0, Number(v) || 0));
-                      }}
+                      onChange={(v) => setExtraMattresses(Math.max(0, Number(v) || 0))}
                     />
                   </div>
                 </FieldGroup>
@@ -456,8 +764,10 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       name="preferredFrom"
                       type="date"
                       required
+                      min={dateMin}
                       value={preferredFrom}
                       onChange={setPreferredFrom}
+                      hint={`Online booking from ${dateMin} onwards (${CURATED_ONLINE_BOOK_DAYS}+ days ahead)`}
                     />
                     <FormInput
                       label="End date"
@@ -497,11 +807,83 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
           {step === 2 && (
             <div>
               <FlowHeading
-                eyebrow="Step 3"
-                title="Confirm & pay advance"
-                body="Review your choices and contact details. Pay 50% at booking to confirm; the balance is due 20 days before your journey."
+                eyebrow="Next steps"
+                title="Confirm your journey"
+                body="Pay 50% at booking to confirm. The remaining balance is due 20 days before your journey."
               />
               <div className="space-y-4">
+                {priced ? (
+                  <div className="grid gap-4 rounded-2xl border border-outline-variant/25 bg-surface-container-low/40 p-5 sm:grid-cols-2">
+                    <div>
+                      <p className="text-[11px] font-bold tracking-[0.14em] text-on-surface-variant uppercase">
+                        Advance
+                      </p>
+                      <p className="mt-1 font-display text-2xl font-semibold text-[#A65D45]">
+                        {formatINR(priced.advanceAmount)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold tracking-[0.14em] text-on-surface-variant uppercase">
+                        Balance
+                      </p>
+                      <p className="mt-1 font-display text-2xl font-semibold text-[#A65D45]">
+                        {formatINR(priced.balanceAmount)}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                <FieldGroup title="Discount code (optional)">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <FormInput
+                      className="flex-1"
+                      label="Code"
+                      name="discountCode"
+                      value={discountCode}
+                      onChange={(v) => {
+                        setDiscountCode(v.toUpperCase());
+                        setDiscountPercent(0);
+                        setDiscountNote("");
+                      }}
+                      placeholder="e.g. TRIS10"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={discountBusy || !discountCode.trim() || !quote}
+                      onClick={async () => {
+                        if (!quote) return;
+                        setDiscountBusy(true);
+                        const res = await previewDiscountedTotal(quote.total, discountCode);
+                        setDiscountBusy(false);
+                        if (!res.ok) {
+                          setDiscountPercent(0);
+                          setDiscountNote(res.error);
+                          return;
+                        }
+                        setDiscountPercent(res.percent);
+                        setDiscountNote(
+                          res.saved > 0
+                            ? `${res.percent}% off · you save ${formatINR(res.saved)}`
+                            : `${res.percent}% applied`,
+                        );
+                      }}
+                    >
+                      {discountBusy ? "Checking…" : "Apply"}
+                    </Button>
+                  </div>
+                  {discountNote ? (
+                    <p
+                      className={cn(
+                        "mt-2 text-sm",
+                        discountPercent > 0 ? "text-primary" : "text-red-700",
+                      )}
+                    >
+                      {discountNote}
+                    </p>
+                  ) : null}
+                </FieldGroup>
+
                 <FieldGroup title="Your details">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormInput
@@ -544,32 +926,28 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                   </div>
                 </FieldGroup>
 
-                {!onlineBookOk && (
-                  <p className="rounded-xl border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface-variant">
-                    Online booking isn’t available for this travel window.{" "}
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface-variant">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                  />
+                  <span>
+                    I agree to the{" "}
                     <Link
-                      href={`/journeys/${journey.slug}/enquire`}
-                      className="font-semibold text-primary underline-offset-2 hover:underline"
+                      href="/terms"
+                      target="_blank"
+                      className="font-semibold text-primary underline underline-offset-2"
                     >
-                      Enquire availability or customise
+                      Terms &amp; Conditions
                     </Link>
                     .
-                  </p>
-                )}
+                  </span>
+                </label>
 
-              {error && <p className="text-sm text-red-700">{error}</p>}
-              <SecureNote request />
-              <p className="text-xs text-on-surface-variant">
-                By confirming, you agree to our{" "}
-                <Link
-                  href="/terms"
-                  target="_blank"
-                  className="font-semibold text-primary underline-offset-2 hover:underline"
-                >
-                  Package Tours Terms &amp; Conditions
-                </Link>
-                .
-              </p>
+                {error && <p className="text-sm text-red-700">{error}</p>}
+                <SecureNote request />
               </div>
               <FlowActions>
                 <Button variant="ghost" onClick={() => setStep(1)}>
@@ -580,10 +958,18 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                     size="lg"
                     onClick={submit}
                     disabled={
-                      busy || !name.trim() || !email.trim() || !phone.trim() || !quote.capacityOk
+                      busy ||
+                      !termsAccepted ||
+                      !name.trim() ||
+                      !email.trim() ||
+                      !phone.trim() ||
+                      !quote ||
+                      !capacityOk
                     }
                   >
-                    {busy ? "Sending…" : `Confirm & Pay advance · ${formatINR(quote.advanceAmount)}`}
+                    {busy
+                      ? "Processing…"
+                      : `Book now · ${priced ? formatINR(priced.advanceAmount) : ""}`}
                   </Button>
                 ) : (
                   <Button size="lg" href={`/journeys/${journey.slug}/enquire`}>
@@ -612,10 +998,20 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
           }
         >
           <div className="space-y-2 text-sm">
-            <Row label="Guests" value={String(totalGuests)} />
-            <Row label="Transport" value={`${quote.vehicleCount} × ${quote.vehicleLabel}`} />
-            <Row label="Stay style" value={stayMeta.label} />
-            <Row label="Rooms" value={String(quote.rooms)} />
+            <Row
+              label="Guests"
+              value={totalGuests > 0 ? String(totalGuests) : "—"}
+            />
+            <Row
+              label="Transport"
+              value={
+                vehicleId && vehicleCountNum
+                  ? `${vehicleCountNum} × ${quote?.vehicleLabel || transportMeta.label}`
+                  : "—"
+              }
+            />
+            <Row label="Stay style" value={stayStyle ? stayMeta.label : "—"} />
+            <Row label="Rooms" value={roomCount > 0 ? String(roomCount) : "—"} />
             {preferredFrom ? (
               <Row
                 label="Dates"
@@ -624,11 +1020,23 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
             ) : null}
 
             <div className="mt-4 space-y-2.5 border-t border-outline-variant/25 pt-4">
-              <Row label="Total (Inclusive of GST)" value={formatINR(quote.total)} bold />
-              <Row label="Advance amount payable (50%)" value={formatINR(quote.advanceAmount)} />
+              {priced?.saved ? (
+                <Row label="Discount saved" value={formatINR(priced.saved)} />
+              ) : null}
               <Row
-                label={`Balance (due ${CURATED_BALANCE_DUE_DAYS} days before)`}
-                value={formatINR(quote.balanceAmount)}
+                label="Total (Inclusive of GST)"
+                value={priced ? formatINR(priced.total) : "—"}
+                bold
+              />
+              <Row
+                label="Advance amount payable (50%)"
+                value={priced ? formatINR(priced.advanceAmount) : "—"}
+                bold
+              />
+              <Row
+                label={`Balance Amount (Due ${CURATED_BALANCE_DUE_DAYS} days before)`}
+                value={priced ? formatINR(priced.balanceAmount) : "—"}
+                bold
               />
             </div>
 
@@ -645,8 +1053,8 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         open={learnOpen}
         onClose={() => setLearnOpen(false)}
         initialTab={learnTab}
-        stayId={stayStyle}
-        vehicleId={vehicleId}
+        stayId={stayStyle || "barefoot"}
+        vehicleId={(vehicleId || "sedan") as PackageTransportId}
         onStayChange={(id) => {
           if ((BOOKING_STAY_STYLE_IDS as readonly string[]).includes(id)) {
             setStayStyle(id as BookingStayStyleId);
@@ -654,7 +1062,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         }}
         onVehicleChange={(id) => {
           setVehicleId(id);
-          setVehicleCountTouched(false);
+          setVehicleCount("");
         }}
       />
     </>

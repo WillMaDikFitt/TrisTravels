@@ -18,6 +18,7 @@ import { StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { CtaBand } from "@/components/ui/CtaBand";
 import { CURATED_ONLINE_BOOK_DAYS } from "@/data/journey-options";
 import { FIXED_LISTING_INTRO } from "@/data/fixed-departures";
+import { cn } from "@/lib/utils";
 
 const FIXED_WHY_ICONS: Record<string, LucideIcon> = {
   calendar: CalendarCheck2,
@@ -179,8 +180,9 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
           ) : null
         }
         sidebar={
-          <div className="space-y-6">
+          <div className="space-y-5">
             <p className="label-caps text-highlight">Filters</p>
+            <div className={cn(isCurated && "lg:space-y-4")}>
             {styleOptions.length > 0 && (
               <FilterPills
                 label="Style"
@@ -203,6 +205,7 @@ export function JourneysBrowser({ journeys }: { journeys: Journey[] }) {
                 { id: "long", label: "7+ days" },
               ]}
             />
+            </div>
             {(activeStyle || duration) && (
               <button
                 type="button"

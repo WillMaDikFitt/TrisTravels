@@ -36,6 +36,14 @@ const local = {
   valleyGreen: "/images/valley-green.jpg",
   villagePath: "/images/village-path.jpg",
   waterfallPool: "/images/waterfall-pool.jpg",
+  categoryAdventure: "/images/categories/adventure.jpg",
+  categoryNatureWildlife: "/images/categories/nature-wildlife.jpg",
+  categoryCultureHeritage: "/images/categories/culture-heritage.jpg",
+  categoryFoodLocalLife: "/images/categories/food-local-life.jpg",
+  categoryWellness: "/images/categories/wellness.jpg",
+  categoryCreative: "/images/categories/creative.jpg",
+  storyMawsynram: "/images/stories/two-days-in-mawsynram.jpg",
+  storyVinayYadav: "/images/stories/natures-dreamscape.jpg",
 } as const;
 
 export const media = {
@@ -82,6 +90,14 @@ export const media = {
   rain: local.trailMist,
   cliffs: local.cliffView,
   water: local.waterfallPool,
+  storyMawsynram: local.storyMawsynram,
+  storyVinayYadav: local.storyVinayYadav,
+  typeAdventure: local.categoryAdventure,
+  typeNatureWildlife: local.categoryNatureWildlife,
+  typeCultureHeritage: local.categoryCultureHeritage,
+  typeFoodLocalLife: local.categoryFoodLocalLife,
+  typeWellness: local.categoryWellness,
+  typeCreative: local.categoryCreative,
   /** Curated local stills for detail carousels */
   local,
 } as const;

@@ -14,12 +14,12 @@ import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { listStories } from "@/lib/data/repo";
 
 const typeVisuals: Record<string, string> = {
-  adventure: media.heroRoots,
-  "nature-wildlife": media.familyWaterfall,
-  "culture-heritage": media.valueCommunity,
-  "food-local-life": media.kitchen,
-  wellness: media.heroMist,
-  creative: media.craft,
+  adventure: media.typeAdventure,
+  "nature-wildlife": media.typeNatureWildlife,
+  "culture-heritage": media.typeCultureHeritage,
+  "food-local-life": media.typeFoodLocalLife,
+  wellness: media.typeWellness,
+  creative: media.typeCreative,
 };
 
 export default async function HomePage() {

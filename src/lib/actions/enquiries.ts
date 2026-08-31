@@ -9,6 +9,7 @@ import {
 } from "@/lib/firebase/admin-read";
 import type { EnquiryRecord, EnquirySource } from "@/lib/types";
 import { memoryStore, uid } from "@/lib/store";
+import { notifyStaffNewLead } from "@/lib/email";
 
 /** Firestore rejects `undefined` field values — strip before write. */
 function stripUndefined<T>(value: T): T {
@@ -20,6 +21,28 @@ function stripUndefined<T>(value: T): T {
     out[key] = stripUndefined(nested);
   }
   return out as T;
+}
+
+async function notifyEnquiryCreated(record: EnquiryRecord) {
+  try {
+    const payloadSummary = record.payload
+      ? Object.entries(record.payload)
+          .slice(0, 12)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+          .join(" · ")
+      : undefined;
+    await notifyStaffNewLead({
+      kind: "enquiry",
+      id: record.id,
+      name: record.name,
+      email: record.email,
+      phone: record.phone,
+      message: record.message,
+      summary: payloadSummary,
+    });
+  } catch (err) {
+    console.error("enquiry notify failed:", err);
+  }
 }
 
 export async function submitEnquiry(input: {
@@ -62,6 +85,7 @@ export async function submitEnquiry(input: {
         console.error("submitEnquiry firestore write failed:", err);
         if (allowMemoryBackend()) {
           memoryStore().enquiries.unshift(record);
+          void notifyEnquiryCreated(record);
           return { ok: true as const, id: record.id };
         }
         return { ok: false as const, error: "Could not send just now. Try again." };
@@ -72,6 +96,7 @@ export async function submitEnquiry(input: {
       console.error("submitEnquiry:", memoryBackendWarning());
       return { ok: false as const, error: "Could not send just now. Try again." };
     }
+    void notifyEnquiryCreated(record);
     return { ok: true as const, id: record.id };
   } catch (err) {
     console.error("submitEnquiry failed:", err);

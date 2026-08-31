@@ -91,12 +91,23 @@ export type ImpactStat = {
   description: string;
 };
 
+export type DiscountCode = {
+  id: string;
+  code: string;
+  /** Percent off total guest price (0–100). */
+  percent: number;
+  active: boolean;
+  note?: string;
+};
+
 export type PlatformSettings = {
   minAdvanceDays: number;
   holdMinutes: number;
   serviceFeePercent: number;
   gstPercent: number;
   impact: ImpactStat[];
+  /** Optional promo codes editable in admin. */
+  discountCodes?: DiscountCode[];
 };
 
 export type JourneyDepartureSeat = {

@@ -8,6 +8,8 @@ export type TransportVehicleOption = {
   price: number;
   /** Short description shown in booking UI (no price). */
   summary: string;
+  idealFor: string;
+  luggage: string;
 };
 
 export type TransportVehiclePrices = Partial<Record<TransportVehicleId, number>>;
@@ -21,29 +23,37 @@ const DEFAULT_MULTIPLIERS: Record<TransportVehicleId, number> = {
 
 export const TRANSPORT_VEHICLE_META: Record<
   TransportVehicleId,
-  { label: string; seats: string; summary: string }
+  { label: string; seats: string; summary: string; idealFor: string; luggage: string }
 > = {
   sedan: {
     label: "Sedan",
     seats: "Up to 3 travellers",
+    idealFor: "Up to 3 adults",
+    luggage: "1 large + 1 small suitcase, or up to 3 small bags",
     summary:
       "A comfortable option for smaller groups, sedans offer good legroom, air conditioning and a smooth ride on highways and hilly roads.",
   },
   suv: {
     label: "SUV",
     seats: "Up to 5 travellers",
+    idealFor: "Up to 4 adults for more comfort",
+    luggage: "3 large + 2 small bags",
     summary:
       "A practical option for small groups, SUVs offer a comfortable cabin, good ground clearance and flexibility for Meghalaya’s hilly roads.",
   },
   innova: {
     label: "Innova / Crystal",
     seats: "Up to 6 travellers",
+    idealFor: "Up to 4 adults",
+    luggage: "3 large + 2 small bags",
     summary:
       "A spacious and comfortable option for families and small groups — generous cabin space and a smooth ride for longer journeys.",
   },
   tempo: {
     label: "Tempo traveller",
     seats: "7–12 travellers",
+    idealFor: "Up to 12 adults",
+    luggage: "9–12 medium to large bags",
     summary:
       "A popular option for medium to large groups — spacious seating, air conditioning, and good luggage storage.",
   },
@@ -63,11 +73,14 @@ export function transportVehicleOptions(
       override != null && Number.isFinite(override) && override >= 0
         ? Math.round(override)
         : Math.round(safeBase * DEFAULT_MULTIPLIERS[id]);
+    const meta = TRANSPORT_VEHICLE_META[id];
     return {
       id,
-      label: TRANSPORT_VEHICLE_META[id].label,
-      seats: TRANSPORT_VEHICLE_META[id].seats,
-      summary: TRANSPORT_VEHICLE_META[id].summary,
+      label: meta.label,
+      seats: meta.seats,
+      summary: meta.summary,
+      idealFor: meta.idealFor,
+      luggage: meta.luggage,
       price,
     };
   });

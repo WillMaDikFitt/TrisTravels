@@ -67,7 +67,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     examples: "Maruti Suzuki Dzire, Honda City, Hyundai Verna, Maruti Suzuki Ciaz",
     summary:
       "A comfortable option for smaller groups, sedans offer good legroom, air conditioning and a smooth ride on highways and hilly roads.",
-    images: [media.ride, media.rideAlt, media.cliffs, media.trail, media.forest],
+    images: [media.ride, media.rideAlt],
   },
   {
     id: "suv",
@@ -81,7 +81,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     examples: "Mahindra Xylo, Mahindra Bolero, Maruti Suzuki Ertiga or similar",
     summary:
       "A practical option for small groups, SUVs offer a comfortable cabin, good ground clearance and flexibility for Meghalaya’s hilly roads.",
-    images: [media.rideAlt, media.ride, media.cliffs, media.trail, media.forest],
+    images: [media.rideAlt, media.cliffs],
   },
   {
     id: "innova",
@@ -95,7 +95,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
       "Additional luggage space may be available when the rear seats are folded, subject to seating needs.",
     summary:
       "A spacious and comfortable option for families and small groups — generous cabin space and a smooth ride for longer journeys.",
-    images: [media.packages, media.ride, media.rideAlt, media.familyWaterfall, media.cliffs],
+    images: [media.packages, media.familyWaterfall],
   },
   {
     id: "tempo10",
@@ -108,7 +108,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     goodToKnow: "Good overhead and rear luggage storage for family and group tours.",
     summary:
       "A practical and spacious option for small to medium-sized groups, with comfortable seating and air conditioning.",
-    images: [media.departures, media.trail, media.packages, media.ride, media.forest],
+    images: [media.departures, media.groupTrail],
   },
   {
     id: "tempo12",
@@ -121,7 +121,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     goodToKnow: "A popular choice for medium to large groups and educational travel.",
     summary:
       "A popular option for medium to large groups — spacious seating, air conditioning, and good luggage storage.",
-    images: [media.departures, media.packages, media.trail, media.forest, media.ride],
+    images: [media.groupTrail, media.departures],
   },
   {
     id: "tempo15",
@@ -134,7 +134,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     goodToKnow: "Suited for bigger groups with generous luggage storage.",
     summary:
       "A larger Tempo Traveller for bigger groups, with spacious seating, air conditioning, and generous luggage space.",
-    images: [media.trail, media.departures, media.packages, media.forest, media.ride],
+    images: [media.trail, media.meadowWalk],
   },
   {
     id: "urbania10",
@@ -148,7 +148,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     goodToKnow: "Windows do not open — climate is managed via air conditioning.",
     summary:
       "A modern and comfortable Force Urbania for smaller groups — spacious seating and a refined travel experience.",
-    images: [media.packages, media.rideAlt, media.trail, media.ride, media.familyWaterfall],
+    images: [media.rideAlt, media.packages],
   },
   {
     id: "urbania12",
@@ -162,7 +162,7 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = [
     goodToKnow: "Windows do not open — climate is managed via air conditioning.",
     summary:
       "A modern and spacious Force Urbania for medium-sized groups — comfort and luggage space for longer journeys.",
-    images: [media.packages, media.departures, media.ride, media.familyWaterfall, media.trail],
+    images: [media.packages, media.departures],
   },
 ];
 
@@ -271,11 +271,11 @@ export const STAY_STYLES: StayStyleMeta[] = [
   },
   {
     id: "flexible",
-    label: "I’m Flexible",
+    label: "I'm open to mixed stays",
     short:
       "You’re open to any type of accommodation based on availability, value, and location — we’ll recommend what fits your style and budget.",
     bestFor: "Travellers happy for us to mix stay types to suit the route and budget.",
-    think: "I’m open — recommend what works best for the journey.",
+    think: "I'm open — recommend what works best for the journey.",
     expect: [
       "Stay mix based on route and availability",
       "Balanced value and comfort",

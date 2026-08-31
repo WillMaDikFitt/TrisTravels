@@ -649,6 +649,7 @@ function applyCuratedPatch(journey: Journey): Journey {
     experienceHighlights: patch.experienceHighlights,
     highlights: patch.highlights,
     itinerary: patch.itinerary,
+    ...(patch.notSuitableFor?.length ? { notSuitableFor: patch.notSuitableFor } : {}),
   };
   if (journey.packagePricing) {
     next.packagePricing = {

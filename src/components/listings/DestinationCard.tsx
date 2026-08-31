@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import type { Destination } from "@/data/destinations";
 import { cn } from "@/lib/utils";
 
@@ -24,50 +23,45 @@ export function DestinationCard({ destination, className, index = 0 }: Props) {
     >
       <div
         className={cn(
-          "relative overflow-hidden rounded-2xl",
-          tall ? "aspect-[4/5]" : "aspect-[5/4]",
+          "relative overflow-hidden",
+          tall ? "aspect-[3/4]" : "aspect-[4/5]",
         )}
       >
         <Image
           src={destination.image}
           alt={destination.name}
           fill
-          className="object-cover transition duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
+          className="object-cover transition duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.03]"
           sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
           quality={90}
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#364037]/35 via-transparent to-transparent opacity-80 transition group-hover:opacity-100"
+          className="absolute inset-0 bg-gradient-to-t from-[#2c3530]/55 via-[#2c3530]/10 to-transparent opacity-90 transition group-hover:opacity-100"
         />
-        <span className="absolute top-3.5 left-3.5 font-[family-name:var(--font-manrope)] text-[10px] font-semibold tracking-[0.18em] text-white uppercase drop-shadow-sm">
+        <span className="absolute top-4 left-4 font-[family-name:var(--font-manrope)] text-[10px] font-semibold tracking-[0.2em] text-white/90 uppercase">
           {destination.region}
-        </span>
-        <span
-          className={cn(
-            "absolute right-3.5 bottom-3.5 grid h-9 w-9 place-items-center rounded-full",
-            "bg-[#E8EBDD]/95 text-primary shadow-sm",
-            "transition duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
-          )}
-        >
-          <ArrowUpRight size={16} strokeWidth={2.25} />
         </span>
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col px-0.5">
+      <div className="mt-5 flex flex-1 flex-col border-t border-primary/15 pt-4">
         <h3
-          className="font-[family-name:var(--font-playfair)] text-[1.45rem] leading-[1.15] font-medium text-primary transition-opacity group-hover:opacity-80 md:text-[1.6rem]"
+          className="font-[family-name:var(--font-playfair)] text-[1.55rem] leading-[1.12] font-medium text-primary transition-opacity group-hover:opacity-80 md:text-[1.75rem]"
           title={destination.name}
         >
           {destination.name}
         </h3>
-        <div className="mt-2.5 h-px w-8 bg-primary/40 transition-[width] duration-500 group-hover:w-12" />
-        <p className="mt-3 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.9rem] leading-relaxed text-on-surface-variant">
+        <p className="mt-2.5 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.9rem] leading-relaxed text-on-surface-variant">
           {destination.tagline}
         </p>
-        <p className="mt-auto pt-3 font-[family-name:var(--font-manrope)] text-[11px] tracking-[0.06em] text-on-surface-variant/75">
-          {destination.distances.shillong} from Shillong
-        </p>
+        <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+          <p className="font-[family-name:var(--font-manrope)] text-[11px] tracking-[0.04em] text-on-surface-variant/70">
+            {destination.distances.shillong} from Shillong
+          </p>
+          <span className="font-[family-name:var(--font-manrope)] text-[12px] font-medium tracking-[0.04em] text-primary transition group-hover:translate-x-0.5">
+            Explore →
+          </span>
+        </div>
       </div>
     </Link>
   );

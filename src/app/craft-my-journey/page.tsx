@@ -538,9 +538,9 @@ export default function CraftMyJourneyPage() {
                           setLearnTab("stay");
                           setLearnOpen(true);
                         }}
-                        className="mt-4 w-full rounded-xl border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 text-sm font-semibold text-primary transition hover:border-primary/40 hover:bg-surface"
+                        className="mt-4 w-full rounded-xl border border-outline-variant/25 bg-transparent px-4 py-3 text-sm font-medium text-on-surface-variant transition hover:border-primary/30 hover:bg-surface-container-lowest hover:text-primary"
                       >
-                        Learn more about Stay Type
+                        Please see more information about accommodation types
                       </button>
                     </FieldGroup>
                   </div>
@@ -576,13 +576,14 @@ export default function CraftMyJourneyPage() {
                   </FieldGroup>
 
                   <FieldGroup title="Budget">
-                    <FormTextarea
+                    <FormInput
                       label="Budget per person (₹)"
                       name="budgetPerPerson"
-                      rows={5}
+                      type="text"
+                      inputMode="decimal"
                       value={form.budgetPerPerson}
                       onChange={(v) => setField("budgetPerPerson", v)}
-                      placeholder="Open amount in ₹ — e.g. 25000. Optional."
+                      placeholder="Open amount — e.g. 25000. Optional."
                     />
                   </FieldGroup>
 

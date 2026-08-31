@@ -28,6 +28,13 @@ export const DEFAULT_SETTINGS = {
   holdMinutes: 30,
   serviceFeePercent: 5,
   gstPercent: 18,
+  discountCodes: [] as {
+    id: string;
+    code: string;
+    percent: number;
+    active: boolean;
+    note?: string;
+  }[],
   impact: [
     {
       id: "partners",

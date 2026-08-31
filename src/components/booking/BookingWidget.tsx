@@ -18,6 +18,7 @@ import type { ClosureRecord } from "@/lib/types";
 import { experienceSlots } from "@/lib/experience-slots";
 import { transportVehicleOptions } from "@/data/transport";
 import { adultRate, childRate } from "@/lib/pricing";
+import { isValidChildAge } from "@/data/child-ages";
 import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
 
 type Props = {
@@ -83,7 +84,8 @@ export function BookingWidget({ experience }: Props) {
     !fullyClosed &&
     guests >= minGuests &&
     guests <= experience.maxGuests &&
-    (children === 0 || childAges.length === children) &&
+    (children === 0 ||
+      (childAges.length === children && childAges.every(isValidChildAge))) &&
     (!transportation || Boolean(vehicleId));
 
   const startBooking = () => {

@@ -37,7 +37,6 @@ export default async function DestinationDetailPage({ params }: Props) {
   ).filter((j): j is NonNullable<typeof j> => Boolean(j));
 
   const storyImage = dest.image;
-  const gallery = dest.gallery.filter((src) => src !== storyImage);
 
   return (
     <div className="bg-surface text-foreground">
@@ -75,7 +74,7 @@ export default async function DestinationDetailPage({ params }: Props) {
             {dest.interestingFact ? (
               <p className="mx-auto mt-8 max-w-3xl border-l-2 border-highlight/70 pl-5 text-base leading-relaxed text-primary md:max-w-4xl md:pl-6 md:text-lg">
                 <span className="label-caps text-highlight">Interesting fact</span>
-                <span className="mt-2 block font-normal text-on-surface-variant">
+                <span className="mt-2 block font-semibold italic text-primary">
                   {dest.interestingFact}
                 </span>
               </p>
@@ -140,7 +139,7 @@ export default async function DestinationDetailPage({ params }: Props) {
       <section className="px-margin-mobile py-10 md:px-margin-desktop md:py-14">
         <div className="mx-auto max-w-container-max">
           <FadeIn>
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:aspect-[21/9] md:rounded-3xl">
+            <div className="relative min-h-[70svh] overflow-hidden rounded-2xl md:min-h-[85svh] md:rounded-3xl">
               <Image
                 src={storyImage}
                 alt={dest.name}
@@ -155,28 +154,8 @@ export default async function DestinationDetailPage({ params }: Props) {
         </div>
       </section>
 
-      {(gallery.length > 0 || relatedExperiences.length > 0 || relatedJourneys.length > 0) && (
+      {(relatedExperiences.length > 0 || relatedJourneys.length > 0) && (
         <div className="mx-auto max-w-container-max space-y-14 px-margin-mobile pb-14 md:space-y-16 md:px-margin-desktop md:pb-16">
-          {gallery.length > 0 && (
-            <FadeIn>
-              <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>Atmosphere</h2>
-              <div className="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-4">
-                {gallery.map((src, i) => (
-                  <div key={src} className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-                    <Image
-                      src={src}
-                      alt={`${dest.name} ${i + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width:768px) 100vw, 33vw"
-                      quality={90}
-                    />
-                  </div>
-                ))}
-              </div>
-            </FadeIn>
-          )}
-
           {relatedExperiences.length > 0 && (
             <FadeIn>
               <h2 className={cn(serif, "text-2xl text-primary md:text-3xl")}>Experiences nearby</h2>

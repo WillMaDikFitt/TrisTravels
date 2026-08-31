@@ -148,6 +148,20 @@ export async function createBooking(input: {
     memoryStore().bookings.unshift(record);
   }
 
+  try {
+    const { notifyStaffNewLead } = await import("@/lib/email");
+    void notifyStaffNewLead({
+      kind: "booking",
+      id: record.id,
+      name: record.customerName,
+      email: record.customerEmail,
+      phone: record.customerPhone,
+      summary: `${record.experienceName} · ${record.date} · ${record.slot} · ${record.guests} guests · ₹${record.customerTotal}`,
+    });
+  } catch (err) {
+    console.error("booking notify failed:", err);
+  }
+
   return { ok: true as const, booking: record };
 }
 

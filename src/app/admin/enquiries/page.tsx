@@ -217,6 +217,22 @@ export default function AdminEnquiriesPage() {
               </select>
             </label>
 
+            {String(open.payload?.paymentStatus || "") === "advance-paid" ? (
+              <AdminButton
+                type="button"
+                onClick={async () => {
+                  setBusy(true);
+                  const { markEnquiryFullyPaid } = await import("@/lib/actions/payments");
+                  await markEnquiryFullyPaid(open.id);
+                  setBusy(false);
+                  refresh();
+                }}
+                disabled={busy}
+              >
+                Mark fully paid &amp; email guest
+              </AdminButton>
+            ) : null}
+
             <div>
               <p className="text-sm font-medium">Reply draft</p>
               <textarea readOnly rows={5} value={replyTemplate} className={`${inputClass} mt-1.5`} />

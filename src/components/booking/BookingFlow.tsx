@@ -32,6 +32,7 @@ import {
   FlowSummary,
   SecureNote,
 } from "@/components/forms/FlowUI";
+import { isValidChildAge } from "@/data/child-ages";
 
 const GST_RATE = 0.05;
 
@@ -40,8 +41,8 @@ function parseAges(raw: string | null, count: number) {
   const parsed = raw
     .split(",")
     .map((v) => Number(v.trim()))
-    .filter((v) => Number.isFinite(v));
-  return Array.from({ length: count }, (_, i) => parsed[i] ?? 8);
+    .filter((v) => isValidChildAge(v));
+  return Array.from({ length: count }, (_, i) => parsed[i] ?? NaN);
 }
 
 export function BookingFlow({ experience }: { experience: Experience }) {
@@ -130,7 +131,8 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     !dateIsClosed(date, closures, slot) &&
     guests >= minGuests &&
     guests <= experience.maxGuests &&
-    (children === 0 || childAges.length === children) &&
+    (children === 0 ||
+      (childAges.length === children && childAges.every(isValidChildAge))) &&
     (!transportation || Boolean(vehicleId));
 
   const contactReady = Boolean(name.trim() && phone.trim() && (!email.trim() || email.includes("@")));

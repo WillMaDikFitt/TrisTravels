@@ -22,7 +22,8 @@ export const stories: Story[] = [
     author: "Rose Christine Kharsyntiew",
     category: "Nature",
     date: "2025-12-05",
-    image: media.rain,
+    image: media.storyMawsynram,
+
     sourceUrl:
       "https://www.trismeghalaya.com/your-stories/two-days-in-mawsynram-%E2%80%94-rain%2C-rivers-%26-adventures-in-the-wettest-place-on-earth",
     body: [
@@ -61,7 +62,7 @@ export const stories: Story[] = [
     author: "Vinay Yadav",
     category: "Nature",
     date: "2024-08-20",
-    image: media.water,
+    image: media.storyVinayYadav,
     sourceUrl: "https://www.trismeghalaya.com/your-stories",
     body: [
       "A soul-stirring journey through Meghalaya — waterfalls of surreal blue, crystal-clear rivers, the magic of the Living Root Bridge, and the charm of Shillong.",

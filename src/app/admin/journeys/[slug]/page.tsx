@@ -179,6 +179,7 @@ export default function JourneyEditorPage() {
             gallery: lines(String(fd.get("gallery") || "")),
             highlights: lines(String(fd.get("highlights") || "")),
             experienceHighlights: lines(String(fd.get("experienceHighlights") || "")),
+            notSuitableFor: lines(String(fd.get("notSuitableFor") || "")),
             stays: lines(String(fd.get("stays") || "")),
             inclusions: lines(String(fd.get("inclusions") || "")),
             exclusions: lines(String(fd.get("exclusions") || "")),
@@ -448,7 +449,7 @@ export default function JourneyEditorPage() {
           <Field label="Overview">
             <textarea name="overview" rows={5} defaultValue={row.overview} className={inputClass} />
           </Field>
-          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Field label="Experience highlights" hint="3–5 short labels for listing cards, one per line">
               <textarea
                 name="experienceHighlights"
@@ -458,8 +459,17 @@ export default function JourneyEditorPage() {
                 placeholder={"Living Root Bridges\nWaterfalls\nCaves"}
               />
             </Field>
-            <Field label="Detail highlights" hint="one per line">
+            <Field label="Detail highlights" hint="one per line — length can vary by journey">
               <textarea name="highlights" rows={6} defaultValue={row.highlights.join("\n")} className={inputClass} />
+            </Field>
+            <Field label="Not suitable for" hint="shown in Journey at a Glance — one per line">
+              <textarea
+                name="notSuitableFor"
+                rows={6}
+                defaultValue={(row.notSuitableFor ?? []).join("\n")}
+                className={inputClass}
+                placeholder={"Extreme trekkers\nTravellers seeking nightlife"}
+              />
             </Field>
             <Field label="Stays" hint="one per line">
               <textarea name="stays" rows={6} defaultValue={row.stays.join("\n")} className={inputClass} />

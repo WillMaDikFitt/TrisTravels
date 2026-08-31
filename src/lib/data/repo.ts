@@ -64,6 +64,19 @@ function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, 
     // Older seeded records can contain the stock placeholders used by the prototype.
     // Keep the curated local media from the static catalogue for those fields.
     if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;
+    // Story covers: prefer curated seed paths under /images/stories/ over older
+    // catalogue stills that were previously written to Firestore.
+    if (
+      key === "image" &&
+      base &&
+      typeof (base as { image?: unknown }).image === "string" &&
+      String((base as { image: string }).image).includes("/images/stories/") &&
+      typeof value === "string" &&
+      value.startsWith("/images/") &&
+      !value.includes("/images/stories/")
+    ) {
+      continue;
+    }
     const clean = sanitizeOverlay(value);
     if (isEmptyOverlay(clean)) continue;
     (out as Record<string, unknown>)[key] = clean;
@@ -216,6 +229,7 @@ export async function getSettings(): Promise<PlatformSettings> {
           ...DEFAULT_SETTINGS,
           ...data,
           impact: data.impact?.length ? data.impact : DEFAULT_SETTINGS.impact,
+          discountCodes: data.discountCodes ?? DEFAULT_SETTINGS.discountCodes,
         };
       }
     } catch (err) {

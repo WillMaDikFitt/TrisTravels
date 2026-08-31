@@ -73,7 +73,9 @@ export default async function JourneyDetailPage({ params }: Props) {
         <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-4xl leading-[1.05] text-balance text-primary md:text-5xl lg:text-[3.35rem]">
           {journey.name}
         </h1>
-        <p className="mt-3 text-base text-on-surface-variant md:text-lg">{journey.tagline}</p>
+        <p className="mt-3 min-h-[6.5rem] max-w-3xl text-base leading-relaxed text-on-surface-variant md:min-h-[7.5rem] md:text-lg md:leading-relaxed">
+          {journey.tagline}
+        </p>
       </DetailGallery>
 
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
@@ -310,7 +312,7 @@ export default async function JourneyDetailPage({ params }: Props) {
                       : `/journeys/${journey.slug}/book`
                   }
                 >
-                  {isFixed ? "Reserve my seat" : "Let the adventure begin"}
+                  {isFixed ? "Reserve my seat" : "Book now"}
                 </Button>
                 {isFixed ? (
                   <Button

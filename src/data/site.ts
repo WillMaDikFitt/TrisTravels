@@ -1,6 +1,10 @@
 /** Public contact + social links used across the site. */
 export const site = {
-  email: "hello@trismeghalaya.com",
+  /** Public contact email (Contact dock / mailto). */
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || "hello@trismeghalaya.com",
+  /** Bookings inbox — staff notifications go here when Resend is configured. */
+  bookingsEmail:
+    process.env.NEXT_PUBLIC_BOOKINGS_EMAIL?.trim() || "tristravelbookings@gmail.com",
   phoneDisplay: "+91 70052 41197",
   whatsappE164: "917005241197",
   whatsappUrl: "https://wa.me/917005241197",

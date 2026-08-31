@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, Minus, Plus, UsersRound, CarFront } from "lucide-react";
-import { FormInput } from "@/components/ui/Form";
+import { FormSelect } from "@/components/ui/Form";
+import { CHILD_AGE_SELECT_OPTIONS } from "@/data/child-ages";
 import { cn } from "@/lib/utils";
 import type { TransportVehicleOption } from "@/data/transport";
 
@@ -120,7 +121,7 @@ export function GuestCompositionFields({
         <Counter
           compact={compact}
           label="Children"
-          note={compact ? "0–17" : "17 years and under"}
+          note={compact ? "Under 1–9" : "Ages under 1 (−1) to 9 years"}
           value={children}
           min={0}
           max={remainingForKids}
@@ -131,16 +132,17 @@ export function GuestCompositionFields({
       {children > 0 && (
         <div className={cn("grid gap-3", compact ? "grid-cols-2" : "sm:grid-cols-2")}>
           {Array.from({ length: children }, (_, index) => (
-            <FormInput
+            <FormSelect
               key={index}
               label={`Child ${index + 1} age`}
               name={`child-age-${index}`}
-              type="number"
-              min={0}
-              max={17}
               required
-              value={String(childAges[index] ?? "")}
-              onChange={(v) => onChildAge(index, Number(v))}
+              options={[
+                { value: "", label: "Select age" },
+                ...CHILD_AGE_SELECT_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+              ]}
+              value={Number.isFinite(childAges[index]) ? String(childAges[index]) : ""}
+              onChange={(v) => onChildAge(index, v === "" ? NaN : Number(v))}
             />
           ))}
         </div>
@@ -230,8 +232,14 @@ export function TransportVehicleFields({
                   )}
                 >
                   <p className="text-xs font-semibold">{option.label}</p>
-                  <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-on-surface-variant">
-                    {option.seats}
+                  <p className="mt-0.5 text-[10px] leading-snug text-on-surface-variant">
+                    {option.idealFor}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-on-surface-variant/85">
+                    {option.summary}
+                  </p>
+                  <p className="mt-1 line-clamp-1 text-[9px] leading-snug text-on-surface-variant/70">
+                    Luggage · {option.luggage}
                   </p>
                 </button>
               );
@@ -263,10 +271,14 @@ export function TransportVehicleFields({
                   >
                     <Check size={11} strokeWidth={3} />
                   </span>
-                  <p className="text-sm font-semibold">{option.label}</p>
-                  <p className="mt-0.5 text-xs text-on-surface-variant">{option.seats}</p>
+                  <p className="pr-8 text-sm font-semibold">{option.label}</p>
+                  <p className="mt-0.5 text-xs text-on-surface-variant">{option.idealFor}</p>
                   <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
                     {option.summary}
+                  </p>
+                  <p className="mt-2 text-xs text-on-surface-variant">
+                    <span className="font-semibold text-primary">Luggage</span>
+                    <span className="mt-0.5 block">{option.luggage}</span>
                   </p>
                 </button>
               );

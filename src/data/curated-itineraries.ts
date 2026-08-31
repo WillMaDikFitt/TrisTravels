@@ -18,6 +18,7 @@ export type CuratedJourneyPatch = {
   stays: string[];
   experienceHighlights: string[];
   highlights: string[];
+  notSuitableFor?: string[];
   itinerary: CuratedDayPlan[];
 };
 
@@ -25,7 +26,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "short-escape-sohra": {
     name: "Short Escape – Sohra",
     tagline:
-      "A nature-filled escape into Sohra — waterfalls, caves and iconic living root bridges.",
+      "A nature-filled escape into Sohra — waterfalls, caves and iconic living root bridges. Slow mornings, highland mist, and trails paced for a short window in Meghalaya when you want depth without rushing.",
     overview:
       "Short on time? Rise into the highlands for Garden of Caves, Nohkalikai, and a choose-your-adventure day in Sohra before returning to Guwahati.",
     days: 3,
@@ -39,6 +40,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Flexible adventure pacing for a short window in Meghalaya",
       "Valley views and Don Bosco Museum on the return to Guwahati",
     ],
+    notSuitableFor: ["Travellers seeking nightlife", "Those unable to walk short uneven trails"],
     itinerary: [
       {
         day: 1,
@@ -243,7 +245,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "meghalaya-escape-the-ordinary": {
     name: "Meghalaya: Escape the Ordinary",
     tagline:
-      "Crest treks, riverside camping near Sohra, caves, and a Mawphanlur hilltop finish — six days off the ordinary path.",
+      "Crest treks, riverside camping near Sohra, caves, and a Mawphanlur hilltop finish — six days off the ordinary path for travellers who want depth, trail time, and quiet nights under highland skies.",
     overview:
       "One night in Shillong, two nights riverside camping near Sohra, and two nights at Mawphanlur hilltop — crest trails, Krem Lymput, Umkar root bridge, and ridge hikes before Guwahati.",
     days: 6,
@@ -257,6 +259,13 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Krem Lymput cave hike with lunch back at camp",
       "Umkar Living Root Bridge walk en route to Mawphanlur",
       "Guided Mawthadraishan & Mawlai Syiem ridge hike",
+      "Two nights of riverside camping under Sohra skies",
+      "Hilltop finish at Mawphanlur before Guwahati",
+    ],
+    notSuitableFor: [
+      "Travellers uncomfortable with camping",
+      "Those seeking luxury hotels only",
+      "Guests unable to trek moderate trails",
     ],
     itinerary: [
       {
@@ -672,7 +681,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "family-sojourn": {
     name: "Family Sojourn: Gentle Trails, Grand Views",
     tagline:
-      "Gentle trails and grand views — a family-paced arc from Brahmaputra sunset to Dawki, Sohra, and Ri-Bhoi.",
+      "Gentle trails and grand views — a family-paced arc from Brahmaputra sunset to Dawki, Sohra, and Ri-Bhoi. Soft days, shared meals, and space for children to explore Meghalaya without rush.",
     overview:
       "Nine soft-paced days built for families: Guwahati cruise, Shillong and sacred forest, Dawki river time, Mawlynnong's short root-bridge hike, easy Sohra sightseeing, and a Ri-Bhoi bonfire close.",
     days: 9,
@@ -686,6 +695,13 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Family-friendly sacred forest, Don Bosco, and Shillong leisure",
       "Dawki river day with optional zip, cliff, or snorkel add-ons",
       "Short Living Root Bridge hike and easy Sohra caves & viewpoints",
+      "Soft pacing designed for children and multi-generation groups",
+      "Ri-Bhoi overnight with a closing bonfire",
+      "Optional adventure add-ons only where families choose them",
+    ],
+    notSuitableFor: [
+      "Extreme trekkers seeking long hard days",
+      "Travellers wanting nightlife-heavy itineraries",
     ],
     itinerary: [
       {
@@ -774,7 +790,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "soul-trails": {
     name: "Soul Trails: Immersive Adventure in Meghalaya",
     tagline:
-      "Fourteen days of immersive Meghalaya — ridges, rivers, hidden root bridges, Nongriat nights, and deep trail time.",
+      "Fourteen days of immersive Meghalaya — ridges, rivers, hidden root bridges, Nongriat nights, and deep trail time. For travellers who want the long, lived-in journey rather than a hurried checklist.",
     overview:
       "The full Soul Trails arc: Guwahati to Mawphanlur, Shnongpdeng adventures, Pynursla immersion, Sohra, two nights in Nongriat, and Shillong before Guwahati — built for travellers who want the long, lived-in journey.",
     days: 14,
@@ -796,6 +812,15 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Full Shnongpdeng river adventure with cultural evening",
       "Pynursla immersion — hidden root bridges and a cooking session",
       "Two nights in Nongriat after Double Decker, Rainbow Falls, and the 3,000-step ascent",
+      "Sohra waterfalls, caves, and highland viewpoints",
+      "Shillong close with space to rest before Guwahati",
+      "Deep trail time across fourteen days — not a rushed circuit",
+      "Community stays and guides woven through every chapter",
+    ],
+    notSuitableFor: [
+      "Travellers seeking a short city break",
+      "Guests unable to trek steep root-bridge and Nongriat trails",
+      "Those requiring luxury hotels every night",
     ],
     itinerary: [
       {

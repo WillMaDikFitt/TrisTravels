@@ -95,7 +95,7 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
             CARD_TYPE.button,
           )}
         >
-          View journey <span aria-hidden>→</span>
+          View Journey <span aria-hidden>→</span>
         </Link>
       </div>
 
@@ -324,7 +324,7 @@ function FixedJourneyCard({
             CARD_TYPE.button,
           )}
         >
-          View journey <span aria-hidden>→</span>
+          View Journey <span aria-hidden>→</span>
         </Link>
       </div>
 

@@ -47,6 +47,7 @@ export default function AdminSettingsPage() {
           const next: PlatformSettings = {
             ...settings,
             impact,
+            discountCodes: settings.discountCodes ?? [],
             minAdvanceDays: Number(fd.get("minAdvanceDays")),
             holdMinutes: Number(fd.get("holdMinutes")),
             serviceFeePercent: Number(fd.get("serviceFeePercent")),
@@ -107,6 +108,128 @@ export default function AdminSettingsPage() {
           {busy ? "Saving…" : "Save settings"}
         </AdminButton>
       </form>
+
+      <Panel className="mt-10 max-w-3xl space-y-5">
+        <div>
+          <h2 className="font-display text-lg text-[#2a2e1f]">Discount codes</h2>
+          <p className="mt-1 text-sm text-[#5c6350]">
+            Percent-off codes for curated Book Now (and shown when guests enter a code). Leave inactive to
+            pause without deleting.
+          </p>
+        </div>
+        <div className="space-y-3">
+          {(settings.discountCodes ?? []).map((row, index) => (
+            <div
+              key={row.id}
+              className="grid gap-3 rounded-xl border border-[#e4dfd4] bg-white p-4 sm:grid-cols-4"
+            >
+              <Field label="Code">
+                <input
+                  className={inputClass}
+                  value={row.code}
+                  onChange={(e) => {
+                    const next = [...(settings.discountCodes ?? [])];
+                    next[index] = { ...row, code: e.target.value.toUpperCase() };
+                    setSettings({ ...settings, discountCodes: next });
+                  }}
+                />
+              </Field>
+              <Field label="Percent off">
+                <input
+                  className={inputClass}
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={row.percent}
+                  onChange={(e) => {
+                    const next = [...(settings.discountCodes ?? [])];
+                    next[index] = { ...row, percent: Number(e.target.value) || 0 };
+                    setSettings({ ...settings, discountCodes: next });
+                  }}
+                />
+              </Field>
+              <Field label="Note">
+                <input
+                  className={inputClass}
+                  value={row.note ?? ""}
+                  onChange={(e) => {
+                    const next = [...(settings.discountCodes ?? [])];
+                    next[index] = { ...row, note: e.target.value };
+                    setSettings({ ...settings, discountCodes: next });
+                  }}
+                />
+              </Field>
+              <div className="flex items-end gap-2">
+                <label className="flex items-center gap-2 text-sm text-[#2a2e1f]">
+                  <input
+                    type="checkbox"
+                    checked={row.active}
+                    onChange={(e) => {
+                      const next = [...(settings.discountCodes ?? [])];
+                      next[index] = { ...row, active: e.target.checked };
+                      setSettings({ ...settings, discountCodes: next });
+                    }}
+                  />
+                  Active
+                </label>
+                <AdminButton
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    const next = (settings.discountCodes ?? []).filter((_, i) => i !== index);
+                    setSettings({ ...settings, discountCodes: next });
+                  }}
+                >
+                  Remove
+                </AdminButton>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <AdminButton
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              const next = [
+                ...(settings.discountCodes ?? []),
+                {
+                  id: `disc_${Date.now()}`,
+                  code: "",
+                  percent: 10,
+                  active: true,
+                  note: "",
+                },
+              ];
+              setSettings({ ...settings, discountCodes: next });
+            }}
+          >
+            Add code
+          </AdminButton>
+          <AdminButton
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              const res = await saveSettings({
+                ...settings,
+                impact,
+                discountCodes: (settings.discountCodes ?? []).filter((d) => d.code.trim()),
+              });
+              setBusy(false);
+              setNote(res.ok ? "Discount codes saved." : res.error ?? "Could not save.");
+              if (res.ok) {
+                setSettings({
+                  ...settings,
+                  discountCodes: (settings.discountCodes ?? []).filter((d) => d.code.trim()),
+                });
+              }
+            }}
+          >
+            Save discount codes
+          </AdminButton>
+        </div>
+      </Panel>
 
       <Panel className="mt-10 max-w-3xl space-y-5">
         <div>

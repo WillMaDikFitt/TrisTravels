@@ -74,8 +74,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
         <BookingWidget experience={exp} compact />
       </div>
 
-      <div className="mx-auto grid max-w-container-max gap-10 px-margin-mobile py-10 md:grid-cols-[minmax(0,1fr)_360px] md:px-margin-desktop md:py-12 lg:gap-12">
-        <div className="space-y-12">
+      <div className="mx-auto grid max-w-container-max gap-8 px-margin-mobile py-8 md:grid-cols-[minmax(0,1fr)_360px] md:px-margin-desktop md:py-10 lg:gap-10">
+        <div className="space-y-10">
           <FadeIn>
             <section className="border-l-2 border-accent pl-6 md:pl-8">
               <p className="label-caps text-accent">The experience</p>
@@ -226,7 +226,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           {exp.faqs.length > 0 && (
             <FadeIn>
-              <section className="pb-4">
+              <section className="pb-0">
                 <h2 className="font-display text-2xl text-primary">FAQ</h2>
                 <div className="mt-6 divide-y divide-outline-variant/30">
                   {exp.faqs.map((f) => (
@@ -250,6 +250,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
       <BreathSection
         size="sm"
+        className="!py-10 md:!py-12"
         eyebrow="Keep exploring"
         title="More experiences across Meghalaya"
         cta={{ href: "/experiences", label: "Browse all" }}

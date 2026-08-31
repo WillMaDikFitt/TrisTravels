@@ -30,6 +30,9 @@
 # local source dumps (files already live in public/)
 /Images.zip
 /hero-section-video.MOV
+/Website Renew.xlsx
+*.HEIC
+*.heic
 
 # debug
 npm-debug.log*

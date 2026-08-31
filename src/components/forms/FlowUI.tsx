@@ -4,9 +4,12 @@ import { cn } from "@/lib/utils";
 export function FlowSteps({
   steps,
   current,
+  onStepClick,
 }: {
   steps: string[];
   current: number;
+  /** Jump to a completed or current step (re-edit). */
+  onStepClick?: (index: number) => void;
 }) {
   return (
     <nav aria-label="Form progress" className="border-b border-outline-variant/25 px-5 py-5 md:px-8">
@@ -14,6 +17,7 @@ export function FlowSteps({
         {steps.map((label, index) => {
           const complete = index < current;
           const active = index === current;
+          const clickable = Boolean(onStepClick) && index <= current;
           return (
             <li key={label} className="relative flex min-w-0 flex-1 flex-col items-center">
               {index > 0 && (
@@ -24,7 +28,10 @@ export function FlowSteps({
                   )}
                 />
               )}
-              <span
+              <button
+                type="button"
+                disabled={!clickable}
+                onClick={() => onStepClick?.(index)}
                 className={cn(
                   "relative z-10 grid h-8 w-8 place-items-center rounded-full border text-xs font-bold transition",
                   complete && "border-primary bg-primary text-on-primary",
@@ -32,11 +39,14 @@ export function FlowSteps({
                   !complete &&
                     !active &&
                     "border-outline-variant bg-surface-container-lowest text-on-surface-variant",
+                  clickable && "cursor-pointer hover:brightness-95",
+                  !clickable && "cursor-default",
                 )}
                 aria-current={active ? "step" : undefined}
+                aria-label={clickable ? `Go to ${label}` : label}
               >
                 {complete ? <Check size={14} strokeWidth={2.5} /> : index + 1}
-              </span>
+              </button>
               <span
                 className={cn(
                   "mt-2 hidden text-center text-[10px] font-bold tracking-[0.1em] uppercase sm:block",
@@ -56,15 +66,17 @@ export function FlowSteps({
 export function FlowShell({
   steps,
   current,
+  onStepClick,
   children,
 }: {
   steps: string[];
   current: number;
+  onStepClick?: (index: number) => void;
   children: React.ReactNode;
 }) {
   return (
     <section className="overflow-hidden rounded-[2rem] border border-outline-variant/25 bg-surface-container-lowest shadow-[0_22px_60px_rgba(42,46,31,0.09)]">
-      <FlowSteps steps={steps} current={current} />
+      <FlowSteps steps={steps} current={current} onStepClick={onStepClick} />
       <div className="px-5 py-7 md:px-9 md:py-9">{children}</div>
     </section>
   );
