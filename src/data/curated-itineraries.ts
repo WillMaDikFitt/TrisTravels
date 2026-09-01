@@ -26,21 +26,26 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "short-escape-sohra": {
     name: "Short Escape – Sohra",
     tagline:
-      "A nature-filled escape into Sohra — waterfalls, caves and iconic living root bridges. Slow mornings, highland mist, and trails paced for a short window in Meghalaya when you want depth without rushing.",
+      "A short, stunning getaway into Sohra with customizable trekking options to waterfalls, caves, or living root bridges.",
     overview:
       "Short on time? Rise into the highlands for Garden of Caves, Nohkalikai, and a choose-your-adventure day in Sohra before returning to Guwahati.",
     days: 3,
     nights: 2,
     route: "2 Nights in Sohra",
     stays: ["Sohra"],
-    experienceHighlights: ["Living Root Bridges", "Nohkalikai", "Garden of Caves", "Waterfall Trails"],
+    experienceHighlights: [
+      "Nohkalikai Crest",
+      "Double Decker living root bridge",
+      "Hidden waterfalls & Sohra caves",
+      "Laitlum canyons",
+    ],
     highlights: [
       "Scenic highland drive into Sohra with Garden of Caves and Nohkalikai Viewpoint",
       "Choose your Day 2 trail: waterfall circuit, Double Decker trek, or crest & cave combo",
       "Flexible adventure pacing for a short window in Meghalaya",
       "Valley views and Don Bosco Museum on the return to Guwahati",
     ],
-    notSuitableFor: ["Travellers seeking nightlife", "Those unable to walk short uneven trails"],
+    notSuitableFor: ["Nightlife seekers", "Limited mobility"],
     itinerary: [
       {
         day: 1,
@@ -77,14 +82,20 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "mawphanlur-meadows-escape": {
     name: "Mawphanlur Meadows Escape",
     tagline:
-      "An off-grid highland escape through sacred forest, meadows, and the soft trails of Nongkhnum River Island.",
+      "Off-grid highland getaway with sacred forest walk and Nongkhnum River Island soft hike.",
     overview:
       "Trade the rush for West Khasi Hills — Umiam and Mawphlang on the way in, a full day at Nongkhnum, and Markham Valley light on the drive home.",
     days: 3,
     nights: 2,
     route: "2 Nights in Mawphanlur",
     stays: ["Mawphanlur"],
-    experienceHighlights: ["Nongkhnum Island", "Sacred Forest", "Village Stay", "Markham Valley"],
+    experienceHighlights: [
+      "2nd largest river island in Asia",
+      "Valleys",
+      "Village stay",
+      "Sacred forest walk",
+    ],
+    notSuitableFor: ["Luxury seekers", "Basic stays", "Limited mobility"],
     highlights: [
       "Highland village stay amid Mawphanlur meadows",
       "Walk Mawphlang Sacred Forest on the way in",
@@ -126,14 +137,20 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "mawsynram-adventures": {
     name: "Mawsynram Adventures",
     tagline:
-      "Wet-season spirit and local-led adventure in the world's wettest hills — rivers, caves, and canyon pools.",
+      "Thrill-packed journey through Mawsynram & Mawlongbna with river trekking, caving, kayaking, and canyon hikes.",
     overview:
       "Two nights in Mawsynram with activities curated by local guides and tailored to weather — kayaking, fossils, cliff canyons, and a natural pool before Guwahati.",
     days: 3,
     nights: 2,
     route: "2 Nights in Mawsynram",
     stays: ["Mawsynram"],
-    experienceHighlights: ["Kayaking", "Caving", "Cliff Canyons", "Sacred Forest"],
+    experienceHighlights: [
+      "Wettest place on earth",
+      "River trekking & Split Rock",
+      "Sacred forest",
+      "Village stay",
+    ],
+    notSuitableFor: ["Non-swimmers", "Rain-averse", "Easy sightseeing"],
     highlights: [
       "Approach via Umiam Lake and Mawphlang Sacred Forest",
       "Full Mawlongbna adventure day with kayaking, fossils, and river treks",
@@ -174,16 +191,22 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   },
 
   "sohra-trekkers-delight": {
-    name: "Sohra Trekkers' Delight",
+    name: "Sohra Trekkers Delight",
     tagline:
-      "A trekker's arc through Sohra caves, the Double Decker, Rainbow Falls, and a night deep in Nongriat.",
+      "Quick nature escape into Sohra with caves, waterfalls and living root bridges; includes a night in Nongriat homestay or camping; moderate to extreme treks.",
     overview:
       "Five days for serious trail time — Mawmluh Cave heritage, a Nongriat overnight (basic, shared bathrooms), then the 3,000-step climb out toward Shillong and Guwahati.",
     days: 5,
     nights: 4,
     route: "2 Nights in Sohra → 1 Night in Nongriat → 1 Night in Shillong",
     stays: ["Sohra", "Nongriat", "Shillong"],
-    experienceHighlights: ["Mawmluh Cave", "Double Decker", "Rainbow Falls", "Nongriat Stay"],
+    experienceHighlights: [
+      "Mawmluh caving",
+      "Waterfalls",
+      "Double Decker living root bridges",
+      "Nongriat homestay or camping",
+    ],
+    notSuitableFor: ["Steep steps", "Basic homestays", "Relaxed sightseeing"],
     highlights: [
       "Five-hour Mawmluh Cave exploration (UNESCO/IUGS heritage)",
       "Overnight in Nongriat after Double Decker and Rainbow Falls",
@@ -245,7 +268,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "meghalaya-escape-the-ordinary": {
     name: "Meghalaya: Escape the Ordinary",
     tagline:
-      "Crest treks, riverside camping near Sohra, caves, and a Mawphanlur hilltop finish — six days off the ordinary path for travellers who want depth, trail time, and quiet nights under highland skies.",
+      "Offbeat 6-day escape into waterfalls, caves, riverside camping, and village life across Meghalaya.",
     overview:
       "One night in Shillong, two nights riverside camping near Sohra, and two nights at Mawphanlur hilltop — crest trails, Krem Lymput, Umkar root bridge, and ridge hikes before Guwahati.",
     days: 6,
@@ -253,7 +276,12 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     route:
       "1 Night in Shillong → 2 Nights Riverside Camping near Sohra → 2 Nights at Mawphanlur Hilltop",
     stays: ["Shillong", "Riverside Camping near Sohra", "Mawphanlur Hilltop"],
-    experienceHighlights: ["Nohkalikai Crest", "Riverside Camping", "Krem Lymput", "Mawphanlur"],
+    experienceHighlights: [
+      "Nohkalikai Crest",
+      "Riverside camping",
+      "Village stay",
+      "Mawphanlur valleys & offbeat caves",
+    ],
     highlights: [
       "Nohkalikai Crest trek into riverside camping near Sohra",
       "Krem Lymput cave hike with lunch back at camp",
@@ -262,11 +290,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Two nights of riverside camping under Sohra skies",
       "Hilltop finish at Mawphanlur before Guwahati",
     ],
-    notSuitableFor: [
-      "Travellers uncomfortable with camping",
-      "Those seeking luxury hotels only",
-      "Guests unable to trek moderate trails",
-    ],
+    notSuitableFor: ["Camping averse", "Luxury only", "Limited mobility"],
     itinerary: [
       {
         day: 1,
@@ -329,7 +353,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "the-pine-and-the-river": {
     name: "The Pine & the River",
     tagline:
-      "Pines, waterfalls, and Umngot days — from Shillong outskirts to Dawki villages, Sohra, and sacred forest.",
+      "Balanced trail from waterfalls and root bridges to sacred groves and riverside stays with treks and kayaking.",
     overview:
       "Six days linking pine-edged hills and river life: Phe Phe and Krangshuri, Amkoi and kayaking near Dawki, Mawlynnong and root bridges, then Nohkalikai Crest and Mawphlang before Guwahati.",
     days: 6,
@@ -337,7 +361,13 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     route:
       "1 Night in Shillong Outskirt → 2 Nights Village near Dawki → 1 Night in Sohra → 1 Night in Mawphlang/Mylliem",
     stays: ["Shillong Outskirt", "Village near Dawki", "Sohra", "Mawphlang/Mylliem"],
-    experienceHighlights: ["Amkoi Trek", "Dawki Rivers", "Mawlynnong", "Sacred Forest"],
+    experienceHighlights: [
+      "Amkoi & Phe Phe falls",
+      "Nohkalikai crest",
+      "Umngot river (Dawki)",
+      "Sacred forest",
+    ],
+    notSuitableFor: ["Camping averse", "Non-swimmers", "Limited mobility"],
     highlights: [
       "Waterfall circuit at Phe Phe and Krangshuri before a riverside village stay",
       "Amkoi trek with boating and kayaking on the Umngot",
@@ -405,14 +435,20 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "essence-of-meghalaya": {
     name: "Essence of Meghalaya",
     tagline:
-      "The classic circuit — Cherrapunjee waterfalls and caves, Mawlynnong, Dawki's clear river, and Shillong.",
+      "A relaxed 6-day journey through Meghalaya’s must-see destinations—Shillong, Dawki, Mawlynnong, and Cherrapunjee—designed for comfort and ease.",
     overview:
       "Six days of Meghalaya essentials: two nights in Cherrapunjee, a Mawlynnong homestay, Dawki's Umngot, and Shillong sightseeing before Guwahati.",
     days: 6,
     nights: 5,
     route: "2 Nights in Cherrapunjee → 1 Night in Mawlynnong → 2 Nights in Shillong",
     stays: ["Cherrapunjee", "Mawlynnong", "Shillong"],
-    experienceHighlights: ["Waterfalls", "Mawlynnong", "Living Root Bridge", "Dawki"],
+    experienceHighlights: [
+      "Shillong city",
+      "Cleanest village in Asia",
+      "Living root bridge",
+      "Sohra & Umngot river",
+    ],
+    notSuitableFor: ["Hard trekkers", "Off-grid only", "Long drives"],
     highlights: [
       "Nohsngithiang, Nohkalikai, and Arwah Cave in Cherrapunjee",
       "Garden of Caves into Mawlynnong and the Single Decker Living Root Bridge",
@@ -481,9 +517,9 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   },
 
   "wild-monsoon-trail": {
-    name: "Wild Monsoon Trail: Where Rain Awakens the Wild",
+    name: "Wild Monsoon Trail",
     tagline:
-      "Seven days where rain feeds the wild — sacred forest, Mawlongbna rivers, Sohra trails, and Mawphanlur ponds.",
+      "Offbeat monsoon adventure through sacred forests, root bridges, waterfalls, caves, and misty highlands.",
     overview:
       "Follow the monsoon pulse from Shillong through Mawlongbna adventures, Sohra's caves and choice trails, and a basic Mawphanlur overnight before Guwahati.",
     days: 7,
@@ -491,7 +527,13 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     route:
       "1 Night in Shillong → 2 Nights in Mawlongbna → 2 Nights in Sohra → 1 Night in Mawphanlur",
     stays: ["Shillong", "Mawlongbna", "Sohra", "Mawphanlur"],
-    experienceHighlights: ["River Trekking", "Sacred Forest", "Hidden Waterfalls", "Kayaking"],
+    experienceHighlights: [
+      "Hidden waterfalls",
+      "River trekking",
+      "Mawphanlur & sacred forests",
+      "Living root bridges & caves",
+    ],
+    notSuitableFor: ["Rain-averse", "Basic stays", "Dry season only"],
     highlights: [
       "Mawphlang Sacred Forest with traditional lunch into Mawlongbna",
       "Full river-trekking day with Split Rock and Umkhakoi kayaking",
@@ -573,7 +615,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   "kaziranga-to-khasi-hills": {
     name: "Kaziranga to Khasi Hills Escape",
     tagline:
-      "From one-horned rhino country to Khasi hills — safaris, sacred forest, Dawki, and Sohra in nine days.",
+      "Blend Kaziranga safaris with Meghalaya’s canyons, caves, waterfalls, and sacred forests at a gentle pace.",
     overview:
       "Nine days bridging Assam and Meghalaya: Kaziranga safaris, Shillong and Mawphlang, Dawki and Mawlynnong, Sohra choice trails, then Ri-Bhoi before Guwahati.",
     days: 9,
@@ -581,7 +623,13 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     route:
       "2 Nights Kaziranga → 2 Nights Shillong → 1 Night Dawki → 2 Nights Sohra → 1 Night Ri-Bhoi",
     stays: ["Kaziranga", "Shillong", "Dawki", "Sohra", "Ri-Bhoi"],
-    experienceHighlights: ["Kaziranga Safari", "Sacred Forest", "Dawki", "Root Bridges"],
+    experienceHighlights: [
+      "Kaziranga safari",
+      "Sacred forest",
+      "Living root bridges",
+      "Umngot river (Dawki)",
+    ],
+    notSuitableFor: ["Limited mobility", "Meghalaya-only", "Early mornings"],
     highlights: [
       "Elephant and jeep safaris plus Orchid & Biodiversity Park in Kaziranga",
       "Mawphlang Sacred Forest with traditional lunch and Don Bosco",
@@ -679,9 +727,9 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   },
 
   "family-sojourn": {
-    name: "Family Sojourn: Gentle Trails, Grand Views",
+    name: "Family Sojourn",
     tagline:
-      "Gentle trails and grand views — a family-paced arc from Brahmaputra sunset to Dawki, Sohra, and Ri-Bhoi. Soft days, shared meals, and space for children to explore Meghalaya without rush.",
+      "A gentle-paced Meghalaya journey designed for families and seniors with caves, waterfalls, villages, and river activities.",
     overview:
       "Nine soft-paced days built for families: Guwahati cruise, Shillong and sacred forest, Dawki river time, Mawlynnong's short root-bridge hike, easy Sohra sightseeing, and a Ri-Bhoi bonfire close.",
     days: 9,
@@ -689,7 +737,12 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     route:
       "1 Night Guwahati → 2 Nights Shillong → 2 Nights Dawki → 2 Nights Sohra → 1 Night Ri-Bhoi",
     stays: ["Guwahati", "Shillong", "Dawki", "Sohra", "Ri-Bhoi"],
-    experienceHighlights: ["Sunset Cruise", "Sacred Forest", "Umngot River", "Living Root Bridge"],
+    experienceHighlights: [
+      "Brahmaputra sunset cruise",
+      "Sacred forests & caves",
+      "Umngot river (Dawki)",
+      "Living root bridges",
+    ],
     highlights: [
       "Brahmaputra sunset cruise on arrival in Guwahati",
       "Family-friendly sacred forest, Don Bosco, and Shillong leisure",
@@ -699,10 +752,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Ri-Bhoi overnight with a closing bonfire",
       "Optional adventure add-ons only where families choose them",
     ],
-    notSuitableFor: [
-      "Extreme trekkers seeking long hard days",
-      "Travellers wanting nightlife-heavy itineraries",
-    ],
+    notSuitableFor: ["Extreme trekkers", "Nightlife seekers"],
     itinerary: [
       {
         day: 1,
@@ -788,9 +838,9 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
   },
 
   "soul-trails": {
-    name: "Soul Trails: Immersive Adventure in Meghalaya",
+    name: "Soul Trails",
     tagline:
-      "Fourteen days of immersive Meghalaya — ridges, rivers, hidden root bridges, Nongriat nights, and deep trail time. For travellers who want the long, lived-in journey rather than a hurried checklist.",
+      "A 13-day immersive adventure across Meghalaya’s hidden gems with homestays, treks, sacred forests, caves, and river adventures.",
     overview:
       "The full Soul Trails arc: Guwahati to Mawphanlur, Shnongpdeng adventures, Pynursla immersion, Sohra, two nights in Nongriat, and Shillong before Guwahati — built for travellers who want the long, lived-in journey.",
     days: 14,
@@ -806,7 +856,12 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Nongriat",
       "Shillong",
     ],
-    experienceHighlights: ["Hidden Root Bridges", "Shnongpdeng Rivers", "Nongriat Trek", "Pynursla"],
+    experienceHighlights: [
+      "Offbeat living root bridge",
+      "Whistling village",
+      "River trekking & offbeat caves",
+      "Waterfalls & canyons",
+    ],
     highlights: [
       "West Khasi Hills ridges and community days in Mawphanlur",
       "Full Shnongpdeng river adventure with cultural evening",
@@ -817,11 +872,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Deep trail time across fourteen days — not a rushed circuit",
       "Community stays and guides woven through every chapter",
     ],
-    notSuitableFor: [
-      "Travellers seeking a short city break",
-      "Guests unable to trek steep root-bridge and Nongriat trails",
-      "Those requiring luxury hotels every night",
-    ],
+    notSuitableFor: ["Short breaks", "Limited mobility", "Luxury only"],
     itinerary: [
       {
         day: 1,

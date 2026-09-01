@@ -49,33 +49,36 @@ export default async function ExperienceDetailPage({ params }: Props) {
       </DetailGallery>
 
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="grid overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_35px_rgba(42,46,31,0.06)] md:grid-cols-4">
-          {[
-            { icon: Clock, label: "Duration", value: exp.duration },
-            { icon: Mountain, label: "Difficulty", value: exp.difficulty },
-            { icon: MapPin, label: "Location", value: exp.location },
-            { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
-          ].map(({ icon: Icon, label, value }) => (
-            <div
-              key={label}
-              className="flex gap-3 border-b border-outline-variant/20 p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
-            >
-              <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
-              <div>
-                <p className="label-caps text-[10px] text-on-surface-variant">{label}</p>
-                <p className="mt-1 font-medium text-primary">{value}</p>
-              </div>
+        <div className="relative z-10 -mt-6 grid gap-6 pb-8 md:-mt-10 md:grid-cols-[minmax(0,1fr)_340px] md:items-start md:gap-8 md:pb-10">
+          <aside className="hidden md:sticky md:top-[calc(var(--header-offset)+0.5rem)] md:col-start-2 md:row-start-1 md:block md:self-start">
+            <BookingWidget experience={exp} />
+          </aside>
+
+          <div className="space-y-10 md:col-start-1 md:row-start-1">
+            <div className="grid overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_35px_rgba(42,46,31,0.06)] md:grid-cols-4">
+              {[
+                { icon: Clock, label: "Duration", value: exp.duration },
+                { icon: Mountain, label: "Difficulty", value: exp.difficulty },
+                { icon: MapPin, label: "Location", value: exp.location },
+                { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
+              ].map(({ icon: Icon, label, value }) => (
+                <div
+                  key={label}
+                  className="flex gap-3 border-b border-outline-variant/20 p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
+                >
+                  <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
+                  <div>
+                    <p className="label-caps text-[10px] text-on-surface-variant">{label}</p>
+                    <p className="mt-1 font-medium text-primary">{value}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="mx-auto max-w-container-max px-margin-mobile pt-6 md:hidden">
-        <BookingWidget experience={exp} compact />
-      </div>
+            <div className="md:hidden">
+              <BookingWidget experience={exp} />
+            </div>
 
-      <div className="mx-auto grid max-w-container-max gap-8 px-margin-mobile py-8 md:grid-cols-[minmax(0,1fr)_360px] md:px-margin-desktop md:py-10 lg:gap-10">
-        <div className="space-y-10">
           <FadeIn>
             <section className="border-l-2 border-accent pl-6 md:pl-8">
               <p className="label-caps text-accent">The experience</p>
@@ -242,10 +245,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
             </FadeIn>
           )}
         </div>
-
-        <aside className="hidden md:block md:self-start md:sticky md:top-[calc(var(--header-offset)+2.5rem)]">
-          <BookingWidget experience={exp} />
-        </aside>
+        </div>
       </div>
 
       <BreathSection

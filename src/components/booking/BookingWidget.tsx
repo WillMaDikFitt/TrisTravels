@@ -109,24 +109,26 @@ export function BookingWidget({ experience }: Props) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[1.35rem] border border-outline-variant/30 bg-surface-container-lowest shadow-[0_16px_40px_rgba(42,46,31,0.08)]",
+        "flex max-h-[calc(100dvh-var(--header-offset)-1.25rem)] flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/30 bg-surface-container-lowest shadow-[0_16px_40px_rgba(42,46,31,0.08)]",
         "p-3.5 md:p-4",
       )}
     >
-      <div className="flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="label-caps text-accent">From</p>
-          <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
-            {formatINR(adultRate(experience))}
-            <span className="text-[12px] font-normal text-on-surface-variant"> / adult</span>
+      <div className="shrink-0">
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="label-caps text-accent">From</p>
+            <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
+              {formatINR(adultRate(experience))}
+              <span className="text-[12px] font-normal text-on-surface-variant"> / adult</span>
+            </p>
+          </div>
+          <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
+            Child {formatINR(childRate(experience))} · max {experience.maxGuests}
           </p>
         </div>
-        <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
-          Child {formatINR(childRate(experience))} · max {experience.maxGuests}
-        </p>
       </div>
 
-      <div className="mt-3 space-y-2.5">
+      <div className="mt-3 min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain pr-0.5">
         <FormInput
           label="Date"
           name="widget-date"
@@ -217,24 +219,16 @@ export function BookingWidget({ experience }: Props) {
         )}
       </div>
 
-      <div className="mt-3 space-y-1 border-t border-outline-variant/25 pt-2.5 text-xs">
-        <div className="flex justify-between text-on-surface-variant">
-          <span>Subtotal</span>
-          <span>{formatINR(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-on-surface-variant">
-          <span>GST (5%)</span>
-          <span>{formatINR(gst)}</span>
-        </div>
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-xs font-semibold text-primary">Gross total</span>
+      <div className="mt-3 shrink-0 border-t border-outline-variant/25 bg-surface-container-lowest pt-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-primary">Total (incl. GST)</span>
           <span className="font-sans text-[1.05rem] font-semibold tracking-tight text-primary">
             {formatINR(gross)}
           </span>
         </div>
       </div>
 
-      <div className="mt-2.5">
+      <div className="shrink-0 pt-2.5">
         <Button onClick={startBooking} className="w-full" size="md" disabled={!canContinue}>
           {instant ? "Continue to book" : "Enquire availability"}
         </Button>

@@ -13,6 +13,7 @@ import { JourneyEnquire } from "@/components/enquiries/JourneyEnquire";
 import { AccordionItem } from "@/components/ui/Accordion";
 import { CURATED_ONLINE_BOOK_DAYS } from "@/data/journey-options";
 import { FIXED_DEPARTURE_PATCHES } from "@/data/fixed-departures";
+import { journeyListingMetaItems } from "@/components/listings/JourneyListingMeta";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -42,22 +43,13 @@ export default async function JourneyDetailPage({ params }: Props) {
       }),
     ) ?? [];
   const glance = [
-    { label: "Duration", value: `${journey.days} Days / ${journey.nights} Nights` },
-    { label: "From price", value: formatINR(journey.priceFrom) },
+    ...journeyListingMetaItems(journey),
+    ...(isFixed && journey.groupSize
+      ? [{ label: "Group size", value: journey.groupSize }]
+      : []),
     ...(isFixed && journey.startingPoint
       ? [{ label: "Starting point", value: journey.startingPoint }]
-      : [{ label: "Best time to travel", value: journey.season }]),
-    {
-      label: isFixed ? "Group size" : "Style",
-      value: isFixed
-        ? journey.groupSize || "—"
-        : journey.style?.slice(0, 2).join(" · ") || journey.groupSize || "—",
-    },
-    ...(journey.notSuitableFor?.length && !isFixed
-      ? [{ label: "Not suitable for", value: journey.notSuitableFor.join(", ") }]
-      : isFixed && journey.season
-        ? [{ label: "Season", value: journey.season }]
-        : []),
+      : []),
   ];
 
   return (

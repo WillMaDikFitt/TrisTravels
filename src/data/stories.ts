@@ -1,4 +1,4 @@
-import { media } from "./media";
+import { listings, media } from "./media";
 
 export type Story = {
   slug: string;
@@ -46,7 +46,7 @@ export const stories: Story[] = [
     author: "Ranjit Kulkarni",
     category: "Culture",
     date: "2024-11-12",
-    image: media.cliffs,
+    image: listings.story("stories-from-meghalaya"),
     sourceUrl: "https://www.trismeghalaya.com/your-stories",
     body: [
       "A six-day journey through Meghalaya filled with serene landscapes, local legends, and cultural insights.",
@@ -77,7 +77,7 @@ export const stories: Story[] = [
     author: "Suchismita Ghosh",
     category: "Family",
     date: "2024-06-14",
-    image: media.familyWaterfall,
+    image: listings.story("experiencing-meghalaya-together"),
     sourceUrl: "https://www.trismeghalaya.com/your-stories",
     body: [
       "A family getaway to Meghalaya turned into a soulful journey through misty hills, cascading waterfalls, living root bridges, and warm Khasi hospitality.",
@@ -92,7 +92,7 @@ export const stories: Story[] = [
     author: "Mridul Gohain",
     category: "Travelogue",
     date: "2024-03-02",
-    image: media.peaks,
+    image: listings.story("six-days-endless-meghalaya-magic"),
     sourceUrl: "https://www.trismeghalaya.com/your-stories",
     body: [
       "A heartfelt six-day journey through Meghalaya’s misty hills — Mawphanlur sunrises, Mawlyngbna adventures, Krem Mawpun caves, and Cherrapunjee’s waterfalls.",

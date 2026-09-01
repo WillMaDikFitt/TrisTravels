@@ -23,6 +23,7 @@ export type FixedDeparturePatch = {
   style: string[];
   route?: string;
   tourHighlights: string[];
+  notSuitableFor?: string[];
   itinerary: FixedDayPlan[];
   inclusions: string[];
   exclusions: string[];
@@ -35,7 +36,7 @@ export type FixedDeparturePatch = {
 export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
   "womens-soulful-escape": {
     idCode: "FD:01",
-    name: "Wild & Free: Soulful Escape for Women in Meghalaya",
+    name: "Women's Soulful Escape",
     tagline: "Where Sisterhood Meets the Spirit of the Hills",
     whyTitle: "Why This Journey?",
     overview:
@@ -59,6 +60,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
       "Kayaking, ziplining, cliff jumping & river fun",
       "Market visits and local shopping sprees",
     ],
+    notSuitableFor: ["Men", "Limited mobility", "Luxury only"],
     itinerary: [
       {
         day: 1,
@@ -186,6 +188,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
       "Offbeat hike to Phe Phe Falls",
       "Bonfire & riverside stay",
     ],
+    notSuitableFor: ["Limited mobility", "Festival crowds", "Dry season only"],
     itinerary: [
       {
         day: 1,

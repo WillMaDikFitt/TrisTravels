@@ -1,4 +1,4 @@
-import { media } from "./media";
+import { listings, media } from "./media";
 import type { CuratedPackagePricing } from "./package-pricing";
 import {
   DEFAULT_PACKAGE_GST_PERCENT,
@@ -111,16 +111,15 @@ function activityFor(priceFrom: number, days: number) {
 const journeySeeds: Journey[] = [
   {
     slug: "short-escape-sohra",
-    name: "Sohra Escape",
+    name: "Short Escape – Sohra",
     type: "curated",
     tagline:
-      "A nature-filled escape into Sohra, combining waterfalls, caves and Meghalaya’s iconic living root bridges.",
+      "A short, stunning getaway into Sohra with customizable trekking options to waterfalls, caves, or living root bridges.",
     days: 3,
     nights: 2,
     priceFrom: 12600,
     priceNote: "per person, based on a group of 4",
-    image: media.local.livingBridge,
-    gallery: [media.local.cliffView, media.local.waterfallPool, media.local.livingBridge, media.local.valleyGreen],
+    image: listings.journey("short-escape-sohra"),
     style: ["Nature", "Trek", "Sohra"],
     season: "October to April",
     overview:
@@ -149,7 +148,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "mawphanlur-meadows-escape",
-    name: "Mawphanlur Hills",
+    name: "Mawphanlur Meadows Escape",
     type: "curated",
     tagline:
       "Off-grid highland getaway with sacred forest walk and Nongkhnum River Island soft hike.",
@@ -157,7 +156,7 @@ const journeySeeds: Journey[] = [
     nights: 2,
     priceFrom: 11100,
     priceNote: "per person, based on a group of 4",
-    image: media.peaks,
+    image: listings.journey("mawphanlur-meadows-escape"),
     gallery: [media.local.meadowWalk, media.local.kyllangRock, media.local.ridgeLight, media.local.homestay],
     style: ["Highlands", "Village", "Slow"],
     season: "August to April",
@@ -183,7 +182,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "mawsynram-adventures",
-    name: "Mawsynram Escape",
+    name: "Mawsynram Adventures",
     type: "curated",
     tagline:
       "Thrill-packed journey through Mawsynram & Mawlongbna with river trekking, caving, kayaking, and canyon hikes.",
@@ -191,7 +190,7 @@ const journeySeeds: Journey[] = [
     nights: 2,
     priceFrom: 14000,
     priceNote: "per person, based on a group of 4",
-    image: media.rain,
+    image: listings.journey("mawsynram-adventures"),
     gallery: [media.local.trailMist, media.local.riverStones, media.local.bridgeTrail, media.local.campfire],
     style: ["Adventure", "River", "Caves"],
     season: "July to April",
@@ -221,7 +220,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "sohra-trekkers-delight",
-    name: "Sohra Trekkers",
+    name: "Sohra Trekkers Delight",
     type: "curated",
     tagline:
       "Quick nature escape into Sohra with caves, waterfalls and living root bridges — including a night in Nongriat homestay or camping.",
@@ -229,7 +228,7 @@ const journeySeeds: Journey[] = [
     nights: 4,
     priceFrom: 25990,
     priceNote: "per person, based on a group of 4",
-    image: media.heroRoots,
+    image: listings.journey("sohra-trekkers-delight"),
     gallery: [media.local.livingBridge, media.local.forestLight, media.local.villagePath, media.local.waterfallPool],
     style: ["Trek", "Roots", "Adventure"],
     season: "Mid October to March",
@@ -261,7 +260,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "meghalaya-escape-the-ordinary",
-    name: "Meghalaya Escape",
+    name: "Meghalaya: Escape the Ordinary",
     type: "curated",
     tagline:
       "Offbeat 6-day escape into waterfalls, camps, riverside camping, and village life across Meghalaya.",
@@ -269,7 +268,7 @@ const journeySeeds: Journey[] = [
     nights: 5,
     priceFrom: 22100,
     priceNote: "per person, based on a group of 4",
-    image: media.familyWaterfall,
+    image: listings.journey("meghalaya-escape-the-ordinary"),
     gallery: [media.local.waterfallPool, media.local.campfire, media.local.groupTrail, media.local.tishu01],
     style: ["Offbeat", "Camping", "Village"],
     season: "Mid-October to March",
@@ -306,7 +305,7 @@ const journeySeeds: Journey[] = [
     nights: 5,
     priceFrom: 22300,
     priceNote: "per person, based on a group of 4",
-    image: media.river,
+    image: listings.journey("the-pine-and-the-river"),
     gallery: [media.local.riverStones, media.local.forestLight, media.local.raksan03, media.local.highlandRoad],
     style: ["Balanced", "Sacred groves", "Kayak"],
     season: "Mid-October to March",
@@ -335,7 +334,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "essence-of-meghalaya",
-    name: "Meghalaya Essence",
+    name: "Essence of Meghalaya",
     type: "curated",
     tagline:
       "A relaxed 6-day journey through Meghalaya’s must-sees — Shillong, Dawki, Mawlynnong, and Cherrapunjee — designed for comfort and ease.",
@@ -343,7 +342,7 @@ const journeySeeds: Journey[] = [
     nights: 5,
     priceFrom: 22250,
     priceNote: "per person, based on a group of 4",
-    image: media.packages,
+    image: listings.journey("essence-of-meghalaya"),
     gallery: [media.local.meadowWalk, media.local.marketDay, media.local.homestay, media.local.landscapePanorama],
     style: ["Classic", "Comfort", "Family-friendly"],
     season: "January to December",
@@ -372,7 +371,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "wild-monsoon-trail",
-    name: "Monsoon Trail",
+    name: "Wild Monsoon Trail",
     type: "curated",
     tagline:
       "Offbeat monsoon adventure through sacred forests, root bridges, waterfalls, caves, and misty highlands.",
@@ -380,7 +379,7 @@ const journeySeeds: Journey[] = [
     nights: 6,
     priceFrom: 30150,
     priceNote: "per person, based on a group of 4",
-    image: media.forest,
+    image: listings.journey("wild-monsoon-trail"),
     gallery: [media.local.forestLight, media.local.trailMist, media.local.bridgeTrail, media.local.detail02],
     style: ["Monsoon", "Offbeat", "Adventure"],
     season: "Mid-May to September",
@@ -410,7 +409,7 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "kaziranga-to-khasi-hills",
-    name: "Kaziranga Escape",
+    name: "Kaziranga to Khasi Hills Escape",
     type: "curated",
     tagline:
       "Blend Kaziranga safaris with Meghalaya’s canyons, caves, waterfalls, and sacred forests at a gentle pace.",
@@ -418,7 +417,7 @@ const journeySeeds: Journey[] = [
     nights: 8,
     priceFrom: 49350,
     priceNote: "per person, based on a group of 4",
-    image: media.mountains,
+    image: listings.journey("kaziranga-to-khasi-hills"),
     gallery: [media.local.cliffView, media.local.landscapePanorama, media.local.raksan06, media.local.livingBridge],
     style: ["Safari", "Culture", "Nature"],
     season: "Mid-October to March",
@@ -458,7 +457,7 @@ const journeySeeds: Journey[] = [
     nights: 8,
     priceFrom: 38730,
     priceNote: "per person, based on a group of 4",
-    image: media.familyWaterfall,
+    image: listings.journey("family-sojourn"),
     gallery: [media.local.waterfallPool, media.local.groupTrail, media.local.homestay, media.local.portraitWarm],
     style: ["Family", "Gentle pace", "Seniors"],
     season: "October to April",
@@ -498,7 +497,7 @@ const journeySeeds: Journey[] = [
     nights: 12,
     priceFrom: 68250,
     priceNote: "per person, based on a group of 4",
-    image: media.heroForest,
+    image: listings.journey("soul-trails"),
     gallery: [media.local.villagePath, media.local.bridgeTrail, media.local.tishu02, media.local.raksan04, media.local.campfire],
     style: ["Immersive", "Offbeat", "Culture"],
     season: "Mid October to March",
@@ -534,17 +533,17 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "womens-soulful-escape",
-    name: "Women's Escape",
+    name: "Women's Soulful Escape",
     type: "small-group",
     tagline: "Where Sisterhood Meets the Spirit of the Hills",
     days: 7,
     nights: 6,
     priceFrom: 38299,
-    image: media.departures,
+    image: listings.journey("womens-soulful-escape"),
     gallery: [media.local.ridgeLight, media.local.groupTrail, media.local.raksan07, media.local.tishu03],
     style: ["Women-only", "Small group", "Sisterhood"],
     season: "Multiple dates · Oct–Dec",
-    overview: "Ladies-only small-group journey across Meghalaya.",
+    overview: "Ladies-only small-group journey across Meghalaya — Laitlum, Phe Phe, Krangshuri, Dawki, Mawlynnong, and Mawsynram.",
     highlights: [],
     itinerary: [],
     stays: ["Cottage, guest house & homestays"],
@@ -563,7 +562,7 @@ const journeySeeds: Journey[] = [
     days: 8,
     nights: 7,
     priceFrom: 38999,
-    image: media.local.meadowWalk,
+    image: listings.journey("blossoms-and-beyond"),
     gallery: [
       media.local.forestLight,
       media.local.waterfallPool,
@@ -586,14 +585,14 @@ const journeySeeds: Journey[] = [
   },
   {
     slug: "offbeat-living-root-bridge",
-    name: "Root Bridge Trail",
+    name: "Offbeat Living Root Bridge",
     type: "small-group",
     tagline:
-      "For travellers who go beyond tourist paths — to feel the place, not just visit it. Up to six living bridges. One forest.",
+      "For travellers who go beyond tourist paths — to feel the place, not just visit it.",
     days: 2,
     nights: 1,
     priceFrom: 6990,
-    image: media.heroRoots,
+    image: listings.journey("offbeat-living-root-bridge"),
     gallery: [media.local.livingBridge, media.local.bridgeTrail, media.local.forestLight, media.local.homestay],
     style: ["Roots", "Small group", "Offbeat"],
     season: "Weekly Mondays · 12 Jan 2026 — 6 Apr 2026",
@@ -624,6 +623,7 @@ const journeySeeds: Journey[] = [
     inclusions: fixedInclusions,
     nextDeparture: "Every Monday · register with no upfront payment",
     groupSize: "4–10 persons",
+    notSuitableFor: ["Limited mobility", "Luxury seekers", "Shared transport"],
     departureSeats: [
       { date: "2026-08-17", seats: 10, held: 0, booked: 6, note: "Monday departure" },
       { date: "2026-08-24", seats: 10, held: 1, booked: 3, note: "Monday departure" },
@@ -683,6 +683,7 @@ function applyFixedPatch(journey: Journey): Journey {
     itinerary: patch.itinerary,
     inclusions: patch.inclusions,
     exclusions: patch.exclusions,
+    ...(patch.notSuitableFor?.length ? { notSuitableFor: patch.notSuitableFor } : {}),
     departureSeats: patch.departureSeats,
     nextDeparture: patch.nextDeparture,
   };

@@ -421,11 +421,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
             />
           ) : null}
           <div className="mt-3 border-t border-outline-variant/25 pt-3">
-            <Row label="Subtotal" value={formatINR(subtotal)} />
-            <Row label="GST (5%)" value={formatINR(gst)} />
-            <div className="mt-2">
-              <Row label="Gross total" value={formatINR(gross)} bold />
-            </div>
+            <Row label="Total (incl. GST)" value={formatINR(gross)} bold />
           </div>
           {name ? <Row label="Guest" value={name} /> : null}
         </div>

@@ -1,4 +1,4 @@
-import { media } from "./media";
+import { listings, media } from "./media";
 import type { TransportVehiclePrices } from "./transport";
 
 export type ExperienceCategory =
@@ -82,8 +82,9 @@ export type Experience = {
 export const experiences: Experience[] = [
   {
     slug: "offbeat-living-root-bridge",
-    name: "Root Bridge",
-    tagline: "Up to six living bridges most travellers never reach — quiet paths, village stay energy.",
+    name: "Offbeat Living Root Bridge",
+    tagline:
+      "For travellers who go beyond tourist paths — to feel the place, not just visit it.",
     category: "Adventure",
     tags: ["Community-Led", "Trek", "Fixed Departure"],
     location: "Rangthylliang–Mawkyrnot",
@@ -103,7 +104,7 @@ export const experiences: Experience[] = [
     transportAvailable: true,
     transportPrice: 2500,
     transportNote: "Shared pickup from Shillong",
-    image: media.heroRoots,
+    image: listings.experience("offbeat-living-root-bridge"),
     gallery: [media.local.bridgeTrail, media.local.forestLight, media.local.villagePath, media.local.raksan02],
     communityLed: true,
     overview:
@@ -167,7 +168,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "double-decker-living-root-bridge",
-    name: "Double Decker",
+    name: "Double Decker Living Root Bridge",
     tagline: "Descend to Nongriat’s famous living architecture — grown across generations.",
     category: "Adventure",
     tags: ["Trek", "Heritage", "Nature"],
@@ -187,7 +188,7 @@ export const experiences: Experience[] = [
       intervalMinutes: 60,
       breaks: [{ start: "09:00", end: "09:30" }],
     },
-    image: media.heroRoots,
+    image: listings.experience("double-decker-living-root-bridge"),
     gallery: [media.local.livingBridge, media.local.waterfallPool, media.local.ridgeLight],
     communityLed: true,
     overview:
@@ -263,8 +264,7 @@ export const experiences: Experience[] = [
     },
     transportAvailable: true,
     transportPrice: 1800,
-    transportNote: "Optional private transfer",
-    image: media.rain,
+    image: listings.experience("mawsynram-river-trek"),
     gallery: [media.local.riverStones, media.local.cliffView, media.local.trailMist],
     communityLed: true,
     overview:
@@ -319,7 +319,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "mawphlang-sacred-forest",
-    name: "Sacred Forest",
+    name: "Mawphlang Sacred Forest",
     tagline: "Where stories live quietly — heritage protected for centuries.",
     category: "Culture & Heritage",
     tags: ["Culture", "Nature", "Slow"],
@@ -332,7 +332,7 @@ export const experiences: Experience[] = [
     bestSeason: "Year-round",
     priceFrom: 2600,
     maxGuests: 12,
-    image: media.forest,
+    image: listings.experience("mawphlang-sacred-forest"),
     gallery: [media.local.forestLight, media.local.detail01, media.local.raksan05],
     sustainabilityFocus: true,
     overview:
@@ -366,7 +366,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "umngot-dawki",
-    name: "Umngot, Dawki",
+    name: "Dawki — Umngot River",
     tagline: "Crystal-clear waters, border views, and boat time with local crews.",
     category: "Nature & Wildlife",
     tags: ["Water", "Family Friendly", "Sustainability Focus"],
@@ -379,7 +379,7 @@ export const experiences: Experience[] = [
     bestSeason: "November – March",
     priceFrom: 2800,
     maxGuests: 10,
-    image: media.river,
+    image: listings.experience("umngot-dawki"),
     gallery: [media.local.waterfallPool, media.local.landscapePanorama, media.local.groupTrail],
     sustainabilityFocus: true,
     overview:
@@ -418,7 +418,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "short-escape-sohra-day",
-    name: "Sohra Cliffs",
+    name: "Short Escape – Sohra",
     tagline: "A customizable Sohra day — Nohkalikai Crest, caves, and waterfall country.",
     category: "Nature & Wildlife",
     tags: ["Sohra", "Viewpoints", "Caves"],
@@ -431,7 +431,7 @@ export const experiences: Experience[] = [
     bestSeason: "October to April",
     priceFrom: 4500,
     maxGuests: 10,
-    image: media.heroMist,
+    image: listings.experience("short-escape-sohra-day"),
     gallery: [media.local.cliffView, media.local.meadowWalk, media.local.valleyGreen],
     overview:
       "Drawn from TRIS’s Short Escape – Sohra package: a stunning getaway into Sohra with options spanning waterfalls, caves, Laitlum canyons, and living root bridge approaches.",
@@ -486,7 +486,7 @@ export const experiences: Experience[] = [
     bestSeason: "September – November",
     priceFrom: 3200,
     maxGuests: 8,
-    image: media.trail,
+    image: listings.experience("krem-puri-cave"),
     gallery: [media.local.bridgeTrail, media.local.detail03, media.local.campfire],
     overview:
       "Trek toward Krem Puri — one of the longest sandstone caves in the world, stretching over 24 kilometres. Inside, cool ancient air, wet walls, and silence that feels far from the noise outside.",
@@ -519,7 +519,7 @@ export const experiences: Experience[] = [
   },
   {
     slug: "mawlynnong-village-stay",
-    name: "Mawlynnong",
+    name: "Mawlynnong Village Stay",
     tagline: "Asia’s cleanest village — overnight hosts, heritage walks, and quiet evenings.",
     category: "Food & Local Life",
     tags: ["Village", "Community-Led", "Family Friendly"],
@@ -532,7 +532,7 @@ export const experiences: Experience[] = [
     bestSeason: "Year-round",
     priceFrom: 4800,
     maxGuests: 8,
-    image: media.valueCommunity,
+    image: listings.experience("mawlynnong-village-stay"),
     gallery: [media.local.homestay, media.local.marketDay, media.local.tishu02, media.local.portraitWarm],
     communityLed: true,
     overview:

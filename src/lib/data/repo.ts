@@ -31,6 +31,14 @@ function containsStockMedia(value: unknown): boolean {
   return false;
 }
 
+function isCuratedCoverImage(path: string) {
+  return (
+    path.includes("/images/listings/") ||
+    path.includes("/images/stories/") ||
+    path.includes("/images/categories/")
+  );
+}
+
 /** Firestore Timestamps / Dates → ISO strings so RSC payloads stay serializable. */
 function sanitizeOverlay(value: unknown): unknown {
   if (value == null || typeof value !== "object") return value;
@@ -64,16 +72,15 @@ function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, 
     // Older seeded records can contain the stock placeholders used by the prototype.
     // Keep the curated local media from the static catalogue for those fields.
     if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;
-    // Story covers: prefer curated seed paths under /images/stories/ over older
-    // catalogue stills that were previously written to Firestore.
+    // Prefer curated listing / story / category covers from the static seed catalogue.
     if (
       key === "image" &&
       base &&
       typeof (base as { image?: unknown }).image === "string" &&
-      String((base as { image: string }).image).includes("/images/stories/") &&
       typeof value === "string" &&
       value.startsWith("/images/") &&
-      !value.includes("/images/stories/")
+      isCuratedCoverImage(String((base as { image: string }).image)) &&
+      !isCuratedCoverImage(value)
     ) {
       continue;
     }
