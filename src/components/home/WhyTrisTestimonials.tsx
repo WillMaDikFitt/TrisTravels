@@ -93,8 +93,8 @@ export function WhyTrisTestimonials() {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-container-max flex-col justify-between gap-2 px-margin-mobile py-4 md:gap-3 md:px-margin-desktop md:py-6">
-        <div className="shrink-0 text-center">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-container-max flex-col items-center justify-center gap-5 px-margin-mobile py-6 md:gap-7 md:px-margin-desktop md:py-8">
+        <div className="w-full shrink-0 text-center">
           <div className="ink-rule mx-auto bg-surface-container-lowest/40" />
           <p className="label-caps mt-2 text-surface-container-lowest/70">Travellers</p>
           <h2 className="mt-1.5 font-[family-name:var(--font-playfair)] text-[clamp(1.9rem,3.6vw,2.85rem)] leading-tight text-surface-container-lowest">
@@ -109,14 +109,14 @@ export function WhyTrisTestimonials() {
           </blockquote>
           <Link
             href="/journeys"
-            className="group mt-4 inline-flex items-center gap-2.5 rounded-lg bg-cta px-6 py-3 text-xs font-bold tracking-[0.16em] text-on-cta uppercase transition hover:brightness-110"
+            className="group mt-4 inline-flex items-center gap-2.5 rounded-lg bg-surface-container-lowest px-6 py-3 text-xs font-bold tracking-[0.16em] text-primary uppercase shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:bg-surface-container-lowest/92 hover:shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
           >
             Explore our journeys
             <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
           </Link>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col justify-end pb-1">
+        <div className="w-full shrink-0">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-[10px] font-semibold tracking-[0.18em] text-surface-container-lowest/55 uppercase">
               From our travellers
