@@ -13,11 +13,11 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-white/80 bg-white/75 px-6 py-6 shadow-[0_16px_45px_rgba(42,46,31,0.06)] backdrop-blur md:px-8">
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-surface-container-lowest/80 bg-surface-container-lowest/75 px-6 py-6 shadow-[0_16px_45px_rgba(54,64,55,0.06)] backdrop-blur md:px-8">
       <div>
-        {eyebrow && <p className="text-[11px] font-semibold tracking-[0.16em] text-[#6b734f] uppercase">{eyebrow}</p>}
-        <h1 className="mt-1 font-display text-3xl text-[#2a2e1f] md:text-4xl">{title}</h1>
-        {description && <p className="mt-1.5 max-w-2xl text-sm text-[#5c6350]">{description}</p>}
+        {eyebrow && <p className="label-caps text-on-surface-variant">{eyebrow}</p>}
+        <h1 className="mt-1 font-display text-3xl text-foreground md:text-4xl">{title}</h1>
+        {description && <p className="mt-1.5 max-w-2xl text-sm text-on-surface-variant">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -34,10 +34,10 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-      <div className="relative overflow-hidden rounded-2xl border border-white bg-white p-5 shadow-[0_14px_36px_rgba(42,46,31,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-[#c2643a]">
-      <p className="text-[11px] font-semibold tracking-[0.14em] text-[#6b734f] uppercase">{label}</p>
-      <p className="mt-2 font-display text-3xl text-[#2a2e1f]">{value}</p>
-      {hint && <p className="mt-1 text-xs text-[#8a917c]">{hint}</p>}
+    <div className="relative overflow-hidden rounded-2xl border border-surface-container-lowest bg-surface-container-lowest p-5 shadow-[0_14px_36px_rgba(54,64,55,0.08)] before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-terracotta">
+      <p className="label-caps text-on-surface-variant">{label}</p>
+      <p className="mt-2 font-display text-3xl text-foreground">{value}</p>
+      {hint && <p className="mt-1 text-xs text-on-surface-variant">{hint}</p>}
     </div>
   );
 }
@@ -46,7 +46,7 @@ export function Panel({ children, className }: { children: ReactNode; className?
   return (
     <div
       className={cn(
-        "w-full min-w-0 max-w-none rounded-2xl border border-[#e4dfd4] bg-white p-5 shadow-[0_14px_36px_rgba(42,46,31,0.07)] md:p-6",
+        "w-full min-w-0 max-w-none rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-[0_14px_36px_rgba(54,64,55,0.07)] md:p-6",
         className,
       )}
     >
@@ -63,12 +63,12 @@ export function Badge({
   tone?: "neutral" | "olive" | "amber" | "green" | "red" | "slate";
 }) {
   const tones = {
-    neutral: "bg-[#f3efe8] text-[#5c6350]",
-    olive: "bg-[#e4e8d4] text-[#3d4a28]",
-    amber: "bg-amber-50 text-amber-800",
-    green: "bg-emerald-50 text-emerald-800",
-    red: "bg-rose-50 text-rose-800",
-    slate: "bg-slate-100 text-slate-600",
+    neutral: "bg-surface-container text-on-surface-variant",
+    olive: "bg-secondary-container text-primary",
+    amber: "bg-terracotta/10 text-terracotta",
+    green: "bg-highlight/15 text-primary",
+    red: "bg-terracotta/12 text-terracotta",
+    slate: "bg-surface-container-high text-on-surface-variant",
   };
   return (
     <span className={cn("inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize", tones[tone])}>
@@ -93,9 +93,9 @@ export function AdminButton({
   onClick?: () => void;
 }) {
   const variants = {
-    primary: "bg-[#4a5a28] text-[#f7f4ee] hover:bg-[#3d4a22]",
-    ghost: "border border-[#d4cec0] bg-white text-[#2a2e1f] hover:bg-[#f3efe8]",
-    danger: "border border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100",
+    primary: "bg-cta text-on-cta hover:brightness-110",
+    ghost: "border border-outline-variant bg-surface-container-lowest text-foreground hover:bg-surface-container",
+    danger: "border border-terracotta/25 bg-terracotta/10 text-terracotta hover:bg-terracotta/15",
   };
   return (
     <button
@@ -123,39 +123,39 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <label className="block text-sm font-medium text-[#2a2e1f]">
+    <label className="block text-sm font-medium text-foreground">
       {label}
-      {hint && <span className="ml-2 text-xs font-normal text-[#8a917c]">{hint}</span>}
+      {hint && <span className="ml-2 text-xs font-normal text-on-surface-variant">{hint}</span>}
       <div className="mt-1.5">{children}</div>
     </label>
   );
 }
 
 export const inputClass =
-  "w-full rounded-xl border border-[#d4cec0] bg-[#f7f4ee] px-3 py-2.5 text-sm text-[#2a2e1f] outline-none transition placeholder:text-[#8a917c] focus:border-[#4a5a28] focus:bg-white focus:ring-2 focus:ring-[#4a5a28]/15";
+  "w-full rounded-xl border border-outline-variant bg-surface-container px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-on-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/15";
 
 export function Notice({ children, tone = "info" }: { children: ReactNode; tone?: "info" | "ok" | "warn" }) {
   const tones = {
-    info: "bg-[#f3efe8] text-[#5c6350]",
-    ok: "bg-emerald-50 text-emerald-800",
-    warn: "bg-amber-50 text-amber-900",
+    info: "bg-surface-container text-on-surface-variant",
+    ok: "bg-highlight/12 text-primary",
+    warn: "bg-terracotta/10 text-terracotta",
   };
   return <p className={cn("rounded-xl px-4 py-3 text-sm", tones[tone])}>{children}</p>;
 }
 
 export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="rounded-2xl border border-[#e4dfd4] bg-white px-6 py-14 text-center">
-      <p className="text-sm text-[#8a917c]">{label}</p>
+    <div className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest px-6 py-14 text-center">
+      <p className="text-sm text-on-surface-variant">{label}</p>
     </div>
   );
 }
 
 export function EmptyState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#d4cec0] px-6 py-14 text-center">
-      <p className="font-display text-lg text-[#2a2e1f]">{title}</p>
-      <p className="mt-1 text-sm text-[#5c6350]">{body}</p>
+    <div className="rounded-2xl border border-dashed border-outline-variant px-6 py-14 text-center">
+      <p className="font-display text-lg text-foreground">{title}</p>
+      <p className="mt-1 text-sm text-on-surface-variant">{body}</p>
     </div>
   );
 }

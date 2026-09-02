@@ -818,7 +818,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       <p className="text-[11px] font-bold tracking-[0.14em] text-on-surface-variant uppercase">
                         Advance
                       </p>
-                      <p className="mt-1 font-display text-2xl font-semibold text-[#A65D45]">
+                      <p className="mt-1 font-display text-2xl font-semibold text-primary">
                         {formatINR(priced.advanceAmount)}
                       </p>
                     </div>
@@ -826,7 +826,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       <p className="text-[11px] font-bold tracking-[0.14em] text-on-surface-variant uppercase">
                         Balance
                       </p>
-                      <p className="mt-1 font-display text-2xl font-semibold text-[#A65D45]">
+                      <p className="mt-1 font-display text-2xl font-semibold text-primary">
                         {formatINR(priced.balanceAmount)}
                       </p>
                     </div>

@@ -4,6 +4,7 @@ import { destinations, getDestination as getStaticDestination } from "@/data/des
 import { stories, type Story } from "@/data/stories";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { ClosureRecord, Experience, Journey, Destination, PlatformSettings } from "@/lib/types";
+import { sortExperiences } from "@/lib/experience-meta";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import { memoryStore } from "@/lib/store";
 
@@ -128,13 +129,13 @@ async function collectionDocs<T>(name: string): Promise<T[] | null> {
 
 export async function listExperiences(): Promise<Experience[]> {
   const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
-  const merged = mergeCatalog(experiences, remote);
+  const merged = sortExperiences(mergeCatalog(experiences, remote));
   return merged.filter((e) => (e.status ?? "active") === "active" || e.status === "seasonal");
 }
 
 export async function listAllExperiencesAdmin(): Promise<Experience[]> {
   const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
-  return mergeCatalog(experiences, remote);
+  return sortExperiences(mergeCatalog(experiences, remote));
 }
 
 export async function findExperience(slug: string): Promise<Experience | undefined> {

@@ -46,7 +46,7 @@ export default function AdminJournalPage() {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/admin/story-submissions"
-              className="rounded-full border border-[#d4cec0] px-4 py-2 text-xs font-bold tracking-wider text-[#2a2e1f] uppercase"
+              className="rounded-full border border-[#c5cbb8] px-4 py-2 text-xs font-bold tracking-wider text-[#26352b] uppercase"
             >
               Guest stories
             </Link>
@@ -65,9 +65,9 @@ export default function AdminJournalPage() {
       />
       <div className="space-y-6">
         <Panel className="overflow-x-auto">
-          <p className="mb-3 text-xs font-semibold tracking-wider text-[#6b734f] uppercase">Published</p>
+          <p className="mb-3 text-xs font-semibold tracking-wider text-[#4a5a50] uppercase">Published</p>
           <table className="w-full min-w-[700px] text-left text-sm">
-            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+            <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
               <tr>
                 <th className="px-3 py-2.5">Story</th>
                 <th className="px-3 py-2.5">Author</th>
@@ -81,14 +81,14 @@ export default function AdminJournalPage() {
               <tr
                 key={s.slug}
                 className={cn(
-                  "border-t border-[#f0ebe3]",
+                  "border-t border-[#dde1d0]",
                   !creating && story?.slug === s.slug ? "bg-[#eef0e3]" : "hover:bg-[#faf8f3]",
                 )}
               >
                 <td className="max-w-[28rem] px-3 py-3 font-medium">{s.title}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{s.author || "—"}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{s.category}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{s.date}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{s.author || "—"}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{s.category}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{s.date}</td>
                 <td className="px-3 py-3 text-right">
                   <button
                   type="button"
@@ -97,7 +97,7 @@ export default function AdminJournalPage() {
                     setStory(s);
                     setNote("");
                   }}
-                  className="text-xs font-semibold text-[#4a5a28]"
+                  className="text-xs font-semibold text-[#364037]"
                 >
                   Edit
                 </button>
@@ -207,7 +207,7 @@ export default function AdminJournalPage() {
           </form>
         ) : (
           <Panel>
-            <p className="text-sm text-[#5c6350]">Select a story to edit, or create a new one.</p>
+            <p className="text-sm text-[#4a5a50]">Select a story to edit, or create a new one.</p>
           </Panel>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus } from "@/data/experiences";
+import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus, ExperienceTransportMode } from "@/data/experiences";
 import { getExperience as getStaticExperience } from "@/data/experiences";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { fetchExperienceAdmin } from "@/lib/actions/content-read";
@@ -91,7 +91,7 @@ export default function ExperienceEditorPage() {
   }, [isNew, slugKey]);
 
   if (!row) {
-    return <p className="text-sm text-[#5c6350]">Loading editor…</p>;
+    return <p className="text-sm text-[#4a5a50]">Loading editor…</p>;
   }
 
   return (
@@ -156,7 +156,8 @@ export default function ExperienceEditorPage() {
                     breaks: breaks.length ? breaks : undefined,
                   };
             })(),
-            transportAvailable: fd.get("transportAvailable") === "on",
+            transportMode: String(fd.get("transportMode") || "none") as ExperienceTransportMode,
+            transportAvailable: ["optional", "required"].includes(String(fd.get("transportMode") || "none")),
             transportPrice: Number(fd.get("transportPrice") || 0) || undefined,
             transportNote: String(fd.get("transportNote") || ""),
             transportVehicles: readTransportVehiclePrices(fd),
@@ -167,10 +168,12 @@ export default function ExperienceEditorPage() {
             trisStory: String(fd.get("trisStory")),
             highlights: lines(String(fd.get("highlights") || "")),
             included: lines(String(fd.get("included") || "")),
+            excluded: lines(String(fd.get("excluded") || "")),
             whatToBring: lines(String(fd.get("whatToBring") || "")),
             meetingPoint: String(fd.get("meetingPoint")),
             tags: lines(String(fd.get("tags") || "").replace(/,/g, "\n")),
             suitableFor: lines(String(fd.get("suitableFor") || "")),
+            sortOrder: Number(fd.get("sortOrder") || 0) || undefined,
             itinerary: lines(String(fd.get("itinerary") || "")).map((line) => {
               const [time, title, ...rest] = line.split("—").map((s) => s.trim());
               return { time: time || "", title: title || line, description: rest.join(" — ") };
@@ -239,6 +242,9 @@ export default function ExperienceEditorPage() {
             <Field label="Meeting point">
               <input name="meetingPoint" defaultValue={row.meetingPoint} className={inputClass} />
             </Field>
+            <Field label="Display order" hint="Lower numbers appear first on the site">
+              <input name="sortOrder" type="number" defaultValue={row.sortOrder ?? ""} className={inputClass} />
+            </Field>
           </div>
         </Panel>
 
@@ -304,12 +310,19 @@ export default function ExperienceEditorPage() {
               />
             </Field>
           </div>
-          <div className="mt-6 border-t border-[#e4dfd4] pt-5">
-            <h3 className="font-display text-base text-[#2a2e1f]">Transportation</h3>
-            <label className="mt-3 flex items-center gap-2 text-sm text-[#2a2e1f]">
-              <input name="transportAvailable" type="checkbox" defaultChecked={row.transportAvailable} />
-              Offer transportation as an optional add-on
-            </label>
+          <div className="mt-6 border-t border-[#c5cbb8] pt-5">
+            <h3 className="font-display text-base text-[#26352b]">Transportation</h3>
+            <Field label="Transportation requirement" hint="Optional lets guests choose own transport or TRIS. Required forces TRIS transport.">
+              <select
+                name="transportMode"
+                defaultValue={row.transportMode ?? (row.transportAvailable ? "optional" : "none")}
+                className={inputClass}
+              >
+                <option value="none">Not offered</option>
+                <option value="optional">Optional — own transport or TRIS</option>
+                <option value="required">Required — TRIS transport only</option>
+              </select>
+            </Field>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <Field label="Base transport price (₹)" hint="Used when a vehicle rate below is blank">
                 <input name="transportPrice" type="number" min="0" defaultValue={row.transportPrice ?? ""} className={inputClass} />
@@ -348,12 +361,15 @@ export default function ExperienceEditorPage() {
             <Field label="TRIS story">
               <textarea name="trisStory" rows={4} defaultValue={row.trisStory} className={inputClass} />
             </Field>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Highlights" hint="one per line">
                 <textarea name="highlights" rows={6} defaultValue={row.highlights.join("\n")} className={inputClass} />
               </Field>
               <Field label="Included" hint="one per line">
                 <textarea name="included" rows={6} defaultValue={row.included.join("\n")} className={inputClass} />
+              </Field>
+              <Field label="Excluded" hint="one per line">
+                <textarea name="excluded" rows={6} defaultValue={(row.excluded ?? []).join("\n")} className={inputClass} />
               </Field>
               <Field label="What to bring" hint="one per line">
                 <textarea name="whatToBring" rows={6} defaultValue={row.whatToBring.join("\n")} className={inputClass} />

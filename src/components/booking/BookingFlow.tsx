@@ -23,7 +23,8 @@ import { dateIsClosed } from "@/lib/catalog";
 import type { ClosureRecord } from "@/lib/types";
 import { transportVehicleOptions } from "@/data/transport";
 import { adultRate, childRate } from "@/lib/pricing";
-import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
+import { GuestCompositionFields, GettingThereFields, type TransportChoice } from "@/components/booking/GuestTransportFields";
+import { experienceTransportMode } from "@/lib/experience-meta";
 import {
   FieldGroup,
   FlowActions,
@@ -60,6 +61,10 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     Number(search.get("adults") || Math.max(minGuests, 1)),
   );
 
+  const transportMode = experienceTransportMode(experience);
+  const initialTransportChoice: TransportChoice =
+    search.get("transport") === "1" ? "tris" : search.get("transport") === "0" ? "own" : null;
+
   const [step, setStep] = useState(0);
   const [slot, setSlot] = useState(search.get("slot") || "");
   const [date, setDate] = useState(search.get("date") || "");
@@ -72,7 +77,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const [childAges, setChildAges] = useState<number[]>(
     parseAges(search.get("childAges"), initialChildren),
   );
-  const [transportation, setTransportation] = useState(search.get("transport") === "1");
+  const [transportChoice, setTransportChoice] = useState<TransportChoice>(initialTransportChoice);
   const [vehicleId, setVehicleId] = useState<string>(search.get("vehicle") || "");
   const [vehicleCount, setVehicleCount] = useState(
     Math.max(1, Number(search.get("vehicles") || 1)),
@@ -101,6 +106,8 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const steps = ["Details", "Contact"];
 
   const guests = adults + children;
+  const transportation =
+    transportMode === "required" || (transportMode === "optional" && transportChoice === "tris");
   const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
   const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
   const transportFee =
@@ -125,6 +132,13 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     }
   };
 
+  const transportReady =
+    transportMode === "none"
+      ? true
+      : transportMode === "required"
+        ? Boolean(vehicleId)
+        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+
   const detailsReady =
     Boolean(date) &&
     Boolean(slot) &&
@@ -133,7 +147,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     guests <= experience.maxGuests &&
     (children === 0 ||
       (childAges.length === children && childAges.every(isValidChildAge))) &&
-    (!transportation || Boolean(vehicleId));
+    transportReady;
 
   const contactReady = Boolean(name.trim() && phone.trim() && (!email.trim() || email.includes("@")));
 
@@ -287,20 +301,18 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 </div>
               </FieldGroup>
 
-              {experience.transportAvailable && (
-                <FieldGroup
-                  title="Getting there"
-                  body="Optional private transport — four vehicle types, same as our curated journeys."
-                >
-                  <TransportVehicleFields
+              {transportMode !== "none" && (
+                <FieldGroup title="Getting there" body="Choose how you reach the experience.">
+                  <GettingThereFields
+                    mode={transportMode}
                     options={vehicles}
-                    enabled={transportation}
+                    choice={transportChoice}
                     vehicleId={vehicleId}
                     vehicleCount={vehicleCount}
                     note={experience.transportNote}
-                    onEnabled={(v) => {
-                      setTransportation(v);
-                      if (!v) setVehicleId("");
+                    onChoice={(next) => {
+                      setTransportChoice(next);
+                      if (next !== "tris") setVehicleId("");
                     }}
                     onVehicle={setVehicleId}
                     onVehicleCount={setVehicleCount}

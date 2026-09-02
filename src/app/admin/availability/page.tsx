@@ -526,8 +526,8 @@ export default function AdminAvailabilityPage() {
         <Panel>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-display text-lg text-[#2a2e1f]">{monthLabel}</h2>
-              <p className="mt-1 text-xs text-[#8a917c]">
+              <h2 className="font-display text-lg text-[#26352b]">{monthLabel}</h2>
+              <p className="mt-1 text-xs text-[#4a5a50]">
                 Orange = full day · Amber = some slots · Olive ring = selected
               </p>
             </div>
@@ -553,7 +553,7 @@ export default function AdminAvailabilityPage() {
                 }}
               >
                 Today
-              </AdminButton>
+                </AdminButton>
                 <AdminButton
                   type="button"
                   variant="ghost"
@@ -569,7 +569,7 @@ export default function AdminAvailabilityPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold tracking-wider text-[#8a917c] uppercase">
+            <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
             {WEEKDAYS.map((day) => (
               <div key={day} className="py-1">
                 {day}
@@ -594,12 +594,12 @@ export default function AdminAvailabilityPage() {
                     className={cn(
                       "aspect-square rounded-xl text-sm transition",
                       blocked
-                        ? "bg-[#c2643a]/15 font-semibold text-[#8a3b1f] ring-1 ring-[#c2643a]/30"
+                        ? "bg-[#c96a3d]/15 font-semibold text-[#c96a3d] ring-1 ring-[#c96a3d]/30"
                       : partiallyBlocked
                         ? "bg-amber-50 font-semibold text-amber-800 ring-1 ring-amber-300"
-                        : "bg-[#f7f4ee] text-[#2a2e1f] hover:bg-[#e4e8d4]",
-                      inPick && "bg-[#e4e8d4] font-semibold text-[#2a2e1f]",
-                      isEdge && "ring-2 ring-[#4a5a28]",
+                        : "bg-[#f8f6f1] text-[#26352b] hover:bg-[#e4e8d4]",
+                      inPick && "bg-[#e4e8d4] font-semibold text-[#26352b]",
+                      isEdge && "ring-2 ring-[#364037]",
                     )}
                   title={
                     blocked
@@ -619,15 +619,15 @@ export default function AdminAvailabilityPage() {
         <Panel className="h-fit">
           <div className="flex items-start justify-between gap-3">
           <div>
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-[#6b734f] uppercase">
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-[#4a5a50] uppercase">
                 {editingId ? "Update block" : "Block / clear"}
               </p>
-              <h2 className="mt-1 font-display text-xl text-[#2a2e1f]">{selectedLabel}</h2>
+              <h2 className="mt-1 font-display text-xl text-[#26352b]">{selectedLabel}</h2>
             </div>
             {(from || editingId) && (
               <button
                 type="button"
-                className="text-xs text-[#8a917c] underline-offset-2 hover:underline"
+                className="text-xs text-[#4a5a50] underline-offset-2 hover:underline"
                 onClick={() => {
                   resetComposer();
                   setNote("");
@@ -640,9 +640,9 @@ export default function AdminAvailabilityPage() {
           </div>
 
           {dayStatus && (
-            <div className="mt-3 rounded-xl bg-[#f7f4ee] px-3 py-2 text-xs text-[#5c6350]">
+            <div className="mt-3 rounded-xl bg-[#f8f6f1] px-3 py-2 text-xs text-[#4a5a50]">
               Current status:{" "}
-              <span className="font-semibold text-[#2a2e1f]">
+              <span className="font-semibold text-[#26352b]">
                 {dayStatus.mode === "full"
                   ? "Full day blocked"
                   : dayStatus.mode === "slots"
@@ -681,14 +681,14 @@ export default function AdminAvailabilityPage() {
 
           <div className="mt-4">
             <div className="flex items-baseline justify-between gap-3">
-              <p className="text-sm font-medium text-[#2a2e1f]">What to block</p>
-              <span className="text-xs text-[#8a917c]">
+              <p className="text-sm font-medium text-[#26352b]">What to block</p>
+              <span className="text-xs text-[#4a5a50]">
                 {scope === "full"
                   ? "Full day"
                   : `${blockedSlots.length} slot${blockedSlots.length === 1 ? "" : "s"}`}
               </span>
             </div>
-            <p className="mt-1 text-xs text-[#8a917c]">
+            <p className="mt-1 text-xs text-[#4a5a50]">
               Choose Full day, or tap individual times to block / keep open only those slots.
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -700,7 +700,7 @@ export default function AdminAvailabilityPage() {
                 }}
                 className={cn(
                   "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                  scope === "full" ? "bg-[#4a5a28] text-[#f7f4ee]" : "bg-[#f3efe8] text-[#5c6350]",
+                  scope === "full" ? "bg-[#364037] text-[#f8f6f1]" : "bg-[#e8ebdd] text-[#4a5a50]",
                 )}
               >
                 Full day
@@ -716,10 +716,10 @@ export default function AdminAvailabilityPage() {
                     className={cn(
                       "rounded-full px-3 py-1.5 text-xs font-semibold transition",
                       selected
-                        ? "bg-[#c2643a] text-white"
+                        ? "bg-[#c96a3d] text-white"
                         : currentlyBlocked
                           ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
-                          : "bg-[#f3efe8] text-[#5c6350]",
+                          : "bg-[#e8ebdd] text-[#4a5a50]",
                     )}
                     title={
                       selected
@@ -735,7 +735,7 @@ export default function AdminAvailabilityPage() {
               })}
             </div>
             {scope === "slots" && (
-              <p className="mt-2 text-xs text-[#6b734f]">
+              <p className="mt-2 text-xs text-[#4a5a50]">
                 Saving will replace the day’s blocks with only the orange slots. Amber chips are currently blocked.
               </p>
             )}
@@ -750,7 +750,7 @@ export default function AdminAvailabilityPage() {
           <div className="mt-4">
             <button
               type="button"
-              className="text-xs font-semibold text-[#6b734f] underline-offset-2 hover:underline"
+              className="text-xs font-semibold text-[#4a5a50] underline-offset-2 hover:underline"
               onClick={() => setShowWeekdays((v) => !v)}
             >
               {showWeekdays ? "Hide repeating weekdays" : "Add repeating weekdays"}
@@ -769,7 +769,7 @@ export default function AdminAvailabilityPage() {
                     aria-pressed={weekdays.includes(i)}
                     className={cn(
                       "rounded-full px-2.5 py-1 text-xs font-semibold",
-                      weekdays.includes(i) ? "bg-[#4a5a28] text-[#f7f4ee]" : "bg-[#f3efe8] text-[#5c6350]",
+                      weekdays.includes(i) ? "bg-[#364037] text-[#f8f6f1]" : "bg-[#e8ebdd] text-[#4a5a50]",
                     )}
                   >
                     {label}
@@ -780,13 +780,13 @@ export default function AdminAvailabilityPage() {
                     </div>
 
           {overlappingBlocks.length > 0 && (
-            <div className="mt-4 rounded-xl bg-[#f7f4ee] p-3">
-              <p className="text-xs font-semibold text-[#5c6350]">
+            <div className="mt-4 rounded-xl bg-[#f8f6f1] p-3">
+              <p className="text-xs font-semibold text-[#4a5a50]">
                 Already blocked on these days ({overlappingBlocks.length})
               </p>
               <ul className="mt-2 space-y-1.5">
                 {overlappingBlocks.slice(0, 4).map((closure) => (
-                  <li key={closure.id} className="flex items-center justify-between gap-2 text-xs text-[#5c6350]">
+                  <li key={closure.id} className="flex items-center justify-between gap-2 text-xs text-[#4a5a50]">
                     <span className="min-w-0 truncate">
                       {formatDateList(closure.dates ?? [])}
                       {closure.weekdays?.length
@@ -796,7 +796,7 @@ export default function AdminAvailabilityPage() {
                     </span>
                     <button
                       type="button"
-                      className="shrink-0 font-semibold text-[#4a5a28] underline-offset-2 hover:underline"
+                      className="shrink-0 font-semibold text-[#364037] underline-offset-2 hover:underline"
                       onClick={() => loadBlock(closure)}
                     >
                       Edit
@@ -847,7 +847,7 @@ export default function AdminAvailabilityPage() {
               Clear whole day
             </AdminButton>
           </div>
-          <p className="mt-3 text-xs leading-relaxed text-[#8a917c]">
+          <p className="mt-3 text-xs leading-relaxed text-[#4a5a50]">
             Example: select a blocked day, tap only `09:00`, then Save slot block — the rest of the day stays bookable.
           </p>
         </Panel>
@@ -856,8 +856,8 @@ export default function AdminAvailabilityPage() {
       <div className="mt-8">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-wider text-[#6b734f] uppercase">Saved blocks</p>
-            <p className="mt-1 text-sm text-[#5c6350]">
+            <p className="text-xs font-semibold tracking-wider text-[#4a5a50] uppercase">Saved blocks</p>
+            <p className="mt-1 text-sm text-[#4a5a50]">
               {forExperience.length
                 ? `${forExperience.length} rule${forExperience.length === 1 ? "" : "s"} for this experience`
                 : "No blocks yet for this experience"}
@@ -866,9 +866,9 @@ export default function AdminAvailabilityPage() {
         </div>
 
         {forExperience.length ? (
-          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-[#c5cbb8] bg-white">
             <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="px-4 py-3">Date / repeat</th>
                   <th className="px-4 py-3">Slots</th>
@@ -882,20 +882,20 @@ export default function AdminAvailabilityPage() {
                   <tr
                     key={closure.id}
                     className={cn(
-                      "border-t border-[#f0ebe3]",
-                      editingId === closure.id && "bg-[#f7f4ee]/70",
+                      "border-t border-[#dde1d0]",
+                      editingId === closure.id && "bg-[#f8f6f1]/70",
                     )}
                   >
-                    <td className="px-4 py-3 text-[#5c6350]">
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {formatDateList(closure.dates ?? [])}
                       {closure.weekdays?.length
                         ? ` · ${closure.weekdays.map((d) => WEEKDAYS[d]).join("/")}`
                         : ""}
                     </td>
-                    <td className="px-4 py-3 text-[#5c6350]">
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {closure.slots?.length ? closure.slots.join(", ") : "All slots"}
                     </td>
-                    <td className="px-4 py-3 text-[#5c6350]">{closure.reason}</td>
+                    <td className="px-4 py-3 text-[#4a5a50]">{closure.reason}</td>
                     <td className="px-4 py-3">
                       <span
                         className={cn(
@@ -904,7 +904,7 @@ export default function AdminAvailabilityPage() {
                             ? "bg-amber-50 text-amber-800"
                             : closure.slots?.length
                               ? "bg-amber-50 text-amber-800"
-                              : "bg-[#f3efe8] text-[#5c6350]",
+                              : "bg-[#e8ebdd] text-[#4a5a50]",
                         )}
                       >
                         {closure.soldOut ? "Sold out" : closure.slots?.length ? "Partial" : "Full day"}
@@ -914,7 +914,7 @@ export default function AdminAvailabilityPage() {
                       <div className="flex justify-end gap-3">
                         <button
                           type="button"
-                          className="text-xs font-semibold text-[#4a5a28]"
+                          className="text-xs font-semibold text-[#364037]"
                           disabled={busy}
                           onClick={() => loadBlock(closure)}
                         >

@@ -65,11 +65,11 @@ function buildOverviewCharts(
   }));
 
   const statusColors: Record<string, string> = {
-    confirmed: "#4a5a28",
-    requested: "#c2643a",
+    confirmed: "#364037",
+    requested: "#c96a3d",
     hold: "#d4a017",
     expired: "#b45353",
-    cancelled: "#8a917c",
+    cancelled: "#4a5a50",
   };
   const statusCounts = new Map<string, number>();
   for (const booking of bookings) {
@@ -78,7 +78,7 @@ function buildOverviewCharts(
   const statusMix = [...statusCounts.entries()].map(([name, value]) => ({
     name,
     value,
-    color: statusColors[name] ?? "#8a917c",
+    color: statusColors[name] ?? "#4a5a50",
   }));
 
   const sourceLabels: Record<string, string> = {
@@ -225,14 +225,14 @@ export default async function AdminDashboard() {
         <Panel>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg">Action required</h2>
-            <div className="flex gap-3 text-xs font-semibold tracking-wider text-[#4a5a28] uppercase">
+            <div className="flex gap-3 text-xs font-semibold tracking-wider text-[#364037] uppercase">
               <Link href="/admin/bookings">Bookings</Link>
               <Link href="/admin/enquiries">Inbox</Link>
             </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[420px] text-left text-sm">
-              <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="pb-2">Type</th>
                   <th className="pb-2">Item</th>
@@ -241,8 +241,8 @@ export default async function AdminDashboard() {
               </thead>
               <tbody>
                 {actionItems.map((item) => (
-                  <tr key={item.key} className="border-t border-[#f0ebe3]">
-                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <tr key={item.key} className="border-t border-[#dde1d0]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                       {item.kind}
                     </td>
                     <td className="py-2.5 pr-3 font-medium">
@@ -250,14 +250,14 @@ export default async function AdminDashboard() {
                         {item.title}
                       </Link>
                     </td>
-                    <td className="max-w-[14rem] py-2.5 text-[#5c6350]">
+                    <td className="max-w-[14rem] py-2.5 text-[#4a5a50]">
                       <p className="line-clamp-2">{item.meta}</p>
                     </td>
                   </tr>
                 ))}
                 {!actionItems.length && (
                   <tr>
-                    <td colSpan={3} className="py-4 text-[#8a917c]">
+                    <td colSpan={3} className="py-4 text-[#4a5a50]">
                       You’re clear — nothing waiting.
                     </td>
                   </tr>
@@ -272,14 +272,14 @@ export default async function AdminDashboard() {
             <h2 className="font-display text-lg">This week</h2>
             <Link
               href="/admin/journeys"
-              className="text-xs font-semibold tracking-wider text-[#4a5a28] uppercase"
+              className="text-xs font-semibold tracking-wider text-[#364037] uppercase"
             >
               Journeys
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[460px] text-left text-sm">
-              <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="pb-2">Type</th>
                   <th className="pb-2">Name</th>
@@ -290,26 +290,26 @@ export default async function AdminDashboard() {
               </thead>
               <tbody>
                 {thisWeekBookings.map((b) => (
-                  <tr key={b.id} className="border-t border-[#f0ebe3]">
-                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <tr key={b.id} className="border-t border-[#dde1d0]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                       Booking
                     </td>
                     <td className="py-2.5 pr-3 font-medium">{b.experienceName}</td>
-                    <td className="py-2.5 pr-3 text-[#5c6350]">
+                    <td className="py-2.5 pr-3 text-[#4a5a50]">
                       {b.date}
-                      <span className="mt-0.5 block text-xs text-[#8a917c]">
+                      <span className="mt-0.5 block text-xs text-[#4a5a50]">
                         {b.slot} · {b.customerName}
                       </span>
                     </td>
                     <td className="py-2.5 pr-3">
                       <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
                     </td>
-                    <td className="py-2.5 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
+                    <td className="py-2.5 text-right text-[#4a5a50]">{formatINR(b.customerTotal)}</td>
                   </tr>
                 ))}
                 {thisWeekDepartures.map(({ journey, dep }) => (
-                  <tr key={`${journey.slug}-${dep.date}`} className="border-t border-[#f0ebe3]">
-                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <tr key={`${journey.slug}-${dep.date}`} className="border-t border-[#dde1d0]">
+                    <td className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                       Fixed
                     </td>
                     <td className="py-2.5 pr-3 font-medium">
@@ -317,14 +317,14 @@ export default async function AdminDashboard() {
                         {journey.name}
                       </Link>
                     </td>
-                    <td className="py-2.5 pr-3 text-[#5c6350]">{dep.date}</td>
-                    <td className="py-2.5 pr-3 text-[#5c6350]">{seatsLeft(dep)} seats left</td>
-                    <td className="py-2.5 text-right text-[#8a917c]">—</td>
+                    <td className="py-2.5 pr-3 text-[#4a5a50]">{dep.date}</td>
+                    <td className="py-2.5 pr-3 text-[#4a5a50]">{seatsLeft(dep)} seats left</td>
+                    <td className="py-2.5 text-right text-[#4a5a50]">—</td>
                   </tr>
                 ))}
                 {!thisWeekBookings.length && !thisWeekDepartures.length && (
                   <tr>
-                    <td colSpan={5} className="py-4 text-[#8a917c]">
+                    <td colSpan={5} className="py-4 text-[#4a5a50]">
                       Nothing scheduled this week yet.
                     </td>
                   </tr>
@@ -334,8 +334,8 @@ export default async function AdminDashboard() {
           </div>
 
           {departuresThisMonth.length > 0 && (
-            <div className="mt-6 border-t border-[#f0ebe3] pt-4">
-              <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+            <div className="mt-6 border-t border-[#dde1d0] pt-4">
+              <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 Next open departure
               </p>
               {journeys
@@ -343,8 +343,8 @@ export default async function AdminDashboard() {
                 .filter((x) => x.next)
                 .slice(0, 3)
                 .map(({ j, next }) => (
-                  <p key={j.slug} className="mt-2 text-sm text-[#5c6350]">
-                    <Link href={`/admin/journeys/${j.slug}`} className="font-medium text-[#2a2e1f]">
+                  <p key={j.slug} className="mt-2 text-sm text-[#4a5a50]">
+                    <Link href={`/admin/journeys/${j.slug}`} className="font-medium text-[#26352b]">
                       {j.name}
                     </Link>
                     {" · "}

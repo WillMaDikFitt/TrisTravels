@@ -31,11 +31,11 @@ export function ImageField({
 
   return (
     <div>
-      <label htmlFor={`img-${name}`} className="text-sm font-medium text-[#2a2e1f]">
+      <label htmlFor={`img-${name}`} className="text-sm font-medium text-[#26352b]">
         {label}
       </label>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <label className="inline-flex cursor-pointer items-center rounded-full border border-[#d4cec0] bg-white px-3 py-1.5 text-xs font-semibold text-[#2a2e1f]">
+        <label className="inline-flex cursor-pointer items-center rounded-full border border-[#c5cbb8] bg-white px-3 py-1.5 text-xs font-semibold text-[#26352b]">
           {busy ? "Uploading…" : "Upload image"}
           <input
             type="file"
@@ -66,7 +66,7 @@ export function ImageField({
             }}
           />
         </label>
-        <span className="text-xs text-[#8a917c]">or paste a link below</span>
+        <span className="text-xs text-[#4a5a50]">or paste a link below</span>
       </div>
       <input
         id={`img-${name}`}
@@ -82,7 +82,7 @@ export function ImageField({
       {error && <span className="mt-2 block text-xs text-rose-700">{error}</span>}
       {url && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="" className="mt-3 h-28 w-44 rounded-xl object-cover ring-1 ring-[#e4dfd4]" />
+        <img src={url} alt="" className="mt-3 h-28 w-44 rounded-xl object-cover ring-1 ring-[#c5cbb8]" />
       )}
     </div>
   );

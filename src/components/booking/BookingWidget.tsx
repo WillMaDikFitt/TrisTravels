@@ -19,7 +19,8 @@ import { experienceSlots } from "@/lib/experience-slots";
 import { transportVehicleOptions } from "@/data/transport";
 import { adultRate, childRate } from "@/lib/pricing";
 import { isValidChildAge } from "@/data/child-ages";
-import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
+import { GuestCompositionFields, GettingThereFields, type TransportChoice } from "@/components/booking/GuestTransportFields";
+import { experienceTransportMode } from "@/lib/experience-meta";
 
 type Props = {
   experience: Experience;
@@ -42,7 +43,8 @@ export function BookingWidget({ experience }: Props) {
   const [adults, setAdults] = useState(Math.max(minGuests, 1));
   const [children, setChildren] = useState(0);
   const [childAges, setChildAges] = useState<number[]>([]);
-  const [transportation, setTransportation] = useState(false);
+  const transportMode = experienceTransportMode(experience);
+  const [transportChoice, setTransportChoice] = useState<TransportChoice>(null);
   const [vehicleId, setVehicleId] = useState("");
   const [vehicleCount, setVehicleCount] = useState(1);
   const [closures, setClosures] = useState<ClosureRecord[]>([]);
@@ -56,6 +58,8 @@ export function BookingWidget({ experience }: Props) {
   const selectedSlotClosed = Boolean(date && slot && dateIsClosed(date, closures, slot));
   const fullyClosed = Boolean(date) && availableSlots.length === 0;
   const instant = date ? isInstantBookingDate(date) : false;
+  const transportation =
+    transportMode === "required" || (transportMode === "optional" && transportChoice === "tris");
   const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
   const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
   const transportFee =
@@ -77,6 +81,13 @@ export function BookingWidget({ experience }: Props) {
     if (nextChildren !== children) syncChildren(nextChildren);
   };
 
+  const transportReady =
+    transportMode === "none"
+      ? true
+      : transportMode === "required"
+        ? Boolean(vehicleId)
+        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+
   const canContinue =
     Boolean(date) &&
     Boolean(slot) &&
@@ -86,7 +97,7 @@ export function BookingWidget({ experience }: Props) {
     guests <= experience.maxGuests &&
     (children === 0 ||
       (childAges.length === children && childAges.every(isValidChildAge))) &&
-    (!transportation || Boolean(vehicleId));
+    transportReady;
 
   const startBooking = () => {
     if (!canContinue) return;
@@ -98,7 +109,15 @@ export function BookingWidget({ experience }: Props) {
       request: instant ? "0" : "1",
     });
     if (children > 0) params.set("childAges", childAges.join(","));
-    if (transportation && vehicleId) {
+    if (transportMode === "optional") {
+      if (transportChoice === "tris" && vehicleId) {
+        params.set("transport", "1");
+        params.set("vehicle", vehicleId);
+        params.set("vehicles", String(vehicleCount));
+      } else if (transportChoice === "own") {
+        params.set("transport", "0");
+      }
+    } else if (transportMode === "required" && vehicleId) {
       params.set("transport", "1");
       params.set("vehicle", vehicleId);
       params.set("vehicles", String(vehicleCount));
@@ -201,17 +220,18 @@ export function BookingWidget({ experience }: Props) {
           }
         />
 
-        {experience.transportAvailable && (
-          <TransportVehicleFields
+        {transportMode !== "none" && (
+          <GettingThereFields
             compact
+            mode={transportMode}
             options={vehicles}
-            enabled={transportation}
+            choice={transportChoice}
             vehicleId={vehicleId}
             vehicleCount={vehicleCount}
             note={experience.transportNote}
-            onEnabled={(v) => {
-              setTransportation(v);
-              if (!v) setVehicleId("");
+            onChoice={(next) => {
+              setTransportChoice(next);
+              if (next !== "tris") setVehicleId("");
             }}
             onVehicle={setVehicleId}
             onVehicleCount={setVehicleCount}

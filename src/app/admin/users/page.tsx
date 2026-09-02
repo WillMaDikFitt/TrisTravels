@@ -112,9 +112,9 @@ export default function AdminUsersPage() {
         {loading ? (
           <LoadingBlock label="Loading travellers…" />
         ) : users.length ? (
-          <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+          <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-[#c5cbb8] bg-white">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">Email</th>
@@ -127,21 +127,21 @@ export default function AdminUsersPage() {
                   <tr
                     key={u.uid ?? u.email}
                     className={cn(
-                      "cursor-pointer border-t border-[#f0ebe3]",
-                      open?.uid === u.uid ? "bg-[#f7f4ee]" : "hover:bg-[#faf8f3]",
+                      "cursor-pointer border-t border-[#dde1d0]",
+                      open?.uid === u.uid ? "bg-[#f8f6f1]" : "hover:bg-[#faf8f3]",
                     )}
                     onClick={() => setOpen(u)}
                   >
                     <td className="px-4 py-3 font-medium">
                       {u.name || "—"}
                       {u.profileMissing && (
-                        <span className="ml-2 rounded-full bg-[#f0ebe3] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#6b734f] uppercase">
+                        <span className="ml-2 rounded-full bg-[#dde1d0] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#4a5a50] uppercase">
                           Profile pending
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-[#5c6350]">{u.email}</td>
-                    <td className="px-4 py-3 text-[#8a917c]">
+                    <td className="px-4 py-3 text-[#4a5a50]">{u.email}</td>
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-IN") : "—"}
                     </td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
@@ -173,26 +173,26 @@ export default function AdminUsersPage() {
         )}
 
         {open && (
-          <div className="w-full min-w-0 space-y-4 rounded-2xl border border-[#e4dfd4] bg-white p-5 shadow-[0_8px_24px_rgba(42,46,31,0.05)] md:p-6">
+          <div className="w-full min-w-0 space-y-4 rounded-2xl border border-[#c5cbb8] bg-white p-5 shadow-[0_8px_24px_rgba(42,46,31,0.05)] md:p-6">
             <div>
-              <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">Traveller</p>
+              <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">Traveller</p>
               <h2 className="mt-1 font-display text-xl">{open.name || "—"}</h2>
-              <p className="text-sm text-[#5c6350]">{open.email}</p>
+              <p className="text-sm text-[#4a5a50]">{open.email}</p>
               <Badge tone={open.role === "admin" || open.role === "staff" ? "olive" : "neutral"}>
                 {open.role || "traveller"}
               </Badge>
             </div>
             {detailLoading ? (
-              <p className="text-sm text-[#8a917c]">Loading bookings and enquiries…</p>
+              <p className="text-sm text-[#4a5a50]">Loading bookings and enquiries…</p>
             ) : (
               <>
                 <div className="w-full min-w-0">
-                  <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                     Recent bookings
                   </p>
                   <div className="mt-2 w-full min-w-0 overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
+                      <thead className="text-[10px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                         <tr>
                           <th className="pb-1.5">Date</th>
                           <th className="pb-1.5">Experience</th>
@@ -202,18 +202,18 @@ export default function AdminUsersPage() {
                       </thead>
                       <tbody>
                         {relatedBookings.map((b) => (
-                          <tr key={b.id} className="border-t border-[#f0ebe3]">
-                            <td className="py-2 text-[#5c6350]">{b.date}</td>
+                          <tr key={b.id} className="border-t border-[#dde1d0]">
+                            <td className="py-2 text-[#4a5a50]">{b.date}</td>
                             <td className="py-2 font-medium">{b.experienceName}</td>
                             <td className="py-2">
                               <Badge tone={bookingTone(b.status)}>{b.status}</Badge>
                             </td>
-                            <td className="py-2 text-right text-[#5c6350]">{formatINR(b.customerTotal)}</td>
+                            <td className="py-2 text-right text-[#4a5a50]">{formatINR(b.customerTotal)}</td>
                           </tr>
                         ))}
                         {!relatedBookings.length && (
                           <tr>
-                            <td colSpan={4} className="py-3 text-[#8a917c]">
+                            <td colSpan={4} className="py-3 text-[#4a5a50]">
                               No bookings for this email.
                             </td>
                           </tr>
@@ -223,12 +223,12 @@ export default function AdminUsersPage() {
                   </div>
                 </div>
                 <div className="w-full min-w-0">
-                  <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                  <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                     Recent enquiries
                   </p>
                   <div className="mt-2 w-full min-w-0 overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="text-[10px] font-semibold tracking-wider text-[#8a917c] uppercase">
+                      <thead className="text-[10px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                         <tr>
                           <th className="pb-1.5">Source</th>
                           <th className="pb-1.5">Preview</th>
@@ -236,18 +236,18 @@ export default function AdminUsersPage() {
                       </thead>
                       <tbody>
                         {relatedEnquiries.map((e) => (
-                          <tr key={e.id} className="border-t border-[#f0ebe3]">
-                            <td className="py-2 text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                          <tr key={e.id} className="border-t border-[#dde1d0]">
+                            <td className="py-2 text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                               {e.source === "story" ? "Guest story" : e.source.replace(/-/g, " ")}
                             </td>
-                            <td className="py-2 text-[#5c6350]">
+                            <td className="py-2 text-[#4a5a50]">
                               <p className="line-clamp-2">{e.message}</p>
                             </td>
                           </tr>
                         ))}
                         {!relatedEnquiries.length && (
                           <tr>
-                            <td colSpan={2} className="py-3 text-[#8a917c]">
+                            <td colSpan={2} className="py-3 text-[#4a5a50]">
                               No enquiries for this email.
                             </td>
                           </tr>

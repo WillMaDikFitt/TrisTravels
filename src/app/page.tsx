@@ -15,7 +15,8 @@ import { listStories } from "@/lib/data/repo";
 
 const typeVisuals: Record<string, string> = {
   adventure: media.typeAdventure,
-  "nature-wildlife": media.typeNatureWildlife,
+  nature: media.typeNature,
+  wildlife: media.typeWildlife,
   "culture-heritage": media.typeCultureHeritage,
   "food-local-life": media.typeFoodLocalLife,
   wellness: media.typeWellness,
@@ -41,7 +42,7 @@ export default async function HomePage() {
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[#e8ebdd]/55"
+          className="pointer-events-none absolute inset-0 bg-surface/55"
         />
         <div className="relative mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
           <FadeIn className="mx-auto max-w-4xl text-center">
@@ -71,9 +72,9 @@ export default async function HomePage() {
                 body: "Thoughtfully designed journeys with room to make them your own.",
                 cta: "Explore journeys",
                 Icon: MapPinned,
-                iconBg: "bg-[#f0ddd0]",
-                iconColor: "text-accent",
-                ctaColor: "text-accent",
+                iconBg: "bg-secondary-container",
+                iconColor: "text-primary",
+                ctaColor: "text-primary",
               },
               {
                 href: "/journeys?type=small-group",
@@ -81,7 +82,7 @@ export default async function HomePage() {
                 body: "Ready-to-go journeys with set dates and itineraries.",
                 cta: "View fixed departures",
                 Icon: CalendarDays,
-                iconBg: "bg-[#dde5d6]",
+                iconBg: "bg-surface-container",
                 iconColor: "text-primary",
                 ctaColor: "text-primary",
               },
@@ -91,7 +92,7 @@ export default async function HomePage() {
                 body: "Tell us what you want, and we'll build the journey around you.",
                 cta: "Start planning",
                 Icon: Compass,
-                iconBg: "bg-[#e4e8d8]",
+                iconBg: "bg-surface-container-lowest",
                 iconColor: "text-primary",
                 ctaColor: "text-primary",
               },
@@ -140,37 +141,71 @@ export default async function HomePage() {
               From adventure to quiet moments, choose the kind of day that speaks to you.
             </p>
           </div>
-          <div className="mt-4 grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:mt-5 lg:grid-cols-3 lg:gap-3.5">
-            {EXPERIENCE_CATEGORIES.map((c, i) => (
-              <Link
-                key={c.id}
-                href={`/experiences?type=${c.slug}`}
-                className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
-              >
-                <Image
-                  src={typeVisuals[c.slug] ?? media.forest}
-                  alt=""
-                  fill
-                  className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-                  sizes="33vw"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
-                />
-                <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="relative z-10 mt-auto">
-                  <h3 className="font-[family-name:var(--font-playfair)] text-[1.1rem] leading-tight text-white drop-shadow-sm sm:text-[1.25rem] lg:text-[1.4rem]">
-                    {c.id}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.7rem] leading-snug text-white/85 sm:text-[0.8rem] lg:text-[0.85rem]">
-                    {c.blurb}
-                  </p>
-                </div>
-              </Link>
-            ))}
+          <div className="mt-4 flex min-h-0 flex-1 flex-col gap-2.5 sm:gap-3 lg:mt-5">
+            <div className="grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 lg:gap-3.5">
+              {EXPERIENCE_CATEGORIES.slice(0, 4).map((c, i) => (
+                <Link
+                  key={c.id}
+                  href={`/experiences?type=${c.slug}`}
+                  className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
+                >
+                  <Image
+                    src={typeVisuals[c.slug] ?? media.forest}
+                    alt=""
+                    fill
+                    className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                    sizes="25vw"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
+                  />
+                  <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="relative z-10 mt-auto">
+                    <h3 className="font-[family-name:var(--font-playfair)] text-[1.05rem] leading-tight text-white drop-shadow-sm sm:text-[1.15rem] lg:text-[1.25rem]">
+                      {c.id}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.68rem] leading-snug text-white/85 sm:text-[0.75rem]">
+                      {c.blurb}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:mx-auto lg:max-w-[75%] lg:grid-cols-3 lg:gap-3.5">
+              {EXPERIENCE_CATEGORIES.slice(4).map((c, i) => (
+                <Link
+                  key={c.id}
+                  href={`/experiences?type=${c.slug}`}
+                  className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
+                >
+                  <Image
+                    src={typeVisuals[c.slug] ?? media.forest}
+                    alt=""
+                    fill
+                    className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                    sizes="25vw"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
+                  />
+                  <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
+                    {String(i + 5).padStart(2, "0")}
+                  </span>
+                  <div className="relative z-10 mt-auto">
+                    <h3 className="font-[family-name:var(--font-playfair)] text-[1.05rem] leading-tight text-white drop-shadow-sm sm:text-[1.15rem] lg:text-[1.25rem]">
+                      {c.id}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.68rem] leading-snug text-white/85 sm:text-[0.75rem]">
+                      {c.blurb}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -186,35 +221,35 @@ export default async function HomePage() {
           sizes="100vw"
           quality={90}
         />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#f8f6f1]/78" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-surface-container-lowest/78" />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse 70% 80% at 78% 50%, rgba(248,246,241,0.92) 0%, transparent 70%), radial-gradient(ellipse 50% 70% at 20% 50%, rgba(248,246,241,0.35) 0%, transparent 65%)",
+              "radial-gradient(ellipse 55% 75% at 72% 50%, rgba(248,246,241,0.88) 0%, transparent 68%), radial-gradient(ellipse 45% 65% at 18% 50%, rgba(248,246,241,0.3) 0%, transparent 62%)",
           }}
         />
         <div className="relative mx-auto grid w-full max-w-container-max md:grid-cols-12 md:items-stretch">
-          <div className="relative z-10 hidden min-h-0 md:col-span-5 md:block">
+          <div className="relative z-10 hidden min-h-0 md:col-span-4 md:block">
             <Image
-              src={media.aboutPortrait}
-              alt="Mei-ieid — the heart behind TRIS"
+              src={media.aboutHomePortrait}
+              alt="Mei-ieid with family — the heart behind TRIS"
               fill
-              className="object-cover"
-              sizes="42vw"
+              className="object-cover object-[center_35%]"
+              sizes="34vw"
               priority={false}
             />
           </div>
 
-          <div className="relative z-10 flex flex-col justify-center px-margin-mobile py-2 md:col-span-7 md:px-10 lg:px-14 xl:px-16">
+          <div className="relative z-10 flex flex-col justify-center px-margin-mobile py-2 md:col-span-8 md:pl-8 md:pr-10 lg:pl-10 lg:pr-16 xl:pr-24">
             {/* Mobile image strip */}
-            <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden md:hidden">
+            <div className="relative mb-6 aspect-[4/3] w-full overflow-hidden md:hidden">
               <Image
-                src={media.aboutPortrait}
-                alt="Mei-ieid — the heart behind TRIS"
+                src={media.aboutHomePortrait}
+                alt="Mei-ieid with family — the heart behind TRIS"
                 fill
-                className="object-cover"
+                className="object-cover object-[center_35%]"
                 sizes="100vw"
               />
             </div>
@@ -237,12 +272,12 @@ export default async function HomePage() {
                 />
               </h2>
 
-              <p className="mt-3 max-w-xl font-[family-name:var(--font-playfair)] text-base leading-snug text-highlight italic md:text-lg">
+              <p className="mt-3 max-w-2xl font-[family-name:var(--font-playfair)] text-base leading-snug text-highlight italic md:text-lg">
                 Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally
                 caring.
               </p>
 
-              <div className="mt-4 max-w-xl space-y-3 text-sm leading-relaxed text-on-surface md:text-[0.95rem] md:leading-[1.65]">
+              <div className="mt-4 max-w-2xl space-y-3 text-sm leading-relaxed text-on-surface md:text-[0.95rem] md:leading-[1.65]">
                 <p>
                   Born in Mairang, she didn&apos;t speak the language of business.{" "}
                   <span className="font-semibold text-primary">
@@ -256,7 +291,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="mt-6 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-stretch sm:divide-x sm:divide-outline-variant/40">
+              <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-stretch sm:divide-x sm:divide-outline-variant/40">
                 {[
                   { label: "Community first", Icon: Users },
                   { label: "Slow travel", Icon: Leaf },
@@ -287,22 +322,30 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-surface py-10 md:h-[100svh] md:max-h-[100svh] md:py-8">
-        {/* Soft pinboard wash */}
+      <section className="home-snap-section relative flex min-h-[100svh] flex-col justify-center overflow-hidden py-10 md:h-[100svh] md:max-h-[100svh] md:py-8">
+        <Image
+          src={media.meadowWalk}
+          alt=""
+          fill
+          className="object-cover object-center scale-105"
+          sizes="100vw"
+          quality={85}
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-surface/52" />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.45]"
+          className="pointer-events-none absolute inset-0 opacity-[0.55]"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse at 20% 30%, rgba(122,163,90,0.12), transparent 45%), radial-gradient(ellipse at 80% 70%, rgba(54,64,55,0.06), transparent 40%)",
+              "radial-gradient(ellipse at 18% 25%, rgba(122,163,90,0.18), transparent 48%), radial-gradient(ellipse at 82% 72%, rgba(54,64,55,0.1), transparent 42%)",
           }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.2]"
+          className="pointer-events-none absolute inset-0 opacity-[0.28]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(54,64,55,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(54,64,55,0.04) 1px, transparent 1px)",
+              "linear-gradient(rgba(54,64,55,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(54,64,55,0.05) 1px, transparent 1px)",
             backgroundSize: "28px 28px",
           }}
         />
@@ -310,9 +353,11 @@ export default async function HomePage() {
         <div className="relative mx-auto flex w-full max-w-container-max flex-col justify-center px-margin-mobile md:px-margin-desktop">
           <FadeIn>
             <div className="ink-rule" />
-            <p className="label-caps mt-3 text-highlight">Journal</p>
-            <div className="mt-1.5 flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-[family-name:var(--font-playfair)] text-[clamp(1.85rem,3.2vw,2.75rem)] text-primary">
+            <p className="label-caps mt-4 text-[11px] tracking-[0.24em] text-highlight md:text-xs">
+              Journal
+            </p>
+            <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+              <h2 className="font-[family-name:var(--font-playfair)] text-[clamp(2.35rem,4.5vw,3.65rem)] leading-[1.02] text-primary">
                 Stories from the hills
               </h2>
               <Link
@@ -322,7 +367,7 @@ export default async function HomePage() {
                 Read all <ArrowRight size={16} />
               </Link>
             </div>
-            <p className="mt-2 max-w-xl text-sm text-on-surface-variant">
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-on-surface-variant md:text-lg">
               Notes pinned from travellers, guides and friends — pick one up and read.
             </p>
           </FadeIn>

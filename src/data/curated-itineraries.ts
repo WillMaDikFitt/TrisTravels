@@ -28,7 +28,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     tagline:
       "A short, stunning getaway into Sohra with customizable trekking options to waterfalls, caves, or living root bridges.",
     overview:
-      "Short on time? Rise into the highlands for Garden of Caves, Nohkalikai, and a choose-your-adventure day in Sohra before returning to Guwahati.",
+      "Short on time? This customizable package takes the guesswork out of planning a Sohra escape — choose your preferred dates, transport, stay preference, and add-ons while we handle the rest. Rise into the highlands for Garden of Caves and Nohkalikai, then pick your Day 2 trail: waterfall circuit, Double Decker trek, or Nohkalikai Crest with Arwah Cave before returning to Guwahati.",
     days: 3,
     nights: 2,
     route: "2 Nights in Sohra",
@@ -45,7 +45,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Flexible adventure pacing for a short window in Meghalaya",
       "Valley views and Don Bosco Museum on the return to Guwahati",
     ],
-    notSuitableFor: ["Nightlife seekers", "Limited mobility"],
+    notSuitableFor: ["Nightlife seekers"],
     itinerary: [
       {
         day: 1,
@@ -84,7 +84,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     tagline:
       "Off-grid highland getaway with sacred forest walk and Nongkhnum River Island soft hike.",
     overview:
-      "Trade the rush for West Khasi Hills — Umiam and Mawphlang on the way in, a full day at Nongkhnum, and Markham Valley light on the drive home.",
+      "An off-grid highland getaway shaped around meadows, valleys, and a soft hike to Asia’s second-largest river island — with a village stay at the heart of it. Trade the rush for West Khasi Hills: Umiam and Mawphlang on the way in, a full day at Nongkhnum with Weinia Falls, and Markham Valley light on the drive home.",
     days: 3,
     nights: 2,
     route: "2 Nights in Mawphanlur",
@@ -95,7 +95,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Village stay",
       "Sacred forest walk",
     ],
-    notSuitableFor: ["Luxury seekers", "Basic stays", "Limited mobility"],
+    notSuitableFor: ["Luxury seekers"],
     highlights: [
       "Highland village stay amid Mawphanlur meadows",
       "Walk Mawphlang Sacred Forest on the way in",
@@ -139,7 +139,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     tagline:
       "Thrill-packed journey through Mawsynram & Mawlongbna with river trekking, caving, kayaking, and canyon hikes.",
     overview:
-      "Two nights in Mawsynram with activities curated by local guides and tailored to weather — kayaking, fossils, cliff canyons, and a natural pool before Guwahati.",
+      "The wettest place on earth — river trekking, Split Rock, sacred forest, and a village stay in Mawlongbna. Two nights in Mawsynram with activities curated by local guides and tailored to weather: kayaking, fossils, cliff canyons, and a natural pool before Guwahati.",
     days: 3,
     nights: 2,
     route: "2 Nights in Mawsynram",
@@ -150,7 +150,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Sacred forest",
       "Village stay",
     ],
-    notSuitableFor: ["Non-swimmers", "Rain-averse", "Easy sightseeing"],
+    notSuitableFor: ["Non-swimmers"],
     highlights: [
       "Approach via Umiam Lake and Mawphlang Sacred Forest",
       "Full Mawlongbna adventure day with kayaking, fossils, and river treks",
@@ -206,7 +206,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Double Decker living root bridges",
       "Nongriat homestay or camping",
     ],
-    notSuitableFor: ["Steep steps", "Basic homestays", "Relaxed sightseeing"],
+    notSuitableFor: ["Steep steps"],
     highlights: [
       "Five-hour Mawmluh Cave exploration (UNESCO/IUGS heritage)",
       "Overnight in Nongriat after Double Decker and Rainbow Falls",
@@ -290,7 +290,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Two nights of riverside camping under Sohra skies",
       "Hilltop finish at Mawphanlur before Guwahati",
     ],
-    notSuitableFor: ["Camping averse", "Luxury only", "Limited mobility"],
+    notSuitableFor: ["Camping averse"],
     itinerary: [
       {
         day: 1,
@@ -367,7 +367,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Umngot river (Dawki)",
       "Sacred forest",
     ],
-    notSuitableFor: ["Camping averse", "Non-swimmers", "Limited mobility"],
+    notSuitableFor: ["Non-swimmers"],
     highlights: [
       "Waterfall circuit at Phe Phe and Krangshuri before a riverside village stay",
       "Amkoi trek with boating and kayaking on the Umngot",
@@ -448,7 +448,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Living root bridge",
       "Sohra & Umngot river",
     ],
-    notSuitableFor: ["Hard trekkers", "Off-grid only", "Long drives"],
+    notSuitableFor: ["Hard trekkers"],
     highlights: [
       "Nohsngithiang, Nohkalikai, and Arwah Cave in Cherrapunjee",
       "Garden of Caves into Mawlynnong and the Single Decker Living Root Bridge",
@@ -533,7 +533,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Mawphanlur & sacred forests",
       "Living root bridges & caves",
     ],
-    notSuitableFor: ["Rain-averse", "Basic stays", "Dry season only"],
+    notSuitableFor: ["Rain-averse"],
     highlights: [
       "Mawphlang Sacred Forest with traditional lunch into Mawlongbna",
       "Full river-trekking day with Split Rock and Umkhakoi kayaking",
@@ -629,7 +629,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Living root bridges",
       "Umngot river (Dawki)",
     ],
-    notSuitableFor: ["Limited mobility", "Meghalaya-only", "Early mornings"],
+    notSuitableFor: ["Limited mobility"],
     highlights: [
       "Elephant and jeep safaris plus Orchid & Biodiversity Park in Kaziranga",
       "Mawphlang Sacred Forest with traditional lunch and Don Bosco",
@@ -752,7 +752,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Ri-Bhoi overnight with a closing bonfire",
       "Optional adventure add-ons only where families choose them",
     ],
-    notSuitableFor: ["Extreme trekkers", "Nightlife seekers"],
+    notSuitableFor: ["Extreme trekkers"],
     itinerary: [
       {
         day: 1,
@@ -872,7 +872,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Deep trail time across fourteen days — not a rushed circuit",
       "Community stays and guides woven through every chapter",
     ],
-    notSuitableFor: ["Short breaks", "Limited mobility", "Luxury only"],
+    notSuitableFor: ["Limited mobility"],
     itinerary: [
       {
         day: 1,

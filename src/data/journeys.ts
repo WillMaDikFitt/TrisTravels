@@ -623,7 +623,7 @@ const journeySeeds: Journey[] = [
     inclusions: fixedInclusions,
     nextDeparture: "Every Monday · register with no upfront payment",
     groupSize: "4–10 persons",
-    notSuitableFor: ["Limited mobility", "Luxury seekers", "Shared transport"],
+    notSuitableFor: ["Limited mobility"],
     departureSeats: [
       { date: "2026-08-17", seats: 10, held: 0, booked: 6, note: "Monday departure" },
       { date: "2026-08-24", seats: 10, held: 1, booked: 3, note: "Monday departure" },

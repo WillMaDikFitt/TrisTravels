@@ -134,7 +134,7 @@ export default function JourneyEditorPage() {
     };
   }, [isNew, slugKey]);
 
-  if (!row) return <p className="text-sm text-[#5c6350]">Loading editor…</p>;
+  if (!row) return <p className="text-sm text-[#4a5a50]">Loading editor…</p>;
 
   return (
     <div>
@@ -288,9 +288,9 @@ export default function JourneyEditorPage() {
               </Field>
             ) : null}
           </div>
-          <div className="mt-6 border-t border-[#e4dfd4] pt-5">
-            <h3 className="font-display text-base text-[#2a2e1f]">Transportation</h3>
-            <label className="mt-3 flex items-center gap-2 text-sm text-[#2a2e1f]">
+          <div className="mt-6 border-t border-[#c5cbb8] pt-5">
+            <h3 className="font-display text-base text-[#26352b]">Transportation</h3>
+            <label className="mt-3 flex items-center gap-2 text-sm text-[#26352b]">
               <input
                 name="transportAvailable"
                 type="checkbox"
@@ -332,9 +332,9 @@ export default function JourneyEditorPage() {
             </div>
           </div>
           {row.type === "curated" && (
-            <div className="mt-6 border-t border-[#e4dfd4] pt-5">
-              <h3 className="font-display text-base text-[#2a2e1f]">Book now package costs (A–E)</h3>
-              <p className="mt-1 text-sm text-[#5c6350]">
+            <div className="mt-6 border-t border-[#c5cbb8] pt-5">
+              <h3 className="font-display text-base text-[#26352b]">Book now package costs (A–E)</h3>
+              <p className="mt-1 text-sm text-[#4a5a50]">
                 A = vehicle/day × vehicles × days · B = stay cost × rooms + mattresses · C = guests × activity · D =
                 TRIS % of (A+B+C) · E = GST % of D
               </p>
@@ -370,13 +370,13 @@ export default function JourneyEditorPage() {
                   />
                 </Field>
               </div>
-              <h4 className="mt-5 text-sm font-semibold text-[#2a2e1f]">A · Vehicle rates (₹ / day) & capacity</h4>
+              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">A · Vehicle rates (₹ / day) & capacity</h4>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {TRANSPORT_VEHICLE_IDS.map((id) => {
                   const rate = row.packagePricing?.vehicles?.[id] ?? DEFAULT_PACKAGE_VEHICLES[id];
                   return (
-                    <div key={id} className="space-y-2 rounded-xl border border-[#e4dfd4] p-3">
-                      <p className="text-sm font-medium text-[#2a2e1f]">{TRANSPORT_VEHICLE_META[id].label}</p>
+                    <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
+                      <p className="text-sm font-medium text-[#26352b]">{TRANSPORT_VEHICLE_META[id].label}</p>
                       <Field label="Cost / day">
                         <input
                           name={`pkgVehicle_${id}_cost`}
@@ -399,13 +399,13 @@ export default function JourneyEditorPage() {
                   );
                 })}
               </div>
-              <h4 className="mt-5 text-sm font-semibold text-[#2a2e1f]">B · Stay preference costs (₹ / journey)</h4>
+              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs (₹ / journey)</h4>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {STAY_PREFERENCE_IDS.map((id) => {
                   const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
                   return (
-                    <div key={id} className="space-y-2 rounded-xl border border-[#e4dfd4] p-3">
-                      <p className="text-sm font-medium text-[#2a2e1f]">{STAY_PREFERENCE_META[id].label}</p>
+                    <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
+                      <p className="text-sm font-medium text-[#26352b]">{STAY_PREFERENCE_META[id].label}</p>
                       <Field label="Room cost">
                         <input
                           name={`pkgStay_${id}_room`}
@@ -431,9 +431,9 @@ export default function JourneyEditorPage() {
             </div>
           )}
           {row.type === "small-group" ? (
-            <div className="mt-6 border-t border-[#e4dfd4] pt-5">
-              <h3 className="font-display text-base text-[#2a2e1f]">Fixed departure calendar</h3>
-              <p className="mt-1 text-sm text-[#5c6350]">
+            <div className="mt-6 border-t border-[#c5cbb8] pt-5">
+              <h3 className="font-display text-base text-[#26352b]">Fixed departure calendar</h3>
+              <p className="mt-1 text-sm text-[#4a5a50]">
                 Select multiple departure days on the calendar. Set seats, held, and booked for each date.
               </p>
               <div className="mt-4">

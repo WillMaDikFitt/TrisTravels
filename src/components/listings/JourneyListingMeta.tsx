@@ -6,6 +6,11 @@ type Props = {
   className?: string;
 };
 
+function formatNotSuitableFor(items: string[]) {
+  const first = items.find((item) => item.trim())?.trim() ?? "";
+  return first.split(/\s+/).slice(0, 3).join(" ");
+}
+
 export function journeyListingMetaItems(journey: Journey) {
   const duration = `${journey.days} days · ${journey.nights} nights`;
   const style = journey.style?.filter(Boolean).join(" · ") || "—";
@@ -16,7 +21,7 @@ export function journeyListingMetaItems(journey: Journey) {
     { label: "Best time to travel", value: journey.season || "—" },
     { label: "Style", value: style },
     ...(journey.notSuitableFor?.length
-      ? [{ label: "Not suitable for", value: journey.notSuitableFor.join(", ") }]
+      ? [{ label: "Not suitable for", value: formatNotSuitableFor(journey.notSuitableFor) }]
       : []),
   ];
 }

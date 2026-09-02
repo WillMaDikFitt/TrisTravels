@@ -38,9 +38,9 @@ export default function AdminJourneysPage() {
         }
       />
       {rows.length ? (
-        <div className="overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[#c5cbb8] bg-white">
           <table className="w-full min-w-[800px] text-left text-sm">
-            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+            <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
               <tr>
                 <th className="px-4 py-3">Journey</th>
                 <th className="px-4 py-3">Type</th>
@@ -54,7 +54,7 @@ export default function AdminJourneysPage() {
               {rows.map((j) => {
                 const next = nextOpenDeparture(j.departureSeats);
                 return (
-                  <tr key={j.slug} className="border-t border-[#f0ebe3]">
+                  <tr key={j.slug} className="border-t border-[#dde1d0]">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-[#efeae1]">
@@ -64,7 +64,7 @@ export default function AdminJourneysPage() {
                         </div>
                         <div>
                           <p className="font-medium">{j.name}</p>
-                          <p className="text-xs text-[#8a917c]">
+                          <p className="text-xs text-[#4a5a50]">
                             {j.days}D / {j.nights}N
                           </p>
                         </div>
@@ -85,11 +85,11 @@ export default function AdminJourneysPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3">{formatINR(j.priceFrom)}</td>
-                    <td className="px-4 py-3 text-[#5c6350]">
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {next ? (
                         <>
                           {next.date}
-                          <span className="mt-0.5 block text-xs text-[#8a917c]">
+                          <span className="mt-0.5 block text-xs text-[#4a5a50]">
                             {seatsLeft(next)} left
                           </span>
                         </>
@@ -100,7 +100,7 @@ export default function AdminJourneysPage() {
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/journeys/${j.slug}`}
-                        className="mr-3 text-xs font-semibold text-[#4a5a28]"
+                        className="mr-3 text-xs font-semibold text-[#364037]"
                       >
                         Edit
                       </Link>

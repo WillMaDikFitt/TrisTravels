@@ -178,7 +178,7 @@ export default function AdminReportsPage() {
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="mt-1 block rounded-xl border border-[#d4cec0] bg-white px-3 py-2"
+            className="mt-1 block rounded-xl border border-[#c5cbb8] bg-white px-3 py-2"
           />
         </label>
         <label className="text-sm">
@@ -187,7 +187,7 @@ export default function AdminReportsPage() {
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="mt-1 block rounded-xl border border-[#d4cec0] bg-white px-3 py-2"
+            className="mt-1 block rounded-xl border border-[#c5cbb8] bg-white px-3 py-2"
           />
         </label>
       </div>
@@ -227,7 +227,7 @@ export default function AdminReportsPage() {
             <Panel>
               <h2 className="font-display text-lg">Bookings by status</h2>
               <table className="mt-4 w-full text-left text-sm">
-                <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <thead className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                   <tr>
                     <th className="pb-2">Status</th>
                     <th className="pb-2 text-right">Bookings</th>
@@ -235,14 +235,14 @@ export default function AdminReportsPage() {
                 </thead>
                 <tbody>
                   {Object.entries(byStatus).map(([status, count]) => (
-                    <tr key={status} className="border-t border-[#f0ebe3]">
+                    <tr key={status} className="border-t border-[#dde1d0]">
                       <td className="py-2 capitalize">{status}</td>
                       <td className="py-2 text-right font-medium">{count}</td>
                     </tr>
                   ))}
                   {!Object.keys(byStatus).length && (
                     <tr>
-                      <td colSpan={2} className="py-4 text-[#8a917c]">
+                      <td colSpan={2} className="py-4 text-[#4a5a50]">
                         {loadingBookings ? "Loading…" : "No bookings in this range."}
                       </td>
                     </tr>
@@ -253,7 +253,7 @@ export default function AdminReportsPage() {
             <Panel>
               <h2 className="font-display text-lg">Enquiries by source</h2>
               <table className="mt-4 w-full text-left text-sm">
-                <thead className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+                <thead className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                   <tr>
                     <th className="pb-2">Source</th>
                     <th className="pb-2 text-right">Enquiries</th>
@@ -261,7 +261,7 @@ export default function AdminReportsPage() {
                 </thead>
                 <tbody>
                   {Object.entries(bySource).map(([source, count]) => (
-                    <tr key={source} className="border-t border-[#f0ebe3]">
+                    <tr key={source} className="border-t border-[#dde1d0]">
                       <td className={cn("py-2 capitalize")}>
                         {source === "story" ? "Guest story" : source.replace(/-/g, " ")}
                       </td>
@@ -270,7 +270,7 @@ export default function AdminReportsPage() {
                   ))}
                   {!Object.keys(bySource).length && (
                     <tr>
-                      <td colSpan={2} className="py-4 text-[#8a917c]">
+                      <td colSpan={2} className="py-4 text-[#4a5a50]">
                         {loadingEnquiries ? "Loading…" : "No enquiries in this range."}
                       </td>
                     </tr>

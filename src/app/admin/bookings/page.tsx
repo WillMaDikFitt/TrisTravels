@@ -98,7 +98,7 @@ export default function AdminBookingsPage() {
             onClick={() => setFilter(s)}
             className={cn(
               "rounded-full px-3 py-1.5 text-xs font-semibold",
-              filter === s ? "bg-[#4a5a28] text-[#f7f4ee]" : "bg-white text-[#5c6350] ring-1 ring-[#d4cec0]",
+              filter === s ? "bg-[#364037] text-[#f8f6f1]" : "bg-white text-[#4a5a50] ring-1 ring-[#c5cbb8]",
             )}
           >
             {s === "all" ? "All" : statusLabel[s]}
@@ -127,9 +127,9 @@ export default function AdminBookingsPage() {
 
       <div className="grid gap-6">
         {visible.length ? (
-          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
+          <div className="overflow-x-auto rounded-2xl border border-[#c5cbb8] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
             <table className="w-full min-w-[850px] text-left text-sm">
-              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="px-4 py-3">Reference</th>
                   <th className="px-4 py-3">Experience</th>
@@ -145,21 +145,21 @@ export default function AdminBookingsPage() {
                     key={b.id}
                     onClick={() => openPanel(b)}
                     className={cn(
-                      "cursor-pointer border-t border-[#f0ebe3] transition hover:bg-[#faf8f3]",
+                      "cursor-pointer border-t border-[#dde1d0] transition hover:bg-[#faf8f3]",
                       open?.id === b.id && "bg-[#eef0e3]",
                     )}
                   >
-                    <td className="px-4 py-3 font-mono text-xs text-[#6b734f]">{b.id}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-[#4a5a50]">{b.id}</td>
                     <td className="px-4 py-3 font-medium">{b.experienceName}</td>
-                    <td className="px-4 py-3 text-[#5c6350]">
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {b.date}
-                      <span className="mt-0.5 block text-xs text-[#8a917c]">
+                      <span className="mt-0.5 block text-xs text-[#4a5a50]">
                         {b.slot} · {b.guests} guests
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-medium">{b.customerName}</p>
-                      <p className="mt-0.5 text-xs text-[#8a917c]">{b.customerEmail}</p>
+                      <p className="mt-0.5 text-xs text-[#4a5a50]">{b.customerEmail}</p>
                     </td>
                     <td className="px-4 py-3">
                       <Badge tone={bookingTone(b.status)}>{statusLabel[b.status]}</Badge>
@@ -177,18 +177,18 @@ export default function AdminBookingsPage() {
         {open && (
           <Panel className="space-y-4">
             <div>
-              <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 {open.id}
               </p>
               <h2 className="mt-1 font-display text-xl">{open.experienceName}</h2>
-              <p className="mt-1 text-sm text-[#5c6350]">
+              <p className="mt-1 text-sm text-[#4a5a50]">
                 {open.date} · {open.slot} · {open.adults ?? open.guests} adult
                 {(open.adults ?? open.guests) === 1 ? "" : "s"}
                 {open.children ? ` · ${open.children} child${open.children === 1 ? "" : "ren"}` : ""}
                 {open.childAges?.length ? ` (ages ${open.childAges.join(", ")})` : ""}
               </p>
               {open.transportation?.requested ? (
-                <p className="mt-1 text-sm text-[#5c6350]">
+                <p className="mt-1 text-sm text-[#4a5a50]">
                   Transport: {open.transportation.vehicleLabel ?? "Requested"}
                   {open.transportation.price
                     ? ` · ${formatINR(open.transportation.price)}`
@@ -196,16 +196,16 @@ export default function AdminBookingsPage() {
                 </p>
               ) : null}
             </div>
-            <div className="rounded-xl bg-[#f7f4ee] p-3 text-sm">
+            <div className="rounded-xl bg-[#f8f6f1] p-3 text-sm">
               <p className="font-medium">{open.customerName}</p>
-              <p className="text-[#5c6350]">{open.customerEmail}</p>
-              {open.customerPhone && <p className="text-[#5c6350]">{open.customerPhone}</p>}
+              <p className="text-[#4a5a50]">{open.customerEmail}</p>
+              {open.customerPhone && <p className="text-[#4a5a50]">{open.customerPhone}</p>}
             </div>
             <div>
-              <p className="text-xs text-[#8a917c] uppercase">Guest total</p>
+              <p className="text-xs text-[#4a5a50] uppercase">Guest total</p>
               <p className="font-display text-2xl">{formatINR(open.customerTotal)}</p>
               {open.internal && (
-                <p className="mt-1 text-xs text-[#8a917c]">
+                <p className="mt-1 text-xs text-[#4a5a50]">
                   Internal: base {formatINR(open.internal.base)} · staff{" "}
                   {formatINR(open.internal.staffCost)} · fee {formatINR(open.internal.serviceFee)} · GST{" "}
                   {formatINR(open.internal.gst)}
@@ -312,15 +312,15 @@ export default function AdminBookingsPage() {
             </AdminButton>
 
             <div>
-              <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">Trail</p>
+              <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">Trail</p>
               <ul className="mt-2 space-y-2">
                 {(open.notes ?? []).length === 0 && (
-                  <li className="text-sm text-[#8a917c]">No notes yet.</li>
+                  <li className="text-sm text-[#4a5a50]">No notes yet.</li>
                 )}
                 {[...(open.notes ?? [])].reverse().map((n, i) => (
-                  <li key={`${n.at}-${i}`} className="rounded-xl border border-[#f0ebe3] px-3 py-2 text-sm">
+                  <li key={`${n.at}-${i}`} className="rounded-xl border border-[#dde1d0] px-3 py-2 text-sm">
                     <p>{n.text}</p>
-                    <p className="mt-1 text-xs text-[#8a917c]">
+                    <p className="mt-1 text-xs text-[#4a5a50]">
                       {new Date(n.at).toLocaleString("en-IN")}
                       {n.by ? ` · ${n.by}` : ""}
                     </p>

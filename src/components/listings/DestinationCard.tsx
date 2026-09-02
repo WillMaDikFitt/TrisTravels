@@ -37,7 +37,7 @@ export function DestinationCard({ destination, className, index = 0 }: Props) {
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#2c3530]/55 via-[#2c3530]/10 to-transparent opacity-90 transition group-hover:opacity-100"
+          className="absolute inset-0 bg-gradient-to-t from-primary-container/55 via-primary-container/10 to-transparent opacity-90 transition group-hover:opacity-100"
         />
         <span className="absolute top-4 left-4 font-[family-name:var(--font-manrope)] text-[10px] font-semibold tracking-[0.2em] text-white/90 uppercase">
           {destination.region}

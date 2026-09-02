@@ -54,7 +54,9 @@ export default async function JourneyDetailPage({ params }: Props) {
 
   return (
     <div className="bg-surface text-foreground">
-      <DetailGallery images={detailImages(journey.image, journey.gallery)} alt={journey.name}>
+      <DetailGallery images={detailImages(journey.image, journey.gallery)} alt={journey.name} />
+
+      <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
         <p className="label-caps text-highlight">
           {isFixed
             ? journey.idCode
@@ -62,20 +64,25 @@ export default async function JourneyDetailPage({ params }: Props) {
               : "Fixed departure"
             : "Curated Journey"}
         </p>
-        <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-4xl leading-[1.05] text-balance text-primary md:text-5xl lg:text-[3.35rem]">
+        <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-4xl leading-[1.05] text-primary md:text-5xl lg:text-[3.35rem]">
           {journey.name}
         </h1>
-        <p className="mt-3 min-h-[6.5rem] max-w-3xl text-base leading-relaxed text-on-surface-variant md:min-h-[7.5rem] md:text-lg md:leading-relaxed">
+        <p className="mt-3 text-base leading-[1.75] text-on-surface-variant md:text-lg">
           {journey.tagline}
         </p>
-      </DetailGallery>
+        {!isFixed && journey.overview ? (
+          <p className="mt-4 text-base leading-[1.75] text-on-surface-variant md:text-lg">
+            {journey.overview}
+          </p>
+        ) : null}
+      </div>
 
-      <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-[0_10px_30px_rgba(54,64,55,0.06)] md:p-8">
+      <div className="mx-auto max-w-container-max px-margin-mobile pt-6 pb-8 md:px-margin-desktop md:pb-10">
+        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 text-center shadow-[0_10px_30px_rgba(54,64,55,0.06)] md:p-8">
           <p className="label-caps text-highlight">Journey at a glance</p>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {glance.map((item) => (
-              <div key={item.label}>
+              <div key={item.label} className="flex flex-col items-center">
                 <p className="text-[11px] font-semibold tracking-wider text-on-surface-variant uppercase">
                   {item.label}
                 </p>

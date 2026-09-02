@@ -66,9 +66,9 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
       "-rotate-[0.75deg] hover:rotate-0",
     ] as const;
     const tapes = [
-      "left-1/2 -translate-x-1/2 rotate-[-2deg] bg-[#d4c4a8]/90",
-      "left-[18%] rotate-[6deg] bg-[#c5d4b8]/90",
-      "right-[16%] left-auto rotate-[-5deg] bg-[#dcc9b4]/90",
+      "left-1/2 -translate-x-1/2 rotate-[-2deg] bg-outline-variant/80",
+      "left-[18%] rotate-[6deg] bg-highlight/35",
+      "right-[16%] left-auto rotate-[-5deg] bg-secondary-container/90",
     ] as const;
     const tilt = tilts[Math.abs(tiltIndex) % tilts.length];
     const tape = tapes[Math.abs(tiltIndex) % tapes.length];
@@ -97,7 +97,7 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
         <Link
           href={`/stories/${story.slug}`}
           className={cn(
-            "group relative flex h-full flex-col rounded-[4px] border border-[#e4ddd0] bg-[#f7f3ea] shadow-[0_12px_28px_rgba(54,64,55,0.12),0_2px_6px_rgba(54,64,55,0.06)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(54,64,55,0.16)]",
+            "group relative flex h-full flex-col rounded-[4px] border border-outline-variant/50 bg-surface-container-lowest shadow-[0_12px_28px_rgba(54,64,55,0.12),0_2px_6px_rgba(54,64,55,0.06)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(54,64,55,0.16)]",
             compact ? "p-2.5 pb-3" : "p-3 pb-4",
           )}
         >
@@ -114,7 +114,7 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
 
           <div
             className={cn(
-              "relative overflow-hidden rounded-[2px] border border-[#e8e2d6] bg-[#ebe6dc] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]",
+              "relative overflow-hidden rounded-[2px] border border-outline-variant/40 bg-surface-container shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]",
               compact ? "aspect-[2/1]" : "aspect-[5/4]",
             )}
           >
@@ -168,7 +168,7 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
           {/* Folded corner */}
           <span
             aria-hidden
-            className="pointer-events-none absolute right-0 bottom-0 h-0 w-0 border-b-[18px] border-l-[18px] border-b-transparent border-l-[#e8e0d2] opacity-80"
+            className="pointer-events-none absolute right-0 bottom-0 h-0 w-0 border-b-[18px] border-l-[18px] border-b-transparent border-l-outline-variant/60 opacity-80"
           />
         </Link>
       </article>

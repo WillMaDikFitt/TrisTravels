@@ -39,7 +39,7 @@ export function HomeFaq() {
         sizes="100vw"
         quality={90}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#e8ebdd]/62" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-surface/62" />
 
       <div className="relative mx-auto flex w-full max-w-container-max flex-col px-margin-mobile md:px-margin-desktop">
         <div className="mx-auto max-w-2xl shrink-0 text-center">

@@ -83,7 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f4ee] text-[#5c6350]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f6f1] text-[#4a5a50]">
         Loading studio…
       </div>
     );
@@ -91,12 +91,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (configured && user && !isAdmin) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7f4ee] px-6 text-center">
-        <p className="font-display text-2xl text-[#2a2e1f]">Studio is for TRIS staff</p>
-        <p className="mt-2 max-w-sm text-sm text-[#5c6350]">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f6f1] px-6 text-center">
+        <p className="font-display text-2xl text-[#26352b]">Studio is for TRIS staff</p>
+        <p className="mt-2 max-w-sm text-sm text-[#4a5a50]">
           You’re signed in, but this account doesn’t have admin access.
         </p>
-        <Link href="/account" className="mt-6 text-sm font-semibold text-[#4a5a28] underline">
+        <Link href="/account" className="mt-6 text-sm font-semibold text-[#364037] underline">
           Back to your account
         </Link>
       </div>
@@ -116,7 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex min-h-screen bg-[#f4f2ec] text-[#24281c]">
-      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-black/10 bg-[#252a1e] text-[#f7f4ee] md:flex">
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-black/10 bg-[#252a1e] text-[#f8f6f1] md:flex">
         <Link href="/admin" className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <Image
             src={TRIS_LOGO_ON_DARK}
@@ -190,7 +190,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <div className="min-w-0 flex-1">
-        <div className="flex gap-2 overflow-x-auto border-b border-[#e4dfd4] bg-white px-4 py-3 md:hidden">
+        <div className="flex gap-2 overflow-x-auto border-b border-[#c5cbb8] bg-white px-4 py-3 md:hidden">
           {flatLinks.map((l) => {
             const active = linkActive(pathname, l.href);
             return (
@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={l.href}
                 className={cn(
                   "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-                  active ? "bg-[#e4e8d4] text-[#3d4a28]" : "text-[#5c6350]",
+                  active ? "bg-[#e4e8d4] text-[#1f4e3d]" : "text-[#4a5a50]",
                 )}
               >
                 {l.label}
@@ -225,16 +225,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </p>
         )}
         {configured && health?.adminConnected && health.adminError && (
-          <p className="mx-4 mt-4 rounded-xl bg-[#f3efe8] px-4 py-2.5 text-sm text-[#5c6350] md:mx-8">
+          <p className="mx-4 mt-4 rounded-xl bg-[#e8ebdd] px-4 py-2.5 text-sm text-[#4a5a50] md:mx-8">
             {health.adminError}
           </p>
         )}
         <header className="sticky top-0 z-30 hidden h-[4.5rem] items-center border-b border-[#ded9cd] bg-white/90 px-8 backdrop-blur-xl md:flex">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.18em] text-[#8a917c] uppercase">
+            <p className="text-[10px] font-bold tracking-[0.18em] text-[#4a5a50] uppercase">
               TRIS Studio
             </p>
-            <p className="mt-0.5 text-sm font-semibold text-[#2a2e1f]">{currentPage}</p>
+            <p className="mt-0.5 text-sm font-semibold text-[#26352b]">{currentPage}</p>
           </div>
         </header>
         <div className="min-h-[calc(100vh-4.5rem)] bg-[radial-gradient(circle_at_top_right,rgba(194,100,58,0.08),transparent_32%),linear-gradient(180deg,#f8f6f1_0%,#f1eee7_100%)]">

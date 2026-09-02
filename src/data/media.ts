@@ -44,6 +44,8 @@ const local = {
   categoryCreative: "/images/categories/creative.jpg",
   storyMawsynram: "/images/stories/two-days-in-mawsynram.jpg",
   storyVinayYadav: "/images/stories/natures-dreamscape.jpg",
+  aboutHomePortrait: "/images/about-home-portrait.png",
+  aboutHero: "/images/about-hero.png",
 } as const;
 
 export const media = {
@@ -56,6 +58,8 @@ export const media = {
   heroMist: local.trailMist,
   familyWaterfall: local.waterfallPool,
   aboutPortrait: local.portraitWarm,
+  aboutHomePortrait: local.aboutHomePortrait,
+  aboutHero: local.aboutHero,
   ride: local.highlandRoad,
   rideAlt: local.ridgeLight,
   craft: local.marketDay,
@@ -93,7 +97,8 @@ export const media = {
   storyMawsynram: local.storyMawsynram,
   storyVinayYadav: local.storyVinayYadav,
   typeAdventure: local.categoryAdventure,
-  typeNatureWildlife: local.categoryNatureWildlife,
+  typeNature: local.categoryNatureWildlife,
+  typeWildlife: local.forestLight,
   typeCultureHeritage: local.categoryCultureHeritage,
   typeFoodLocalLife: local.categoryFoodLocalLife,
   typeWellness: local.categoryWellness,

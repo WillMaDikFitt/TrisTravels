@@ -4,7 +4,6 @@ import type { Journey } from "@/data/journeys";
 import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
 import { CARD_TYPE, clipClean, clipTitle } from "./cardText";
-import { JourneyListingMeta } from "./JourneyListingMeta";
 
 type Props = {
   journey: Journey;
@@ -130,8 +129,6 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
           {description}
         </p>
 
-        <JourneyListingMeta journey={journey} className="mt-4" />
-
         <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-3 border-t border-outline-variant/30 pt-4">
           <div className="min-w-0">
             <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>From</p>
@@ -237,10 +234,6 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
         <p className={cn(CARD_TYPE.body, "mt-3 max-w-[34rem] leading-[1.55] text-white/90")}>
           {description}
         </p>
-
-        <div className="mt-4 rounded-xl bg-black/35 px-3 py-3 backdrop-blur-sm">
-          <JourneyListingMeta journey={journey} className="border-t-0 pt-0 [&_dt]:text-white/65 [&_dd]:text-white" />
-        </div>
 
         <div className="mt-4 h-px w-full bg-white/20" />
 
@@ -355,8 +348,6 @@ function FixedJourneyCard({
         <p className="mt-3 line-clamp-2 font-sans text-[13px] leading-[1.55] text-on-surface-variant md:text-[14px]">
           {description}
         </p>
-
-        <JourneyListingMeta journey={journey} className="mt-4" />
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/30 pt-4">
           <div className="min-w-0">

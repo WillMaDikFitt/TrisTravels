@@ -3,8 +3,9 @@
 import { Check, Minus, Plus, UsersRound, CarFront } from "lucide-react";
 import { FormSelect } from "@/components/ui/Form";
 import { CHILD_AGE_SELECT_OPTIONS } from "@/data/child-ages";
-import { cn } from "@/lib/utils";
+import { formatINR, cn } from "@/lib/utils";
 import type { TransportVehicleOption } from "@/data/transport";
+import type { ExperienceTransportMode } from "@/lib/experience-meta";
 
 type GuestFieldsProps = {
   adults: number;
@@ -311,6 +312,236 @@ export function TransportVehicleFields({
             </button>
           </div>
         </div>
+      ) : null}
+    </div>
+  );
+}
+
+export type TransportChoice = "own" | "tris" | null;
+
+type GettingThereFieldsProps = {
+  mode: ExperienceTransportMode;
+  options: TransportVehicleOption[];
+  choice: TransportChoice;
+  vehicleId: string;
+  vehicleCount?: number;
+  note?: string;
+  onChoice: (choice: TransportChoice) => void;
+  onVehicle: (id: string) => void;
+  onVehicleCount?: (n: number) => void;
+  compact?: boolean;
+};
+
+function VehicleGrid({
+  options,
+  vehicleId,
+  onVehicle,
+  compact,
+}: {
+  options: TransportVehicleOption[];
+  vehicleId: string;
+  onVehicle: (id: string) => void;
+  compact?: boolean;
+}) {
+  return compact ? (
+    <div className="grid grid-cols-2 gap-2">
+      {options.map((option) => {
+        const active = option.id === vehicleId;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onVehicle(option.id)}
+            className={cn(
+              "rounded-xl border px-2.5 py-2 text-left transition",
+              active
+                ? "border-primary bg-secondary-container/60 text-primary"
+                : "border-outline-variant/40 bg-surface-container-lowest hover:border-primary/40",
+            )}
+          >
+            <p className="text-xs font-semibold">{option.label}</p>
+            <p className="mt-0.5 text-[10px] leading-snug text-on-surface-variant">{option.idealFor}</p>
+            <p className="mt-1 text-[10px] font-medium text-primary">{formatINR(option.price)}</p>
+          </button>
+        );
+      })}
+    </div>
+  ) : (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {options.map((option) => {
+        const active = option.id === vehicleId;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onVehicle(option.id)}
+            className={cn(
+              "relative rounded-2xl border p-4 text-left transition",
+              active
+                ? "border-primary bg-secondary-container/55 text-primary shadow-[inset_0_0_0_1px_rgba(74,90,40,0.16)]"
+                : "border-outline-variant/35 bg-surface-container-lowest text-on-surface hover:-translate-y-0.5 hover:border-primary/40",
+            )}
+          >
+            <span
+              className={cn(
+                "absolute top-4 right-4 grid h-5 w-5 place-items-center rounded-full border",
+                active ? "border-primary bg-primary text-on-primary" : "border-outline-variant/70 text-transparent",
+              )}
+            >
+              <Check size={11} strokeWidth={3} />
+            </span>
+            <p className="pr-8 text-sm font-semibold">{option.label}</p>
+            <p className="mt-0.5 text-xs text-on-surface-variant">{option.idealFor}</p>
+            <p className="mt-2 text-sm font-semibold text-primary">{formatINR(option.price)}</p>
+            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">{option.summary}</p>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function GettingThereFields({
+  mode,
+  options,
+  choice,
+  vehicleId,
+  vehicleCount = 1,
+  note,
+  onChoice,
+  onVehicle,
+  onVehicleCount,
+  compact,
+}: GettingThereFieldsProps) {
+  const lowestPrice = options.length ? Math.min(...options.map((o) => o.price)) : 0;
+
+  if (mode === "none") return null;
+
+  if (mode === "required") {
+    return (
+      <div className={cn("space-y-3", compact && "space-y-2")}>
+        <p className={cn("text-on-surface-variant", compact ? "text-[11px]" : "text-sm")}>
+          Transportation is required for this experience.
+          {note ? ` ${note}` : ""}
+        </p>
+        <p className={cn("font-medium text-primary", compact ? "text-xs" : "text-sm")}>
+          Select your transport
+        </p>
+        <VehicleGrid options={options} vehicleId={vehicleId} onVehicle={onVehicle} compact={compact} />
+        {onVehicleCount ? (
+          <div className="flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3">
+            <span className="text-sm font-medium text-primary">Number of vehicles</span>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                aria-label="Fewer vehicles"
+                disabled={vehicleCount <= 1}
+                onClick={() => onVehicleCount(vehicleCount - 1)}
+                className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+              >
+                <Minus size={14} />
+              </button>
+              <span className="w-5 text-center text-sm font-bold text-primary">{vehicleCount}</span>
+              <button
+                type="button"
+                aria-label="More vehicles"
+                disabled={vehicleCount >= 10}
+                onClick={() => onVehicleCount(vehicleCount + 1)}
+                className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("space-y-3", compact && "space-y-2")}>
+      <p className={cn("font-medium text-primary", compact ? "text-xs" : "text-sm")}>
+        How would you like to travel?
+      </p>
+      <div className={cn("grid gap-2", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
+        {[
+          {
+            id: "own" as const,
+            title: "I'll arrange my own transport",
+            body: "No transport charge added",
+          },
+          {
+            id: "tris" as const,
+            title: "Book TRIS transport",
+            body: lowestPrice ? `From ${formatINR(lowestPrice)}` : "Choose a vehicle below",
+          },
+        ].map((item) => {
+          const active = choice === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onChoice(item.id)}
+              className={cn(
+                "rounded-2xl border px-4 py-3 text-left transition",
+                active
+                  ? "border-primary bg-secondary-container/55 text-primary"
+                  : "border-outline-variant/35 bg-surface-container-lowest hover:border-primary/40",
+              )}
+            >
+              <span className="flex items-start gap-3">
+                <span
+                  className={cn(
+                    "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                    active ? "border-primary bg-primary" : "border-outline-variant/70",
+                  )}
+                >
+                  {active ? <span className="h-1.5 w-1.5 rounded-full bg-on-primary" /> : null}
+                </span>
+                <span>
+                  <span className={cn("block font-semibold", compact ? "text-xs" : "text-sm")}>{item.title}</span>
+                  <span className={cn("mt-0.5 block text-on-surface-variant", compact ? "text-[10px]" : "text-xs")}>
+                    {item.body}
+                  </span>
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {choice === "tris" ? (
+        <>
+          <VehicleGrid options={options} vehicleId={vehicleId} onVehicle={onVehicle} compact={compact} />
+          {onVehicleCount ? (
+            <div className="flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3">
+              <span className="text-sm font-medium text-primary">Number of vehicles</span>
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  aria-label="Fewer vehicles"
+                  disabled={vehicleCount <= 1}
+                  onClick={() => onVehicleCount(vehicleCount - 1)}
+                  className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="w-5 text-center text-sm font-bold text-primary">{vehicleCount}</span>
+                <button
+                  type="button"
+                  aria-label="More vehicles"
+                  disabled={vehicleCount >= 10}
+                  onClick={() => onVehicleCount(vehicleCount + 1)}
+                  className="grid h-8 w-8 place-items-center rounded-full border border-outline-variant/50 text-primary disabled:opacity-30"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </>
+      ) : null}
+      {note ? (
+        <p className={cn("text-on-surface-variant", compact ? "text-[10px]" : "text-xs")}>{note}</p>
       ) : null}
     </div>
   );

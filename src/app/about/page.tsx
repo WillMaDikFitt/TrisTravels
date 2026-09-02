@@ -95,26 +95,36 @@ export default async function AboutPage() {
     <div className="bg-surface text-foreground">
       {/* Hero */}
       <section className="relative min-h-[min(62vh,32rem)] overflow-hidden pt-header md:min-h-[min(68vh,36rem)]">
-        <Image
-          src={media.aboutPortrait}
-          alt="Mei-ieid — the heart behind TRIS"
-          fill
-          priority
-          className="object-cover object-[center_28%]"
-          sizes="100vw"
-          quality={92}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-[#F8F6F1]/92 via-[#F8F6F1]/55 to-transparent md:via-[#F8F6F1]/35"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#E8EBDD]/40 via-transparent to-transparent"
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={media.aboutHero}
+            alt="Mei-ieid — the heart behind TRIS"
+            fill
+            priority
+            className="object-cover object-[72%_center]"
+            sizes="100vw"
+            quality={92}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, var(--surface-container-lowest) 0%, var(--surface) 18%, var(--surface) 34%, color-mix(in srgb, var(--surface) 90%, transparent) 42%, color-mix(in srgb, var(--surface) 62%, transparent) 50%, color-mix(in srgb, var(--surface) 28%, transparent) 56%, transparent 62%)",
+            }}
+          />
+        </div>
 
-        <div className="relative mx-auto flex min-h-[min(62vh,32rem)] w-full max-w-container-max items-end px-margin-mobile pb-12 md:min-h-[min(68vh,36rem)] md:px-margin-desktop md:pb-16">
-          <FadeIn className="max-w-xl">
+        <div className="relative mx-auto flex min-h-[min(62vh,32rem)] w-full max-w-container-max items-end justify-start px-margin-mobile pb-12 md:min-h-[min(68vh,36rem)] md:pl-8 md:pr-margin-desktop lg:pl-10 md:pb-16">
+          <FadeIn className="relative max-w-lg md:max-w-xl">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-5 -right-[24%] -bottom-6 -left-8 -z-10 rounded-r-3xl md:-left-12 md:-right-[28%]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, var(--surface) 0%, var(--surface) 72%, color-mix(in srgb, var(--surface) 94%, transparent) 84%, color-mix(in srgb, var(--surface) 55%, transparent) 94%, transparent 100%)",
+              }}
+            />
             <p className="label-caps text-highlight">Our story</p>
             <h1
               className={cn(
@@ -284,7 +294,7 @@ export default async function AboutPage() {
                     >
                       {value.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-snug text-[#A65D45] italic md:text-[0.95rem]">
+                    <p className="mt-2 text-sm leading-snug text-highlight italic md:text-[0.95rem]">
                       {value.tagline}
                     </p>
                     <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
@@ -342,7 +352,7 @@ export default async function AboutPage() {
                       <p className={cn(serif, "mt-3 text-[2rem] leading-none text-primary md:text-[2.25rem]")}>
                         {stat.value}
                       </p>
-                      <p className="mt-3 text-sm font-semibold text-[#A65D45]">{stat.label}</p>
+                      <p className="mt-3 text-sm font-semibold text-highlight">{stat.label}</p>
                       <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
                         {stat.description}
                       </p>

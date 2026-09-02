@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 type Props = {
   images: string[];
   alt: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 type Tile = { src: string; index: number; tall: boolean };
@@ -81,7 +81,7 @@ export function DetailGallery({ images, alt, children }: Props) {
   if (!mosaic) return null;
 
   return (
-    <section className="bg-background pt-header pb-10 md:pb-14">
+    <section className={cn("bg-background pt-header", children ? "pb-10 md:pb-14" : "pb-4 md:pb-6")}>
       <div className="mx-auto max-w-container-max px-margin-mobile pt-6 md:px-margin-desktop md:pt-8">
         <div className="relative">
           {mosaic.mode === "portraits" ? (
@@ -166,7 +166,7 @@ export function DetailGallery({ images, alt, children }: Props) {
           )}
         </div>
 
-        <div className="mt-8 md:mt-10">{children}</div>
+        {children ? <div className="mt-8 md:mt-10">{children}</div> : null}
       </div>
 
       {open && (
@@ -174,7 +174,7 @@ export function DetailGallery({ images, alt, children }: Props) {
           role="dialog"
           aria-modal="true"
           aria-label={`${alt} photo gallery`}
-          className="fixed inset-0 z-[100] flex flex-col bg-[#12130f]/97 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex flex-col bg-primary/97 backdrop-blur-sm"
         >
           <div className="flex items-center justify-between px-4 py-4 text-white md:px-8">
             <p className="text-sm text-white/70">

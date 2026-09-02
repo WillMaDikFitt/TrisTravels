@@ -19,7 +19,7 @@ export function HomeHero() {
     <section ref={ref} className="home-snap-section relative">
       <div className="relative flex h-[100svh] min-h-[640px] w-full items-center">
         {/* Video scaled down from the top-left — cream overlays below stay as-is */}
-        <div className="absolute inset-0 overflow-hidden bg-[#2a332c]">
+        <div className="absolute inset-0 overflow-hidden bg-primary-container">
           <motion.div
             style={{ y }}
             className="absolute top-[9%] left-[16%] right-0 bottom-0 md:top-[10%] md:left-[20%]"
@@ -52,20 +52,20 @@ export function HomeHero() {
 
           <div
             aria-hidden
-            className="absolute inset-y-0 left-0 w-[min(100%,58rem)] bg-gradient-to-r from-[#E8EBDD] from-0% via-[#E8EBDD] via-42% to-transparent to-100%"
+            className="absolute inset-y-0 left-0 w-[min(100%,58rem)] bg-gradient-to-r from-surface from-0% via-surface via-42% to-transparent to-100%"
           />
           <div
             aria-hidden
-            className="absolute inset-y-0 left-0 w-[min(100%,44rem)] bg-gradient-to-r from-[#F5F6F0] via-[#E8EBDD]/90 to-transparent"
+            className="absolute inset-y-0 left-0 w-[min(100%,44rem)] bg-gradient-to-r from-surface-container-lowest via-surface/90 to-transparent"
           />
           {/* Top wash so navbar + headline sit on clear cream */}
           <div
             aria-hidden
-            className="absolute inset-x-0 top-0 h-[min(42%,22rem)] bg-gradient-to-b from-[#E8EBDD] via-[#E8EBDD]/85 to-transparent"
+            className="absolute inset-x-0 top-0 h-[min(42%,22rem)] bg-gradient-to-b from-surface via-surface/85 to-transparent"
           />
           <div
             aria-hidden
-            className="absolute inset-x-0 top-0 h-[min(28%,14rem)] bg-gradient-to-b from-[#F5F6F0]/95 to-transparent"
+            className="absolute inset-x-0 top-0 h-[min(28%,14rem)] bg-gradient-to-b from-surface-container-lowest/95 to-transparent"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
         </div>

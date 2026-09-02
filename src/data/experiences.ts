@@ -3,11 +3,14 @@ import type { TransportVehiclePrices } from "./transport";
 
 export type ExperienceCategory =
   | "Adventure"
-  | "Nature & Wildlife"
+  | "Nature"
+  | "Wildlife"
   | "Culture & Heritage"
   | "Food & Local Life"
   | "Wellness"
   | "Creative Experiences";
+
+export type ExperienceTransportMode = "none" | "optional" | "required";
 
 export type Difficulty = "Easy" | "Moderate" | "Challenging";
 
@@ -45,6 +48,8 @@ export type Experience = {
   slots?: string[];
   slotConfig?: ExperienceSlotConfig;
   transportAvailable?: boolean;
+  /** Optional add-on vs required TRIS transport. Falls back from transportAvailable when unset. */
+  transportMode?: ExperienceTransportMode;
   transportPrice?: number;
   transportNote?: string;
   /** Optional per-vehicle transfer prices. Missing ids fall back to transportPrice multipliers. */
@@ -66,7 +71,10 @@ export type Experience = {
   trisStory: string;
   highlights: string[];
   included: string[];
+  excluded?: string[];
   whatToBring: string[];
+  /** Lower numbers appear first on browse pages and admin. */
+  sortOrder?: number;
   meetingPoint: string;
   itinerary: { time: string; title: string; description: string }[];
   faqs: { q: string; a: string }[];
@@ -102,6 +110,7 @@ export const experiences: Experience[] = [
       breaks: [{ start: "12:00", end: "13:00" }],
     },
     transportAvailable: true,
+    transportMode: "optional",
     transportPrice: 2500,
     transportNote: "Shared pickup from Shillong",
     image: listings.experience("offbeat-living-root-bridge"),
@@ -123,6 +132,7 @@ export const experiences: Experience[] = [
       "Shared transport & local driver",
       "Breakfast, dinner & accommodation",
     ],
+    excluded: ["Personal expenses", "Village lunch shopping", "Travel insurance"],
     whatToBring: [
       "Sturdy walking shoes with grip",
       "Rain jacket",
@@ -165,6 +175,7 @@ export const experiences: Experience[] = [
     ],
     sourceUrl:
       "https://www.trismeghalaya.com/fixed-departures/rooted-trails%3A-the-offbeat-living-root-bridge-experience",
+    sortOrder: 0,
   },
   {
     slug: "double-decker-living-root-bridge",
@@ -202,6 +213,7 @@ export const experiences: Experience[] = [
       "Small groups for a respectful pace",
     ],
     included: ["Community guide", "Trail support", "First-aid basics"],
+    excluded: ["Meals", "Private transport to Tyrna", "Personal trekking gear"],
     whatToBring: [
       "Sturdy shoes with grip",
       "Rain jacket",
@@ -239,6 +251,7 @@ export const experiences: Experience[] = [
     ],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/destination/nongriat",
+    sortOrder: 10,
   },
   {
     slug: "mawsynram-river-trek",
@@ -263,6 +276,7 @@ export const experiences: Experience[] = [
       breaks: [{ start: "12:00", end: "13:00" }],
     },
     transportAvailable: true,
+    transportMode: "optional",
     transportPrice: 1800,
     image: listings.experience("mawsynram-river-trek"),
     gallery: [media.local.riverStones, media.local.cliffView, media.local.trailMist],
@@ -278,6 +292,7 @@ export const experiences: Experience[] = [
       "Local lunch after the trail",
     ],
     included: ["Local adventure guide", "Safety briefing", "Trail coordination"],
+    excluded: ["Meals", "Transport to trailhead", "Personal gear & rain protection"],
     whatToBring: [
       "Quick-dry clothes + spare set",
       "Good-grip trekking shoes",
@@ -316,6 +331,7 @@ export const experiences: Experience[] = [
     reviews: [],
     sourceUrl:
       "https://www.trismeghalaya.com/your-stories/two-days-in-mawsynram-%E2%80%94-rain%2C-rivers-%26-adventures-in-the-wettest-place-on-earth",
+    sortOrder: 20,
   },
   {
     slug: "mawphlang-sacred-forest",
@@ -346,6 +362,7 @@ export const experiences: Experience[] = [
       "Nearby craft / herbal purchases optional",
     ],
     included: ["Local guide", "Interpretation"],
+    excluded: ["Transport", "Meals", "Personal expenses"],
     whatToBring: ["Modest clothing", "Quiet shoes", "Respect for no-take forest rules"],
     meetingPoint: "Mawphlang Sacred Grove entrance",
     itinerary: [
@@ -363,12 +380,13 @@ export const experiences: Experience[] = [
     faqs: [],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/your-stories",
+    sortOrder: 30,
   },
   {
     slug: "umngot-dawki",
     name: "Dawki — Umngot River",
     tagline: "Crystal-clear waters, border views, and boat time with local crews.",
-    category: "Nature & Wildlife",
+    category: "Nature",
     tags: ["Water", "Family Friendly", "Sustainability Focus"],
     location: "Dawki",
     region: "Jaintia Hills",
@@ -393,6 +411,7 @@ export const experiences: Experience[] = [
       "Easy add-on to multi-day packages",
     ],
     included: ["Boat & local crew", "Life jackets", "Coordination"],
+    excluded: ["Transport to Dawki", "Meals", "Border permits (if applicable)"],
     whatToBring: ["Sun protection", "Dry bag for phones", "Swimwear (optional)"],
     meetingPoint: "Dawki riverside jetty",
     itinerary: [
@@ -415,12 +434,13 @@ export const experiences: Experience[] = [
     ],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
+    sortOrder: 40,
   },
   {
     slug: "short-escape-sohra-day",
     name: "Short Escape – Sohra",
     tagline: "A customizable Sohra day — Nohkalikai Crest, caves, and waterfall country.",
-    category: "Nature & Wildlife",
+    category: "Nature",
     tags: ["Sohra", "Viewpoints", "Caves"],
     location: "Sohra (Cherrapunjee)",
     region: "Sohra",
@@ -431,6 +451,9 @@ export const experiences: Experience[] = [
     bestSeason: "October to April",
     priceFrom: 4500,
     maxGuests: 10,
+    transportMode: "required",
+    transportPrice: 3500,
+    transportNote: "Private vehicle with driver for the full day",
     image: listings.experience("short-escape-sohra-day"),
     gallery: [media.local.cliffView, media.local.meadowWalk, media.local.valleyGreen],
     overview:
@@ -448,6 +471,7 @@ export const experiences: Experience[] = [
       "Guide at key locations",
       "Sightseeing entries as planned",
     ],
+    excluded: ["Meals", "Personal expenses", "Accommodation"],
     whatToBring: ["Layered clothing for mist", "Comfortable shoes", "Rain jacket"],
     meetingPoint: "Shillong or Sohra (shared on confirmation)",
     itinerary: [
@@ -470,6 +494,7 @@ export const experiences: Experience[] = [
     faqs: [],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/customizable-packages",
+    sortOrder: 50,
   },
   {
     slug: "krem-puri-cave",
@@ -499,6 +524,7 @@ export const experiences: Experience[] = [
       "Pairs beautifully with Mawlongbna river days",
     ],
     included: ["Local cave guide", "Coordination"],
+    excluded: ["Transport to Mawsynram", "Meals", "Headlamp (optional backup)"],
     whatToBring: ["Closed shoes with grip", "Light jacket", "Headlamp (optional backup)"],
     meetingPoint: "Mawsynram area (shared on confirmation)",
     itinerary: [
@@ -516,6 +542,7 @@ export const experiences: Experience[] = [
     faqs: [],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/destination/mawsynram",
+    sortOrder: 60,
   },
   {
     slug: "mawlynnong-village-stay",
@@ -546,6 +573,7 @@ export const experiences: Experience[] = [
       "Optional living root bridge day-trips nearby",
     ],
     included: ["Homestay (double-sharing base)", "Local host orientation", "Village walk"],
+    excluded: ["Transport to Mawlynnong", "Meals beyond host breakfast", "Personal expenses"],
     whatToBring: ["Respectful clothing", "Cash for crafts & snacks", "Mosquito protection"],
     meetingPoint: "Mawlynnong village (transfer options available)",
     itinerary: [
@@ -568,6 +596,7 @@ export const experiences: Experience[] = [
     faqs: [],
     reviews: [],
     sourceUrl: "https://www.trismeghalaya.com/fixed-departures",
+    sortOrder: 70,
   },
 ];
 

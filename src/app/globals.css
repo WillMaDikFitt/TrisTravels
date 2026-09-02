@@ -41,6 +41,10 @@
   --highlight: #7aa35a;
   --on-highlight: #f8f6f1;
 
+  /* Terracotta — sparing accent (Excel colour guideline #10) */
+  --terracotta: #c96a3d;
+  --on-terracotta: #f8f6f1;
+
   /* Alias for older classnames — same as highlight, never terracotta */
   --accent: #7aa35a;
   --on-accent: #f8f6f1;
@@ -93,6 +97,8 @@
   --color-on-cta: var(--on-cta);
   --color-highlight: var(--highlight);
   --color-on-highlight: var(--on-highlight);
+  --color-terracotta: var(--terracotta);
+  --color-on-terracotta: var(--on-terracotta);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
   --color-outline: var(--outline);

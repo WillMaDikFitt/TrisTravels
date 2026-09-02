@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { experiences as staticExperiences, type Experience } from "@/data/experiences";
 import { fetchExperiencesAdmin } from "@/lib/actions/content-read";
-import { deleteDocument } from "@/lib/actions/cms";
+import { deleteDocument, saveDocument } from "@/lib/actions/cms";
+import { sortExperiences } from "@/lib/experience-meta";
 import { Badge, EmptyState, PageHeader, AdminButton, inputClass } from "@/components/admin/ui";
 import { formatINR } from "@/lib/utils";
 
@@ -29,6 +31,7 @@ function statusLabel(status?: string) {
 export default function AdminExperiencesPage() {
   const [rows, setRows] = useState<Experience[]>(staticExperiences);
   const [q, setQ] = useState("");
+  const [reordering, setReordering] = useState<string | null>(null);
 
   useEffect(() => {
     fetchExperiencesAdmin()
@@ -37,9 +40,10 @@ export default function AdminExperiencesPage() {
   }, []);
 
   const filtered = useMemo(() => {
+    const sorted = sortExperiences(rows);
     const s = q.trim().toLowerCase();
-    if (!s) return rows;
-    return rows.filter(
+    if (!s) return sorted;
+    return sorted.filter(
       (e) =>
         e.name.toLowerCase().includes(s) ||
         e.category.toLowerCase().includes(s) ||
@@ -47,12 +51,40 @@ export default function AdminExperiencesPage() {
     );
   }, [rows, q]);
 
+  const moveExperience = async (slug: string, direction: "up" | "down") => {
+    const sorted = sortExperiences(rows);
+    const index = sorted.findIndex((row) => row.slug === slug);
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    if (index < 0 || swapIndex < 0 || swapIndex >= sorted.length) return;
+
+    const current = sorted[index];
+    const swap = sorted[swapIndex];
+    const currentOrder = current.sortOrder ?? index * 10;
+    const swapOrder = swap.sortOrder ?? swapIndex * 10;
+
+    setReordering(slug);
+    await Promise.all([
+      saveDocument("experiences", current.slug, { sortOrder: swapOrder }),
+      saveDocument("experiences", swap.slug, { sortOrder: currentOrder }),
+    ]);
+    setRows((prev) =>
+      sortExperiences(
+        prev.map((row) => {
+          if (row.slug === current.slug) return { ...row, sortOrder: swapOrder };
+          if (row.slug === swap.slug) return { ...row, sortOrder: currentOrder };
+          return row;
+        }),
+      ),
+    );
+    setReordering(null);
+  };
+
   return (
     <div>
       <PageHeader
         eyebrow="Catalogue"
         title="Experiences"
-        description="Day immersions travellers can book or request. Status controls what appears on the public site."
+        description="Day immersions travellers can book or request. Use the arrows to control browse order."
         actions={
           <Link href="/admin/experiences/new">
             <AdminButton>New experience</AdminButton>
@@ -69,10 +101,11 @@ export default function AdminExperiencesPage() {
         />
       </label>
       {filtered.length ? (
-        <div className="overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[#c5cbb8] bg-white">
           <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+            <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
               <tr>
+                <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Experience</th>
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">From</th>
@@ -81,8 +114,30 @@ export default function AdminExperiencesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((e) => (
-                <tr key={e.slug} className="border-t border-[#f0ebe3]">
+              {filtered.map((e, index) => (
+                <tr key={e.slug} className="border-t border-[#dde1d0]">
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <button
+                        type="button"
+                        aria-label={`Move ${e.name} up`}
+                        disabled={index === 0 || reordering === e.slug}
+                        onClick={() => moveExperience(e.slug, "up")}
+                        className="rounded border border-[#c5cbb8] p-1 text-[#364037] disabled:opacity-30"
+                      >
+                        <ChevronUp size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Move ${e.name} down`}
+                        disabled={index === filtered.length - 1 || reordering === e.slug}
+                        onClick={() => moveExperience(e.slug, "down")}
+                        className="rounded border border-[#c5cbb8] p-1 text-[#364037] disabled:opacity-30"
+                      >
+                        <ChevronDown size={14} />
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-[#efeae1]">
@@ -92,20 +147,20 @@ export default function AdminExperiencesPage() {
                       </div>
                       <div>
                         <p className="font-medium">{e.name}</p>
-                        <p className="text-xs text-[#8a917c]">
+                        <p className="text-xs text-[#4a5a50]">
                           {e.location} · {e.duration}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[#5c6350]">{e.category}</td>
+                  <td className="px-4 py-3 text-[#4a5a50]">{e.category}</td>
                   <td className="px-4 py-3">{formatINR(e.priceFrom)}</td>
                   <td className="px-4 py-3">
                     <Badge tone={statusTone(e.status)}>{statusLabel(e.status)}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Link href={`/admin/experiences/${e.slug}`} className="text-xs font-semibold text-[#4a5a28]">
+                      <Link href={`/admin/experiences/${e.slug}`} className="text-xs font-semibold text-[#364037]">
                         Edit
                       </Link>
                       <button

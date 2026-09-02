@@ -111,8 +111,8 @@ export default function AdminSettingsPage() {
 
       <Panel className="mt-10 max-w-3xl space-y-5">
         <div>
-          <h2 className="font-display text-lg text-[#2a2e1f]">Discount codes</h2>
-          <p className="mt-1 text-sm text-[#5c6350]">
+          <h2 className="font-display text-lg text-[#26352b]">Discount codes</h2>
+          <p className="mt-1 text-sm text-[#4a5a50]">
             Percent-off codes for curated Book Now (and shown when guests enter a code). Leave inactive to
             pause without deleting.
           </p>
@@ -121,7 +121,7 @@ export default function AdminSettingsPage() {
           {(settings.discountCodes ?? []).map((row, index) => (
             <div
               key={row.id}
-              className="grid gap-3 rounded-xl border border-[#e4dfd4] bg-white p-4 sm:grid-cols-4"
+              className="grid gap-3 rounded-xl border border-[#c5cbb8] bg-white p-4 sm:grid-cols-4"
             >
               <Field label="Code">
                 <input
@@ -160,7 +160,7 @@ export default function AdminSettingsPage() {
                 />
               </Field>
               <div className="flex items-end gap-2">
-                <label className="flex items-center gap-2 text-sm text-[#2a2e1f]">
+                <label className="flex items-center gap-2 text-sm text-[#26352b]">
                   <input
                     type="checkbox"
                     checked={row.active}
@@ -233,8 +233,8 @@ export default function AdminSettingsPage() {
 
       <Panel className="mt-10 max-w-3xl space-y-5">
         <div>
-          <h2 className="font-display text-lg text-[#2a2e1f]">About — Our Impact</h2>
-          <p className="mt-1 text-sm text-[#5c6350]">
+          <h2 className="font-display text-lg text-[#26352b]">About — Our Impact</h2>
+          <p className="mt-1 text-sm text-[#4a5a50]">
             Numbers and labels on the About page. Update these as partnerships and travellers grow.
           </p>
         </div>
@@ -242,7 +242,7 @@ export default function AdminSettingsPage() {
           {impact.map((stat, index) => (
             <div
               key={stat.id}
-              className="grid gap-3 rounded-xl border border-[#e4dfd4] bg-white p-4 sm:grid-cols-2"
+              className="grid gap-3 rounded-xl border border-[#c5cbb8] bg-white p-4 sm:grid-cols-2"
             >
               <Field label="Value">
                 <input
@@ -307,13 +307,13 @@ export default function AdminSettingsPage() {
 
       <Panel className="mt-8 max-w-xl space-y-4">
         <div>
-          <h2 className="font-display text-lg text-[#2a2e1f]">Sample Studio data</h2>
-          <p className="mt-1 text-sm text-[#5c6350]">
+          <h2 className="font-display text-lg text-[#26352b]">Sample Studio data</h2>
+          <p className="mt-1 text-sm text-[#4a5a50]">
             Load realistic bookings, enquiries, closures, and travellers so you can review every Studio
             screen. Marked as demo and safe to clear later.
           </p>
         </div>
-        <p className="text-xs font-semibold tracking-wider text-[#6b734f] uppercase">
+        <p className="text-xs font-semibold tracking-wider text-[#4a5a50] uppercase">
           Status · {demoSeeded ? "Sample data loaded" : "No sample data"}
         </p>
         <div className="flex flex-wrap gap-2">

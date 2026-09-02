@@ -99,7 +99,7 @@ export function DepartureSeatsCalendar({
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="rounded-2xl border border-[#e4dfd4] bg-white p-4">
+        <div className="rounded-2xl border border-[#c5cbb8] bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <AdminButton
               type="button"
@@ -113,7 +113,7 @@ export function DepartureSeatsCalendar({
             >
               <ChevronLeft size={16} />
             </AdminButton>
-            <p className="text-sm font-semibold text-[#2a2e1f]">{label}</p>
+            <p className="text-sm font-semibold text-[#26352b]">{label}</p>
             <AdminButton
               type="button"
               variant="ghost"
@@ -128,7 +128,7 @@ export function DepartureSeatsCalendar({
             </AdminButton>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold tracking-wide text-[#8a917c] uppercase">
+          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold tracking-wide text-[#4a5a50] uppercase">
             {WEEKDAYS.map((d) => (
               <span key={d} className="py-1">
                 {d}
@@ -151,7 +151,7 @@ export function DepartureSeatsCalendar({
                     "relative flex h-10 flex-col items-center justify-center rounded-lg text-sm transition",
                     selected
                       ? "bg-[#364037] text-white"
-                      : "text-[#2a2e1f] hover:bg-[#e8ebdd]",
+                      : "text-[#26352b] hover:bg-[#e8ebdd]",
                     isActive && "ring-2 ring-[#7aa35a] ring-offset-1",
                   )}
                   title={selected ? `${seatsLeft(row!)} seats left` : "Add departure"}
@@ -166,18 +166,18 @@ export function DepartureSeatsCalendar({
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-[#5c6350]">
+          <p className="mt-3 text-xs text-[#4a5a50]">
             Click days to add or remove fixed departure dates. Selected days show remaining seats.
           </p>
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-[#2a2e1f]">
+          <p className="text-sm font-semibold text-[#26352b]">
             {rows.length} departure{rows.length === 1 ? "" : "s"} selected
           </p>
-          <ul className="max-h-48 space-y-1.5 overflow-y-auto text-sm text-[#5c6350]">
+          <ul className="max-h-48 space-y-1.5 overflow-y-auto text-sm text-[#4a5a50]">
             {rows.length === 0 ? (
-              <li className="text-[#8a917c]">No dates yet — pick from the calendar.</li>
+              <li className="text-[#4a5a50]">No dates yet — pick from the calendar.</li>
             ) : (
               rows.map((r) => (
                 <li key={r.date}>
@@ -186,7 +186,7 @@ export function DepartureSeatsCalendar({
                     onClick={() => setActive(r.date)}
                     className={cn(
                       "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left transition",
-                      active === r.date ? "bg-[#e8ebdd] text-[#2a2e1f]" : "hover:bg-[#f4f1ea]",
+                      active === r.date ? "bg-[#e8ebdd] text-[#26352b]" : "hover:bg-[#f4f1ea]",
                     )}
                   >
                     <span>{pretty(r.date)}</span>
@@ -198,14 +198,14 @@ export function DepartureSeatsCalendar({
           </ul>
 
           {activeRow ? (
-            <div className="rounded-xl border border-[#e4dfd4] bg-[#f8f6f1] p-3">
+            <div className="rounded-xl border border-[#c5cbb8] bg-[#f8f6f1] p-3">
               <div className="mb-2 flex items-start justify-between gap-2">
-                <p className="text-xs font-semibold text-[#2a2e1f]">{pretty(activeRow.date)}</p>
+                <p className="text-xs font-semibold text-[#26352b]">{pretty(activeRow.date)}</p>
                 <button
                   type="button"
                   aria-label="Remove date"
                   onClick={() => toggleDate(activeRow.date)}
-                  className="text-[#8a917c] hover:text-[#2a2e1f]"
+                  className="text-[#4a5a50] hover:text-[#26352b]"
                 >
                   <X size={14} />
                 </button>

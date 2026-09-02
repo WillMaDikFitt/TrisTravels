@@ -147,7 +147,7 @@ export function StoryBody({ paragraphs, className }: { paragraphs: string[]; cla
           return (
             <aside
               key={key}
-              className="rounded-[1.25rem] border border-[#e4ddd0] bg-[#f7f3ea] px-5 py-6 shadow-[0_10px_28px_rgba(54,64,55,0.06)] md:px-7 md:py-7"
+              className="rounded-[1.25rem] border border-outline-variant/50 bg-surface-container-lowest px-5 py-6 shadow-[0_10px_28px_rgba(54,64,55,0.06)] md:px-7 md:py-7"
             >
               <p className="label-caps text-highlight">Good to know</p>
               <div className="mt-4">

@@ -23,7 +23,7 @@ export function SectionBackdrop({ image, tone = "cream", className }: Props) {
       />
       {tone === "cream" ? (
         <>
-          <div className="absolute inset-0 bg-[#e8ebdd]/88" />
+          <div className="absolute inset-0 bg-surface/88" />
           <div
             className="absolute inset-0"
             style={{
@@ -34,7 +34,7 @@ export function SectionBackdrop({ image, tone = "cream", className }: Props) {
         </>
       ) : (
         <>
-          <div className="absolute inset-0 bg-[#364037]/72" />
+          <div className="absolute inset-0 bg-primary-container/72" />
           <div
             className="absolute inset-0"
             style={{

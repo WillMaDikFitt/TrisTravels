@@ -54,7 +54,7 @@ export default function AdminStorySubmissionsPage() {
         actions={
           <Link
             href="/admin/journal"
-            className="rounded-full bg-[#4a5a28] px-4 py-2 text-xs font-bold tracking-wider text-[#f7f4ee] uppercase"
+            className="rounded-full bg-[#364037] px-4 py-2 text-xs font-bold tracking-wider text-[#f8f6f1] uppercase"
           >
             Published journal
           </Link>
@@ -76,7 +76,7 @@ export default function AdminStorySubmissionsPage() {
             onClick={() => setFilter(id)}
             className={cn(
               "rounded-full px-3 py-1.5 text-xs font-semibold",
-              filter === id ? "bg-[#4a5a28] text-[#f7f4ee]" : "bg-white text-[#5c6350] ring-1 ring-[#d4cec0]",
+              filter === id ? "bg-[#364037] text-[#f8f6f1]" : "bg-white text-[#4a5a50] ring-1 ring-[#c5cbb8]",
             )}
           >
             {label}
@@ -95,9 +95,9 @@ export default function AdminStorySubmissionsPage() {
 
       <div className="grid gap-6">
         {visible.length ? (
-          <div className="overflow-x-auto rounded-2xl border border-[#e4dfd4] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
+          <div className="overflow-x-auto rounded-2xl border border-[#c5cbb8] bg-white shadow-[0_8px_24px_rgba(42,46,31,0.05)]">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 <tr>
                   <th className="px-4 py-3">Story</th>
                   <th className="px-4 py-3">Traveller</th>
@@ -115,20 +115,20 @@ export default function AdminStorySubmissionsPage() {
                       setMessage("");
                     }}
                     className={cn(
-                      "cursor-pointer border-t border-[#f0ebe3] transition hover:bg-[#faf8f3]",
+                      "cursor-pointer border-t border-[#dde1d0] transition hover:bg-[#faf8f3]",
                       open?.id === e.id && "bg-[#eef0e3]",
                     )}
                   >
                     <td className="max-w-[21rem] px-4 py-3">
                       <p className="font-medium">{titleOf(e)}</p>
-                      <p className="mt-1 line-clamp-1 text-xs text-[#8a917c]">{e.message}</p>
+                      <p className="mt-1 line-clamp-1 text-xs text-[#4a5a50]">{e.message}</p>
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-medium">{e.name}</p>
-                      <p className="mt-0.5 text-xs text-[#8a917c]">{e.email}</p>
+                      <p className="mt-0.5 text-xs text-[#4a5a50]">{e.email}</p>
                     </td>
-                    <td className="px-4 py-3 text-[#5c6350]">{placeOf(e) || "—"}</td>
-                    <td className="px-4 py-3 text-[#5c6350]">
+                    <td className="px-4 py-3 text-[#4a5a50]">{placeOf(e) || "—"}</td>
+                    <td className="px-4 py-3 text-[#4a5a50]">
                       {new Date(e.createdAt).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -155,24 +155,24 @@ export default function AdminStorySubmissionsPage() {
         {open && (
           <Panel className="space-y-4">
             <div>
-              <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+              <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
                 Guest submission
               </p>
               <h2 className="mt-2 font-display text-2xl">{titleOf(open)}</h2>
-              <p className="mt-2 text-sm text-[#5c6350]">
+              <p className="mt-2 text-sm text-[#4a5a50]">
                 {open.name} · {open.email}
                 {open.phone ? ` · ${open.phone}` : ""}
               </p>
               {(placeOf(open) || open.payload?.travelled) && (
-                <p className="mt-1 text-sm text-[#8a917c]">
+                <p className="mt-1 text-sm text-[#4a5a50]">
                   {[placeOf(open), open.payload?.travelled].filter(Boolean).join(" · ")}
                 </p>
               )}
             </div>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-[#2a2e1f]">{open.message}</p>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-[#26352b]">{open.message}</p>
             {photosOf(open).length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">Photos</p>
+                <p className="text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">Photos</p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {photosOf(open).map((url) => (
                     <a

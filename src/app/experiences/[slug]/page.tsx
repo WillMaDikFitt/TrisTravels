@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Clock, Mountain, MapPin, Users, Star, Check } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Users, Star, Check } from "lucide-react";
 import { experiences } from "@/data/experiences";
 import { detailImages } from "@/data/media";
 import { findExperience } from "@/lib/data/repo";
@@ -25,6 +25,13 @@ export default async function ExperienceDetailPage({ params }: Props) {
   const { slug } = await params;
   const exp = await findExperience(slug);
   if (!exp) notFound();
+
+  const metaItems = [
+    { icon: Clock, label: "Duration", value: exp.duration },
+    { icon: CalendarDays, label: "Best time to visit", value: exp.bestSeason },
+    { icon: MapPin, label: "Location", value: exp.location },
+    { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
+  ];
 
   return (
     <div className="bg-background">
@@ -56,12 +63,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           <div className="space-y-10 md:col-start-1 md:row-start-1">
             <div className="grid overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_35px_rgba(42,46,31,0.06)] md:grid-cols-4">
-              {[
-                { icon: Clock, label: "Duration", value: exp.duration },
-                { icon: Mountain, label: "Difficulty", value: exp.difficulty },
-                { icon: MapPin, label: "Location", value: exp.location },
-                { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
-              ].map(({ icon: Icon, label, value }) => (
+              {metaItems.map(({ icon: Icon, label, value }) => (
                 <div
                   key={label}
                   className="flex gap-3 border-b border-outline-variant/20 p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
@@ -117,32 +119,18 @@ export default async function ExperienceDetailPage({ params }: Props) {
           </FadeIn>
 
           <FadeIn>
-            <div className="grid overflow-hidden rounded-3xl border border-outline-variant/25 md:grid-cols-2">
-              <div className="p-7 md:p-8">
-                <p className="label-caps text-accent">What stands out</p>
-                <h3 className="mt-2 font-display text-2xl text-primary">Highlights</h3>
-                <ul className="mt-4 space-y-3">
-                  {exp.highlights.map((h) => (
-                    <li key={h} className="flex gap-2 text-on-surface-variant">
-                      <Check className="mt-0.5 shrink-0 text-accent" size={18} />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="border-t border-outline-variant/25 bg-surface-container-low p-7 md:border-t-0 md:border-l md:p-8">
-                <p className="label-caps text-accent">Taken care of</p>
-                <h3 className="mt-2 font-display text-2xl text-primary">What&apos;s included</h3>
-                <ul className="mt-4 space-y-3">
-                  {exp.included.map((h) => (
-                    <li key={h} className="flex gap-2 text-on-surface-variant">
-                      <Check className="mt-0.5 shrink-0 text-accent" size={18} />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <section className="rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-7 md:p-8">
+              <p className="label-caps text-accent">What stands out</p>
+              <h3 className="mt-2 font-display text-2xl text-primary">Highlights</h3>
+              <ul className="mt-4 space-y-3">
+                {exp.highlights.map((h) => (
+                  <li key={h} className="flex gap-2 text-on-surface-variant">
+                    <Check className="mt-0.5 shrink-0 text-accent" size={18} />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </section>
           </FadeIn>
 
           <FadeIn>
@@ -159,6 +147,39 @@ export default async function ExperienceDetailPage({ params }: Props) {
                   </li>
                 ))}
               </ol>
+            </section>
+          </FadeIn>
+
+          <FadeIn>
+            <section className="grid gap-px overflow-hidden rounded-2xl border border-outline-variant/30 bg-outline-variant/30 md:grid-cols-2">
+              <div className="bg-surface-container-lowest p-6 md:p-8">
+                <p className="label-caps text-highlight">Inclusions</p>
+                <ul className="mt-4 space-y-2.5 text-sm text-on-surface-variant">
+                  {exp.included.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <Check className="mt-0.5 shrink-0 text-highlight" size={16} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-surface-container-lowest p-6 md:p-8">
+                <p className="label-caps text-highlight">Exclusions</p>
+                {(exp.excluded?.length ?? 0) > 0 ? (
+                  <ul className="mt-4 space-y-2.5 text-sm text-on-surface-variant">
+                    {exp.excluded!.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-on-surface-variant" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-4 text-sm text-on-surface-variant">
+                    Shared when we confirm your booking.
+                  </p>
+                )}
+              </div>
             </section>
           </FadeIn>
 

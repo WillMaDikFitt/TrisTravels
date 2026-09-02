@@ -86,8 +86,8 @@ function navLinkClass(active: boolean, onLight = false) {
     "inline-flex h-11 items-center whitespace-nowrap px-2.5 text-[13px] font-bold tracking-[0.1em] uppercase transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] xl:px-3 xl:text-[14px]",
     onLight
       ? active
-        ? "text-[#1F4E3D]"
-        : "text-[#1F4E3D]/85 hover:text-[#1F4E3D]"
+        ? "text-primary"
+        : "text-primary/85 hover:text-primary"
       : active
         ? "text-white"
         : "text-white/65 hover:text-white",

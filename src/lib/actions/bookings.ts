@@ -16,6 +16,7 @@ import { daysUntilDate } from "@/lib/utils";
 import { dateIsClosed } from "@/lib/catalog";
 import { experienceSlots } from "@/lib/experience-slots";
 import { findTransportVehicle, transportVehicleOptions } from "@/data/transport";
+import { experienceTransportMode } from "@/lib/experience-meta";
 
 function expireIfNeeded(row: BookingRecord): BookingRecord {
   if (
@@ -94,18 +95,21 @@ export async function createBooking(input: {
     return { ok: false as const, error: "This slot is full" };
   }
 
+  const transportMode = experienceTransportMode(experience);
   const vehicles = transportVehicleOptions(experience.transportPrice, experience.transportVehicles);
   const vehicle = input.transportation
     ? findTransportVehicle(vehicles, input.transportVehicle) ?? vehicles[0]
     : undefined;
-  if (input.transportation && experience.transportAvailable && !vehicle) {
+  if (transportMode === "required" && (!input.transportation || !vehicle)) {
+    return { ok: false as const, error: "Choose a vehicle type" };
+  }
+  if (input.transportation && transportMode !== "none" && !vehicle) {
     return { ok: false as const, error: "Choose a vehicle type" };
   }
 
   const instant = daysUntilDate(input.date) >= settings.minAdvanceDays;
   const quote = quoteExperience(experience, adults, settings, children);
-  const transportPrice =
-    input.transportation && experience.transportAvailable ? vehicle?.price ?? 0 : 0;
+  const transportPrice = input.transportation && transportMode !== "none" ? vehicle?.price ?? 0 : 0;
   const now = new Date();
   const expires = new Date(now.getTime() + settings.holdMinutes * 60_000);
 

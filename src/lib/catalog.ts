@@ -6,7 +6,8 @@ export const EXPERIENCE_CATEGORIES: {
   blurb: string;
 }[] = [
   { id: "Adventure", slug: "adventure", blurb: "Treks, caves, and active days outdoors." },
-  { id: "Nature & Wildlife", slug: "nature-wildlife", blurb: "Forests, rivers, and living landscapes." },
+  { id: "Nature", slug: "nature", blurb: "Forests, rivers, and living landscapes." },
+  { id: "Wildlife", slug: "wildlife", blurb: "Sanctuaries, birds, and wild country." },
   { id: "Culture & Heritage", slug: "culture-heritage", blurb: "Villages, sacred groves, and local life." },
   { id: "Food & Local Life", slug: "food-local-life", blurb: "Kitchens, markets, and shared tables." },
   { id: "Wellness", slug: "wellness", blurb: "Slow days, mist, and quiet recovery." },
@@ -14,6 +15,7 @@ export const EXPERIENCE_CATEGORIES: {
 ];
 
 export function categoryFromSlug(slug: string): ExperienceCategory | undefined {
+  if (slug === "nature-wildlife") return "Nature";
   return EXPERIENCE_CATEGORIES.find((c) => c.slug === slug)?.id;
 }
 

@@ -60,7 +60,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
       "Kayaking, ziplining, cliff jumping & river fun",
       "Market visits and local shopping sprees",
     ],
-    notSuitableFor: ["Men", "Limited mobility", "Luxury only"],
+    notSuitableFor: ["Men only"],
     itinerary: [
       {
         day: 1,
@@ -188,7 +188,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
       "Offbeat hike to Phe Phe Falls",
       "Bonfire & riverside stay",
     ],
-    notSuitableFor: ["Limited mobility", "Festival crowds", "Dry season only"],
+    notSuitableFor: ["Festival crowds"],
     itinerary: [
       {
         day: 1,

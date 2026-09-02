@@ -66,9 +66,9 @@ export default function AdminPlacesPage() {
       />
       <div className="space-y-6">
         <Panel className="overflow-x-auto">
-          <p className="mb-3 text-xs font-semibold tracking-wider text-[#6b734f] uppercase">All places</p>
+          <p className="mb-3 text-xs font-semibold tracking-wider text-[#4a5a50] uppercase">All places</p>
           <table className="w-full min-w-[650px] text-left text-sm">
-            <thead className="bg-[#f7f4ee] text-[11px] font-semibold tracking-wider text-[#6b734f] uppercase">
+            <thead className="bg-[#f8f6f1] text-[11px] font-semibold tracking-wider text-[#4a5a50] uppercase">
               <tr>
                 <th className="px-3 py-2.5">Place</th>
                 <th className="px-3 py-2.5">Region</th>
@@ -82,14 +82,14 @@ export default function AdminPlacesPage() {
               <tr
                 key={d.slug}
                 className={cn(
-                  "border-t border-[#f0ebe3]",
+                  "border-t border-[#dde1d0]",
                   !creating && dest?.slug === d.slug ? "bg-[#eef0e3]" : "hover:bg-[#faf8f3]",
                 )}
               >
                 <td className="px-3 py-3 font-medium">{d.name}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{d.region}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{d.distances.shillong || "—"}</td>
-                <td className="px-3 py-3 text-[#5c6350]">{d.highlights.length}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{d.region}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{d.distances.shillong || "—"}</td>
+                <td className="px-3 py-3 text-[#4a5a50]">{d.highlights.length}</td>
                 <td className="px-3 py-3 text-right">
                   <button
                   type="button"
@@ -98,7 +98,7 @@ export default function AdminPlacesPage() {
                     setDest(d);
                     setNote("");
                   }}
-                  className="text-xs font-semibold text-[#4a5a28]"
+                  className="text-xs font-semibold text-[#364037]"
                 >
                   Edit
                 </button>
@@ -243,7 +243,7 @@ export default function AdminPlacesPage() {
           </form>
         ) : (
           <Panel>
-            <p className="text-sm text-[#5c6350]">Select a place to edit, or create a new one.</p>
+            <p className="text-sm text-[#4a5a50]">Select a place to edit, or create a new one.</p>
           </Panel>
         )}
       </div>

@@ -26,7 +26,7 @@ export type OverviewChartData = {
 
 const tooltipStyle = {
   borderRadius: 12,
-  border: "1px solid #e4dfd4",
+  border: "1px solid #c5cbb8",
   background: "#ffffff",
   boxShadow: "0 10px 30px rgba(42,46,31,0.08)",
   fontSize: 12,
@@ -46,8 +46,8 @@ function ChartCard({
   return (
     <Panel className="flex min-h-[340px] flex-col pb-6">
       <div className="mb-4">
-        <h2 className="font-display text-lg text-[#2a2e1f]">{title}</h2>
-        {hint ? <p className="mt-1 text-xs text-[#8a917c]">{hint}</p> : null}
+        <h2 className="font-display text-lg text-[#26352b]">{title}</h2>
+        {hint ? <p className="mt-1 text-xs text-[#4a5a50]">{hint}</p> : null}
       </div>
       <div className={cn("w-full", footer ? "h-48" : "h-56")}>{children}</div>
       {footer ? <div className="mt-4 pb-1">{footer}</div> : null}
@@ -57,7 +57,7 @@ function ChartCard({
 
 function EmptyChart({ label }: { label: string }) {
   return (
-    <div className="flex h-full items-center justify-center rounded-xl bg-[#f7f4ee] text-sm text-[#8a917c]">
+    <div className="flex h-full items-center justify-center rounded-xl bg-[#f8f6f1] text-sm text-[#4a5a50]">
       {label}
     </div>
   );
@@ -72,9 +72,9 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
   return (
     <section className="mt-8 space-y-4">
       <div>
-        <p className="text-[11px] font-semibold tracking-[0.16em] text-[#6b734f] uppercase">Analytics</p>
-        <h2 className="mt-1 font-display text-2xl text-[#2a2e1f]">Performance snapshot</h2>
-        <p className="mt-1 text-sm text-[#5c6350]">Last 30 days of bookings, revenue, and enquiry mix.</p>
+        <p className="text-[11px] font-semibold tracking-[0.16em] text-[#4a5a50] uppercase">Analytics</p>
+        <h2 className="mt-1 font-display text-2xl text-[#26352b]">Performance snapshot</h2>
+        <p className="mt-1 text-sm text-[#4a5a50]">Last 30 days of bookings, revenue, and enquiry mix.</p>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -84,12 +84,12 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
               <AreaChart data={data.bookingTrend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="bookingsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4a5a28" stopOpacity={0.28} />
-                    <stop offset="95%" stopColor="#4a5a28" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="#364037" stopOpacity={0.28} />
+                    <stop offset="95%" stopColor="#364037" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#c2643a" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#c2643a" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="#c96a3d" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#c96a3d" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="#ece7de" vertical={false} />
@@ -97,7 +97,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   dataKey="label"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                   interval="preserveStartEnd"
                   minTickGap={28}
                 />
@@ -106,7 +106,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                   width={28}
                 />
                 <YAxis
@@ -114,7 +114,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   orientation="right"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                   width={56}
                   tickFormatter={(value) =>
                     value >= 1000 ? `${Math.round(value / 1000)}k` : String(value)
@@ -142,7 +142,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   yAxisId="left"
                   type="monotone"
                   dataKey="bookings"
-                  stroke="#4a5a28"
+                  stroke="#364037"
                   fill="url(#bookingsFill)"
                   strokeWidth={2.2}
                   name="bookings"
@@ -151,7 +151,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   yAxisId="right"
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#c2643a"
+                  stroke="#c96a3d"
                   fill="url(#revenueFill)"
                   strokeWidth={2}
                   name="revenue"
@@ -170,10 +170,10 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
             hasStatus ? (
               <div className="flex flex-wrap gap-x-4 gap-y-2">
                 {data.statusMix.map((entry) => (
-                  <div key={entry.name} className="flex items-center gap-2 text-xs text-[#5c6350]">
+                  <div key={entry.name} className="flex items-center gap-2 text-xs text-[#4a5a50]">
                     <span className="h-2.5 w-2.5 rounded-full" style={{ background: entry.color }} />
                     <span className="capitalize">{entry.name}</span>
-                    <span className="font-semibold text-[#2a2e1f]">{entry.value}</span>
+                    <span className="font-semibold text-[#26352b]">{entry.value}</span>
                   </div>
                 ))}
               </div>
@@ -217,17 +217,17 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                 />
                 <YAxis
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                   width={28}
                 />
                 <Tooltip contentStyle={tooltipStyle} formatter={(value) => [value ?? 0, "Enquiries"]} />
-                <Bar dataKey="value" fill="#4a5a28" radius={[8, 8, 0, 0]} maxBarSize={42} />
+                <Bar dataKey="value" fill="#364037" radius={[8, 8, 0, 0]} maxBarSize={42} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -249,7 +249,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#8a917c", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                 />
                 <YAxis
                   type="category"
@@ -257,7 +257,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                   width={120}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: "#5c6350", fontSize: 11 }}
+                  tick={{ fill: "#4a5a50", fontSize: 11 }}
                 />
                 <Tooltip
                   contentStyle={tooltipStyle}
@@ -267,7 +267,7 @@ export function OverviewCharts({ data }: { data: OverviewChartData }) {
                     return [formatINR(revenue), "Revenue"];
                   }}
                 />
-                <Bar dataKey="bookings" fill="#c2643a" radius={[0, 8, 8, 0]} maxBarSize={22} />
+                <Bar dataKey="bookings" fill="#c96a3d" radius={[0, 8, 8, 0]} maxBarSize={22} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
