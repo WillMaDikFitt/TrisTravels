@@ -14,6 +14,7 @@ import {
   FormTextarea,
 } from "@/components/ui/Form";
 import { media } from "@/data/media";
+import { site } from "@/data/site";
 import { getCraftProduct } from "@/data/artisans";
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { submitEnquiry } from "@/lib/actions/enquiries";
@@ -72,18 +73,20 @@ function ContactPageInner() {
             {
               icon: Mail,
               label: "Email",
-              value: "hello@trismeghalaya.com",
-              href: "mailto:hello@trismeghalaya.com",
+              value: site.email,
+              href: `mailto:${site.email}`,
             },
             {
               icon: MessageCircle,
               label: "WhatsApp",
-              value: "Leave your number — we’ll ping you back",
+              value: site.phoneDisplay,
+              href: site.whatsappUrl,
             },
             {
               icon: Phone,
               label: "Phone",
-              value: "Shared on confirmation",
+              value: site.phoneDisplay,
+              href: `tel:+${site.whatsappE164}`,
             },
             {
               icon: MapPin,

@@ -31,6 +31,13 @@ const columns = [
   },
 ];
 
+const legalLinks = [
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/refunds", label: "Cancellation & Refunds" },
+  { href: "/shipping", label: "Shipping & Delivery" },
+  { href: "/pricing", label: "Pricing" },
+];
+
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -80,6 +87,19 @@ export function Footer() {
               All rights reserved.
             </p>
           </div>
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 border-t border-outline-variant/20 pt-5 text-[11px] text-on-surface-variant md:text-xs">
+          <nav aria-label="Policies" className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
+            {legalLinks.map((link, i) => (
+              <span key={link.href} className="inline-flex items-center gap-x-1">
+                {i > 0 ? <span className="text-outline-variant/80" aria-hidden>·</span> : null}
+                <Link href={link.href} className="transition hover:text-primary">
+                  {link.label}
+                </Link>
+              </span>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

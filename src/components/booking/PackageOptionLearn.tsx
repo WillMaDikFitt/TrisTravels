@@ -320,6 +320,14 @@ function TermsPanel({ sub }: { sub: TermsSub }) {
           >
             Package Tours Terms &amp; Conditions
           </Link>
+          {" · "}
+          <Link
+            href="/refunds"
+            target="_blank"
+            className="font-semibold text-primary underline-offset-2 hover:underline"
+          >
+            Cancellation &amp; Refunds
+          </Link>
         </p>
       </div>
     );
