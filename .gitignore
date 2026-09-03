@@ -31,9 +31,17 @@
 /Images.zip
 /hero-section-video.MOV
 /Website Renew.xlsx
+/Website Renew*.xlsx
+/Home page.png
+/Hero image inside TRIS story.png
 /Pics/
 *.HEIC
 *.heic
+
+# local worksheet / scrape scratch notes
+/ws-*.txt
+/ws2-*.txt
+/xlsx-*.txt
 
 # debug
 npm-debug.log*
