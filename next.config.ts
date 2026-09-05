@@ -1,26 +1,9 @@
 import type { NextConfig } from "next";
 
-const firebaseAuthHost =
-  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim() ||
-  (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    ? `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`
-    : "");
-
 const nextConfig: NextConfig = {
   // Avoid Auth SDK duplication edge cases that can cause Google sign-in
   // auth/argument-error in production builds.
   serverExternalPackages: ["firebase", "firebase-admin"],
-  // Proxy Firebase Auth helpers onto the custom domain so Google redirect
-  // storage is first-party (fixes “pick account → back to login, still signed out”).
-  async rewrites() {
-    if (!firebaseAuthHost) return [];
-    return [
-      {
-        source: "/__/auth/:path*",
-        destination: `https://${firebaseAuthHost}/__/auth/:path*`,
-      },
-    ];
-  },
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 80, 90],
