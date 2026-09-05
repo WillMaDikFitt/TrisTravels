@@ -50,6 +50,15 @@ export async function saveDocument(collection: string, id: string, data: Record<
   }
 }
 
+/** Quick front visibility toggle from Studio list pages. */
+export async function setListingVisibility(
+  collection: "experiences" | "journeys" | "destinations" | "stories",
+  id: string,
+  visible: boolean,
+) {
+  return saveDocument(collection, id, { status: visible ? "active" : "hidden" });
+}
+
 export async function deleteDocument(collection: string, id: string) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };

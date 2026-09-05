@@ -52,9 +52,19 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // After Google redirect, land back here already signed in.
+  // After Google redirect / popup, leave login once the session is ready.
   useEffect(() => {
-    if (!authLoading && user) router.replace(dest);
+    if (authLoading) return;
+    if (user) {
+      router.replace(dest);
+      return;
+    }
+    if (typeof window !== "undefined" && sessionStorage.getItem("tris_google_redirect")) {
+      sessionStorage.removeItem("tris_google_redirect");
+      setError(
+        "Google sign-in didn’t finish on this browser. Please try “Continue with Google” again (a popup works best).",
+      );
+    }
   }, [authLoading, user, dest, router]);
 
   const run = async (fn: () => Promise<void>) => {

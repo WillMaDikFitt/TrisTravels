@@ -128,18 +128,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    let authReady = false;
+    let redirectReady = false;
 
+    const maybeFinishLoading = () => {
+      if (!cancelled && authReady && redirectReady) setLoading(false);
+    };
+
+    // Finish redirect sign-in before treating the session as settled.
     getRedirectResult(auth)
       .then(async (result) => {
-        if (cancelled || !result?.user) return;
-        try {
-          setProfile(await ensureProfile(result.user));
-        } catch {
-          /* onAuthStateChanged will also hydrate profile */
+        if (cancelled) return;
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("tris_google_redirect");
+        }
+        if (result?.user) {
+          try {
+            setUser(result.user);
+            setProfile(await ensureProfile(result.user));
+          } catch {
+            /* onAuthStateChanged will also hydrate profile */
+          }
         }
       })
       .catch((err) => {
         console.error("Google redirect sign-in failed:", err);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("tris_google_redirect");
+        }
+      })
+      .finally(() => {
+        redirectReady = true;
+        maybeFinishLoading();
       });
 
     const unsub = onAuthStateChanged(auth, async (next) => {
@@ -161,7 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null);
         }
       } finally {
-        setLoading(false);
+        authReady = true;
+        maybeFinishLoading();
       }
     });
 
@@ -204,21 +225,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const provider = getGoogleProvider();
         const resolver = getAuthResolver();
 
-        // Custom domains + some browsers are unreliable with popups; prefer redirect in production.
-        const preferRedirect =
-          process.env.NODE_ENV === "production" ||
-          (typeof window !== "undefined" &&
-            (window.matchMedia("(max-width: 768px)").matches ||
-              /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)));
-
+        // Prefer popup on custom domains — redirect often “succeeds” then loses
+        // the session when browsers block third-party auth storage.
         try {
-          if (preferRedirect) {
-            await signInWithRedirect(auth, provider, resolver);
-            return;
-          }
           await signInWithPopup(auth, provider, resolver);
         } catch (err) {
           if (shouldFallbackToRedirect(err)) {
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("tris_google_redirect", "1");
+            }
             await signInWithRedirect(auth, provider, resolver);
             return;
           }

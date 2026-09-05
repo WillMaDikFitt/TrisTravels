@@ -7,6 +7,7 @@ import { journeys as staticJourneys, type Journey } from "@/data/journeys";
 import { fetchJourneysAdmin } from "@/lib/actions/content-read";
 import { deleteDocument } from "@/lib/actions/cms";
 import { AdminButton, Badge, EmptyState, PageHeader } from "@/components/admin/ui";
+import { VisibilityToggle } from "@/components/admin/VisibilityToggle";
 import { formatINR } from "@/lib/utils";
 import { nextOpenDeparture, seatsLeft } from "@/lib/journey-seats";
 
@@ -76,13 +77,25 @@ export default function AdminJourneysPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        tone={
-                          j.status === "draft" ? "amber" : j.status === "hidden" ? "slate" : "green"
-                        }
-                      >
-                        {statusLabel(j.status)}
-                      </Badge>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          tone={
+                            j.status === "draft" ? "amber" : j.status === "hidden" ? "slate" : "green"
+                          }
+                        >
+                          {statusLabel(j.status)}
+                        </Badge>
+                        <VisibilityToggle
+                          collection="journeys"
+                          id={j.slug}
+                          status={j.status}
+                          onChange={(status) =>
+                            setRows((prev) =>
+                              prev.map((row) => (row.slug === j.slug ? { ...row, status } : row)),
+                            )
+                          }
+                        />
+                      </div>
                     </td>
                     <td className="px-4 py-3">{formatINR(j.priceFrom)}</td>
                     <td className="px-4 py-3 text-[#4a5a50]">

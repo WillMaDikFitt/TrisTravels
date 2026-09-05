@@ -24,6 +24,8 @@ export type Destination = {
   relatedExperienceSlugs?: string[];
   relatedJourneySlugs?: string[];
   sourceUrl: string;
+  /** When `hidden` or `draft`, the place is omitted from public pages. */
+  status?: "active" | "draft" | "hidden";
 };
 
 /**

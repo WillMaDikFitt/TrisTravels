@@ -1,18 +1,17 @@
 "use server";
 
 import {
-  findDestination,
-  findExperience,
-  findJourney,
-  findStory,
+  findDestinationAdmin,
+  findExperienceAdmin,
+  findJourneyAdmin,
+  findStoryAdmin,
   getSettings,
+  listAllDestinationsAdmin,
   listAllExperiencesAdmin,
-  listClosures,
-  listDestinations,
-  listExperiences,
   listAllJourneysAdmin,
-  listJourneys,
-  listStories,
+  listAllStoriesAdmin,
+  listClosures,
+  listExperiences,
 } from "@/lib/data/repo";
 
 export async function fetchPublicExperiences() {
@@ -28,7 +27,7 @@ export async function fetchExperiencesAdmin() {
 }
 
 export async function fetchExperienceAdmin(slug: string) {
-  return findExperience(slug);
+  return findExperienceAdmin(slug);
 }
 
 export async function fetchJourneysAdmin() {
@@ -36,23 +35,23 @@ export async function fetchJourneysAdmin() {
 }
 
 export async function fetchJourneyAdmin(slug: string) {
-  return findJourney(slug);
+  return findJourneyAdmin(slug);
 }
 
 export async function fetchDestinationsAdmin() {
-  return listDestinations();
+  return listAllDestinationsAdmin();
 }
 
 export async function fetchDestinationAdmin(slug: string) {
-  return findDestination(slug);
+  return findDestinationAdmin(slug);
 }
 
 export async function fetchStoriesAdmin() {
-  return listStories();
+  return listAllStoriesAdmin();
 }
 
 export async function fetchStoryAdmin(slug: string) {
-  return findStory(slug);
+  return findStoryAdmin(slug);
 }
 
 export async function fetchClosuresAdmin() {

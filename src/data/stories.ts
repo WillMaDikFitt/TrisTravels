@@ -10,6 +10,8 @@ export type Story = {
   image: string;
   body: string[];
   sourceUrl?: string;
+  /** When `hidden` or `draft`, the story is omitted from public pages. */
+  status?: "active" | "draft" | "hidden";
 };
 
 /** Stories listed on https://www.trismeghalaya.com/your-stories */

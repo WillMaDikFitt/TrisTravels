@@ -9,6 +9,7 @@ import { fetchExperiencesAdmin } from "@/lib/actions/content-read";
 import { deleteDocument, saveDocument } from "@/lib/actions/cms";
 import { sortExperiences } from "@/lib/experience-meta";
 import { Badge, EmptyState, PageHeader, AdminButton, inputClass } from "@/components/admin/ui";
+import { VisibilityToggle } from "@/components/admin/VisibilityToggle";
 import { formatINR } from "@/lib/utils";
 
 function statusTone(status?: string) {
@@ -156,7 +157,19 @@ export default function AdminExperiencesPage() {
                   <td className="px-4 py-3 text-[#4a5a50]">{e.category}</td>
                   <td className="px-4 py-3">{formatINR(e.priceFrom)}</td>
                   <td className="px-4 py-3">
-                    <Badge tone={statusTone(e.status)}>{statusLabel(e.status)}</Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone={statusTone(e.status)}>{statusLabel(e.status)}</Badge>
+                      <VisibilityToggle
+                        collection="experiences"
+                        id={e.slug}
+                        status={e.status}
+                        onChange={(status) =>
+                          setRows((prev) =>
+                            prev.map((row) => (row.slug === e.slug ? { ...row, status } : row)),
+                          )
+                        }
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">

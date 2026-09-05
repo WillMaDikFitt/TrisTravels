@@ -5,8 +5,8 @@ import {
   browserLocalPersistence,
   browserPopupRedirectResolver,
   getAuth,
+  initializeAuth,
   GoogleAuthProvider,
-  setPersistence,
   type Auth,
   type PopupRedirectResolver,
 } from "firebase/auth";
@@ -16,19 +16,27 @@ import { isFirebaseClientConfigured } from "./config";
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
-let persistenceReady: Promise<void> | null = null;
+
+function resolveAuthDomain(fallback: string) {
+  if (typeof window === "undefined") return fallback;
+  const host = window.location.hostname;
+  if (!host || host === "localhost" || host.endsWith(".localhost")) return fallback;
+  // First-party auth helper via next.config rewrite of /__/auth/*
+  return host;
+}
 
 function requireClientConfig() {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY?.trim();
-  const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim();
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim();
   const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID?.trim();
-  if (!apiKey || !authDomain || !projectId || !appId) {
+  const fallbackAuthDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim();
+  if (!apiKey || !fallbackAuthDomain || !projectId || !appId) {
     return null;
   }
+
   return {
     apiKey,
-    authDomain,
+    authDomain: resolveAuthDomain(fallbackAuthDomain),
     projectId,
     appId,
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim(),
@@ -37,6 +45,8 @@ function requireClientConfig() {
 }
 
 export function getFirebaseApp() {
+  // Auth must init in the browser so authDomain can match the live hostname.
+  if (typeof window === "undefined") return null;
   if (!isFirebaseClientConfigured()) return null;
   if (!app) {
     const config = requireClientConfig();
@@ -59,10 +69,14 @@ export function getClientAuth() {
   if (auth) return auth;
   const firebaseApp = getFirebaseApp();
   if (!firebaseApp) return null;
-  // Prefer getAuth (not initializeAuth) — more reliable across Next.js prod chunks.
-  auth = getAuth(firebaseApp);
-  if (!persistenceReady) {
-    persistenceReady = setPersistence(auth, browserLocalPersistence).catch(() => undefined);
+  try {
+    auth = initializeAuth(firebaseApp, {
+      persistence: browserLocalPersistence,
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
+  } catch {
+    // Already initialized in this runtime (HMR / duplicate import).
+    auth = getAuth(firebaseApp);
   }
   return auth;
 }

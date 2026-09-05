@@ -7,6 +7,7 @@ import { deleteDocument, saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
+import { VisibilityToggle } from "@/components/admin/VisibilityToggle";
 import { cn } from "@/lib/utils";
 
 const regions: DestinationRegion[] = [
@@ -73,7 +74,7 @@ export default function AdminPlacesPage() {
                 <th className="px-3 py-2.5">Place</th>
                 <th className="px-3 py-2.5">Region</th>
                 <th className="px-3 py-2.5">From Shillong</th>
-                <th className="px-3 py-2.5">Highlights</th>
+                <th className="px-3 py-2.5">Front</th>
                 <th className="px-3 py-2.5 text-right">Action</th>
               </tr>
             </thead>
@@ -89,7 +90,18 @@ export default function AdminPlacesPage() {
                 <td className="px-3 py-3 font-medium">{d.name}</td>
                 <td className="px-3 py-3 text-[#4a5a50]">{d.region}</td>
                 <td className="px-3 py-3 text-[#4a5a50]">{d.distances.shillong || "—"}</td>
-                <td className="px-3 py-3 text-[#4a5a50]">{d.highlights.length}</td>
+                <td className="px-3 py-3">
+                  <VisibilityToggle
+                    collection="destinations"
+                    id={d.slug}
+                    status={d.status}
+                    onChange={(status) =>
+                      setDests((prev) =>
+                        prev.map((row) => (row.slug === d.slug ? { ...row, status } : row)),
+                      )
+                    }
+                  />
+                </td>
                 <td className="px-3 py-3 text-right">
                   <button
                   type="button"

@@ -74,6 +74,16 @@ function isPublicJourney(j: Journey) {
   return true;
 }
 
+function isPublicExperience(e: Experience) {
+  const status = e.status ?? "active";
+  return status === "active" || status === "seasonal";
+}
+
+function isPublicListing(item: { status?: string }) {
+  const status = item.status ?? "active";
+  return status !== "draft" && status !== "hidden";
+}
+
 /**
  * Firestore-first catalogue.
  * - Remote docs are authoritative (Studio edits win).
@@ -115,7 +125,7 @@ async function collectionDocs<T>(name: string): Promise<T[] | null> {
 export async function listExperiences(): Promise<Experience[]> {
   const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
   const merged = sortExperiences(mergeCatalog(experiences, remote));
-  return merged.filter((e) => (e.status ?? "active") === "active" || e.status === "seasonal");
+  return merged.filter(isPublicExperience);
 }
 
 export async function listAllExperiencesAdmin(): Promise<Experience[]> {
@@ -123,7 +133,7 @@ export async function listAllExperiencesAdmin(): Promise<Experience[]> {
   return sortExperiences(mergeCatalog(experiences, remote));
 }
 
-export async function findExperience(slug: string): Promise<Experience | undefined> {
+async function loadExperience(slug: string): Promise<Experience | undefined> {
   const staticFallback = getStaticExperience(slug);
   const db = getAdminDb();
   if (db) {
@@ -141,6 +151,15 @@ export async function findExperience(slug: string): Promise<Experience | undefin
   return staticFallback;
 }
 
+export async function findExperience(slug: string): Promise<Experience | undefined> {
+  const item = await loadExperience(slug);
+  return item && isPublicExperience(item) ? item : undefined;
+}
+
+export async function findExperienceAdmin(slug: string): Promise<Experience | undefined> {
+  return loadExperience(slug);
+}
+
 export async function listJourneys(): Promise<Journey[]> {
   const remote = await collectionDocs<Journey & { slug?: string; id?: string }>("journeys");
   return mergeCatalog(journeys, remote).filter(isPublicJourney);
@@ -151,7 +170,7 @@ export async function listAllJourneysAdmin(): Promise<Journey[]> {
   return mergeCatalog(journeys, remote);
 }
 
-export async function findJourney(slug: string): Promise<Journey | undefined> {
+async function loadJourney(slug: string): Promise<Journey | undefined> {
   const staticFallback = getStaticJourney(slug);
   const db = getAdminDb();
   if (db) {
@@ -169,12 +188,26 @@ export async function findJourney(slug: string): Promise<Journey | undefined> {
   return staticFallback;
 }
 
+export async function findJourney(slug: string): Promise<Journey | undefined> {
+  const item = await loadJourney(slug);
+  return item && isPublicJourney(item) ? item : undefined;
+}
+
+export async function findJourneyAdmin(slug: string): Promise<Journey | undefined> {
+  return loadJourney(slug);
+}
+
 export async function listDestinations(): Promise<Destination[]> {
+  const remote = await collectionDocs<Destination & { slug?: string; id?: string }>("destinations");
+  return mergeCatalog(destinations, remote).filter(isPublicListing);
+}
+
+export async function listAllDestinationsAdmin(): Promise<Destination[]> {
   const remote = await collectionDocs<Destination & { slug?: string; id?: string }>("destinations");
   return mergeCatalog(destinations, remote);
 }
 
-export async function findDestination(slug: string): Promise<Destination | undefined> {
+async function loadDestination(slug: string): Promise<Destination | undefined> {
   const staticFallback = getStaticDestination(slug);
   const db = getAdminDb();
   if (db) {
@@ -190,12 +223,26 @@ export async function findDestination(slug: string): Promise<Destination | undef
   return staticFallback;
 }
 
+export async function findDestination(slug: string): Promise<Destination | undefined> {
+  const item = await loadDestination(slug);
+  return item && isPublicListing(item) ? item : undefined;
+}
+
+export async function findDestinationAdmin(slug: string): Promise<Destination | undefined> {
+  return loadDestination(slug);
+}
+
 export async function listStories(): Promise<Story[]> {
+  const remote = await collectionDocs<Story & { slug?: string; id?: string }>("stories");
+  return mergeCatalog(stories, remote).filter(isPublicListing);
+}
+
+export async function listAllStoriesAdmin(): Promise<Story[]> {
   const remote = await collectionDocs<Story & { slug?: string; id?: string }>("stories");
   return mergeCatalog(stories, remote);
 }
 
-export async function findStory(slug: string): Promise<Story | undefined> {
+async function loadStory(slug: string): Promise<Story | undefined> {
   const staticFallback = stories.find((s) => s.slug === slug);
   const db = getAdminDb();
   if (db) {
@@ -209,6 +256,15 @@ export async function findStory(slug: string): Promise<Story | undefined> {
     }
   }
   return staticFallback;
+}
+
+export async function findStory(slug: string): Promise<Story | undefined> {
+  const item = await loadStory(slug);
+  return item && isPublicListing(item) ? item : undefined;
+}
+
+export async function findStoryAdmin(slug: string): Promise<Story | undefined> {
+  return loadStory(slug);
 }
 
 export async function getSettings(): Promise<PlatformSettings> {
