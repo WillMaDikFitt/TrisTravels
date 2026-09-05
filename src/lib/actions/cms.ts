@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { getAdminAuth } from "@/lib/firebase/admin";
 import { asIsoString, sanitizeForClient } from "@/lib/firebase/admin-read";
@@ -14,11 +15,34 @@ function isHiddenStudioTraveller(user: { uid?: string; name?: string; email?: st
   return haystack.includes("willmadikfit");
 }
 
+function revalidateListingPaths(collection: string, id: string) {
+  const paths: string[] = [];
+  if (collection === "experiences") {
+    paths.push("/experiences", `/experiences/${id}`, `/experiences/${id}/book`);
+  } else if (collection === "journeys") {
+    paths.push("/journeys", `/journeys/${id}`, `/journeys/${id}/book`, `/journeys/${id}/enquire`);
+  } else if (collection === "destinations") {
+    paths.push("/destinations", `/destinations/${id}`);
+  } else if (collection === "stories") {
+    paths.push("/stories", `/stories/${id}`, "/");
+  } else {
+    paths.push("/");
+  }
+  for (const path of paths) {
+    try {
+      revalidatePath(path);
+    } catch (err) {
+      console.error(`revalidatePath(${path}) failed:`, err);
+    }
+  }
+}
+
 export async function saveDocument(collection: string, id: string, data: Record<string, unknown>) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };
   try {
     await db.collection(collection).doc(id).set({ ...data, slug: id }, { merge: true });
+    revalidateListingPaths(collection, id);
     return { ok: true as const };
   } catch (err) {
     console.error("saveDocument failed:", err);
@@ -31,6 +55,7 @@ export async function deleteDocument(collection: string, id: string) {
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };
   try {
     await db.collection(collection).doc(id).delete();
+    revalidateListingPaths(collection, id);
     return { ok: true as const };
   } catch (err) {
     console.error("deleteDocument failed:", err);
@@ -42,6 +67,12 @@ export async function saveSettings(settings: PlatformSettings) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE, settings: DEFAULT_SETTINGS };
   await db.collection("settings").doc("platform").set(settings, { merge: true });
+  try {
+    revalidatePath("/about");
+    revalidatePath("/");
+  } catch (err) {
+    console.error("revalidatePath after saveSettings failed:", err);
+  }
   return { ok: true as const, settings };
 }
 

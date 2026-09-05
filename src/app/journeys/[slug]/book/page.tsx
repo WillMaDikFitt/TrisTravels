@@ -7,6 +7,8 @@ import { CuratedBookFlow } from "@/components/booking/CuratedBookFlow";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return journeys.filter((j) => j.type === "curated").map((journey) => ({ slug: journey.slug }));
 }

@@ -11,6 +11,9 @@ import { CtaBand } from "@/components/ui/CtaBand";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Pick up Studio / Firestore edits without waiting for a full redeploy. */
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return staticStories.map((s) => ({ slug: s.slug }));
 }

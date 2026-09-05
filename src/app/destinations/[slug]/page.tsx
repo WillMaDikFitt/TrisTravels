@@ -14,6 +14,9 @@ type Props = { params: Promise<{ slug: string }> };
 
 const serif = "font-[family-name:var(--font-playfair)]";
 
+/** Pick up Studio / Firestore edits without waiting for a full redeploy. */
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return destinations.map((d) => ({ slug: d.slug }));
 }

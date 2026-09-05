@@ -7,6 +7,8 @@ import { BookingFlow } from "@/components/booking/BookingFlow";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return experiences.map((e) => ({ slug: e.slug }));
 }

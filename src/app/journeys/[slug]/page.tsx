@@ -17,6 +17,9 @@ import { journeyListingMetaItems } from "@/components/listings/JourneyListingMet
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Pick up Studio / Firestore edits without waiting for a full redeploy. */
+export const revalidate = 60;
+
 export function generateStaticParams() {
   return journeys.map((j) => ({ slug: j.slug }));
 }

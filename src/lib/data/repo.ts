@@ -32,14 +32,6 @@ function containsStockMedia(value: unknown): boolean {
   return false;
 }
 
-function isCuratedCoverImage(path: string) {
-  return (
-    path.includes("/images/listings/") ||
-    path.includes("/images/stories/") ||
-    path.includes("/images/categories/")
-  );
-}
-
 /** Firestore Timestamps / Dates → ISO strings so RSC payloads stay serializable. */
 function sanitizeOverlay(value: unknown): unknown {
   if (value == null || typeof value !== "object") return value;
@@ -58,33 +50,14 @@ function sanitizeOverlay(value: unknown): unknown {
   return out;
 }
 
-/** Merge seed catalogue with Firestore overrides; ignore empty remote fields. */
+/** Firestore wins over seed. Seed only fills gaps / missing docs. */
 function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, slug: string): T {
   const out = { ...(base ?? {}), slug } as T & { slug: string };
   for (const [key, value] of Object.entries(remote)) {
     if (key === "slug" || key === "id") continue;
     if (isEmptyOverlay(value)) continue;
-    // Seed catalogue titles stay authoritative so listing cards stay short & consistent.
-    // Admins can still rename via Studio once static seeds are cleared for that slug.
-    if (key === "name" && base && typeof (base as { name?: unknown }).name === "string") {
-      const seedName = String((base as { name: string }).name).trim();
-      if (seedName) continue;
-    }
-    // Older seeded records can contain the stock placeholders used by the prototype.
-    // Keep the curated local media from the static catalogue for those fields.
+    // Ignore old Unsplash / Wix placeholders if we already have a real seed image.
     if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;
-    // Prefer curated listing / story / category covers from the static seed catalogue.
-    if (
-      key === "image" &&
-      base &&
-      typeof (base as { image?: unknown }).image === "string" &&
-      typeof value === "string" &&
-      value.startsWith("/images/") &&
-      isCuratedCoverImage(String((base as { image: string }).image)) &&
-      !isCuratedCoverImage(value)
-    ) {
-      continue;
-    }
     const clean = sanitizeOverlay(value);
     if (isEmptyOverlay(clean)) continue;
     (out as Record<string, unknown>)[key] = clean;
@@ -101,17 +74,29 @@ function isPublicJourney(j: Journey) {
   return true;
 }
 
+/**
+ * Firestore-first catalogue.
+ * - Remote docs are authoritative (Studio edits win).
+ * - Seed docs appear only when that slug is not in Firestore yet (or Firebase is offline).
+ */
 function mergeCatalog<T extends { slug: string }>(
   staticItems: T[],
   remote: ({ slug?: string; id?: string } & Partial<T>)[] | null,
 ): T[] {
-  const map = new Map(staticItems.map((item) => [item.slug, item]));
   if (!remote?.length) return staticItems;
+  const staticMap = new Map(staticItems.map((item) => [item.slug, item]));
+  const map = new Map<string, T>();
+
   for (const item of remote) {
     const slug = docSlug(item);
     if (!slug) continue;
-    map.set(slug, mergeRecord(map.get(slug), item, slug));
+    map.set(slug, mergeRecord(staticMap.get(slug), item, slug));
   }
+
+  for (const item of staticItems) {
+    if (!map.has(item.slug)) map.set(item.slug, item);
+  }
+
   return Array.from(map.values());
 }
 
