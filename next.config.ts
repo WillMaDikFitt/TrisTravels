@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Avoid Auth SDK duplication edge cases that can cause Google sign-in
+  // auth/argument-error in production builds.
+  serverExternalPackages: ["firebase", "firebase-admin"],
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 80, 90],

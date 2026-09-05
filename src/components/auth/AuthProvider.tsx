@@ -20,7 +20,7 @@ import {
   type User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getClientAuth, getClientDb, getGoogleProvider } from "@/lib/firebase/client";
+import { getClientAuth, getClientDb, getAuthResolver, getGoogleProvider } from "@/lib/firebase/client";
 import { isFirebaseClientConfigured } from "@/lib/firebase/config";
 import type { UserProfile, UserRole } from "@/lib/types";
 
@@ -201,21 +201,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async signInGoogle() {
         const auth = getClientAuth();
         if (!auth) throw new Error("Accounts aren’t available right now");
+        const provider = getGoogleProvider();
+        const resolver = getAuthResolver();
 
+        // Custom domains + some browsers are unreliable with popups; prefer redirect in production.
         const preferRedirect =
-          typeof window !== "undefined" &&
-          (window.matchMedia("(max-width: 768px)").matches ||
-            /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+          process.env.NODE_ENV === "production" ||
+          (typeof window !== "undefined" &&
+            (window.matchMedia("(max-width: 768px)").matches ||
+              /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)));
 
         try {
           if (preferRedirect) {
-            await signInWithRedirect(auth, getGoogleProvider());
+            await signInWithRedirect(auth, provider, resolver);
             return;
           }
-          await signInWithPopup(auth, getGoogleProvider());
+          await signInWithPopup(auth, provider, resolver);
         } catch (err) {
           if (shouldFallbackToRedirect(err)) {
-            await signInWithRedirect(auth, getGoogleProvider());
+            await signInWithRedirect(auth, provider, resolver);
             return;
           }
           throw new Error(authErrorMessage(err, "Could not sign in with Google"));
