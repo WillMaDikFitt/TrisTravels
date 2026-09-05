@@ -10,15 +10,17 @@ import {
 } from "react";
 import {
   createUserWithEmailAndPassword,
+  getRedirectResult,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   updateProfile,
   type User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { getClientAuth, getClientDb, googleProvider } from "@/lib/firebase/client";
+import { getClientAuth, getClientDb, getGoogleProvider } from "@/lib/firebase/client";
 import { isFirebaseClientConfigured } from "@/lib/firebase/config";
 import type { UserProfile, UserRole } from "@/lib/types";
 
@@ -50,6 +52,38 @@ function isTransientDbError(err: unknown) {
   return msg.includes("closing/hidden") || msg.includes("Failed to execute 'transaction'");
 }
 
+function authErrorMessage(err: unknown, fallback: string) {
+  const code =
+    err && typeof err === "object" && "code" in err ? String((err as { code: string }).code) : "";
+  switch (code) {
+    case "auth/popup-blocked":
+      return "Your browser blocked the Google window. Allow popups for this site, or try again — we’ll use a full-page sign-in.";
+    case "auth/popup-closed-by-user":
+    case "auth/cancelled-popup-request":
+      return "Google sign-in was closed before it finished. Please try again.";
+    case "auth/unauthorized-domain":
+      return "This website domain isn’t authorized for Google sign-in yet. In Firebase Console → Authentication → Settings → Authorized domains, add your live domain (e.g. trismeghalaya.com and www.trismeghalaya.com).";
+    case "auth/operation-not-allowed":
+      return "Google sign-in isn’t enabled yet. In Firebase Console → Authentication → Sign-in method, enable Google.";
+    case "auth/account-exists-with-different-credential":
+      return "An account already exists with this email using a different sign-in method. Try email login, or use the same method you used before.";
+    case "auth/network-request-failed":
+      return "Network error during Google sign-in. Check your connection and try again.";
+    default:
+      return err instanceof Error && err.message ? err.message : fallback;
+  }
+}
+
+function shouldFallbackToRedirect(err: unknown) {
+  const code =
+    err && typeof err === "object" && "code" in err ? String((err as { code: string }).code) : "";
+  return (
+    code === "auth/popup-blocked" ||
+    code === "auth/cancelled-popup-request" ||
+    code === "auth/operation-not-supported-in-this-environment"
+  );
+}
+
 async function ensureProfile(user: User): Promise<UserProfile> {
   const db = getClientDb();
   const fallback: UserProfile = {
@@ -74,9 +108,7 @@ async function ensureProfile(user: User): Promise<UserProfile> {
     }
     return profile;
   }
-  const role: UserRole = isConfiguredAdmin
-    ? "admin"
-    : "traveller";
+  const role: UserRole = isConfiguredAdmin ? "admin" : "traveller";
   const profile = { ...fallback, role };
   await setDoc(ref, profile);
   return profile;
@@ -94,7 +126,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    return onAuthStateChanged(auth, async (next) => {
+
+    let cancelled = false;
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (cancelled || !result?.user) return;
+        try {
+          setProfile(await ensureProfile(result.user));
+        } catch {
+          /* onAuthStateChanged will also hydrate profile */
+        }
+      })
+      .catch((err) => {
+        console.error("Google redirect sign-in failed:", err);
+      });
+
+    const unsub = onAuthStateChanged(auth, async (next) => {
       setUser(next);
       try {
         if (next) setProfile(await ensureProfile(next));
@@ -116,6 +164,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     });
+
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -128,19 +181,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async signIn(email, password) {
         const auth = getClientAuth();
         if (!auth) throw new Error("Accounts aren’t available right now");
-        await signInWithEmailAndPassword(auth, email, password);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          throw new Error(authErrorMessage(err, "Could not sign in"));
+        }
       },
       async signUp(name, email, password) {
         const auth = getClientAuth();
         if (!auth) throw new Error("Accounts aren’t available right now");
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(cred.user, { displayName: name });
-        await ensureProfile({ ...cred.user, displayName: name } as User);
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(cred.user, { displayName: name });
+          await ensureProfile({ ...cred.user, displayName: name } as User);
+        } catch (err) {
+          throw new Error(authErrorMessage(err, "Could not create account"));
+        }
       },
       async signInGoogle() {
         const auth = getClientAuth();
         if (!auth) throw new Error("Accounts aren’t available right now");
-        await signInWithPopup(auth, googleProvider);
+
+        const preferRedirect =
+          typeof window !== "undefined" &&
+          (window.matchMedia("(max-width: 768px)").matches ||
+            /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+
+        try {
+          if (preferRedirect) {
+            await signInWithRedirect(auth, getGoogleProvider());
+            return;
+          }
+          await signInWithPopup(auth, getGoogleProvider());
+        } catch (err) {
+          if (shouldFallbackToRedirect(err)) {
+            await signInWithRedirect(auth, getGoogleProvider());
+            return;
+          }
+          throw new Error(authErrorMessage(err, "Could not sign in with Google"));
+        }
       },
       async logout() {
         const auth = getClientAuth();

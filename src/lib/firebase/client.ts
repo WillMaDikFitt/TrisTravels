@@ -3,6 +3,7 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import {
   browserLocalPersistence,
+  browserPopupRedirectResolver,
   getAuth,
   GoogleAuthProvider,
   initializeAuth,
@@ -37,10 +38,12 @@ export function getClientAuth() {
   const firebaseApp = getFirebaseApp();
   if (!firebaseApp) return null;
   try {
-    // localStorage persistence avoids IndexedDB "Database is closing/hidden" during
-    // tab hide, OAuth popups, and Next.js fast refresh.
+    // localStorage persistence avoids IndexedDB issues during OAuth / tab hide.
+    // popupRedirectResolver is required for Google popup + redirect sign-in when
+    // using initializeAuth (missing it causes auth/argument-error).
     auth = initializeAuth(firebaseApp, {
       persistence: browserLocalPersistence,
+      popupRedirectResolver: browserPopupRedirectResolver,
     });
   } catch {
     auth = getAuth(firebaseApp);
@@ -56,4 +59,8 @@ export function getClientDb() {
   return db;
 }
 
-export const googleProvider = new GoogleAuthProvider();
+export function getGoogleProvider() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  return provider;
+}

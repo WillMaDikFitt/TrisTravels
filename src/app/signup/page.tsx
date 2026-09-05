@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { Button } from "@/components/ui/Button";
 import { FormCard, FormInput } from "@/components/ui/Form";
 import { GoogleIcon } from "@/components/auth/GoogleIcon";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { getClientAuth } from "@/lib/firebase/client";
 import { media } from "@/data/media";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ function GoogleButton({
       )}
     >
       <GoogleIcon className="h-5 w-5 shrink-0" />
-      Continue with Google
+      {busy ? "Connecting to Google…" : "Continue with Google"}
     </button>
   );
 }
@@ -45,19 +45,23 @@ function GoogleButton({
 function SignupForm() {
   const router = useRouter();
   const dest = safeNext(useSearchParams().get("next"));
-  const { signUp, signInGoogle, configured } = useAuth();
+  const { signUp, signInGoogle, configured, user, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && user) router.replace(dest);
+  }, [authLoading, user, dest, router]);
+
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
     setError("");
     try {
       await fn();
-      router.push(dest);
+      if (getClientAuth()?.currentUser) router.push(dest);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not sign up");
     } finally {
@@ -107,6 +111,7 @@ function SignupForm() {
                 busy={busy}
                 onClick={() => run(() => signInGoogle())}
               />
+              {error && <p className="mt-3 text-sm text-primary">{error}</p>}
 
               <div className="my-5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-outline-variant/30" />
