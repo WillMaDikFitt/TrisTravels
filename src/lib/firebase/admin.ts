@@ -31,5 +31,12 @@ export function getAdminAuth() {
 
 export function getAdminDb() {
   if (!initAdmin()) return null;
-  return getFirestore();
+  const db = getFirestore();
+  try {
+    // Optional fields on bookings/enquiries often omit keys as `undefined`.
+    db.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // settings() throws if already called on this app instance — safe to ignore.
+  }
+  return db;
 }

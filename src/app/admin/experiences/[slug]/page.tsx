@@ -10,7 +10,7 @@ import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { normalizeExperience } from "@/lib/normalize-listing";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
-import { ImageField } from "@/components/admin/ImageField";
+import { ImageField, GalleryField } from "@/components/admin/ImageField";
 import {
   compactExperienceItinerary,
   ItineraryEditor,
@@ -158,7 +158,7 @@ export default function ExperienceEditorPage() {
                   }
                 : {
                     mode: "fixed" as const,
-                    times: lines(String(fd.get("slots") || "")),
+                    times: Array.from(new Set(lines(String(fd.get("slots") || "")))),
                     breaks: breaks.length ? breaks : undefined,
                   };
             })(),
@@ -169,7 +169,12 @@ export default function ExperienceEditorPage() {
             transportVehicles: readTransportVehiclePrices(fd),
             status: String(fd.get("status")) as ExperienceStatus,
             backendId: String(fd.get("backendId") || "").trim() || undefined,
-            image: String(fd.get("image")),
+            image: (() => {
+              const cover = String(fd.get("image") || "").trim();
+              if (cover) return cover;
+              const galleryFirst = lines(String(fd.get("gallery") || ""))[0];
+              return galleryFirst || "";
+            })(),
             gallery: lines(String(fd.get("gallery") || "")),
             overview: String(fd.get("overview")),
             trisStory: String(fd.get("trisStory")),
@@ -413,11 +418,15 @@ export default function ExperienceEditorPage() {
 
         <Panel>
           <h2 className="mb-4 font-display text-lg">Media & SEO</h2>
-          <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
-          <div className="mt-4">
-            <Field label="Gallery URLs" hint="one per line">
-              <textarea name="gallery" rows={4} defaultValue={(row.gallery ?? []).join("\n")} className={inputClass} />
-            </Field>
+          <ImageField key={`cover-${row.slug}-${row.image}`} name="image" label="Cover image" defaultValue={row.image} />
+          <div className="mt-6">
+            <GalleryField
+              key={`gallery-${row.slug}-${(row.gallery ?? []).join("|")}`}
+              name="gallery"
+              label="Gallery images"
+              defaultValue={row.gallery ?? []}
+              hint="Extra photos on the experience detail page. Upload several at once; reorder as needed."
+            />
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Field label="SEO title">

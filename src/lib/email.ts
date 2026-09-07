@@ -64,12 +64,19 @@ export async function sendEmail(input: SendEmailInput): Promise<{ ok: boolean; e
   }
 
   try {
-    await transport.sendMail({
+    const info = await transport.sendMail({
       from: emailFromAddress(),
       to: Array.isArray(input.to) ? input.to.join(", ") : input.to,
       subject: input.subject,
       html: input.html,
       replyTo: input.replyTo,
+    });
+    console.info("sendEmail ok:", {
+      to: input.to,
+      subject: input.subject,
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
     });
     return { ok: true };
   } catch (err) {
@@ -199,20 +206,28 @@ export async function notifyGuestExperienceBooking(input: {
   total: string;
   status: string;
   backendId?: string;
+  paid?: boolean;
 }) {
+  const paid = Boolean(input.paid);
   const html = emailShell({
-    eyebrow: "Booking received",
+    eyebrow: paid ? "Payment received" : "Booking received",
     title: input.experienceName,
     bodyHtml: `
       <p style="margin:0 0 12px">Hi ${esc(input.name)},</p>
-      <p style="margin:0 0 12px">Thanks for booking with TRIS. We’ve received your request and our team will follow up if anything else is needed.</p>
+      <p style="margin:0 0 12px">${
+        paid
+          ? "Thanks for booking with TRIS. We’ve received your payment and your place is confirmed."
+          : input.status === "requested"
+            ? "Thanks for your enquiry. Our team will confirm availability and share payment next steps shortly."
+            : "We’ve reserved your place while payment is completed. Your booking is <strong>not confirmed</strong> until payment is received — reply to this email or WhatsApp us if you need help paying."
+      }</p>
       ${detailTable([
         { label: "Reference", value: input.refId },
         ...(input.backendId ? [{ label: "Backend ID", value: input.backendId }] : []),
         { label: "Date", value: input.date },
         { label: "Slot", value: input.slot },
         { label: "Guests", value: String(input.guests) },
-        { label: "Status", value: input.status },
+        { label: "Status", value: paid ? "Confirmed · paid" : input.status === "requested" ? "Enquiry" : "Held · payment pending" },
         { label: "Amount", value: input.total },
       ])}
       <p style="margin:0;font-size:14px;color:${BRAND.muted}">Questions? Reply to this email or write to ${esc(bookingsNotifyEmail())}.</p>
@@ -221,7 +236,7 @@ export async function notifyGuestExperienceBooking(input: {
   });
   return sendEmail({
     to: input.to,
-    subject: `Booking received · ${input.experienceName} · ${input.refId}`,
+    subject: `${paid ? "Booking confirmed" : "Booking received"} · ${input.experienceName} · ${input.refId}`,
     html,
     replyTo: bookingsNotifyEmail(),
   });

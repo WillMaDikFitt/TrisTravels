@@ -192,7 +192,12 @@ export default function AdminJournalPage() {
               <Field label="Body" hint="paragraphs separated by a blank line">
                 <textarea name="body" rows={10} defaultValue={editing.body.join("\n\n")} className={inputClass} />
               </Field>
-              <ImageField name="image" label="Cover image" defaultValue={editing.image} />
+              <ImageField
+                key={`cover-${creating ? "new" : editing.slug}-${editing.image}`}
+                name="image"
+                label="Cover image"
+                defaultValue={editing.image}
+              />
               <div className="flex flex-wrap gap-2">
                 <AdminButton type="submit" disabled={busy}>
                   {busy ? "Saving…" : "Save story"}

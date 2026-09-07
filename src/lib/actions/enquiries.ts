@@ -85,7 +85,7 @@ export async function submitEnquiry(input: {
         console.error("submitEnquiry firestore write failed:", err);
         if (allowMemoryBackend()) {
           memoryStore().enquiries.unshift(record);
-          void notifyEnquiryCreated(record);
+          await notifyEnquiryCreated(record);
           return { ok: true as const, id: record.id };
         }
         return { ok: false as const, error: "Could not send just now. Try again." };
@@ -96,7 +96,7 @@ export async function submitEnquiry(input: {
       console.error("submitEnquiry:", memoryBackendWarning());
       return { ok: false as const, error: "Could not send just now. Try again." };
     }
-    void notifyEnquiryCreated(record);
+    await notifyEnquiryCreated(record);
     return { ok: true as const, id: record.id };
   } catch (err) {
     console.error("submitEnquiry failed:", err);

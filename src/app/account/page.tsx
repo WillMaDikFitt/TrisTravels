@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { FormInput } from "@/components/ui/Form";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -16,6 +16,10 @@ import { fetchPublicExperiences } from "@/lib/actions/content-read";
 
 type Tab = "profile" | "wishlist" | "bookings" | "enquiries";
 
+function isTab(value: string | null): value is Tab {
+  return value === "profile" || value === "wishlist" || value === "bookings" || value === "enquiries";
+}
+
 function StatusPill({ status }: { status: string }) {
   const tone =
     status === "confirmed" || status === "closed"
@@ -26,10 +30,12 @@ function StatusPill({ status }: { status: string }) {
   return <span className={cn("rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize", tone)}>{status}</span>;
 }
 
-export default function AccountPage() {
+function AccountPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, profile, loading, logout, configured, updateAccount, isAdmin } = useAuth();
-  const [tab, setTab] = useState<Tab>("profile");
+  const tabParam = searchParams.get("tab");
+  const [tab, setTab] = useState<Tab>(isTab(tabParam) ? tabParam : "profile");
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [enquiries, setEnquiries] = useState<EnquiryRecord[]>([]);
   const [catalog, setCatalog] = useState<Experience[]>([]);
@@ -39,8 +45,17 @@ export default function AccountPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (isTab(tabParam)) setTab(tabParam);
+  }, [tabParam]);
+
+  useEffect(() => {
     if (!loading && !user && configured) router.push("/login");
   }, [loading, user, configured, router]);
+
+  const selectTab = (next: Tab) => {
+    setTab(next);
+    router.replace(`/account?tab=${next}`, { scroll: false });
+  };
 
   useEffect(() => {
     if (profile) {
@@ -124,7 +139,7 @@ export default function AccountPage() {
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => selectTab(t.id)}
                 className={cn(
                   "rounded-full px-4 py-2 text-xs font-semibold tracking-wider uppercase",
                   tab === t.id ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-surface-container",
@@ -187,8 +202,14 @@ export default function AccountPage() {
                       href={`/experiences/${e.slug}`}
                       className="group flex overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-ambient"
                     >
-                      <div className="relative h-28 w-28 shrink-0">
-                        <Image src={e.image} alt={e.name} fill className="object-cover" sizes="112px" />
+                      <div className="relative h-28 w-28 shrink-0 bg-surface-container">
+                        {e.image?.trim() ? (
+                          <Image src={e.image} alt={e.name} fill className="object-cover" sizes="112px" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center px-3 text-center text-[11px] leading-snug text-on-surface-variant">
+                            Photos coming soon
+                          </div>
+                        )}
                       </div>
                       <div className="p-4">
                         <p className="text-[11px] font-semibold tracking-wider text-primary uppercase">{e.category}</p>
@@ -280,5 +301,13 @@ export default function AccountPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={<div className="pt-header p-16 text-on-surface-variant">Loading your account…</div>}>
+      <AccountPageInner />
+    </Suspense>
   );
 }

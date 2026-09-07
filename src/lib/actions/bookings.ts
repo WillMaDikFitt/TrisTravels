@@ -119,44 +119,56 @@ export async function createBooking(input: {
     id: uid("bkg"),
     experienceSlug: experience.slug,
     experienceName: experience.name,
-    backendId: experience.backendId?.trim() || undefined,
     date: input.date,
     slot: selectedSlot,
     guests,
     adults,
     children,
-    childAges: children > 0 ? input.childAges : undefined,
     status,
     customerName: input.customerName,
     customerEmail: input.customerEmail,
     customerPhone: input.customerPhone,
-    uid: input.uid,
     customerTotal: quote.customerTotal + transportPrice,
-    transportation:
-      input.transportation && vehicle
-        ? {
-            requested: true,
-            vehicle: vehicle.id,
-            vehicleLabel: vehicle.label,
-            price: transportPrice,
-          }
-        : undefined,
     internal: quote.internal,
     createdAt: now.toISOString(),
-    expiresAt: status === "hold" ? expires.toISOString() : undefined,
   };
+  const backendId = experience.backendId?.trim();
+  if (backendId) record.backendId = backendId;
+  if (children > 0 && input.childAges) record.childAges = input.childAges;
+  if (input.uid) record.uid = input.uid;
+  if (input.transportation && vehicle) {
+    record.transportation = {
+      requested: true,
+      vehicle: vehicle.id,
+      vehicleLabel: vehicle.label,
+      price: transportPrice,
+    };
+  }
+  if (status === "hold") record.expiresAt = expires.toISOString();
 
   const db = getAdminDb();
-  if (db) {
-    await db.collection("bookings").doc(record.id).set(record);
-  } else {
-    memoryStore().bookings.unshift(record);
+  try {
+    if (db) {
+      await db.collection("bookings").doc(record.id).set(record);
+    } else {
+      memoryStore().bookings.unshift(record);
+    }
+  } catch (err) {
+    console.error("createBooking write failed:", err);
+    return {
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Could not save booking",
+    };
   }
 
   try {
     const { notifyStaffNewLead, notifyGuestExperienceBooking } = await import("@/lib/email");
     const { formatINR } = await import("@/lib/utils");
-    void notifyStaffNewLead({
+    const guestEmail = record.customerEmail?.trim() || "";
+    const canEmailGuest =
+      guestEmail.includes("@") && !guestEmail.endsWith("@trismeghalaya.com");
+
+    await notifyStaffNewLead({
       kind: "booking",
       id: record.id,
       name: record.customerName,
@@ -164,18 +176,21 @@ export async function createBooking(input: {
       phone: record.customerPhone,
       summary: `${record.experienceName}${record.backendId ? ` [${record.backendId}]` : ""} · ${record.date} · ${record.slot} · ${record.guests} guests · ₹${record.customerTotal}`,
     });
-    void notifyGuestExperienceBooking({
-      to: record.customerEmail,
-      name: record.customerName,
-      experienceName: record.experienceName,
-      refId: record.id,
-      date: record.date,
-      slot: record.slot,
-      guests: record.guests,
-      total: formatINR(record.customerTotal),
-      status: record.status,
-      backendId: record.backendId,
-    });
+    if (canEmailGuest) {
+      await notifyGuestExperienceBooking({
+        to: guestEmail,
+        name: record.customerName,
+        experienceName: record.experienceName,
+        refId: record.id,
+        date: record.date,
+        slot: record.slot,
+        guests: record.guests,
+        total: formatINR(record.customerTotal),
+        status: record.status,
+        backendId: record.backendId,
+        paid: false,
+      });
+    }
   } catch (err) {
     console.error("booking notify failed:", err);
   }
@@ -183,16 +198,72 @@ export async function createBooking(input: {
   return { ok: true as const, booking: record };
 }
 
-export async function confirmPayment(bookingId: string) {
+export async function confirmPayment(
+  bookingId: string,
+  opts?: { paymentId?: string; orderId?: string },
+) {
+  const paymentRef = opts?.paymentId?.trim() || undefined;
   const db = getAdminDb();
+  let booking: BookingRecord | undefined;
+
   if (db) {
-    await db.collection("bookings").doc(bookingId).update({ status: "confirmed" });
+    const patch: Record<string, unknown> = {
+      status: "confirmed" as BookingStatus,
+      expiresAt: null,
+    };
+    if (paymentRef) patch.paymentRef = paymentRef;
+    if (opts?.orderId?.trim()) patch.razorpayOrderId = opts.orderId.trim();
+    await db.collection("bookings").doc(bookingId).update(patch);
     const doc = await db.collection("bookings").doc(bookingId).get();
-    return { ok: true, booking: doc.data() as BookingRecord };
+    booking = doc.data() as BookingRecord | undefined;
+  } else {
+    const row = memoryStore().bookings.find((b) => b.id === bookingId);
+    if (row) {
+      row.status = "confirmed";
+      row.expiresAt = undefined;
+      if (paymentRef) row.paymentRef = paymentRef;
+      if (opts?.orderId?.trim()) row.razorpayOrderId = opts.orderId.trim();
+      booking = row;
+    }
   }
-  const row = memoryStore().bookings.find((b) => b.id === bookingId);
-  if (row) row.status = "confirmed";
-  return { ok: true, booking: row };
+
+  if (!booking) return { ok: false as const, error: "Booking not found" };
+
+  try {
+    const { notifyGuestExperienceBooking, notifyStaffNewLead } = await import("@/lib/email");
+    const { formatINR } = await import("@/lib/utils");
+    const guestEmail = booking.customerEmail?.trim() || "";
+    const canEmailGuest =
+      guestEmail.includes("@") && !guestEmail.endsWith("@trismeghalaya.com");
+
+    if (canEmailGuest) {
+      await notifyGuestExperienceBooking({
+        to: guestEmail,
+        name: booking.customerName,
+        experienceName: booking.experienceName,
+        refId: booking.id,
+        date: booking.date,
+        slot: booking.slot,
+        guests: booking.guests,
+        total: formatINR(booking.customerTotal),
+        status: "confirmed",
+        backendId: booking.backendId,
+        paid: true,
+      });
+    }
+    await notifyStaffNewLead({
+      kind: "booking",
+      id: booking.id,
+      name: booking.customerName,
+      email: booking.customerEmail,
+      phone: booking.customerPhone,
+      summary: `PAID · ${booking.experienceName} · ${booking.date} · ${formatINR(booking.customerTotal)}${paymentRef ? ` · ${paymentRef}` : ""}`,
+    });
+  } catch (err) {
+    console.error("confirmPayment notify failed:", err);
+  }
+
+  return { ok: true as const, booking };
 }
 
 export async function listBookings(): Promise<BookingRecord[]> {

@@ -17,7 +17,7 @@ import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { normalizeJourney } from "@/lib/normalize-listing";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
-import { ImageField } from "@/components/admin/ImageField";
+import { ImageField, GalleryField } from "@/components/admin/ImageField";
 import { parseDepartureSeats } from "@/lib/journey-seats";
 import { DepartureSeatsCalendar } from "@/components/admin/DepartureSeatsCalendar";
 import {
@@ -177,7 +177,11 @@ export default function JourneyEditorPage() {
             transportVehicles: readTransportVehiclePrices(fd),
             season: String(fd.get("season")),
             overview: String(fd.get("overview")),
-            image: String(fd.get("image")),
+            image: (() => {
+              const cover = String(fd.get("image") || "").trim();
+              if (cover) return cover;
+              return lines(String(fd.get("gallery") || ""))[0] || "";
+            })(),
             gallery: lines(String(fd.get("gallery") || "")),
             highlights: lines(String(fd.get("highlights") || "")),
             experienceHighlights: lines(String(fd.get("experienceHighlights") || "")),
@@ -526,16 +530,16 @@ export default function JourneyEditorPage() {
           </div>
         </Panel>
         <Panel>
-          <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
-          <div className="mt-4">
-            <Field label="Gallery images" hint="one URL or path per line — shown in the detail carousel">
-              <textarea
-                name="gallery"
-                rows={5}
-                defaultValue={(row.gallery ?? []).join("\n")}
-                className={inputClass}
-              />
-            </Field>
+          <h2 className="mb-4 font-display text-lg">Media</h2>
+          <ImageField key={`cover-${row.slug}-${row.image}`} name="image" label="Cover image" defaultValue={row.image} />
+          <div className="mt-6">
+            <GalleryField
+              key={`gallery-${row.slug}-${(row.gallery ?? []).join("|")}`}
+              name="gallery"
+              label="Gallery images"
+              defaultValue={row.gallery ?? []}
+              hint="Extra photos on the journey detail page. Upload several at once; reorder as needed."
+            />
           </div>
         </Panel>
         {note && <Notice tone={note === "Saved." ? "ok" : "warn"}>{note}</Notice>}

@@ -48,5 +48,9 @@ export function experienceSlots(experience: Experience) {
   }
 
   const withoutBreaks = slots.filter((time) => !isInsideBreak(time, config?.breaks));
-  return withoutBreaks.length ? withoutBreaks : slots;
+  const cleaned = (withoutBreaks.length ? withoutBreaks : slots)
+    .map((time) => time.trim())
+    .filter(Boolean);
+  // Studio textareas can accidentally list the same time twice — keep order, drop dupes.
+  return Array.from(new Set(cleaned));
 }

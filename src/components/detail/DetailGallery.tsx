@@ -78,13 +78,21 @@ export function DetailGallery({ images, alt, children }: Props) {
   }, [open, close, step]);
 
   const mosaic = useMemo(() => (slides.length ? buildMosaic(slides) : null), [slides]);
-  if (!mosaic) return null;
 
   return (
-    <section className={cn("bg-background pt-header", children ? "pb-10 md:pb-14" : "pb-4 md:pb-6")}>
+    <section className={cn("bg-background pt-header", children ? "pb-6 md:pb-8" : "pb-4 md:pb-6")}>
       <div className="mx-auto max-w-container-max px-margin-mobile pt-6 md:px-margin-desktop md:pt-8">
         <div className="relative">
-          {mosaic.mode === "portraits" ? (
+          {!mosaic ? (
+            <div className="flex min-h-[16rem] items-center justify-center rounded-3xl border border-outline-variant/30 bg-surface-container px-8 py-16 text-center md:min-h-[20rem]">
+              <div className="max-w-sm">
+                <p className="font-display text-2xl text-primary">Photos coming soon</p>
+                <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                  We’re still gathering images for {alt}. The rest of this page has the full details.
+                </p>
+              </div>
+            </div>
+          ) : mosaic.mode === "portraits" ? (
             <div className="grid h-[24rem] grid-cols-1 gap-2 overflow-hidden rounded-3xl md:h-[32rem] md:grid-cols-3">
               {mosaic.tiles.map((tile, position) => (
                 <button
@@ -154,7 +162,7 @@ export function DetailGallery({ images, alt, children }: Props) {
             </div>
           )}
 
-          {slides.length > 1 && (
+          {mosaic && slides.length > 1 && (
             <button
               type="button"
               onClick={() => setLightboxAt(0)}
@@ -166,7 +174,7 @@ export function DetailGallery({ images, alt, children }: Props) {
           )}
         </div>
 
-        {children ? <div className="mt-8 md:mt-10">{children}</div> : null}
+        {children ? <div className="mt-6 md:mt-7">{children}</div> : null}
       </div>
 
       {open && (

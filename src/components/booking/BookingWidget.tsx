@@ -184,11 +184,11 @@ export function BookingWidget({ experience }: Props) {
         <div>
           <p className="text-xs font-semibold text-primary">Start time</p>
           <div className="mt-1.5 grid grid-cols-4 gap-1.5">
-            {slots.map((time) => {
+            {slots.map((time, index) => {
               const unavailable = !date || dateIsClosed(date, closures, time);
               return (
                 <button
-                  key={time}
+                  key={`${time}-${index}`}
                   type="button"
                   disabled={unavailable}
                   onClick={() => setSlot(time)}

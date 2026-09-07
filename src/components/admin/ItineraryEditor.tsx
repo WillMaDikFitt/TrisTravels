@@ -343,11 +343,11 @@ function ExperienceItineraryEditor({
   return (
     <EditorShell
       heading="Itinerary"
-      hint="One card per step. Descriptions keep line breaks."
+      hint="One card per day. Descriptions keep line breaks."
       emptyTitle="Build the day’s flow"
-      emptyBody="Add each step with a title and description. Guests see this on the experience page."
-      emptyCta="Add first step"
-      addLabel="Add another step"
+      emptyBody="Add each day with a title and description. Guests see this on the experience page."
+      emptyCta="Add day 1"
+      addLabel={`Add day ${items.length + 1}`}
       count={items.length}
       onSeed={() => {
         onChange([blankExperience()]);
@@ -367,8 +367,8 @@ function ExperienceItineraryEditor({
         return (
           <ItineraryCard
             key={`${baseId}-${index}`}
-            badge={`Step ${index + 1}`}
-            title={preview(item.title, "Untitled step")}
+            badge={`Day ${index + 1}`}
+            title={preview(item.title, "Untitled day")}
             collapsedPreview={item.description.replace(/\s+/g, " ").trim() || "No description yet"}
             open={isOpen}
             panelId={panelId}
@@ -398,7 +398,7 @@ function ExperienceItineraryEditor({
             }}
           >
             <label className="block text-sm font-medium text-[#26352b]">
-              Title
+              Day title
               <input
                 value={item.title}
                 onChange={(e) =>
@@ -419,7 +419,7 @@ function ExperienceItineraryEditor({
                   )
                 }
                 rows={4}
-                placeholder={"What happens in this step…\nAny notes for the guest…"}
+                placeholder={"What happens this day…\nAny notes for the guest…"}
                 className={cn(inputClass, "mt-1.5 resize-y bg-white leading-relaxed")}
               />
             </label>

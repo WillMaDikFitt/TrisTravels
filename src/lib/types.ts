@@ -55,6 +55,7 @@ export type BookingRecord = {
   };
   notes?: StaffNote[];
   paymentRef?: string;
+  razorpayOrderId?: string;
   createdAt: string;
   expiresAt?: string;
 };

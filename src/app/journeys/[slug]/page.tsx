@@ -8,12 +8,33 @@ import { FadeIn } from "@/components/motion/Motion";
 import { DetailGallery } from "@/components/detail/DetailGallery";
 import { Button } from "@/components/ui/Button";
 import { CtaBand } from "@/components/ui/CtaBand";
-import { Check, Clock3 } from "lucide-react";
+import {
+  Check,
+  Clock3,
+  CalendarDays,
+  Compass,
+  IndianRupee,
+  MapPin,
+  Route,
+  Users,
+  Ban,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { JourneyEnquire } from "@/components/enquiries/JourneyEnquire";
 import { AccordionItem } from "@/components/ui/Accordion";
 import { CURATED_ONLINE_BOOK_DAYS } from "@/data/journey-options";
 import { FIXED_DEPARTURE_PATCHES } from "@/data/fixed-departures";
 import { journeyListingMetaItems } from "@/components/listings/JourneyListingMeta";
+
+const GLANCE_ICONS: Record<string, LucideIcon> = {
+  Duration: Clock3,
+  "From price": IndianRupee,
+  "Best time to travel": CalendarDays,
+  Style: Compass,
+  "Not suitable for": Ban,
+  "Group size": Users,
+  "Starting point": MapPin,
+};
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -53,7 +74,7 @@ export default async function JourneyDetailPage({ params }: Props) {
     ...(isFixed && journey.startingPoint
       ? [{ label: "Starting point", value: journey.startingPoint }]
       : []),
-  ];
+  ].filter((item) => item.label !== "Duration" && item.label !== "From price");
 
   return (
     <div className="bg-surface text-foreground">
@@ -81,37 +102,78 @@ export default async function JourneyDetailPage({ params }: Props) {
       </div>
 
       <div className="mx-auto max-w-container-max px-margin-mobile pt-6 pb-8 md:px-margin-desktop md:pb-10">
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 text-center shadow-[0_10px_30px_rgba(54,64,55,0.06)] md:p-8">
-          <p className="label-caps text-highlight">Journey at a glance</p>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {glance.map((item) => (
-              <div key={item.label} className="flex flex-col items-center">
-                <p className="text-[11px] font-semibold tracking-wider text-on-surface-variant uppercase">
-                  {item.label}
-                </p>
-                <p className="mt-1 text-sm font-medium text-primary md:text-[0.95rem]">{item.value}</p>
-              </div>
-            ))}
+        <div className="overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0_12px_36px_rgba(54,64,55,0.07)]">
+          <div className="flex flex-col gap-3 border-b border-outline-variant/25 bg-primary/[0.04] px-5 py-4 sm:flex-row sm:items-end sm:justify-between md:px-7 md:py-5">
+            <div>
+              <p className="label-caps text-highlight">Journey at a glance</p>
+              <p className="mt-1 font-[family-name:var(--font-playfair)] text-xl text-primary md:text-2xl">
+                {journey.days} days · {journey.nights} nights
+              </p>
+            </div>
+            <p className="text-sm text-on-surface-variant">
+              From{" "}
+              <span className="font-semibold text-primary">{formatINR(journey.priceFrom)}</span>
+              <span className="text-on-surface-variant/80"> / person</span>
+            </p>
           </div>
-          {journey.route ? (
-            <p className="mt-5 border-t border-outline-variant/25 pt-4 text-sm text-on-surface-variant">
-              <span className="font-semibold text-primary">Route:</span> {journey.route}
-            </p>
-          ) : null}
-          {isFixed && departureList.length > 0 ? (
-            <p className="mt-3 text-sm text-on-surface-variant">
-              <span className="font-semibold text-primary">Departure dates:</span>{" "}
-              {departureList.join(" · ")}
-            </p>
-          ) : null}
-          {!isFixed && (
-            <p className={`${journey.route ? "mt-3" : "mt-6 border-t border-outline-variant/25 pt-4"} text-sm text-on-surface-variant`}>
-              <span className="font-semibold text-primary">{CURATED_ONLINE_BOOK_DAYS}+ days ahead:</span> Book
-              online
-              <span className="mx-2 text-outline">·</span>
-              <span className="font-semibold text-primary">Within {CURATED_ONLINE_BOOK_DAYS} days:</span> Enquire
-              or customise
-            </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3">
+            {glance.map((item) => {
+              const Icon = GLANCE_ICONS[item.label] ?? Compass;
+              return (
+                <div
+                  key={item.label}
+                  className="flex gap-3.5 border-b border-outline-variant/20 p-5 last:border-b-0 sm:odd:border-r lg:border-r lg:[&:nth-child(3n)]:border-r-0 md:p-6"
+                >
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-highlight/12 text-highlight">
+                    <Icon size={18} strokeWidth={1.75} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-sm leading-snug font-medium text-primary md:text-[0.95rem]">
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {(journey.route || (isFixed && departureList.length > 0) || !isFixed) && (
+            <div className="space-y-3 border-t border-outline-variant/25 bg-surface-container/40 px-5 py-4 md:px-7 md:py-5">
+              {journey.route ? (
+                <p className="flex gap-3 text-sm leading-relaxed text-on-surface-variant">
+                  <Route size={16} className="mt-0.5 shrink-0 text-highlight" />
+                  <span>
+                    <span className="font-semibold text-primary">Route</span>
+                    <span className="mx-2 text-outline">·</span>
+                    {journey.route}
+                  </span>
+                </p>
+              ) : null}
+              {isFixed && departureList.length > 0 ? (
+                <p className="flex gap-3 text-sm leading-relaxed text-on-surface-variant">
+                  <CalendarDays size={16} className="mt-0.5 shrink-0 text-highlight" />
+                  <span>
+                    <span className="font-semibold text-primary">Departures</span>
+                    <span className="mx-2 text-outline">·</span>
+                    {departureList.join(" · ")}
+                  </span>
+                </p>
+              ) : null}
+              {!isFixed ? (
+                <div className="flex flex-wrap gap-2 pt-0.5">
+                  <span className="inline-flex items-center rounded-full border border-highlight/25 bg-highlight/10 px-3 py-1.5 text-xs font-medium text-primary">
+                    {CURATED_ONLINE_BOOK_DAYS}+ days ahead · Book online
+                  </span>
+                  <span className="inline-flex items-center rounded-full border border-outline-variant/40 bg-surface-container-lowest px-3 py-1.5 text-xs font-medium text-on-surface-variant">
+                    Within {CURATED_ONLINE_BOOK_DAYS} days · Enquire or customise
+                  </span>
+                </div>
+              ) : null}
+            </div>
           )}
         </div>
       </div>

@@ -6,7 +6,7 @@ import { fetchDestinationsAdmin } from "@/lib/actions/content-read";
 import { deleteDocument, saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
-import { ImageField } from "@/components/admin/ImageField";
+import { ImageField, GalleryField } from "@/components/admin/ImageField";
 import { VisibilityToggle } from "@/components/admin/VisibilityToggle";
 import { cn } from "@/lib/utils";
 
@@ -141,7 +141,18 @@ export default function AdminPlacesPage() {
                 tagline: String(fd.get("tagline")),
                 overview: String(fd.get("overview")),
                 interestingFact: String(fd.get("interestingFact")),
-                image: String(fd.get("image")),
+                image: (() => {
+                  const cover = String(fd.get("image") || "").trim();
+                  if (cover) return cover;
+                  return String(fd.get("gallery") || "")
+                    .split("\n")
+                    .map((s) => s.trim())
+                    .filter(Boolean)[0] || "";
+                })(),
+                gallery: String(fd.get("gallery") || "")
+                  .split("\n")
+                  .map((s) => s.trim())
+                  .filter(Boolean),
                 highlights: String(fd.get("highlights") || "")
                   .split("\n")
                   .map((s) => s.trim())
@@ -228,7 +239,21 @@ export default function AdminPlacesPage() {
                   <input name="distUmroi" defaultValue={editing.distances.umroiAirport} className={inputClass} />
                 </Field>
               </div>
-              <ImageField name="image" label="Cover image" defaultValue={editing.image} />
+              <ImageField
+                key={`cover-${creating ? "new" : editing.slug}-${editing.image}`}
+                name="image"
+                label="Cover image"
+                defaultValue={editing.image}
+              />
+              <div className="mt-6">
+                <GalleryField
+                  key={`gallery-${creating ? "new" : editing.slug}-${(editing.gallery ?? []).join("|")}`}
+                  name="gallery"
+                  label="Gallery images"
+                  defaultValue={editing.gallery ?? []}
+                  hint="Extra photos for the destination page. Upload several at once; reorder as needed."
+                />
+              </div>
               <div className="flex flex-wrap gap-2">
                 <AdminButton type="submit" disabled={busy}>
                   {busy ? "Saving…" : "Save place"}

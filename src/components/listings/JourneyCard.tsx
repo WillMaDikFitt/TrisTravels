@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Journey } from "@/data/journeys";
-import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
 import { CARD_TYPE, clipClean } from "./cardText";
+import { ListingCardMedia, listingImageSrc, MediaEmptyState } from "./ListingMedia";
 
 type Props = {
   journey: Journey;
@@ -53,7 +53,7 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
 
 /** GetYourGuide-style: clear photo on top, readable content below. */
 function CuratedSplitCard({ journey, className }: { journey: Journey; className?: string }) {
-  const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
+  const image = listingImageSrc(journey.image, journey.gallery);
   const price = Number(journey.priceFrom);
   const tagline = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
@@ -78,14 +78,7 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
           aria-label={`View ${journey.name}`}
           className="absolute inset-0 z-10"
         />
-        <Image
-          src={image}
-          alt={journey.name}
-          fill
-          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
-          sizes="(max-width:640px) 100vw, 50vw"
-          quality={90}
-        />
+        <ListingCardMedia src={image} alt={journey.name} sizes="(max-width:640px) 100vw, 50vw" quality={90} />
         <div className="absolute top-3.5 left-3.5 z-20">
           <span className="inline-block rounded-full bg-surface-container-lowest/95 px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">
             {duration}
@@ -170,7 +163,7 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
 
 /** Previous full-bleed overlay card — flip CURATED_LAYOUT to "overlay" to restore. */
 function CuratedOverlayCard({ journey, className }: { journey: Journey; className?: string }) {
-  const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
+  const image = listingImageSrc(journey.image, journey.gallery);
   const price = Number(journey.priceFrom);
   const tagline = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
@@ -187,14 +180,18 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
         className,
       )}
     >
-      <Image
-        src={image}
-        alt={journey.name}
-        fill
-        className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
-        sizes="(max-width:640px) 100vw, 50vw"
-        quality={90}
-      />
+      {image ? (
+        <Image
+          src={image}
+          alt={journey.name}
+          fill
+          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
+          sizes="(max-width:640px) 100vw, 50vw"
+          quality={90}
+        />
+      ) : (
+        <MediaEmptyState tone="dark" className="absolute inset-0" />
+      )}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -286,7 +283,7 @@ function FixedJourneyCard({
   className?: string;
   variant: "horizontal" | "tile";
 }) {
-  const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
+  const image = listingImageSrc(journey.image, journey.gallery);
   const price = Number(journey.priceFrom);
   const description = clipClean(journey.tagline ?? "", 96);
   const duration = `${journey.days} days · ${journey.nights} nights`;
@@ -308,13 +305,10 @@ function FixedJourneyCard({
           aria-label={`View ${journey.name}`}
           className="absolute inset-0 z-10"
         />
-        <Image
+        <ListingCardMedia
           src={image}
           alt={journey.name}
-          fill
-          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
           sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
-          quality={85}
         />
         <div className="absolute top-3.5 left-3.5 z-20">
           <span className="inline-block rounded-full bg-surface-container-lowest/95 px-3.5 py-1.5 font-sans text-[10px] font-semibold tracking-[0.16em] text-primary uppercase">

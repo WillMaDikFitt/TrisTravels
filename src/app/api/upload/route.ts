@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { v2 as cloudinary } from "cloudinary";
 import { isCloudinaryConfigured } from "@/lib/firebase/config";
 
@@ -29,14 +30,25 @@ export async function POST(req: Request) {
   const root = process.env.CLOUDINARY_FOLDER || "TrisTravels";
   const purpose = form.get("purpose");
   const folder = purpose === "story" ? `${root}/story-submissions` : root;
+  // Never derive public_id from the original filename — that can overwrite siblings.
+  const publicId = `${Date.now()}-${randomUUID().slice(0, 8)}`;
+
   const uploaded = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
-        { folder, resource_type: "image" },
+        {
+          folder,
+          public_id: publicId,
+          resource_type: "image",
+          overwrite: false,
+          unique_filename: true,
+          use_filename: false,
+        },
         (err, result) => {
-        if (err || !result) reject(err);
-        else resolve({ secure_url: result.secure_url, public_id: result.public_id });
-      })
+          if (err || !result) reject(err);
+          else resolve({ secure_url: result.secure_url, public_id: result.public_id });
+        },
+      )
       .end(buffer);
   });
 

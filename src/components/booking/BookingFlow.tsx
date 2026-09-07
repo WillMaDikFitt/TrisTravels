@@ -34,6 +34,8 @@ import {
   SecureNote,
 } from "@/components/forms/FlowUI";
 import { isValidChildAge } from "@/data/child-ages";
+import { site } from "@/data/site";
+import { openRazorpayCheckout } from "@/lib/razorpay-client";
 
 const GST_RATE = 0.05;
 
@@ -97,6 +99,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   }, [experience.slug]);
 
   const [done, setDone] = useState(false);
+  const [paid, setPaid] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [booking, setBooking] = useState<BookingRecord | null>(null);
@@ -181,7 +184,10 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     setError("");
     const rec = await persist();
     setPaying(false);
-    if (rec) setDone(true);
+    if (rec) {
+      setPaid(false);
+      setDone(true);
+    }
   };
 
   const finishPay = async () => {
@@ -191,42 +197,158 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     try {
       const rec = booking ?? (await persist());
       if (!rec) return;
-      await confirmPayment(rec.id);
+
+      // Instant bookings stay on hold until Razorpay succeeds.
+      if (site.razorpayKeyId && gross >= 1) {
+        try {
+          const pay = await openRazorpayCheckout({
+            amountInr: gross,
+            receipt: rec.id,
+            description: experience.name,
+            notes: {
+              bookingId: rec.id,
+              experienceSlug: experience.slug,
+            },
+            prefill: {
+              name,
+              email: email.trim() || undefined,
+              contact: phone,
+            },
+          });
+
+          if (pay.paid) {
+            const confirmed = await confirmPayment(rec.id, {
+              paymentId: pay.paymentId,
+              orderId: pay.orderId,
+            });
+            if (!confirmed.ok) {
+              setPaid(false);
+              setDone(true);
+              return;
+            }
+            setBooking(confirmed.booking);
+            setPaid(true);
+            setDone(true);
+            return;
+          }
+
+          // Dismissed / failed / unavailable — keep hold, ask to pay later.
+          setPaid(false);
+          setDone(true);
+          return;
+        } catch (err) {
+          console.error(err);
+          setPaid(false);
+          setDone(true);
+          return;
+        }
+      }
+
+      // No Razorpay key configured — take the hold and ask them to pay later.
+      setPaid(false);
       setDone(true);
-    } catch {
-      setError("Payment simulation failed. Try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not complete booking. Try again.");
     } finally {
       setPaying(false);
     }
   };
 
   if (done && booking) {
+    const confirmed = !requestMode && paid;
+    const pendingPay = !requestMode && !paid;
     return (
-      <div className="mx-auto max-w-lg rounded-3xl border border-outline-variant/25 bg-surface-container-lowest p-8 text-center shadow-ambient md:p-10">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-primary">
-          <Check size={32} />
+      <div className="mx-auto max-w-xl rounded-[2rem] border border-outline-variant/25 bg-surface-container-lowest p-7 shadow-[0_22px_60px_rgba(42,46,31,0.09)] md:p-10">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-primary">
+          <Check size={28} />
         </div>
-        <h1 className="mt-6 font-display text-3xl text-primary">
-          {requestMode ? "Enquiry received" : "Booking reserved"}
-        </h1>
-        <p className="mt-3 text-on-surface-variant">
-          {requestMode ? (
-            <>
-              Availability enquiry for <strong>{experience.name}</strong> on {date}. Dates within{" "}
-              {BOOKING_NOTICE_DAYS} days need confirmation — we&apos;ll contact you. Ref {booking.id}.
-            </>
-          ) : (
-            <>
-              Confirmation for <strong>{experience.name}</strong> on {date} at {slot}. Your place is
-              held — ref {booking.id}.
-            </>
-          )}
+
+        <p className="mt-5 text-center label-caps text-highlight">
+          {requestMode ? "Enquiry" : confirmed ? "Confirmed" : "Awaiting payment"}
         </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <h1 className="mt-2 text-center font-display text-3xl leading-tight text-primary md:text-[2rem]">
+          {requestMode
+            ? "Enquiry received"
+            : confirmed
+              ? "Booking confirmed"
+              : "Place held — payment pending"}
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-md text-center text-sm leading-relaxed text-on-surface-variant md:text-[0.95rem]">
+          {requestMode
+            ? `Dates within ${BOOKING_NOTICE_DAYS} days need a quick confirmation from our team. We’ll contact you shortly.`
+            : confirmed
+              ? "Payment received. Your place is confirmed — we’ll share any final trip details by email."
+              : "Your details are saved, but this booking is not confirmed until payment is completed."}
+        </p>
+
+        <dl className="mt-7 overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container/35">
+          <div className="border-b border-outline-variant/25 px-5 py-4">
+            <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+              Experience
+            </dt>
+            <dd className="mt-1 font-display text-lg text-primary">{experience.name}</dd>
+          </div>
+          <div className="grid sm:grid-cols-2">
+            <div className="border-b border-outline-variant/25 px-5 py-4 sm:border-r sm:border-b-0">
+              <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                Date & time
+              </dt>
+              <dd className="mt-1 text-sm font-medium text-primary">
+                {date}
+                {slot ? ` · ${slot}` : ""}
+              </dd>
+            </div>
+            <div className="border-b border-outline-variant/25 px-5 py-4 sm:border-b-0">
+              <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                Reference
+              </dt>
+              <dd className="mt-1 font-mono text-sm font-medium text-primary">{booking.id}</dd>
+            </div>
+          </div>
+          {!requestMode ? (
+            <div className="border-t border-outline-variant/25 px-5 py-4">
+              <dt className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                {confirmed ? "Amount paid" : "Amount due"}
+              </dt>
+              <dd className="mt-1 font-display text-2xl text-primary">
+                {formatINR(gross)}
+                <span className="ml-2 text-sm font-sans font-normal text-on-surface-variant">
+                  incl. GST
+                </span>
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+
+        {pendingPay ? (
+          <div className="mt-5 rounded-2xl border border-highlight/25 bg-highlight/10 px-5 py-4 text-sm leading-relaxed text-primary">
+            <p className="font-semibold">Next step</p>
+            <p className="mt-1 text-on-surface-variant">
+              We’ll share a payment link shortly — or message us on WhatsApp{" "}
+              <span className="font-medium text-primary">{site.phoneDisplay}</span> quoting your
+              reference.
+            </p>
+          </div>
+        ) : null}
+
+        {requestMode ? (
+          <p className="mt-5 text-center text-sm text-on-surface-variant">
+            We’ll reply about availability for this date. Keep ref{" "}
+            <span className="font-mono font-medium text-primary">{booking.id}</span> handy.
+          </p>
+        ) : null}
+
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
           <Button href={`/experiences/${experience.slug}`}>Back to experience</Button>
-          <Button href="/account" variant="ghost">
+          <Button href="/account?tab=bookings" variant="ghost">
             My bookings
           </Button>
+          {pendingPay ? (
+            <Button href={site.whatsappUrl} variant="ghost">
+              WhatsApp to pay
+            </Button>
+          ) : null}
         </div>
       </div>
     );
@@ -282,9 +404,9 @@ export function BookingFlow({ experience }: { experience: Experience }) {
 
               <FieldGroup title="Start time" body="Unavailable times are disabled.">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {slots.map((s) => (
+                  {slots.map((s, index) => (
                     <button
-                      key={s}
+                      key={`${s}-${index}`}
                       type="button"
                       disabled={!date || dateIsClosed(date, closures, s)}
                       onClick={() => setSlot(s)}
@@ -395,7 +517,13 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                   className="gap-2"
                 >
                   <CreditCard size={16} />
-                  {paying ? "Processing…" : "Confirm & pay"}
+                  {paying
+                    ? site.razorpayKeyId
+                      ? "Opening payment…"
+                      : "Saving booking…"
+                    : site.razorpayKeyId
+                      ? `Pay ${formatINR(gross)} & confirm`
+                      : "Save booking"}
                 </Button>
               )}
             </FlowActions>

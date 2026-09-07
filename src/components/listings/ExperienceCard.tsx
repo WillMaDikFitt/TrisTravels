@@ -1,10 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Experience } from "@/data/experiences";
-import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
 import { WishlistButton } from "./WishlistButton";
 import { CARD_TYPE, clipClean } from "./cardText";
+import { ListingCardMedia, listingImageSrc } from "./ListingMedia";
 
 type Props = {
   experience: Experience;
@@ -17,10 +16,7 @@ const CARD_TITLE =
 
 export function ExperienceCard({ experience, className }: Props) {
   const description = clipClean(experience.tagline ?? "", DESCRIPTION_MAX);
-  const image =
-    typeof experience.image === "string" && experience.image.trim()
-      ? experience.image
-      : media.packages;
+  const image = listingImageSrc(experience.image, experience.gallery);
 
   return (
     <article
@@ -39,14 +35,7 @@ export function ExperienceCard({ experience, className }: Props) {
           aria-label={`View ${experience.name}`}
           className="absolute inset-0 z-10"
         />
-        <Image
-          src={image}
-          alt={experience.name}
-          fill
-          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
-          sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
-          quality={85}
-        />
+        <ListingCardMedia src={image} alt={experience.name} sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw" />
         <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
           <span className="rounded-full bg-surface-container-lowest/95 px-3 py-1.5 font-sans text-[10px] font-semibold tracking-[0.12em] text-primary uppercase">
             {experience.duration}

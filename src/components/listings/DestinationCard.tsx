@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Destination } from "@/data/destinations";
 import { cn } from "@/lib/utils";
+import { listingImageSrc, MediaEmptyState } from "./ListingMedia";
 
 type Props = {
   destination: Destination;
@@ -12,6 +13,7 @@ type Props = {
 
 export function DestinationCard({ destination, className, index = 0 }: Props) {
   const tall = index % 5 === 1 || index % 5 === 3;
+  const image = listingImageSrc(destination.image, destination.gallery);
 
   return (
     <Link
@@ -27,14 +29,18 @@ export function DestinationCard({ destination, className, index = 0 }: Props) {
           tall ? "aspect-[3/4]" : "aspect-[4/5]",
         )}
       >
-        <Image
-          src={destination.image}
-          alt={destination.name}
-          fill
-          className="object-cover transition duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.03]"
-          sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
-          quality={90}
-        />
+        {image ? (
+          <Image
+            src={image}
+            alt={destination.name}
+            fill
+            className="object-cover transition duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.03]"
+            sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
+            quality={90}
+          />
+        ) : (
+          <MediaEmptyState className="absolute inset-0" />
+        )}
         <div
           aria-hidden
           className="absolute inset-0 bg-gradient-to-t from-primary-container/55 via-primary-container/10 to-transparent opacity-90 transition group-hover:opacity-100"

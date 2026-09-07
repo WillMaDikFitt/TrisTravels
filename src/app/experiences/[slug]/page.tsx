@@ -59,7 +59,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
       </DetailGallery>
 
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="relative z-10 -mt-6 grid gap-6 pb-8 md:-mt-10 md:grid-cols-[minmax(0,1fr)_340px] md:items-start md:gap-8 md:pb-10">
+        <div className="relative z-10 -mt-12 grid gap-6 pb-8 md:-mt-16 md:grid-cols-[minmax(0,1fr)_340px] md:items-start md:gap-8 md:pb-10">
           <aside className="hidden md:sticky md:top-[calc(var(--header-offset)+0.5rem)] md:col-start-2 md:row-start-1 md:block md:self-start">
             <BookingWidget experience={exp} />
           </aside>
@@ -138,16 +138,16 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           <FadeIn>
             <section>
-              <p className="label-caps text-accent">Step by step</p>
+              <p className="label-caps text-accent">Day by day</p>
               <h2 className="mt-2 font-display text-3xl text-primary">How the day unfolds</h2>
               <ol className="relative mt-8 space-y-8 border-l border-outline-variant/40 pl-8">
-                {exp.itinerary.map((step, index) => (
-                  <li key={`${step.title}-${index}`} className="relative">
+                {exp.itinerary.map((day, index) => (
+                  <li key={`${day.title}-${index}`} className="relative">
                     <span className="absolute top-1.5 left-0 h-3 w-3 -translate-x-[calc(2rem+6px)] rounded-full bg-accent" />
-                    <p className="label-caps text-accent">Step {index + 1}</p>
-                    <h4 className="mt-1 font-display text-lg text-primary">{step.title}</h4>
-                    {step.description?.trim() ? (
-                      <p className="mt-2 whitespace-pre-line text-on-surface-variant">{step.description}</p>
+                    <p className="label-caps text-accent">Day {index + 1}</p>
+                    <h4 className="mt-1 font-display text-lg text-primary">{day.title}</h4>
+                    {day.description?.trim() ? (
+                      <p className="mt-2 whitespace-pre-line text-on-surface-variant">{day.description}</p>
                     ) : null}
                   </li>
                 ))}

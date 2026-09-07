@@ -28,6 +28,7 @@ import {
   stayStyleMeta,
   type PackageTransportId,
 } from "@/data/journey-options";
+import { openRazorpayCheckout } from "@/lib/razorpay-client";
 import { PackageOptionsModal, type PackageLearnTab } from "@/components/booking/PackageOptionLearn";
 import {
   minVehiclesForGuests,
@@ -62,36 +63,6 @@ function minOnlineStartDate() {
   d.setHours(12, 0, 0, 0);
   d.setDate(d.getDate() + CURATED_ONLINE_BOOK_DAYS);
   return d.toISOString().slice(0, 10);
-}
-
-declare global {
-  interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
-  }
-}
-
-function loadRazorpayScript() {
-  return new Promise<boolean>((resolve) => {
-    if (typeof window === "undefined") {
-      resolve(false);
-      return;
-    }
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-    if (existing) {
-      existing.addEventListener("load", () => resolve(true));
-      existing.addEventListener("error", () => resolve(false));
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
 }
 
 export function CuratedBookFlow({ journey }: { journey: Journey }) {
@@ -307,90 +278,21 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
     return res;
   };
 
-  const openRazorpayCheckout = async (enquiryId: string) => {
-    if (!priced) return { paid: false as const };
-    const orderRes = await fetch("/api/razorpay/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amountInr: priced.advanceAmount,
-        receipt: enquiryId,
-        notes: {
-          journeySlug: journey.slug,
-          enquiryId,
-        },
-      }),
-    });
-    const order = (await orderRes.json()) as {
-      ok?: boolean;
-      configured?: boolean;
-      orderId?: string;
-      amount?: number;
-      currency?: string;
-      keyId?: string;
-      error?: string;
-    };
-
-    if (!orderRes.ok || !order.ok || !order.orderId || !order.keyId) {
-      if (order.configured === false || orderRes.status === 503) {
-        return { paid: false as const, needsLink: true as const };
-      }
-      throw new Error(order.error || "Could not start payment");
-    }
-
-    const loaded = await loadRazorpayScript();
-    if (!loaded || !window.Razorpay) {
-      throw new Error("Could not load Razorpay Checkout");
-    }
-
-    return new Promise<{ paid: boolean; paymentId?: string; orderId?: string }>((resolve, reject) => {
-      const rzp = new window.Razorpay!({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency || "INR",
-        name: "TRIS Travels",
-        description: `50% advance — ${journey.name}`,
-        order_id: order.orderId,
-        prefill: {
-          name,
-          email,
-          contact: phone,
-        },
-        theme: { color: "#364037" },
-        handler: async (response: {
-          razorpay_order_id: string;
-          razorpay_payment_id: string;
-          razorpay_signature: string;
-        }) => {
-          try {
-            const verifyRes = await fetch("/api/razorpay/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              }),
-            });
-            const verified = (await verifyRes.json()) as { ok?: boolean };
-            if (!verifyRes.ok || !verified.ok) {
-              reject(new Error("Payment verification failed"));
-              return;
-            }
-            resolve({
-              paid: true,
-              paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id,
-            });
-          } catch (err) {
-            reject(err);
-          }
-        },
-        modal: {
-          ondismiss: () => resolve({ paid: false }),
-        },
-      });
-      rzp.open();
+  const openRazorpayForEnquiry = async (enquiryId: string) => {
+    if (!priced) return { paid: false as const, reason: "unavailable" as const };
+    return openRazorpayCheckout({
+      amountInr: priced.advanceAmount,
+      receipt: enquiryId,
+      description: `50% advance — ${journey.name}`,
+      notes: {
+        journeySlug: journey.slug,
+        enquiryId,
+      },
+      prefill: {
+        name,
+        email,
+        contact: phone,
+      },
     });
   };
 
@@ -426,10 +328,8 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
 
       if (site.razorpayKeyId) {
         try {
-          const pay = await openRazorpayCheckout(res.id);
-          if ("needsLink" in pay && pay.needsLink) {
-            // Fall through to payment link
-          } else if (pay.paid) {
+          const pay = await openRazorpayForEnquiry(res.id);
+          if (pay.paid) {
             paymentOk = true;
             paymentId = pay.paymentId || "";
             orderId = pay.orderId || "";
@@ -515,7 +415,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         ) : null}
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button href={`/journeys/${journey.slug}`}>Back to journey</Button>
-          <Button href="/account" variant="ghost">
+          <Button href="/account?tab=bookings" variant="ghost">
             My account
           </Button>
         </div>
