@@ -55,6 +55,8 @@ export type Experience = {
   /** Optional per-vehicle transfer prices. Missing ids fall back to transportPrice multipliers. */
   transportVehicles?: TransportVehiclePrices;
   status?: ExperienceStatus;
+  /** External / ops backend product ID (entered in Studio). */
+  backendId?: string;
   staffRules?: {
     minGuests: number;
     maxGuests: number;
@@ -76,7 +78,7 @@ export type Experience = {
   /** Lower numbers appear first on browse pages and admin. */
   sortOrder?: number;
   meetingPoint: string;
-  itinerary: { time: string; title: string; description: string }[];
+  itinerary: { time?: string; title: string; description: string }[];
   faqs: { q: string; a: string }[];
   reviews: { name: string; place: string; rating: number; quote: string }[];
   guideQuote?: { name: string; role: string; quote: string; avatar: string };

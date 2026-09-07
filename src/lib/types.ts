@@ -27,6 +27,8 @@ export type BookingRecord = {
   id: string;
   experienceSlug: string;
   experienceName: string;
+  /** Ops / backend catalogue ID copied from the experience at booking time. */
+  backendId?: string;
   date: string;
   slot: string;
   guests: number;

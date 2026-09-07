@@ -276,6 +276,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
       payload: {
         journeySlug: journey.slug,
         journeyName: journey.name,
+        backendId: journey.backendId || journey.idCode || "",
         bookingType: "curated-package-booking",
         paymentPlan: "50-advance-50-balance",
         preferredFrom,
@@ -747,13 +748,19 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                       value={rooms === "" ? "" : String(rooms)}
                       onChange={(v) => setRooms(v ? Math.max(1, Number(v) || 1) : "")}
                     />
-                    <FormSelect
-                      label="Extra mattresses"
-                      name="extraMattresses"
-                      options={mattressOptions}
-                      value={String(extraMattresses)}
-                      onChange={(v) => setExtraMattresses(Math.max(0, Number(v) || 0))}
-                    />
+                    <div>
+                      <FormSelect
+                        label="Extra mattresses"
+                        name="extraMattresses"
+                        options={mattressOptions}
+                        value={String(extraMattresses)}
+                        onChange={(v) => setExtraMattresses(Math.max(0, Number(v) || 0))}
+                      />
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        Charged per mattress ×{" "}
+                        {Math.max(1, journey.nights || journey.days - 1 || 1)} night(s)
+                      </p>
+                    </div>
                   </div>
                 </FieldGroup>
 

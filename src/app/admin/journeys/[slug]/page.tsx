@@ -20,6 +20,10 @@ import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/com
 import { ImageField } from "@/components/admin/ImageField";
 import { parseDepartureSeats } from "@/lib/journey-seats";
 import { DepartureSeatsCalendar } from "@/components/admin/DepartureSeatsCalendar";
+import {
+  compactJourneyItinerary,
+  ItineraryEditor,
+} from "@/components/admin/ItineraryEditor";
 import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 function blank(): Journey {
@@ -156,10 +160,6 @@ export default function JourneyEditorPage() {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);
           const nextSlug = isNew ? slugify(String(fd.get("name") || "")) || `journey-${Date.now()}` : row.slug;
-          const itinerary = lines(String(fd.get("itinerary") || "")).map((line, i) => {
-            const [title, ...rest] = line.split("—");
-            return { day: i + 1, title: (title || `Day ${i + 1}`).trim(), summary: rest.join("—").trim() };
-          });
           const next: Journey = {
             ...row,
             slug: nextSlug,
@@ -193,8 +193,10 @@ export default function JourneyEditorPage() {
               .filter(Boolean),
             departureSeats: parseDepartureSeats(String(fd.get("departureSeats") || "")),
             groupSize: String(fd.get("groupSize") || ""),
-            itinerary,
+            itinerary: compactJourneyItinerary(row.itinerary ?? []),
             status: String(fd.get("status") || "active") as Journey["status"],
+            backendId: String(fd.get("backendId") || "").trim() || undefined,
+            idCode: String(fd.get("idCode") || "").trim() || undefined,
             paymentLink: String(fd.get("paymentLink") || "").trim() || undefined,
           };
           // Prefer earliest calendar date as next-departure label when blank
@@ -248,6 +250,27 @@ export default function JourneyEditorPage() {
                 <option>hidden</option>
               </select>
             </Field>
+            <Field
+              label="Backend ID"
+              hint="Ops / backend catalogue ID — included on bookings and enquiries"
+            >
+              <input
+                name="backendId"
+                defaultValue={row.backendId ?? ""}
+                placeholder={row.type === "small-group" ? "e.g. FD-01" : "e.g. CJ-0018"}
+                className={inputClass}
+              />
+            </Field>
+            {row.type === "small-group" ? (
+              <Field label="Display code" hint="Optional public label, e.g. FD:01">
+                <input
+                  name="idCode"
+                  defaultValue={row.idCode ?? ""}
+                  placeholder="FD:01"
+                  className={inputClass}
+                />
+              </Field>
+            ) : null}
             <Field label="Days">
               <input name="days" type="number" defaultValue={row.days} className={inputClass} />
             </Field>
@@ -337,7 +360,8 @@ export default function JourneyEditorPage() {
             <div className="mt-6 border-t border-[#c5cbb8] pt-5">
               <h3 className="font-display text-base text-[#26352b]">Book now package costs (A–E)</h3>
               <p className="mt-1 text-sm text-[#4a5a50]">
-                A = vehicle/day × vehicles × days · B = stay cost × rooms + mattresses · C = guests × activity · D =
+                A = vehicle/day × vehicles × days · B = room × rooms + mattress × nights · C = guests ×
+                activity · D =
                 TRIS % of (A+B+C) · E = GST % of D
               </p>
               <div className="mt-4 grid gap-4 md:grid-cols-3">
@@ -401,14 +425,17 @@ export default function JourneyEditorPage() {
                   );
                 })}
               </div>
-              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs (₹ / journey)</h4>
+              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs</h4>
+              <p className="mt-1 text-xs text-[#4a5a50]">
+                Room cost is for the whole journey. Extra mattress is charged per person per night × nights.
+              </p>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {STAY_PREFERENCE_IDS.map((id) => {
                   const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
                   return (
                     <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
                       <p className="text-sm font-medium text-[#26352b]">{STAY_PREFERENCE_META[id].label}</p>
-                      <Field label="Room cost">
+                      <Field label="Room cost (₹ / journey)">
                         <input
                           name={`pkgStay_${id}_room`}
                           type="number"
@@ -417,7 +444,7 @@ export default function JourneyEditorPage() {
                           className={inputClass}
                         />
                       </Field>
-                      <Field label="Extra mattress / person">
+                      <Field label="Extra mattress (₹ / person / night)">
                         <input
                           name={`pkgStay_${id}_mattress`}
                           type="number"
@@ -491,14 +518,11 @@ export default function JourneyEditorPage() {
             </Field>
           </div>
           <div className="mt-4">
-            <Field label="Itinerary" hint="one day per line: Title — summary">
-              <textarea
-                name="itinerary"
-                rows={8}
-                defaultValue={(row.itinerary ?? []).map((d) => `${d.title} — ${d.summary}`).join("\n")}
-                className={inputClass}
-              />
-            </Field>
+            <ItineraryEditor
+              mode="journey"
+              value={row.itinerary ?? []}
+              onChange={(itinerary) => setRow((prev) => (prev ? { ...prev, itinerary } : prev))}
+            />
           </div>
         </Panel>
         <Panel>

@@ -119,6 +119,7 @@ export async function createBooking(input: {
     id: uid("bkg"),
     experienceSlug: experience.slug,
     experienceName: experience.name,
+    backendId: experience.backendId?.trim() || undefined,
     date: input.date,
     slot: selectedSlot,
     guests,
@@ -153,14 +154,27 @@ export async function createBooking(input: {
   }
 
   try {
-    const { notifyStaffNewLead } = await import("@/lib/email");
+    const { notifyStaffNewLead, notifyGuestExperienceBooking } = await import("@/lib/email");
+    const { formatINR } = await import("@/lib/utils");
     void notifyStaffNewLead({
       kind: "booking",
       id: record.id,
       name: record.customerName,
       email: record.customerEmail,
       phone: record.customerPhone,
-      summary: `${record.experienceName} · ${record.date} · ${record.slot} · ${record.guests} guests · ₹${record.customerTotal}`,
+      summary: `${record.experienceName}${record.backendId ? ` [${record.backendId}]` : ""} · ${record.date} · ${record.slot} · ${record.guests} guests · ₹${record.customerTotal}`,
+    });
+    void notifyGuestExperienceBooking({
+      to: record.customerEmail,
+      name: record.customerName,
+      experienceName: record.experienceName,
+      refId: record.id,
+      date: record.date,
+      slot: record.slot,
+      guests: record.guests,
+      total: formatINR(record.customerTotal),
+      status: record.status,
+      backendId: record.backendId,
     });
   } catch (err) {
     console.error("booking notify failed:", err);

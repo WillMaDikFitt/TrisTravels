@@ -70,6 +70,8 @@ export type Journey = {
   tourHighlights?: string[];
   whyTitle?: string;
   status?: "draft" | "active" | "hidden";
+  /** External / ops backend product ID (entered in Studio). */
+  backendId?: string;
   /** External payment URL TRIS can raise per journey (Razorpay / UPI / bank link). */
   paymentLink?: string;
   sourceUrl: string;

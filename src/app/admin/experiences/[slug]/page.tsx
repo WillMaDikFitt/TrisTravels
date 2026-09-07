@@ -11,6 +11,10 @@ import { slugify } from "@/lib/slug";
 import { normalizeExperience } from "@/lib/normalize-listing";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
+import {
+  compactExperienceItinerary,
+  ItineraryEditor,
+} from "@/components/admin/ItineraryEditor";
 import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 const categories = EXPERIENCE_CATEGORIES.map((c) => c.id) as ExperienceCategory[];
@@ -164,6 +168,7 @@ export default function ExperienceEditorPage() {
             transportNote: String(fd.get("transportNote") || ""),
             transportVehicles: readTransportVehiclePrices(fd),
             status: String(fd.get("status")) as ExperienceStatus,
+            backendId: String(fd.get("backendId") || "").trim() || undefined,
             image: String(fd.get("image")),
             gallery: lines(String(fd.get("gallery") || "")),
             overview: String(fd.get("overview")),
@@ -176,10 +181,7 @@ export default function ExperienceEditorPage() {
             tags: lines(String(fd.get("tags") || "").replace(/,/g, "\n")),
             suitableFor: lines(String(fd.get("suitableFor") || "")),
             sortOrder: Number(fd.get("sortOrder") || 0) || undefined,
-            itinerary: lines(String(fd.get("itinerary") || "")).map((line) => {
-              const [time, title, ...rest] = line.split("—").map((s) => s.trim());
-              return { time: time || "", title: title || line, description: rest.join(" — ") };
-            }),
+            itinerary: compactExperienceItinerary(row.itinerary ?? []),
             faqs: lines(String(fd.get("faqs") || "")).map((line) => {
               const [q, ...rest] = line.split("—").map((s) => s.trim());
               return { q: q || line, a: rest.join(" — ") };
@@ -205,6 +207,17 @@ export default function ExperienceEditorPage() {
                   <option key={s}>{s}</option>
                 ))}
               </select>
+            </Field>
+            <Field
+              label="Backend ID"
+              hint="Ops / backend catalogue ID — saved onto bookings for this experience"
+            >
+              <input
+                name="backendId"
+                defaultValue={row.backendId ?? ""}
+                placeholder="e.g. EXP-0042"
+                className={inputClass}
+              />
             </Field>
             <Field label="Tagline" hint="One line under the name">
               <input name="tagline" defaultValue={row.tagline} className={inputClass} />
@@ -380,16 +393,13 @@ export default function ExperienceEditorPage() {
             <Field label="Suitable for" hint="one per line">
               <textarea name="suitableFor" rows={3} defaultValue={(row.suitableFor ?? []).join("\n")} className={inputClass} />
             </Field>
-            <Field label="Itinerary" hint="one beat per line: Time — Title — description">
-              <textarea
-                name="itinerary"
-                rows={6}
-                defaultValue={(row.itinerary ?? [])
-                  .map((i) => `${i.time} — ${i.title} — ${i.description}`)
-                  .join("\n")}
-                className={inputClass}
+            <div className="pt-2">
+              <ItineraryEditor
+                mode="experience"
+                value={row.itinerary ?? []}
+                onChange={(itinerary) => setRow((prev) => (prev ? { ...prev, itinerary } : prev))}
               />
-            </Field>
+            </div>
             <Field label="FAQs" hint="one per line: Question — Answer">
               <textarea
                 name="faqs"

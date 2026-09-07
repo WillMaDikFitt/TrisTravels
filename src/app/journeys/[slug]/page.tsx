@@ -172,7 +172,7 @@ export default async function JourneyDetailPage({ params }: Props) {
                         <span className="font-normal text-on-surface-variant">{day.activities}</span>
                       </p>
                     ) : null}
-                    <p>{day.summary}</p>
+                    <p className="whitespace-pre-line">{day.summary}</p>
                     <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
                       {day.trekDifficulty ? (
                         <span>

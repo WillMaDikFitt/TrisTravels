@@ -67,6 +67,7 @@ export default function AdminJourneysPage() {
                           <p className="font-medium">{j.name}</p>
                           <p className="text-xs text-[#4a5a50]">
                             {j.days}D / {j.nights}N
+                            {j.backendId || j.idCode ? ` · ID ${j.backendId || j.idCode}` : ""}
                           </p>
                         </div>
                       </div>

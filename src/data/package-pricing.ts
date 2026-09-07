@@ -20,7 +20,7 @@ export type PackageVehicleRate = {
 export type PackageStayRate = {
   /** Cost for one room for the full journey stay (all nights) */
   roomCost: number;
-  /** Cost per extra mattress / person for the full journey stay */
+  /** Cost per extra mattress / person / night */
   extraMattressPerPerson: number;
 };
 

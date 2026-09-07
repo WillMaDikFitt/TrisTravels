@@ -100,7 +100,7 @@ export type CuratedQuote = {
   extraMattresses: number;
   /** A — vehicle type × vehicles × days */
   vehicleCost: number;
-  /** B — (stay cost × rooms) + (extra mattress × per-person stay cost) */
+  /** B — (stay cost × rooms) + (extra mattress × per-person-per-night × nights) */
   roomCost: number;
   /** C — guests × activity cost per guest */
   activityCost: number;
@@ -123,7 +123,7 @@ export type CuratedQuote = {
 /**
  * Curated package quote:
  * A = vehicle/day × vehicles × days
- * B = (stay preference cost × rooms) + (extra mattresses × mattress cost)
+ * B = (stay preference cost × rooms) + (extra mattresses × mattress/night × nights)
  * C = guests × activity cost per guest
  * D = TRIS % of (A+B+C)
  * E = GST % of D
@@ -168,8 +168,11 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
       ? Math.max(0, pricing.gstPercent)
       : DEFAULT_PACKAGE_GST_PERCENT;
 
+  const mattressNights = Math.max(1, nights || days - 1 || 1);
   const vehicleCost = Math.round(dayRate * vehicleCount * days);
-  const roomCost = Math.round(stay.roomCost * rooms + stay.extraMattressPerPerson * extraMattresses);
+  const roomCost = Math.round(
+    stay.roomCost * rooms + stay.extraMattressPerPerson * extraMattresses * mattressNights,
+  );
   const activityCost = Math.round(activityCostPerGuest * totalGuests);
   const subtotalABC = vehicleCost + roomCost + activityCost;
   const trisService = Math.round((subtotalABC * trisServicePercent) / 100);

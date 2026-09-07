@@ -146,12 +146,13 @@ export default function AdminExperiencesPage() {
                           <Image src={e.image} alt="" fill className="object-cover" sizes="64px" />
                         ) : null}
                       </div>
-                      <div>
-                        <p className="font-medium">{e.name}</p>
-                        <p className="text-xs text-[#4a5a50]">
-                          {e.location} · {e.duration}
-                        </p>
-                      </div>
+                        <div>
+                          <p className="font-medium">{e.name}</p>
+                          <p className="text-xs text-[#4a5a50]">
+                            {e.location} · {e.duration}
+                            {e.backendId ? ` · ID ${e.backendId}` : ""}
+                          </p>
+                        </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-[#4a5a50]">{e.category}</td>

@@ -30,7 +30,7 @@ function experienceLine(journey: Journey) {
   )
     .map((item) => item.replace(/\s+/g, " ").trim())
     .filter(Boolean)
-    .slice(0, 5);
+    .slice(0, 8);
   return items.join(" · ");
 }
 
@@ -55,22 +55,24 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
 function CuratedSplitCard({ journey, className }: { journey: Journey; className?: string }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const description = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
+  const tagline = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
+  const season = (journey.season ?? "").replace(/\s+/g, " ").trim();
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
   return (
     <article
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest",
+        "group flex h-full min-h-[36rem] flex-col overflow-hidden rounded-[1.5rem] bg-surface-container-lowest",
         "border border-outline-variant/25",
         "shadow-[0_14px_36px_-22px_rgba(42,46,31,0.35)]",
         "transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,_1,_0.36,_1)]",
         "hover:-translate-y-1 hover:shadow-[0_24px_48px_-22px_rgba(42,46,31,0.45)]",
+        "md:min-h-[38rem]",
         className,
       )}
     >
-      <div className="relative aspect-[16/10] shrink-0 overflow-hidden">
+      <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
         <Link
           href={`/journeys/${journey.slug}`}
           aria-label={`View ${journey.name}`}
@@ -100,34 +102,36 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
         </Link>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pt-4 pb-5 md:px-5 md:pb-5">
+      <div className="flex flex-1 flex-col px-5 pt-5 pb-6 md:px-6 md:pt-6 md:pb-7">
         <h3 className={CARD_TITLE}>
           <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
             {journey.name}
           </Link>
         </h3>
 
-        {journey.route ? (
-          <p className="mt-2 line-clamp-2 font-sans text-[12px] leading-snug text-on-surface-variant/90 md:text-[13px]">
-            {journey.route}
+        {tagline ? (
+          <p className="mt-2.5 line-clamp-3 font-sans text-[13px] leading-[1.55] text-on-surface-variant md:text-[14px]">
+            {tagline}
           </p>
         ) : null}
 
         {experience ? (
-          <div className="mt-3">
+          <div className="mt-4">
             <p className={cn(CARD_TYPE.label, "text-highlight")}>Experiences</p>
-            <p className="mt-1 line-clamp-1 font-sans text-[13px] leading-snug text-on-surface md:text-[14px]">
+            <p className="mt-1.5 line-clamp-3 font-sans text-[13px] leading-[1.55] text-on-surface md:text-[14px]">
               {experience}
             </p>
-            <div className="mt-2.5 h-px w-11 bg-primary/50" />
           </div>
         ) : null}
 
-        <p className="mt-3 line-clamp-2 font-sans text-[13px] leading-[1.55] text-on-surface-variant md:text-[14px]">
-          {description}
-        </p>
+        {season ? (
+          <div className="mt-4">
+            <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>Best season</p>
+            <p className="mt-1 font-sans text-[13px] leading-snug text-primary md:text-[14px]">{season}</p>
+          </div>
+        ) : null}
 
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-3 border-t border-outline-variant/30 pt-4">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-3 border-t border-outline-variant/30 pt-5">
           <div className="min-w-0">
             <p className={cn(CARD_TYPE.label, "text-on-surface-variant")}>From</p>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5">
@@ -168,8 +172,9 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
 function CuratedOverlayCard({ journey, className }: { journey: Journey; className?: string }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const description = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
+  const tagline = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
+  const season = (journey.season ?? "").replace(/\s+/g, " ").trim();
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
   return (
@@ -218,17 +223,22 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
       <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-5 md:px-6 md:pb-6">
         <h3 className={CARD_TITLE_ON_DARK}>{journey.name}</h3>
 
+        {tagline ? (
+          <p className={cn(CARD_TYPE.body, "mt-2 line-clamp-3 leading-[1.55] text-white/90")}>{tagline}</p>
+        ) : null}
+
         {experience ? (
           <div className="mt-3">
             <p className={cn(CARD_TYPE.label, "text-highlight")}>Experiences</p>
-            <p className={cn(CARD_TYPE.body, "mt-1 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]")}>{experience}</p>
-            <div className="mt-2.5 h-px w-11 bg-primary" />
+            <p className={cn(CARD_TYPE.body, "mt-1 line-clamp-3 [text-shadow:0_1px_12px_rgba(0,0,0,0.5)]")}>
+              {experience}
+            </p>
           </div>
         ) : null}
 
-        <p className={cn(CARD_TYPE.body, "mt-3 max-w-[34rem] leading-[1.55] text-white/90")}>
-          {description}
-        </p>
+        {season ? (
+          <p className={cn(CARD_TYPE.meta, "mt-3 text-white/75")}>Best season · {season}</p>
+        ) : null}
 
         <div className="mt-4 h-px w-full bg-white/20" />
 

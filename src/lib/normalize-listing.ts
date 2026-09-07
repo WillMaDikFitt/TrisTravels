@@ -18,6 +18,26 @@ function asNumber(value: unknown, fallback: number) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+/** Recover title/description from sparse or legacy Studio rows. */
+function normalizeExperienceItinerary(value: unknown): Experience["itinerary"] {
+  return asArray<Record<string, unknown>>(value).map((raw) => {
+    let title = asString(raw.title);
+    let description = asString(raw.description) || asString(raw.summary);
+    // Old “Time — Title — description” saves sometimes left description empty
+    // and stuffed the body into title.
+    if (!description && title.includes("—")) {
+      const [head, ...rest] = title.split("—").map((part) => part.trim());
+      title = head || title;
+      description = rest.join(" — ").trim();
+    }
+    return {
+      title,
+      description,
+      ...(asString(raw.time) ? { time: asString(raw.time) } : {}),
+    };
+  });
+}
+
 export function normalizeExperience(raw: Partial<Experience> | null | undefined, slug = ""): Experience {
   const row = (raw ?? {}) as Partial<Experience>;
   return {
@@ -46,6 +66,7 @@ export function normalizeExperience(raw: Partial<Experience> | null | undefined,
     transportNote: row.transportNote,
     transportVehicles: row.transportVehicles,
     status: (row.status as Experience["status"]) || "draft",
+    backendId: asString(row.backendId) || undefined,
     image: asString(row.image),
     gallery: asArray<string>(row.gallery),
     overview: asString(row.overview),
@@ -55,7 +76,7 @@ export function normalizeExperience(raw: Partial<Experience> | null | undefined,
     excluded: asArray<string>(row.excluded),
     whatToBring: asArray<string>(row.whatToBring),
     meetingPoint: asString(row.meetingPoint),
-    itinerary: asArray(row.itinerary),
+    itinerary: normalizeExperienceItinerary(row.itinerary),
     faqs: asArray(row.faqs),
     reviews: asArray(row.reviews),
     sortOrder: row.sortOrder,
@@ -90,6 +111,7 @@ export function normalizeJourney(raw: Partial<Journey> | null | undefined, slug 
     departures: asArray<string>(row.departures),
     departureSeats: asArray(row.departureSeats),
     status: (row.status as Journey["status"]) || "draft",
+    backendId: asString(row.backendId) || undefined,
     sourceUrl: asString(row.sourceUrl),
   };
 }

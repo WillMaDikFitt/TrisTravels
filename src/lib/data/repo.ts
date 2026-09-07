@@ -7,6 +7,7 @@ import type { ClosureRecord, Experience, Journey, Destination, PlatformSettings 
 import { sortExperiences } from "@/lib/experience-meta";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import { memoryStore } from "@/lib/store";
+import { normalizeExperience } from "@/lib/normalize-listing";
 
 function docSlug(item: { slug?: string; id?: string }) {
   return item.slug ?? item.id ?? "";
@@ -125,7 +126,7 @@ async function collectionDocs<T>(name: string): Promise<T[] | null> {
 export async function listExperiences(): Promise<Experience[]> {
   const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
   const merged = sortExperiences(mergeCatalog(experiences, remote));
-  return merged.filter(isPublicExperience);
+  return merged.filter(isPublicExperience).map((item) => normalizeExperience(item, item.slug));
 }
 
 export async function listAllExperiencesAdmin(): Promise<Experience[]> {
@@ -153,11 +154,13 @@ async function loadExperience(slug: string): Promise<Experience | undefined> {
 
 export async function findExperience(slug: string): Promise<Experience | undefined> {
   const item = await loadExperience(slug);
-  return item && isPublicExperience(item) ? item : undefined;
+  if (!item || !isPublicExperience(item)) return undefined;
+  return normalizeExperience(item, slug);
 }
 
 export async function findExperienceAdmin(slug: string): Promise<Experience | undefined> {
-  return loadExperience(slug);
+  const item = await loadExperience(slug);
+  return item ? normalizeExperience(item, slug) : undefined;
 }
 
 export async function listJourneys(): Promise<Journey[]> {

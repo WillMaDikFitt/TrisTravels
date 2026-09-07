@@ -141,12 +141,14 @@ export default async function ExperienceDetailPage({ params }: Props) {
               <p className="label-caps text-accent">Step by step</p>
               <h2 className="mt-2 font-display text-3xl text-primary">How the day unfolds</h2>
               <ol className="relative mt-8 space-y-8 border-l border-outline-variant/40 pl-8">
-                {exp.itinerary.map((step) => (
-                  <li key={step.time} className="relative">
+                {exp.itinerary.map((step, index) => (
+                  <li key={`${step.title}-${index}`} className="relative">
                     <span className="absolute top-1.5 left-0 h-3 w-3 -translate-x-[calc(2rem+6px)] rounded-full bg-accent" />
-                    <p className="label-caps text-accent">{step.time}</p>
+                    <p className="label-caps text-accent">Step {index + 1}</p>
                     <h4 className="mt-1 font-display text-lg text-primary">{step.title}</h4>
-                    <p className="mt-1 text-on-surface-variant">{step.description}</p>
+                    {step.description?.trim() ? (
+                      <p className="mt-2 whitespace-pre-line text-on-surface-variant">{step.description}</p>
+                    ) : null}
                   </li>
                 ))}
               </ol>

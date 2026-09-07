@@ -150,7 +150,14 @@ export default function AdminBookingsPage() {
                     )}
                   >
                     <td className="px-4 py-3 font-mono text-xs text-[#4a5a50]">{b.id}</td>
-                    <td className="px-4 py-3 font-medium">{b.experienceName}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <p>{b.experienceName}</p>
+                      {b.backendId ? (
+                        <p className="mt-0.5 text-[11px] font-normal tracking-wide text-[#4a5a50]">
+                          ID {b.backendId}
+                        </p>
+                      ) : null}
+                    </td>
                     <td className="px-4 py-3 text-[#4a5a50]">
                       {b.date}
                       <span className="mt-0.5 block text-xs text-[#4a5a50]">
@@ -181,6 +188,11 @@ export default function AdminBookingsPage() {
                 {open.id}
               </p>
               <h2 className="mt-1 font-display text-xl">{open.experienceName}</h2>
+              {open.backendId ? (
+                <p className="mt-1 text-xs font-semibold tracking-wide text-[#4a5a50]">
+                  Backend ID · {open.backendId}
+                </p>
+              ) : null}
               <p className="mt-1 text-sm text-[#4a5a50]">
                 {open.date} · {open.slot} · {open.adults ?? open.guests} adult
                 {(open.adults ?? open.guests) === 1 ? "" : "s"}
