@@ -141,8 +141,8 @@ export function StoryCard({ story, featured, variant, tiltIndex = 0, compact = f
               className={cn(
                 "font-[family-name:var(--font-playfair)] leading-snug text-primary",
                 compact
-                  ? "mt-1 line-clamp-2 text-[1.05rem] md:text-[1.1rem]"
-                  : "mt-2 text-[1.2rem] md:text-[1.3rem]",
+                  ? "mt-1 text-[1.05rem] leading-snug md:text-[1.1rem]"
+                  : "mt-2 text-[1.1rem] leading-snug md:text-[1.2rem]",
               )}
             >
               {story.title}

@@ -3,16 +3,13 @@ import Link from "next/link";
 import type { Journey } from "@/data/journeys";
 import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
-import { CARD_TYPE, clipClean, clipTitle } from "./cardText";
+import { CARD_TYPE, clipClean } from "./cardText";
 
 type Props = {
   journey: Journey;
   className?: string;
   variant?: "horizontal" | "tile";
 };
-
-const CURATED_TITLE_MAX = 42;
-const FIXED_TITLE_MAX = 18;
 
 /**
  * Curated listing layout switch.
@@ -21,10 +18,15 @@ const FIXED_TITLE_MAX = 18;
  */
 const CURATED_LAYOUT: "split" | "overlay" = "split";
 
+const CARD_TITLE =
+  "font-[family-name:var(--font-playfair)] text-[1.05rem] font-medium leading-snug text-primary md:text-[1.15rem]";
+const CARD_TITLE_ON_DARK =
+  "font-[family-name:var(--font-playfair)] text-[1.05rem] font-medium leading-snug text-white md:text-[1.15rem] [text-shadow:0_1px_18px_rgba(0,0,0,0.55)]";
+
 function experienceLine(journey: Journey) {
   const items = (journey.experienceHighlights?.length
     ? journey.experienceHighlights
-    : journey.highlights
+    : journey.highlights ?? []
   )
     .map((item) => item.replace(/\s+/g, " ").trim())
     .filter(Boolean)
@@ -53,8 +55,7 @@ function CuratedJourneyCard({ journey, className }: { journey: Journey; classNam
 function CuratedSplitCard({ journey, className }: { journey: Journey; className?: string }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const title = clipTitle(journey.name, CURATED_TITLE_MAX);
-  const description = journey.tagline.replace(/\s+/g, " ").trim();
+  const description = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
@@ -100,12 +101,9 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5 md:px-5 md:pb-5">
-        <h3
-          className="line-clamp-2 font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-snug text-primary md:text-[1.5rem]"
-          title={journey.name}
-        >
+        <h3 className={CARD_TITLE}>
           <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
-            {title}
+            {journey.name}
           </Link>
         </h3>
 
@@ -170,8 +168,7 @@ function CuratedSplitCard({ journey, className }: { journey: Journey; className?
 function CuratedOverlayCard({ journey, className }: { journey: Journey; className?: string }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const title = clipTitle(journey.name, CURATED_TITLE_MAX);
-  const description = journey.tagline.replace(/\s+/g, " ").trim();
+  const description = (journey.tagline ?? "").replace(/\s+/g, " ").trim();
   const experience = experienceLine(journey);
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
@@ -219,9 +216,7 @@ function CuratedOverlayCard({ journey, className }: { journey: Journey; classNam
       </div>
 
       <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-5 md:px-6 md:pb-6">
-        <h3 className={cn(CARD_TYPE.title, "[text-shadow:0_1px_18px_rgba(0,0,0,0.55)]")} title={journey.name}>
-          {title}
-        </h3>
+        <h3 className={CARD_TITLE_ON_DARK}>{journey.name}</h3>
 
         {experience ? (
           <div className="mt-3">
@@ -283,8 +278,7 @@ function FixedJourneyCard({
 }) {
   const image = typeof journey.image === "string" && journey.image.trim() ? journey.image : media.packages;
   const price = Number(journey.priceFrom);
-  const title = clipTitle(journey.name, FIXED_TITLE_MAX);
-  const description = clipClean(journey.tagline, 96);
+  const description = clipClean(journey.tagline ?? "", 96);
   const duration = `${journey.days} days · ${journey.nights} nights`;
 
   return (
@@ -329,12 +323,9 @@ function FixedJourneyCard({
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
-        <h3
-          className="truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-none text-primary md:text-[1.5rem]"
-          title={journey.name}
-        >
+        <h3 className={CARD_TITLE}>
           <Link href={`/journeys/${journey.slug}`} className="transition-opacity hover:opacity-80">
-            {title}
+            {journey.name}
           </Link>
         </h3>
 

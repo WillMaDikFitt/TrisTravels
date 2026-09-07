@@ -1,21 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Experience } from "@/data/experiences";
+import { media } from "@/data/media";
 import { formatINR, cn } from "@/lib/utils";
 import { WishlistButton } from "./WishlistButton";
-import { CARD_TYPE, clipClean, clipTitle } from "./cardText";
+import { CARD_TYPE, clipClean } from "./cardText";
 
 type Props = {
   experience: Experience;
   className?: string;
 };
 
-const TITLE_MAX = 14;
 const DESCRIPTION_MAX = 96;
+const CARD_TITLE =
+  "font-[family-name:var(--font-playfair)] text-[1.05rem] font-medium leading-snug text-primary md:text-[1.15rem]";
 
 export function ExperienceCard({ experience, className }: Props) {
-  const title = clipTitle(experience.name, TITLE_MAX);
-  const description = clipClean(experience.tagline, DESCRIPTION_MAX);
+  const description = clipClean(experience.tagline ?? "", DESCRIPTION_MAX);
+  const image =
+    typeof experience.image === "string" && experience.image.trim()
+      ? experience.image
+      : media.packages;
 
   return (
     <article
@@ -35,7 +40,7 @@ export function ExperienceCard({ experience, className }: Props) {
           className="absolute inset-0 z-10"
         />
         <Image
-          src={experience.image}
+          src={image}
           alt={experience.name}
           fill
           className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,_1,_0.36,_1)] group-hover:scale-[1.04]"
@@ -60,12 +65,9 @@ export function ExperienceCard({ experience, className }: Props) {
       </div>
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
-        <h3
-          className="truncate whitespace-nowrap font-[family-name:var(--font-playfair)] text-[1.35rem] font-medium leading-none text-primary md:text-[1.5rem]"
-          title={experience.name}
-        >
+        <h3 className={CARD_TITLE}>
           <Link href={`/experiences/${experience.slug}`} className="transition-opacity hover:opacity-80">
-            {title}
+            {experience.name}
           </Link>
         </h3>
 

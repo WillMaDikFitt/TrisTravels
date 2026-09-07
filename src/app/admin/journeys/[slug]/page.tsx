@@ -15,6 +15,7 @@ import {
 import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
+import { normalizeJourney } from "@/lib/normalize-listing";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
 import { parseDepartureSeats } from "@/lib/journey-seats";
@@ -107,7 +108,8 @@ export default function JourneyEditorPage() {
   const isNew = slugKey === "new";
   const [row, setRow] = useState<Journey | null>(() => {
     if (isNew) return blank();
-    return getStaticJourney(slugKey) ?? null;
+    const seeded = getStaticJourney(slugKey);
+    return seeded ? normalizeJourney(seeded, slugKey) : null;
   });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -120,13 +122,13 @@ export default function JourneyEditorPage() {
     fetchJourneyAdmin(slugKey)
       .then((j) => {
         if (cancelled) return;
-        if (j?.name?.trim()) setRow(j);
-        else if (seeded) setRow(seeded);
-        else if (j) setRow(j);
+        if (j?.name?.trim()) setRow(normalizeJourney(j, slugKey));
+        else if (seeded) setRow(normalizeJourney(seeded, slugKey));
+        else if (j) setRow(normalizeJourney(j, slugKey));
         else setRow(blank());
       })
       .catch(() => {
-        if (!cancelled) setRow(seeded ?? blank());
+        if (!cancelled) setRow(seeded ? normalizeJourney(seeded, slugKey) : blank());
       });
 
     return () => {
@@ -460,7 +462,7 @@ export default function JourneyEditorPage() {
               />
             </Field>
             <Field label="Detail highlights" hint="one per line — length can vary by journey">
-              <textarea name="highlights" rows={6} defaultValue={row.highlights.join("\n")} className={inputClass} />
+              <textarea name="highlights" rows={6} defaultValue={(row.highlights ?? []).join("\n")} className={inputClass} />
             </Field>
             <Field label="Not suitable for" hint="shown in Journey at a Glance — one per line">
               <textarea
@@ -472,10 +474,10 @@ export default function JourneyEditorPage() {
               />
             </Field>
             <Field label="Stays" hint="one per line">
-              <textarea name="stays" rows={6} defaultValue={row.stays.join("\n")} className={inputClass} />
+              <textarea name="stays" rows={6} defaultValue={(row.stays ?? []).join("\n")} className={inputClass} />
             </Field>
             <Field label="Inclusions" hint="one per line">
-              <textarea name="inclusions" rows={6} defaultValue={row.inclusions.join("\n")} className={inputClass} />
+              <textarea name="inclusions" rows={6} defaultValue={(row.inclusions ?? []).join("\n")} className={inputClass} />
             </Field>
           </div>
           <div className="mt-4">
@@ -493,7 +495,7 @@ export default function JourneyEditorPage() {
               <textarea
                 name="itinerary"
                 rows={8}
-                defaultValue={row.itinerary.map((d) => `${d.title} — ${d.summary}`).join("\n")}
+                defaultValue={(row.itinerary ?? []).map((d) => `${d.title} — ${d.summary}`).join("\n")}
                 className={inputClass}
               />
             </Field>

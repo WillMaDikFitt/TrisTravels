@@ -45,10 +45,7 @@ export function DestinationCard({ destination, className, index = 0 }: Props) {
       </div>
 
       <div className="mt-5 flex flex-1 flex-col border-t border-primary/15 pt-4">
-        <h3
-          className="font-[family-name:var(--font-playfair)] text-[1.55rem] leading-[1.12] font-medium text-primary transition-opacity group-hover:opacity-80 md:text-[1.75rem]"
-          title={destination.name}
-        >
+        <h3 className="font-[family-name:var(--font-playfair)] text-[1.15rem] leading-snug font-medium text-primary transition-opacity group-hover:opacity-80 md:text-[1.25rem]">
           {destination.name}
         </h3>
         <p className="mt-2.5 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.9rem] leading-relaxed text-on-surface-variant">

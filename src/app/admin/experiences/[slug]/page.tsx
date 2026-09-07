@@ -8,6 +8,7 @@ import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { fetchExperienceAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
+import { normalizeExperience } from "@/lib/normalize-listing";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField } from "@/components/admin/ImageField";
 import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
@@ -63,7 +64,8 @@ export default function ExperienceEditorPage() {
   const isNew = slugKey === "new";
   const [row, setRow] = useState<Experience | null>(() => {
     if (isNew) return blank();
-    return getStaticExperience(slugKey) ?? null;
+    const seeded = getStaticExperience(slugKey);
+    return seeded ? normalizeExperience(seeded, slugKey) : null;
   });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,13 +78,13 @@ export default function ExperienceEditorPage() {
     fetchExperienceAdmin(slugKey)
       .then((exp) => {
         if (cancelled) return;
-        if (exp?.name?.trim()) setRow(exp);
-        else if (seeded) setRow(seeded);
-        else if (exp) setRow(exp);
+        if (exp?.name?.trim()) setRow(normalizeExperience(exp, slugKey));
+        else if (seeded) setRow(normalizeExperience(seeded, slugKey));
+        else if (exp) setRow(normalizeExperience(exp, slugKey));
         else setRow(blank(slugKey));
       })
       .catch(() => {
-        if (!cancelled) setRow(seeded ?? blank(slugKey));
+        if (!cancelled) setRow(seeded ? normalizeExperience(seeded, slugKey) : blank(slugKey));
       });
 
     return () => {
@@ -237,7 +239,7 @@ export default function ExperienceEditorPage() {
               <input name="bestSeason" defaultValue={row.bestSeason} className={inputClass} />
             </Field>
             <Field label="Tags" hint="comma or new line">
-              <input name="tags" defaultValue={row.tags.join(", ")} className={inputClass} />
+              <input name="tags" defaultValue={(row.tags ?? []).join(", ")} className={inputClass} />
             </Field>
             <Field label="Meeting point">
               <input name="meetingPoint" defaultValue={row.meetingPoint} className={inputClass} />
@@ -363,26 +365,28 @@ export default function ExperienceEditorPage() {
             </Field>
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Highlights" hint="one per line">
-                <textarea name="highlights" rows={6} defaultValue={row.highlights.join("\n")} className={inputClass} />
+                <textarea name="highlights" rows={6} defaultValue={(row.highlights ?? []).join("\n")} className={inputClass} />
               </Field>
               <Field label="Included" hint="one per line">
-                <textarea name="included" rows={6} defaultValue={row.included.join("\n")} className={inputClass} />
+                <textarea name="included" rows={6} defaultValue={(row.included ?? []).join("\n")} className={inputClass} />
               </Field>
               <Field label="Excluded" hint="one per line">
                 <textarea name="excluded" rows={6} defaultValue={(row.excluded ?? []).join("\n")} className={inputClass} />
               </Field>
               <Field label="What to bring" hint="one per line">
-                <textarea name="whatToBring" rows={6} defaultValue={row.whatToBring.join("\n")} className={inputClass} />
+                <textarea name="whatToBring" rows={6} defaultValue={(row.whatToBring ?? []).join("\n")} className={inputClass} />
               </Field>
             </div>
             <Field label="Suitable for" hint="one per line">
-              <textarea name="suitableFor" rows={3} defaultValue={row.suitableFor.join("\n")} className={inputClass} />
+              <textarea name="suitableFor" rows={3} defaultValue={(row.suitableFor ?? []).join("\n")} className={inputClass} />
             </Field>
             <Field label="Itinerary" hint="one beat per line: Time — Title — description">
               <textarea
                 name="itinerary"
                 rows={6}
-                defaultValue={row.itinerary.map((i) => `${i.time} — ${i.title} — ${i.description}`).join("\n")}
+                defaultValue={(row.itinerary ?? [])
+                  .map((i) => `${i.time} — ${i.title} — ${i.description}`)
+                  .join("\n")}
                 className={inputClass}
               />
             </Field>
@@ -390,7 +394,7 @@ export default function ExperienceEditorPage() {
               <textarea
                 name="faqs"
                 rows={5}
-                defaultValue={row.faqs.map((f) => `${f.q} — ${f.a}`).join("\n")}
+                defaultValue={(row.faqs ?? []).map((f) => `${f.q} — ${f.a}`).join("\n")}
                 className={inputClass}
               />
             </Field>
@@ -402,7 +406,7 @@ export default function ExperienceEditorPage() {
           <ImageField key={row.image} name="image" label="Cover image" defaultValue={row.image} />
           <div className="mt-4">
             <Field label="Gallery URLs" hint="one per line">
-              <textarea name="gallery" rows={4} defaultValue={row.gallery.join("\n")} className={inputClass} />
+              <textarea name="gallery" rows={4} defaultValue={(row.gallery ?? []).join("\n")} className={inputClass} />
             </Field>
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">

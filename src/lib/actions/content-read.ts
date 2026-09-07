@@ -13,6 +13,11 @@ import {
   listClosures,
   listExperiences,
 } from "@/lib/data/repo";
+import { sanitizeForClient } from "@/lib/firebase/admin-read";
+
+function clean<T>(value: T): T {
+  return sanitizeForClient(value) as T;
+}
 
 export async function fetchPublicExperiences() {
   return listExperiences();
@@ -23,35 +28,35 @@ export async function fetchClosuresForExperience(slug: string) {
 }
 
 export async function fetchExperiencesAdmin() {
-  return listAllExperiencesAdmin();
+  return clean(await listAllExperiencesAdmin());
 }
 
 export async function fetchExperienceAdmin(slug: string) {
-  return findExperienceAdmin(slug);
+  return clean(await findExperienceAdmin(slug));
 }
 
 export async function fetchJourneysAdmin() {
-  return listAllJourneysAdmin();
+  return clean(await listAllJourneysAdmin());
 }
 
 export async function fetchJourneyAdmin(slug: string) {
-  return findJourneyAdmin(slug);
+  return clean(await findJourneyAdmin(slug));
 }
 
 export async function fetchDestinationsAdmin() {
-  return listAllDestinationsAdmin();
+  return clean(await listAllDestinationsAdmin());
 }
 
 export async function fetchDestinationAdmin(slug: string) {
-  return findDestinationAdmin(slug);
+  return clean(await findDestinationAdmin(slug));
 }
 
 export async function fetchStoriesAdmin() {
-  return listAllStoriesAdmin();
+  return clean(await listAllStoriesAdmin());
 }
 
 export async function fetchStoryAdmin(slug: string) {
-  return findStoryAdmin(slug);
+  return clean(await findStoryAdmin(slug));
 }
 
 export async function fetchClosuresAdmin() {
