@@ -21,10 +21,11 @@ import {
   CURATED_BALANCE_DUE_DAYS,
   CURATED_ONLINE_BOOK_DAYS,
   journeyEndDate,
-  PACKAGE_TRANSPORT,
+  packageTransportList,
   packageTransportMeta,
-  STAY_STYLES,
-  BOOKING_STAY_STYLE_IDS,
+  toLegacyTransportId,
+  normalizePackageTransportId,
+  bookingStayStyles,
   stayStyleMeta,
   type PackageTransportId,
 } from "@/data/journey-options";
@@ -32,6 +33,7 @@ import { openRazorpayCheckout } from "@/lib/razorpay-client";
 import { PackageOptionsModal, type PackageLearnTab } from "@/components/booking/PackageOptionLearn";
 import {
   minVehiclesForGuests,
+  resolvePackageVehicles,
   type BookingStayStyleId,
 } from "@/data/package-pricing";
 import { CHILD_AGE_SELECT_OPTIONS, isValidChildAge } from "@/data/child-ages";
@@ -41,6 +43,9 @@ import {
   recordAdvancePaidAndNotify,
 } from "@/lib/actions/payments";
 import { quoteCuratedPackage } from "@/lib/pricing";
+import { fetchFleetVehicles, fetchStayStyles } from "@/lib/actions/content-read";
+import type { FleetVehicle } from "@/data/transport";
+import type { StayStyle } from "@/data/stay-styles";
 import { site } from "@/data/site";
 import { formatINR, cn } from "@/lib/utils";
 
@@ -96,16 +101,26 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const [paid, setPaid] = useState(false);
   const [learnOpen, setLearnOpen] = useState(false);
   const [learnTab, setLearnTab] = useState<PackageLearnTab>("stay");
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
+  const [stays, setStays] = useState<StayStyle[] | null>(null);
 
   const adultCount = typeof adults === "number" ? adults : 0;
   const roomCount = typeof rooms === "number" ? rooms : 0;
   const vehicleCountNum = typeof vehicleCount === "number" ? vehicleCount : 0;
   const totalGuests = adultCount + children;
-  const transportMeta = packageTransportMeta(vehicleId || "sedan");
-  const capacity = transportMeta.maxGuests;
+  const transportMeta = packageTransportMeta(vehicleId || "sedan", fleet);
+  const stayMeta = stayStyleMeta(stayStyle || "barefoot", stays);
+  const packageVehicles = useMemo(
+    () => resolvePackageVehicles(journey.packagePricing?.vehicles),
+    [journey.packagePricing?.vehicles],
+  );
+  const capacity = Math.max(
+    1,
+    packageVehicles[toLegacyTransportId(normalizePackageTransportId(vehicleId || "sedan"))]?.capacity ??
+      transportMeta.maxGuests,
+  );
   const minVehicles = minVehiclesForGuests(Math.max(totalGuests, 1), capacity);
   const onlineBookOk = !preferredFrom || canBookCuratedOnline(preferredFrom);
-  const stayMeta = stayStyleMeta(stayStyle || "barefoot");
   const selectionsReady = Boolean(
     adultCount >= 1 && vehicleId && vehicleCountNum >= 1 && stayStyle && roomCount >= 1,
   );
@@ -145,21 +160,19 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const transportOptions = useMemo(
     () => [
       { value: "", label: "Select vehicle type" },
-      ...PACKAGE_TRANSPORT.map((t) => ({
+      ...packageTransportList(fleet).map((t) => ({
         value: t.id,
         label: `${t.label} (Max ${t.maxGuests})`,
       })),
     ],
-    [],
+    [fleet],
   );
   const stayOptions = useMemo(
     () => [
       { value: "", label: "Select stay style" },
-      ...STAY_STYLES.filter((s) =>
-        (BOOKING_STAY_STYLE_IDS as readonly string[]).includes(s.id),
-      ).map((s) => ({ value: s.id, label: s.label })),
+      ...bookingStayStyles(stays).map((s) => ({ value: s.id, label: s.label })),
     ],
-    [],
+    [stays],
   );
 
   useEffect(() => {
@@ -167,6 +180,15 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
     if (profile?.email) setEmail((e) => e || profile.email);
     if (profile?.phone) setPhone((p) => p || profile.phone || "");
   }, [profile]);
+
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then(setFleet)
+      .catch(() => setFleet(null));
+    fetchStayStyles()
+      .then(setStays)
+      .catch(() => setStays(null));
+  }, []);
 
   useEffect(() => {
     setChildAges((prev) => {
@@ -962,8 +984,10 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         initialTab={learnTab}
         stayId={stayStyle || "barefoot"}
         vehicleId={(vehicleId || "sedan") as PackageTransportId}
+        fleet={fleet}
+        stays={stays}
         onStayChange={(id) => {
-          if ((BOOKING_STAY_STYLE_IDS as readonly string[]).includes(id)) {
+          if (bookingStayStyles(stays).some((s) => s.id === id)) {
             setStayStyle(id as BookingStayStyleId);
           }
         }}

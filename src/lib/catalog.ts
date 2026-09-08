@@ -23,6 +23,13 @@ export function slugFromCategory(id: ExperienceCategory): string {
   return EXPERIENCE_CATEGORIES.find((c) => c.id === id)?.slug ?? "adventure";
 }
 
+import { DEFAULT_FLEET_VEHICLES } from "@/data/transport";
+import { DEFAULT_STAY_STYLES } from "@/data/stay-styles";
+import {
+  DEFAULT_CURATED_JOURNEY_FAQS,
+  DEFAULT_EXPERIENCE_FAQS,
+} from "@/data/shared-faqs";
+
 export const DEFAULT_SLOTS = ["08:30", "09:00", "10:00"];
 
 export const DEFAULT_SETTINGS = {
@@ -37,6 +44,10 @@ export const DEFAULT_SETTINGS = {
     active: boolean;
     note?: string;
   }[],
+  fleetVehicles: DEFAULT_FLEET_VEHICLES,
+  stayStyles: DEFAULT_STAY_STYLES,
+  experienceFaqs: DEFAULT_EXPERIENCE_FAQS,
+  curatedJourneyFaqs: DEFAULT_CURATED_JOURNEY_FAQS,
   impact: [
     {
       id: "partners",

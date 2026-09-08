@@ -24,7 +24,8 @@ import {
   compactJourneyItinerary,
   ItineraryEditor,
 } from "@/components/admin/ItineraryEditor";
-import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
+import { TransportPricingFields, transportEditorFromListing, transportFieldsFromEditor } from "@/components/admin/TransportPricingFields";
+import { TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
 
 function blank(): Journey {
   return {
@@ -171,10 +172,10 @@ export default function JourneyEditorPage() {
             priceFrom: Number(fd.get("priceFrom") || 0),
             priceNote: String(fd.get("priceNote") || ""),
             priceChild: Number(fd.get("priceChild") || 0) || undefined,
-            transportAvailable: fd.get("transportAvailable") === "on",
-            transportPrice: Number(fd.get("transportPrice") || 0) || undefined,
-            transportNote: String(fd.get("transportNote") || ""),
-            transportVehicles: readTransportVehiclePrices(fd),
+            transportAvailable: row.transportAvailable !== false,
+            transportPrice: row.transportPrice,
+            transportNote: row.transportNote ?? "",
+            transportVehicles: row.transportVehicles,
             season: String(fd.get("season")),
             overview: String(fd.get("overview")),
             image: (() => {
@@ -317,167 +318,154 @@ export default function JourneyEditorPage() {
               </Field>
             ) : null}
           </div>
-          <div className="mt-6 border-t border-[#c5cbb8] pt-5">
-            <h3 className="font-display text-base text-[#26352b]">Transportation</h3>
-            <label className="mt-3 flex items-center gap-2 text-sm text-[#26352b]">
-              <input
-                name="transportAvailable"
-                type="checkbox"
-                defaultChecked={row.transportAvailable !== false}
-              />
-              Offer transportation on the enquire form
-            </label>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <Field label="Base transport price (₹)" hint="Used when a vehicle rate below is blank">
+        </Panel>
+
+        <Panel>
+          <TransportPricingFields
+            variant="journey"
+            value={transportEditorFromListing({
+              variant: "journey",
+              transportAvailable: row.transportAvailable,
+              transportPrice: row.transportPrice,
+              transportNote: row.transportNote,
+              transportVehicles: row.transportVehicles,
+            })}
+            onChange={(next) => {
+              const fields = transportFieldsFromEditor(next);
+              setRow((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      transportAvailable: next.available !== false,
+                      transportPrice: fields.transportPrice,
+                      transportNote: fields.transportNote,
+                      transportVehicles: fields.transportVehicles,
+                    }
+                  : prev,
+              );
+            }}
+          />
+        </Panel>
+
+        {row.type === "curated" ? (
+          <Panel>
+            <h3 className="font-display text-base text-[#26352b]">Book now package costs (A–E)</h3>
+            <p className="mt-1 text-sm text-[#4a5a50]">
+              Separate from enquire transfer prices. Vehicle day rates and capacity here are used when guests
+              book online. A = vehicle/day × vehicles × days · B = room × rooms + mattress × nights · C =
+              guests × activity · D = TRIS % of (A+B+C) · E = GST % of D
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <Field label="C · Activity cost per guest (₹)">
                 <input
-                  name="transportPrice"
+                  name="pkgActivityCost"
                   type="number"
                   min="0"
-                  defaultValue={row.transportPrice ?? ""}
+                  defaultValue={row.packagePricing?.activityCostPerGuest ?? ""}
+                  className={inputClass}
+                  placeholder="Per guest for whole journey"
+                />
+              </Field>
+              <Field label="D · TRIS services %">
+                <input
+                  name="pkgTrisPercent"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  defaultValue={row.packagePricing?.trisServicePercent ?? DEFAULT_TRIS_SERVICE_PERCENT}
                   className={inputClass}
                 />
               </Field>
-              <Field label="Transport note">
-                <input name="transportNote" defaultValue={row.transportNote ?? ""} className={inputClass} />
+              <Field label="E · GST % of D">
+                <input
+                  name="pkgGstPercent"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  defaultValue={row.packagePricing?.gstPercent ?? DEFAULT_PACKAGE_GST_PERCENT}
+                  className={inputClass}
+                />
               </Field>
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {TRANSPORT_VEHICLE_IDS.map((id) => (
-                <Field
-                  key={id}
-                  label={`${TRANSPORT_VEHICLE_META[id].label} (₹)`}
-                  hint={TRANSPORT_VEHICLE_META[id].seats}
-                >
-                  <input
-                    name={`transport${id.charAt(0).toUpperCase()}${id.slice(1)}`}
-                    type="number"
-                    min="0"
-                    defaultValue={row.transportVehicles?.[id] ?? ""}
-                    className={inputClass}
-                    placeholder="Auto from base"
-                  />
-                </Field>
-              ))}
+            <h4 className="mt-5 text-sm font-semibold text-[#26352b]">A · Vehicle rates (₹ / day) & capacity</h4>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {TRANSPORT_VEHICLE_IDS.map((id) => {
+                const rate = row.packagePricing?.vehicles?.[id] ?? DEFAULT_PACKAGE_VEHICLES[id];
+                return (
+                  <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
+                    <p className="text-sm font-medium text-[#26352b]">{TRANSPORT_VEHICLE_META[id].label}</p>
+                    <Field label="Cost / day">
+                      <input
+                        name={`pkgVehicle_${id}_cost`}
+                        type="number"
+                        min="0"
+                        defaultValue={rate.costPerDay}
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="Capacity">
+                      <input
+                        name={`pkgVehicle_${id}_capacity`}
+                        type="number"
+                        min="1"
+                        defaultValue={rate.capacity}
+                        className={inputClass}
+                      />
+                    </Field>
+                  </div>
+                );
+              })}
             </div>
-          </div>
-          {row.type === "curated" && (
-            <div className="mt-6 border-t border-[#c5cbb8] pt-5">
-              <h3 className="font-display text-base text-[#26352b]">Book now package costs (A–E)</h3>
-              <p className="mt-1 text-sm text-[#4a5a50]">
-                A = vehicle/day × vehicles × days · B = room × rooms + mattress × nights · C = guests ×
-                activity · D =
-                TRIS % of (A+B+C) · E = GST % of D
-              </p>
-              <div className="mt-4 grid gap-4 md:grid-cols-3">
-                <Field label="C · Activity cost per guest (₹)">
-                  <input
-                    name="pkgActivityCost"
-                    type="number"
-                    min="0"
-                    defaultValue={row.packagePricing?.activityCostPerGuest ?? ""}
-                    className={inputClass}
-                    placeholder="Per guest for whole journey"
-                  />
-                </Field>
-                <Field label="D · TRIS services %">
-                  <input
-                    name="pkgTrisPercent"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    defaultValue={row.packagePricing?.trisServicePercent ?? DEFAULT_TRIS_SERVICE_PERCENT}
-                    className={inputClass}
-                  />
-                </Field>
-                <Field label="E · GST % of D">
-                  <input
-                    name="pkgGstPercent"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    defaultValue={row.packagePricing?.gstPercent ?? DEFAULT_PACKAGE_GST_PERCENT}
-                    className={inputClass}
-                  />
-                </Field>
-              </div>
-              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">A · Vehicle rates (₹ / day) & capacity</h4>
-              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {TRANSPORT_VEHICLE_IDS.map((id) => {
-                  const rate = row.packagePricing?.vehicles?.[id] ?? DEFAULT_PACKAGE_VEHICLES[id];
-                  return (
-                    <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                      <p className="text-sm font-medium text-[#26352b]">{TRANSPORT_VEHICLE_META[id].label}</p>
-                      <Field label="Cost / day">
-                        <input
-                          name={`pkgVehicle_${id}_cost`}
-                          type="number"
-                          min="0"
-                          defaultValue={rate.costPerDay}
-                          className={inputClass}
-                        />
-                      </Field>
-                      <Field label="Capacity">
-                        <input
-                          name={`pkgVehicle_${id}_capacity`}
-                          type="number"
-                          min="1"
-                          defaultValue={rate.capacity}
-                          className={inputClass}
-                        />
-                      </Field>
-                    </div>
-                  );
-                })}
-              </div>
-              <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs</h4>
-              <p className="mt-1 text-xs text-[#4a5a50]">
-                Room cost is for the whole journey. Extra mattress is charged per person per night × nights.
-              </p>
-              <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {STAY_PREFERENCE_IDS.map((id) => {
-                  const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
-                  return (
-                    <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                      <p className="text-sm font-medium text-[#26352b]">{STAY_PREFERENCE_META[id].label}</p>
-                      <Field label="Room cost (₹ / journey)">
-                        <input
-                          name={`pkgStay_${id}_room`}
-                          type="number"
-                          min="0"
-                          defaultValue={rate.roomCost}
-                          className={inputClass}
-                        />
-                      </Field>
-                      <Field label="Extra mattress (₹ / person / night)">
-                        <input
-                          name={`pkgStay_${id}_mattress`}
-                          type="number"
-                          min="0"
-                          defaultValue={rate.extraMattressPerPerson}
-                          className={inputClass}
-                        />
-                      </Field>
-                    </div>
-                  );
-                })}
-              </div>
+            <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs</h4>
+            <p className="mt-1 text-xs text-[#4a5a50]">
+              Room cost is for the whole journey. Extra mattress is charged per person per night × nights.
+            </p>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {STAY_PREFERENCE_IDS.map((id) => {
+                const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
+                return (
+                  <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
+                    <p className="text-sm font-medium text-[#26352b]">{STAY_PREFERENCE_META[id].label}</p>
+                    <Field label="Room cost (₹ / journey)">
+                      <input
+                        name={`pkgStay_${id}_room`}
+                        type="number"
+                        min="0"
+                        defaultValue={rate.roomCost}
+                        className={inputClass}
+                      />
+                    </Field>
+                    <Field label="Extra mattress (₹ / person / night)">
+                      <input
+                        name={`pkgStay_${id}_mattress`}
+                        type="number"
+                        min="0"
+                        defaultValue={rate.extraMattressPerPerson}
+                        className={inputClass}
+                      />
+                    </Field>
+                  </div>
+                );
+              })}
             </div>
-          )}
-          {row.type === "small-group" ? (
-            <div className="mt-6 border-t border-[#c5cbb8] pt-5">
-              <h3 className="font-display text-base text-[#26352b]">Fixed departure calendar</h3>
-              <p className="mt-1 text-sm text-[#4a5a50]">
-                Select multiple departure days on the calendar. Set seats, held, and booked for each date.
-              </p>
-              <div className="mt-4">
-                <DepartureSeatsCalendar
-                  key={`${row.slug}-${(row.departureSeats ?? []).map((d) => d.date).join(",")}`}
-                  initial={row.departureSeats}
-                />
-              </div>
+          </Panel>
+        ) : null}
+
+        {row.type === "small-group" ? (
+          <Panel>
+            <h3 className="font-display text-base text-[#26352b]">Fixed departure calendar</h3>
+            <p className="mt-1 text-sm text-[#4a5a50]">
+              Select multiple departure days on the calendar. Set seats, held, and booked for each date.
+            </p>
+            <div className="mt-4">
+              <DepartureSeatsCalendar
+                key={`${row.slug}-${(row.departureSeats ?? []).map((d) => d.date).join(",")}`}
+                initial={row.departureSeats}
+              />
             </div>
-          ) : null}
-        </Panel>
+          </Panel>
+        ) : null}
+
         <Panel>
           <Field label="Overview">
             <textarea name="overview" rows={5} defaultValue={row.overview} className={inputClass} />

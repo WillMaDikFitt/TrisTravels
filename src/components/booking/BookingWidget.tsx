@@ -12,14 +12,23 @@ import {
   BOOKING_NOTICE_DAYS,
 } from "@/lib/utils";
 import type { Experience } from "@/data/experiences";
-import { fetchClosuresForExperience } from "@/lib/actions/content-read";
+import { fetchClosuresForExperience, fetchFleetVehicles } from "@/lib/actions/content-read";
 import { dateIsClosed } from "@/lib/catalog";
 import type { ClosureRecord } from "@/lib/types";
-import { experienceSlots } from "@/lib/experience-slots";
-import { transportVehicleOptions } from "@/data/transport";
-import { adultRate, childRate } from "@/lib/pricing";
+import {
+  experienceSlotCapacity,
+  experienceSlots,
+  formatExperienceSlotLabel,
+  isWholeDayExperience,
+} from "@/lib/experience-slots";
+import { transportVehicleOptions, type FleetVehicle } from "@/data/transport";
+import { adultRate, childRate, hasExperienceCosting, quoteExperience } from "@/lib/pricing";
 import { isValidChildAge } from "@/data/child-ages";
-import { GuestCompositionFields, GettingThereFields, type TransportChoice } from "@/components/booking/GuestTransportFields";
+import {
+  GuestCompositionFields,
+  GettingThereFields,
+  type TransportChoice,
+} from "@/components/booking/GuestTransportFields";
 import { experienceTransportMode } from "@/lib/experience-meta";
 
 type Props = {
@@ -27,24 +36,29 @@ type Props = {
   compact?: boolean;
 };
 
-const GST_RATE = 0.05;
-
 export function BookingWidget({ experience }: Props) {
   const router = useRouter();
   const earliest = daysFromNow(1);
   const slots = experienceSlots(experience);
+  const wholeDay = isWholeDayExperience(experience);
+  const slotCapacity = experienceSlotCapacity(experience);
+  const partyCap = Math.min(experience.maxGuests, slotCapacity);
   const minGuests = experience.minGuests ?? 1;
+  const usingCosting = hasExperienceCosting(experience);
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles),
-    [experience.transportPrice, experience.transportVehicles],
+    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles, fleet),
+    [experience.transportPrice, experience.transportVehicles, fleet],
   );
   const [date, setDate] = useState("");
-  const [slot, setSlot] = useState("");
+  const [slot, setSlot] = useState(wholeDay ? slots[0] ?? "" : "");
   const [adults, setAdults] = useState(Math.max(minGuests, 1));
   const [children, setChildren] = useState(0);
   const [childAges, setChildAges] = useState<number[]>([]);
   const transportMode = experienceTransportMode(experience);
-  const [transportChoice, setTransportChoice] = useState<TransportChoice>(null);
+  const [transportChoice, setTransportChoice] = useState<TransportChoice>(
+    transportMode === "required" ? "tris" : null,
+  );
   const [vehicleId, setVehicleId] = useState("");
   const [vehicleCount, setVehicleCount] = useState(1);
   const [closures, setClosures] = useState<ClosureRecord[]>([]);
@@ -52,6 +66,15 @@ export function BookingWidget({ experience }: Props) {
   useEffect(() => {
     fetchClosuresForExperience(experience.slug).then(setClosures).catch(() => setClosures([]));
   }, [experience.slug]);
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then(setFleet)
+      .catch(() => setFleet(null));
+  }, []);
+
+  useEffect(() => {
+    if (wholeDay && slots[0]) setSlot(slots[0]);
+  }, [wholeDay, slots[0]]);
 
   const guests = adults + children;
   const availableSlots = slots.filter((time) => date && !dateIsClosed(date, closures, time));
@@ -61,22 +84,26 @@ export function BookingWidget({ experience }: Props) {
   const transportation =
     transportMode === "required" || (transportMode === "optional" && transportChoice === "tris");
   const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
-  const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
-  const transportFee =
-    transportation && selectedVehicle ? selectedVehicle.price * vehicleCount : 0;
-  const subtotal = guestSubtotal + transportFee;
-  const gst = Math.round(subtotal * GST_RATE);
-  const gross = subtotal + gst;
+  const legacyTransportFee =
+    !usingCosting && transportation && selectedVehicle
+      ? selectedVehicle.price * vehicleCount
+      : 0;
+  const quote = quoteExperience(experience, adults, undefined, children, {
+    trisTransport: transportation,
+    transportFee: legacyTransportFee,
+    vehicleCount,
+  });
+  const gross = quote.customerTotal;
 
   const syncChildren = (next: number) => {
-    const capped = Math.min(next, Math.max(0, experience.maxGuests - adults));
+    const capped = Math.min(next, Math.max(0, partyCap - adults));
     setChildren(capped);
     setChildAges((prev) => Array.from({ length: capped }, (_, i) => prev[i] ?? 8));
   };
 
   const syncAdults = (next: number) => {
-    const capped = Math.min(Math.max(1, next), experience.maxGuests);
-    const nextChildren = Math.min(children, Math.max(0, experience.maxGuests - capped));
+    const capped = Math.min(Math.max(1, next), partyCap);
+    const nextChildren = Math.min(children, Math.max(0, partyCap - capped));
     setAdults(capped);
     if (nextChildren !== children) syncChildren(nextChildren);
   };
@@ -84,9 +111,11 @@ export function BookingWidget({ experience }: Props) {
   const transportReady =
     transportMode === "none"
       ? true
-      : transportMode === "required"
-        ? Boolean(vehicleId)
-        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+      : usingCosting
+        ? transportMode === "required" || transportChoice === "own" || transportChoice === "tris"
+        : transportMode === "required"
+          ? Boolean(vehicleId)
+          : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
 
   const canContinue =
     Boolean(date) &&
@@ -94,7 +123,7 @@ export function BookingWidget({ experience }: Props) {
     !selectedSlotClosed &&
     !fullyClosed &&
     guests >= minGuests &&
-    guests <= experience.maxGuests &&
+    guests <= partyCap &&
     (children === 0 ||
       (childAges.length === children && childAges.every(isValidChildAge))) &&
     transportReady;
@@ -110,17 +139,21 @@ export function BookingWidget({ experience }: Props) {
     });
     if (children > 0) params.set("childAges", childAges.join(","));
     if (transportMode === "optional") {
-      if (transportChoice === "tris" && vehicleId) {
+      if (transportChoice === "tris" && (usingCosting || vehicleId)) {
         params.set("transport", "1");
-        params.set("vehicle", vehicleId);
-        params.set("vehicles", String(vehicleCount));
+        if (!usingCosting && vehicleId) {
+          params.set("vehicle", vehicleId);
+          params.set("vehicles", String(vehicleCount));
+        }
       } else if (transportChoice === "own") {
         params.set("transport", "0");
       }
-    } else if (transportMode === "required" && vehicleId) {
+    } else if (transportMode === "required") {
       params.set("transport", "1");
-      params.set("vehicle", vehicleId);
-      params.set("vehicles", String(vehicleCount));
+      if (!usingCosting && vehicleId) {
+        params.set("vehicle", vehicleId);
+        params.set("vehicles", String(vehicleCount));
+      }
     }
     router.push(`/experiences/${experience.slug}/book?${params.toString()}`);
   };
@@ -137,12 +170,16 @@ export function BookingWidget({ experience }: Props) {
           <div className="min-w-0">
             <p className="label-caps text-accent">From</p>
             <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
-              {formatINR(adultRate(experience))}
-              <span className="text-[12px] font-normal text-on-surface-variant"> / adult</span>
+              {formatINR(experience.priceFrom || adultRate(experience))}
+              <span className="text-[12px] font-normal text-on-surface-variant">
+                {usingCosting ? " / person" : " / adult"}
+              </span>
             </p>
           </div>
           <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
-            Child {formatINR(childRate(experience))} · max {experience.maxGuests}
+            {usingCosting
+              ? `Total updates with guests · max ${partyCap}`
+              : `Child ${formatINR(childRate(experience))} · max ${partyCap}`}
           </p>
         </div>
       </div>
@@ -156,7 +193,7 @@ export function BookingWidget({ experience }: Props) {
           value={date}
           onChange={(v) => {
             setDate(v);
-            setSlot("");
+            setSlot(wholeDay ? slots[0] ?? "" : "");
           }}
           required
         />
@@ -173,7 +210,9 @@ export function BookingWidget({ experience }: Props) {
           {!date
             ? `Book online ${BOOKING_NOTICE_DAYS}+ days ahead, or enquire for closer dates.`
             : fullyClosed
-              ? "All slots closed on this date."
+              ? wholeDay
+                ? "This date is closed."
+                : "All slots closed on this date."
               : selectedSlotClosed
                 ? "This slot is unavailable."
                 : instant
@@ -182,28 +221,41 @@ export function BookingWidget({ experience }: Props) {
         </p>
 
         <div>
-          <p className="text-xs font-semibold text-primary">Start time</p>
-          <div className="mt-1.5 grid grid-cols-4 gap-1.5">
-            {slots.map((time, index) => {
-              const unavailable = !date || dateIsClosed(date, closures, time);
-              return (
-                <button
-                  key={`${time}-${index}`}
-                  type="button"
-                  disabled={unavailable}
-                  onClick={() => setSlot(time)}
-                  className={cn(
-                    "rounded-lg border px-1 py-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-35",
-                    slot === time
-                      ? "border-primary bg-primary text-on-primary"
-                      : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/40",
-                  )}
-                >
-                  {time}
-                </button>
-              );
-            })}
-          </div>
+          <p className="text-xs font-semibold text-primary">{wholeDay ? "Schedule" : "Start time"}</p>
+          {wholeDay ? (
+            <p
+              className={cn(
+                "mt-1.5 rounded-lg border px-3 py-2 text-sm font-semibold",
+                !date || selectedSlotClosed
+                  ? "border-outline-variant/30 text-on-surface-variant"
+                  : "border-primary bg-primary text-on-primary",
+              )}
+            >
+              {formatExperienceSlotLabel(slots[0] ?? "all-day", experience)}
+            </p>
+          ) : (
+            <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+              {slots.map((time, index) => {
+                const unavailable = !date || dateIsClosed(date, closures, time);
+                return (
+                  <button
+                    key={`${time}-${index}`}
+                    type="button"
+                    disabled={unavailable}
+                    onClick={() => setSlot(time)}
+                    className={cn(
+                      "rounded-lg border px-1 py-1.5 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-35",
+                      slot === time
+                        ? "border-primary bg-primary text-on-primary"
+                        : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/40",
+                    )}
+                  >
+                    {formatExperienceSlotLabel(time, experience)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <GuestCompositionFields
@@ -211,7 +263,7 @@ export function BookingWidget({ experience }: Props) {
           adults={adults}
           children={children}
           childAges={childAges}
-          maxGuests={experience.maxGuests}
+          maxGuests={partyCap}
           minGuests={minGuests}
           onAdults={syncAdults}
           onChildren={syncChildren}
@@ -229,12 +281,13 @@ export function BookingWidget({ experience }: Props) {
             vehicleId={vehicleId}
             vehicleCount={vehicleCount}
             note={experience.transportNote}
+            costingTransport={usingCosting}
             onChoice={(next) => {
               setTransportChoice(next);
               if (next !== "tris") setVehicleId("");
             }}
             onVehicle={setVehicleId}
-            onVehicleCount={setVehicleCount}
+            onVehicleCount={usingCosting ? undefined : setVehicleCount}
           />
         )}
       </div>

@@ -6,13 +6,15 @@ import Link from "next/link";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import {
-  PACKAGE_TRANSPORT,
-  STAY_STYLES,
+  packageTransportList,
   packageTransportMeta,
+  stayStyleList,
   stayStyleMeta,
   type PackageTransportId,
   type StayStyleId,
 } from "@/data/journey-options";
+import type { FleetVehicle } from "@/data/transport";
+import type { StayStyle } from "@/data/stay-styles";
 import { cn } from "@/lib/utils";
 
 export type PackageLearnTab = "stay" | "vehicle" | "terms";
@@ -173,8 +175,14 @@ function ImageCarousel({ images, label }: { images: string[]; label: string }) {
   );
 }
 
-function StayPanel({ stayId }: { stayId: StayStyleId }) {
-  const style = stayStyleMeta(stayId);
+function StayPanel({
+  stayId,
+  stays,
+}: {
+  stayId: StayStyleId;
+  stays?: StayStyle[] | null;
+}) {
+  const style = stayStyleMeta(stayId, stays);
   return (
     <div className="grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:items-start md:gap-7">
       <ImageCarousel images={style.images} label={style.label} />
@@ -202,8 +210,14 @@ function StayPanel({ stayId }: { stayId: StayStyleId }) {
   );
 }
 
-function VehiclePanel({ vehicleId }: { vehicleId: PackageTransportId }) {
-  const option = packageTransportMeta(vehicleId);
+function VehiclePanel({
+  vehicleId,
+  fleet,
+}: {
+  vehicleId: PackageTransportId;
+  fleet?: FleetVehicle[] | null;
+}) {
+  const option = packageTransportMeta(vehicleId, fleet);
   return (
     <div className="grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:items-start md:gap-7">
       <ImageCarousel images={option.images} label={option.label} />
@@ -576,6 +590,8 @@ export function PackageOptionsModal({
   initialTab = "stay",
   stayId,
   vehicleId,
+  fleet,
+  stays,
   onStayChange,
   onVehicleChange,
 }: {
@@ -584,6 +600,8 @@ export function PackageOptionsModal({
   initialTab?: PackageLearnTab;
   stayId: StayStyleId;
   vehicleId: PackageTransportId;
+  fleet?: FleetVehicle[] | null;
+  stays?: StayStyle[] | null;
   onStayChange?: (id: StayStyleId) => void;
   onVehicleChange?: (id: PackageTransportId) => void;
 }) {
@@ -591,6 +609,8 @@ export function PackageOptionsModal({
   const [staySub, setStaySub] = useState<StayStyleId>(stayId);
   const [vehicleSub, setVehicleSub] = useState<PackageTransportId>(vehicleId);
   const [termsSub, setTermsSub] = useState<TermsSub>("general");
+  const vehicles = packageTransportList(fleet);
+  const stayOptions = stayStyleList(stays);
 
   useEffect(() => {
     if (!open) return;
@@ -610,7 +630,10 @@ export function PackageOptionsModal({
         {tab === "stay" ? (
           <>
             <SubTabs
-              options={STAY_STYLES.map((s) => ({ id: s.id, label: s.label.replace(" Stays", "") }))}
+              options={stayOptions.map((s) => ({
+                id: s.id,
+                label: s.label.replace(" Stays", ""),
+              }))}
               value={staySub}
               onChange={(id) => {
                 const next = id as StayStyleId;
@@ -618,14 +641,14 @@ export function PackageOptionsModal({
                 onStayChange?.(next);
               }}
             />
-            <StayPanel stayId={staySub} />
+            <StayPanel stayId={staySub} stays={stays} />
           </>
         ) : null}
 
         {tab === "vehicle" ? (
           <>
             <SubTabs
-              options={PACKAGE_TRANSPORT.map((t) => ({
+              options={vehicles.map((t) => ({
                 id: t.id,
                 label: `${t.label} · ${t.maxGuests}`,
               }))}
@@ -636,7 +659,7 @@ export function PackageOptionsModal({
                 onVehicleChange?.(next);
               }}
             />
-            <VehiclePanel vehicleId={vehicleSub} />
+            <VehiclePanel vehicleId={vehicleSub} fleet={fleet} />
           </>
         ) : null}
 

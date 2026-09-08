@@ -1,6 +1,9 @@
 import type { Experience } from "@/data/experiences";
 import { DEFAULT_SLOTS } from "@/lib/catalog";
 
+/** Synthetic slot id used when an experience is whole-day (no timed starts). */
+export const ALL_DAY_SLOT = "all-day";
+
 function minutesFromTime(value: string) {
   const match = /^(\d{1,2}):(\d{2})$/.exec(value);
   if (!match) return null;
@@ -28,9 +31,33 @@ function isInsideBreak(time: string, breaks?: { start: string; end: string }[]) 
   });
 }
 
+export function isWholeDayExperience(experience: Experience) {
+  return experience.slotConfig?.mode === "day";
+}
+
+/** Max guests that can fill one slot across all bookings. */
+export function experienceSlotCapacity(experience: Experience) {
+  const configured = experience.slotConfig?.capacity;
+  if (configured != null && Number.isFinite(configured) && configured > 0) {
+    return Math.round(configured);
+  }
+  return Math.max(1, experience.maxGuests);
+}
+
+export function formatExperienceSlotLabel(slot: string, experience: Experience) {
+  if (slot === ALL_DAY_SLOT || isWholeDayExperience(experience)) {
+    return experience.slotConfig?.dayLabel?.trim() || "Full day";
+  }
+  return slot;
+}
+
 export function experienceSlots(experience: Experience) {
   const config = experience.slotConfig;
   let slots: string[] = [];
+
+  if (config?.mode === "day") {
+    return [ALL_DAY_SLOT];
+  }
 
   if (config?.mode === "interval") {
     const start = minutesFromTime(config.start ?? "");
@@ -50,7 +77,8 @@ export function experienceSlots(experience: Experience) {
   const withoutBreaks = slots.filter((time) => !isInsideBreak(time, config?.breaks));
   const cleaned = (withoutBreaks.length ? withoutBreaks : slots)
     .map((time) => time.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((time) => (time.toLowerCase() === "all-day" || time.toLowerCase() === "all day" ? ALL_DAY_SLOT : time));
   // Studio textareas can accidentally list the same time twice — keep order, drop dupes.
   return Array.from(new Set(cleaned));
 }

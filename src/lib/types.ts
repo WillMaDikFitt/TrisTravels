@@ -39,6 +39,7 @@ export type BookingRecord = {
     requested: boolean;
     vehicle?: string;
     vehicleLabel?: string;
+    vehicleCount?: number;
     price: number;
   };
   status: BookingStatus;
@@ -52,6 +53,8 @@ export type BookingRecord = {
     staffCost: number;
     serviceFee: number;
     gst: number;
+    /** Full operational breakdown when the costing engine was used. */
+    costing?: import("@/data/experience-costing").ExperienceCostingQuote;
   };
   notes?: StaffNote[];
   paymentRef?: string;
@@ -111,6 +114,14 @@ export type PlatformSettings = {
   impact: ImpactStat[];
   /** Optional promo codes editable in admin. */
   discountCodes?: DiscountCode[];
+  /** Transfer fleet for experiences / journey enquire (Studio → Vehicles). */
+  fleetVehicles?: import("@/data/transport").FleetVehicle[];
+  /** Stay styles for learn-more / book flows (Studio → Stays). */
+  stayStyles?: import("@/data/stay-styles").StayStyle[];
+  /** Shared FAQs linked from every experience page (Studio → FAQs). */
+  experienceFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
+  /** Shared FAQs linked from every curated journey page (Studio → FAQs). */
+  curatedJourneyFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
 };
 
 export type JourneyDepartureSeat = {

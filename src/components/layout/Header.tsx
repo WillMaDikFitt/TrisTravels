@@ -271,18 +271,18 @@ export function Header() {
             aria-label="TRIS Travels home"
           >
             <span className="relative block h-[4.75rem] w-[4.75rem] overflow-hidden md:h-[5.35rem] md:w-[5.35rem] lg:h-[6.15rem] lg:w-[6.15rem]">
-              <Image
+            <Image
                 src={logoSrc}
-                alt="TRIS Travels"
+              alt="TRIS Travels"
                 fill
-                priority
-                unoptimized
-                className={cn(
+              priority
+              unoptimized
+              className={cn(
                   "object-contain",
                   /* Light (black) asset has more transparent padding — scale to match cream mark */
                   onLight ? "scale-[1.22]" : "drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]",
-                )}
-              />
+              )}
+            />
             </span>
           </Link>
 
@@ -322,18 +322,18 @@ export function Header() {
               </div>
             ) : (
               <div className="max-lg:hidden">
-                <Button
-                  href="/login"
-                  size="sm"
+              <Button
+                href="/login"
+                size="sm"
                   variant="secondary"
                   className={
                     onLight
                       ? "border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/5"
                       : "border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10"
                   }
-                >
-                  Log in / Sign up
-                </Button>
+              >
+                Log in / Sign up
+              </Button>
               </div>
             )}
             <button
@@ -415,7 +415,7 @@ export function Header() {
                   className="text-[11px] font-bold tracking-[0.12em] text-highlight uppercase"
                 >
                   Browse all
-                </Link>
+                    </Link>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {EXPERIENCE_CATEGORIES.map((category) => (
@@ -425,8 +425,8 @@ export function Header() {
                     className="rounded-xl bg-surface px-3 py-2.5 text-sm font-medium text-secondary transition active:bg-secondary-container"
                   >
                     {category.id}
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
               </div>
             </section>
 
@@ -466,7 +466,7 @@ export function Header() {
                       <span className="mt-0.5 block text-xs text-on-surface-variant">{item.tag}</span>
                     </span>
                     <ArrowRight size={16} className="shrink-0 text-highlight" />
-                  </Link>
+                    </Link>
                 ))}
               </section>
             ))}

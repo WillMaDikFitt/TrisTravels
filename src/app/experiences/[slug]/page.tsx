@@ -8,6 +8,7 @@ import { BookingWidget } from "@/components/booking/BookingWidget";
 import { FadeIn } from "@/components/motion/Motion";
 import { BreathSection } from "@/components/ui/BreathSection";
 import { DetailGallery } from "@/components/detail/DetailGallery";
+import { ListingFaqCta } from "@/components/listings/ListingFaqCta";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -138,14 +139,13 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
           <FadeIn>
             <section>
-              <p className="label-caps text-accent">Day by day</p>
+              <p className="label-caps text-accent">Itinerary</p>
               <h2 className="mt-2 font-display text-3xl text-primary">How the day unfolds</h2>
               <ol className="relative mt-8 space-y-8 border-l border-outline-variant/40 pl-8">
                 {exp.itinerary.map((day, index) => (
                   <li key={`${day.title}-${index}`} className="relative">
                     <span className="absolute top-1.5 left-0 h-3 w-3 -translate-x-[calc(2rem+6px)] rounded-full bg-accent" />
-                    <p className="label-caps text-accent">Day {index + 1}</p>
-                    <h4 className="mt-1 font-display text-lg text-primary">{day.title}</h4>
+                    <h4 className="font-display text-lg text-primary">{day.title}</h4>
                     {day.description?.trim() ? (
                       <p className="mt-2 whitespace-pre-line text-on-surface-variant">{day.description}</p>
                     ) : null}
@@ -253,23 +253,12 @@ export default async function ExperienceDetailPage({ params }: Props) {
             </FadeIn>
           )}
 
-          {exp.faqs.length > 0 && (
-            <FadeIn>
-              <section className="pb-0">
-                <h2 className="font-display text-2xl text-primary">FAQ</h2>
-                <div className="mt-6 divide-y divide-outline-variant/30">
-                  {exp.faqs.map((f) => (
-                    <details key={f.q} className="group py-4">
-                      <summary className="cursor-pointer list-none font-medium text-primary marker:content-none focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                        {f.q}
-                      </summary>
-                      <p className="mt-2 text-on-surface-variant">{f.a}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            </FadeIn>
-          )}
+          <FadeIn>
+            <ListingFaqCta
+              href="/experiences/faqs"
+              body="Common questions about booking, transport, children, and how TRIS experiences usually work — one shared guide for every day outing."
+            />
+          </FadeIn>
         </div>
         </div>
       </div>

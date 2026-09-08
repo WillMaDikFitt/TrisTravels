@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus, ExperienceTransportMode } from "@/data/experiences";
+import type { Difficulty, Experience, ExperienceCategory, ExperienceStatus } from "@/data/experiences";
 import { getExperience as getStaticExperience } from "@/data/experiences";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { fetchExperienceAdmin } from "@/lib/actions/content-read";
@@ -15,7 +15,15 @@ import {
   compactExperienceItinerary,
   ItineraryEditor,
 } from "@/components/admin/ItineraryEditor";
-import { readTransportVehiclePrices, TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
+import { SlotScheduleEditor } from "@/components/admin/SlotScheduleEditor";
+import {
+  TransportPricingFields,
+  transportEditorFromListing,
+  transportFieldsFromEditor,
+} from "@/components/admin/TransportPricingFields";
+import { ExperienceCostingFields } from "@/components/admin/ExperienceCostingFields";
+import { ALL_DAY_SLOT, experienceSlots } from "@/lib/experience-slots";
+import { hasExperienceCosting } from "@/data/experience-costing";
 
 const categories = EXPERIENCE_CATEGORIES.map((c) => c.id) as ExperienceCategory[];
 const difficulties: Difficulty[] = ["Easy", "Moderate", "Challenging"];
@@ -138,35 +146,26 @@ export default function ExperienceEditorPage() {
             priceFrom: Number(fd.get("priceFrom") || 0),
             priceAdult: Number(fd.get("priceAdult") || fd.get("priceFrom") || 0),
             priceChild: Number(fd.get("priceChild") || 0) || undefined,
-            minGuests: Number(fd.get("minGuests") || 1),
-            maxGuests: Number(fd.get("maxGuests") || 10),
-            slots: lines(String(fd.get("slots") || "")),
-            slotConfig: (() => {
-              const breaks = lines(String(fd.get("slotBreaks") || ""))
-                .map((line) => {
-                  const [start, end] = line.split("-").map((part) => part.trim());
-                  return start && end ? { start, end } : null;
-                })
-                .filter((row): row is { start: string; end: string } => Boolean(row));
-              return String(fd.get("slotMode")) === "interval"
-                ? {
-                    mode: "interval" as const,
-                    start: String(fd.get("slotStart") || ""),
-                    end: String(fd.get("slotEnd") || ""),
-                    intervalMinutes: Number(fd.get("slotInterval") || 60),
-                    breaks: breaks.length ? breaks : undefined,
-                  }
-                : {
-                    mode: "fixed" as const,
-                    times: Array.from(new Set(lines(String(fd.get("slots") || "")))),
-                    breaks: breaks.length ? breaks : undefined,
-                  };
-            })(),
-            transportMode: String(fd.get("transportMode") || "none") as ExperienceTransportMode,
-            transportAvailable: ["optional", "required"].includes(String(fd.get("transportMode") || "none")),
-            transportPrice: Number(fd.get("transportPrice") || 0) || undefined,
-            transportNote: String(fd.get("transportNote") || ""),
-            transportVehicles: readTransportVehiclePrices(fd),
+            costing: row.costing ?? null,
+            minGuests: row.minGuests ?? 1,
+            maxGuests: row.maxGuests || 10,
+            slots:
+              row.slotConfig?.mode === "day"
+                ? [ALL_DAY_SLOT]
+                : row.slotConfig?.mode === "fixed"
+                  ? row.slotConfig.times ?? []
+                  : experienceSlots(row),
+            slotConfig: {
+              ...(row.slotConfig ?? { mode: "fixed" as const, times: ["08:30", "09:00", "10:00"] }),
+              capacity: row.slotConfig?.capacity ?? row.maxGuests,
+            },
+            transportMode: row.transportMode ?? (row.transportAvailable ? "optional" : "none"),
+            transportAvailable: ["optional", "required"].includes(
+              row.transportMode ?? (row.transportAvailable ? "optional" : "none"),
+            ),
+            transportPrice: row.transportPrice,
+            transportNote: row.transportNote ?? "",
+            transportVehicles: row.transportVehicles,
             status: String(fd.get("status")) as ExperienceStatus,
             backendId: String(fd.get("backendId") || "").trim() || undefined,
             image: (() => {
@@ -187,10 +186,7 @@ export default function ExperienceEditorPage() {
             suitableFor: lines(String(fd.get("suitableFor") || "")),
             sortOrder: Number(fd.get("sortOrder") || 0) || undefined,
             itinerary: compactExperienceItinerary(row.itinerary ?? []),
-            faqs: lines(String(fd.get("faqs") || "")).map((line) => {
-              const [q, ...rest] = line.split("—").map((s) => s.trim());
-              return { q: q || line, a: rest.join(" — ") };
-            }),
+            faqs: row.faqs ?? [],
             seo: { title: String(fd.get("seoTitle") || ""), description: String(fd.get("seoDescription") || "") },
           };
           setBusy(true);
@@ -269,107 +265,103 @@ export default function ExperienceEditorPage() {
         </Panel>
 
         <Panel>
-          <h2 className="mb-4 font-display text-lg">Pricing & capacity</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Field label="Price from (₹)">
+          <h2 className="mb-4 font-display text-lg">Guest-facing from price</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="From price (₹)" hint="Shown on cards / browse">
               <input name="priceFrom" type="number" defaultValue={row.priceFrom} className={inputClass} />
             </Field>
-            <Field label="Adult price (₹)" hint="optional">
-              <input name="priceAdult" type="number" defaultValue={row.priceAdult ?? row.priceFrom} className={inputClass} />
-            </Field>
-            <Field label="Child price (₹)" hint="blank = 70% of adult">
-              <input name="priceChild" type="number" min="0" defaultValue={row.priceChild ?? ""} className={inputClass} />
-            </Field>
-            <Field label="Min guests">
-              <input name="minGuests" type="number" defaultValue={row.minGuests ?? 1} className={inputClass} />
-            </Field>
-            <Field label="Max guests">
-              <input name="maxGuests" type="number" defaultValue={row.maxGuests} className={inputClass} />
-            </Field>
-          </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <Field label="Slot schedule">
-              <select name="slotMode" defaultValue={row.slotConfig?.mode ?? "fixed"} className={inputClass}>
-                <option value="fixed">Set times each day</option>
-                <option value="interval">Repeat at an interval</option>
-              </select>
-            </Field>
-            <Field label="Time slots" hint="Fixed schedule: one per line">
-              <textarea
-                name="slots"
-                rows={3}
-                defaultValue={(row.slotConfig?.times ?? row.slots ?? ["08:30", "09:00", "10:00"]).join("\n")}
-                className={inputClass}
-              />
-            </Field>
-          </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <Field label="Interval start">
-              <input name="slotStart" type="time" defaultValue={row.slotConfig?.start ?? "09:00"} className={inputClass} />
-            </Field>
-            <Field label="Interval end">
-              <input name="slotEnd" type="time" defaultValue={row.slotConfig?.end ?? "17:00"} className={inputClass} />
-            </Field>
-            <Field label="Minutes between slots">
-              <input name="slotInterval" type="number" min="15" step="15" defaultValue={row.slotConfig?.intervalMinutes ?? 60} className={inputClass} />
-            </Field>
-          </div>
-          <div className="mt-4">
-            <Field
-              label="Break windows (optional)"
-              hint="One per line as 12:00-13:00 — slot times inside a break are skipped"
-            >
-              <textarea
-                name="slotBreaks"
-                rows={2}
-                placeholder={"12:00-13:00"}
-                defaultValue={(row.slotConfig?.breaks ?? [])
-                  .map((window) => `${window.start}-${window.end}`)
-                  .join("\n")}
-                className={inputClass}
-              />
-            </Field>
-          </div>
-          <div className="mt-6 border-t border-[#c5cbb8] pt-5">
-            <h3 className="font-display text-base text-[#26352b]">Transportation</h3>
-            <Field label="Transportation requirement" hint="Optional lets guests choose own transport or TRIS. Required forces TRIS transport.">
-              <select
-                name="transportMode"
-                defaultValue={row.transportMode ?? (row.transportAvailable ? "optional" : "none")}
-                className={inputClass}
-              >
-                <option value="none">Not offered</option>
-                <option value="optional">Optional — own transport or TRIS</option>
-                <option value="required">Required — TRIS transport only</option>
-              </select>
-            </Field>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <Field label="Base transport price (₹)" hint="Used when a vehicle rate below is blank">
-                <input name="transportPrice" type="number" min="0" defaultValue={row.transportPrice ?? ""} className={inputClass} />
-              </Field>
-              <Field label="Transport note" hint="Pickup area, shared/private, etc.">
-                <input name="transportNote" defaultValue={row.transportNote ?? ""} className={inputClass} />
-              </Field>
-            </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {TRANSPORT_VEHICLE_IDS.map((id) => (
-                <Field
-                  key={id}
-                  label={`${TRANSPORT_VEHICLE_META[id].label} (₹)`}
-                  hint={TRANSPORT_VEHICLE_META[id].seats}
-                >
+            {!hasExperienceCosting(row) ? (
+              <>
+                <Field label="Adult (₹)" hint="Legacy booking rate">
                   <input
-                    name={`transport${id.charAt(0).toUpperCase()}${id.slice(1)}`}
+                    name="priceAdult"
                     type="number"
-                    min="0"
-                    defaultValue={row.transportVehicles?.[id] ?? ""}
+                    defaultValue={row.priceAdult ?? row.priceFrom}
                     className={inputClass}
-                    placeholder="Auto from base"
                   />
                 </Field>
-              ))}
-            </div>
+                <Field label="Child (₹)" hint="Leave blank for 70% of adult">
+                  <input
+                    name="priceChild"
+                    type="number"
+                    min="0"
+                    defaultValue={row.priceChild ?? ""}
+                    className={inputClass}
+                  />
+                </Field>
+              </>
+            ) : (
+              <>
+                <input type="hidden" name="priceAdult" value={row.priceAdult ?? row.priceFrom} />
+                <input type="hidden" name="priceChild" value={row.priceChild ?? ""} />
+                <div className="sm:col-span-2 flex items-end">
+                  <p className="text-sm text-[#4a5a50]">
+                    Booking totals come from operational costing below. Keep “from price” for marketing cards.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
+        </Panel>
+
+        <Panel>
+          <ExperienceCostingFields
+            value={row.costing}
+            transportMode={row.transportMode ?? (row.transportAvailable ? "optional" : "none")}
+            onChange={(costing) => setRow((prev) => (prev ? { ...prev, costing } : prev))}
+          />
+        </Panel>
+
+        <Panel>
+          <SlotScheduleEditor
+            value={{
+              slotConfig: row.slotConfig ?? { mode: "fixed", times: ["08:30", "09:00", "10:00"] },
+              minGuests: row.minGuests ?? 1,
+              maxGuests: row.maxGuests,
+            }}
+            onChange={(next) =>
+              setRow((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      slotConfig: next.slotConfig,
+                      minGuests: next.minGuests,
+                      maxGuests: next.maxGuests,
+                    }
+                  : prev,
+              )
+            }
+          />
+        </Panel>
+
+        <Panel>
+          <TransportPricingFields
+            variant="experience"
+            value={transportEditorFromListing({
+              variant: "experience",
+              transportMode: row.transportMode,
+              transportAvailable: row.transportAvailable,
+              transportPrice: row.transportPrice,
+              transportNote: row.transportNote,
+              transportVehicles: row.transportVehicles,
+            })}
+            onChange={(next) => {
+              const fields = transportFieldsFromEditor(next);
+              setRow((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      transportMode: fields.transportMode,
+                      transportAvailable: fields.transportAvailable,
+                      transportPrice: fields.transportPrice,
+                      transportNote: fields.transportNote,
+                      transportVehicles: fields.transportVehicles,
+                    }
+                  : prev,
+              );
+            }}
+            hideVehiclePrices={hasExperienceCosting(row)}
+          />
         </Panel>
 
         <Panel>
@@ -405,14 +397,6 @@ export default function ExperienceEditorPage() {
                 onChange={(itinerary) => setRow((prev) => (prev ? { ...prev, itinerary } : prev))}
               />
             </div>
-            <Field label="FAQs" hint="one per line: Question — Answer">
-              <textarea
-                name="faqs"
-                rows={5}
-                defaultValue={(row.faqs ?? []).map((f) => `${f.q} — ${f.a}`).join("\n")}
-                className={inputClass}
-              />
-            </Field>
           </div>
         </Panel>
 

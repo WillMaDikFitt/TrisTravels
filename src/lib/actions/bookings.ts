@@ -10,11 +10,12 @@ import {
   sanitizeForClient,
 } from "@/lib/firebase/admin-read";
 import { quoteExperience } from "@/lib/pricing";
+import { hasExperienceCosting } from "@/data/experience-costing";
 import { memoryStore, uid } from "@/lib/store";
 import type { BookingRecord, BookingStatus } from "@/lib/types";
 import { daysUntilDate } from "@/lib/utils";
 import { dateIsClosed } from "@/lib/catalog";
-import { experienceSlots } from "@/lib/experience-slots";
+import { experienceSlotCapacity, experienceSlots } from "@/lib/experience-slots";
 import { findTransportVehicle, transportVehicleOptions } from "@/data/transport";
 import { experienceTransportMode } from "@/lib/experience-meta";
 
@@ -43,6 +44,7 @@ export async function createBooking(input: {
   request?: boolean;
   transportation?: boolean;
   transportVehicle?: string;
+  vehicleCount?: number;
 }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date)) {
     return { ok: false as const, error: "Choose a valid date first" };
@@ -81,6 +83,7 @@ export async function createBooking(input: {
   }
 
   const existing = await listBookings();
+  const slotCapacity = experienceSlotCapacity(experience);
   const occupied = existing
     .map(expireIfNeeded)
     .filter(
@@ -91,25 +94,46 @@ export async function createBooking(input: {
         (b.status === "hold" || b.status === "requested" || b.status === "confirmed"),
     )
     .reduce((sum, b) => sum + b.guests, 0);
-  if (occupied + guests > experience.maxGuests) {
-    return { ok: false as const, error: "This slot is full" };
+  if (occupied + guests > slotCapacity) {
+    const remaining = Math.max(0, slotCapacity - occupied);
+    return {
+      ok: false as const,
+      error:
+        remaining > 0
+          ? `Only ${remaining} guest${remaining === 1 ? "" : "s"} left in this slot`
+          : "This slot is full",
+    };
   }
 
   const transportMode = experienceTransportMode(experience);
-  const vehicles = transportVehicleOptions(experience.transportPrice, experience.transportVehicles);
-  const vehicle = input.transportation
+  const vehicles = transportVehicleOptions(
+    experience.transportPrice,
+    experience.transportVehicles,
+    settings.fleetVehicles,
+  );
+  const usingCosting = hasExperienceCosting(experience);
+  const wantsTransport = Boolean(input.transportation) && transportMode !== "none";
+  const vehicle = wantsTransport && !usingCosting
     ? findTransportVehicle(vehicles, input.transportVehicle) ?? vehicles[0]
     : undefined;
-  if (transportMode === "required" && (!input.transportation || !vehicle)) {
-    return { ok: false as const, error: "Choose a vehicle type" };
+  const vehicleCountInput = Math.max(1, Math.min(10, Math.round(input.vehicleCount ?? 1)));
+  if (transportMode === "required" && !wantsTransport) {
+    return { ok: false as const, error: "Transport is required for this experience" };
   }
-  if (input.transportation && transportMode !== "none" && !vehicle) {
+  if (wantsTransport && !usingCosting && !vehicle) {
     return { ok: false as const, error: "Choose a vehicle type" };
   }
 
   const instant = daysUntilDate(input.date) >= settings.minAdvanceDays;
-  const quote = quoteExperience(experience, adults, settings, children);
-  const transportPrice = input.transportation && transportMode !== "none" ? vehicle?.price ?? 0 : 0;
+  const legacyTransportFee =
+    wantsTransport && !usingCosting ? (vehicle?.price ?? 0) * vehicleCountInput : 0;
+  const quote = quoteExperience(experience, adults, settings, children, {
+    trisTransport: wantsTransport,
+    transportFee: legacyTransportFee,
+    vehicleCount: vehicleCountInput,
+  });
+  const transportPrice = quote.transportCost;
+  const vehicleCount = quote.vehicleCount || (wantsTransport ? vehicleCountInput : 0);
   const now = new Date();
   const expires = new Date(now.getTime() + settings.holdMinutes * 60_000);
 
@@ -128,7 +152,7 @@ export async function createBooking(input: {
     customerName: input.customerName,
     customerEmail: input.customerEmail,
     customerPhone: input.customerPhone,
-    customerTotal: quote.customerTotal + transportPrice,
+    customerTotal: quote.customerTotal,
     internal: quote.internal,
     createdAt: now.toISOString(),
   };
@@ -136,11 +160,12 @@ export async function createBooking(input: {
   if (backendId) record.backendId = backendId;
   if (children > 0 && input.childAges) record.childAges = input.childAges;
   if (input.uid) record.uid = input.uid;
-  if (input.transportation && vehicle) {
+  if (wantsTransport && (usingCosting || vehicle)) {
     record.transportation = {
       requested: true,
-      vehicle: vehicle.id,
-      vehicleLabel: vehicle.label,
+      vehicle: usingCosting ? "tris" : vehicle?.id,
+      vehicleLabel: usingCosting ? "TRIS transport" : vehicle?.label,
+      vehicleCount: vehicleCount || 1,
       price: transportPrice,
     };
   }

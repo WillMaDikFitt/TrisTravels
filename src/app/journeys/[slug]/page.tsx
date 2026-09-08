@@ -22,6 +22,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { JourneyEnquire } from "@/components/enquiries/JourneyEnquire";
 import { AccordionItem } from "@/components/ui/Accordion";
+import { ListingFaqCta } from "@/components/listings/ListingFaqCta";
 import { CURATED_ONLINE_BOOK_DAYS } from "@/data/journey-options";
 import { FIXED_DEPARTURE_PATCHES } from "@/data/fixed-departures";
 import { journeyListingMetaItems } from "@/components/listings/JourneyListingMeta";
@@ -325,6 +326,15 @@ export default async function JourneyDetailPage({ params }: Props) {
               </section>
             )}
           </FadeIn>
+
+          {!isFixed ? (
+            <FadeIn>
+              <ListingFaqCta
+                href="/journeys/faqs"
+                body="Shared answers about curated journeys — booking, stays, transport, and pacing. Your itinerary details stay on this page."
+              />
+            </FadeIn>
+          ) : null}
 
           {!isFixed ? (
             <FadeIn>

@@ -23,6 +23,9 @@ import {
   BarChart3,
   ExternalLink,
   LogOut,
+  CarFront,
+  BedDouble,
+  CircleHelp,
 } from "lucide-react";
 
 const sections: { label: string; links: { href: string; label: string; icon: typeof LayoutDashboard }[] }[] = [
@@ -41,6 +44,9 @@ const sections: { label: string; links: { href: string; label: string; icon: typ
     links: [
       { href: "/admin/experiences", label: "Experiences", icon: Compass },
       { href: "/admin/journeys", label: "Journeys", icon: Map },
+      { href: "/admin/fleet", label: "Vehicles", icon: CarFront },
+      { href: "/admin/stays", label: "Stays", icon: BedDouble },
+      { href: "/admin/faqs", label: "FAQs", icon: CircleHelp },
       { href: "/admin/places", label: "Places", icon: MapPin },
       { href: "/admin/journal", label: "Journal", icon: BookOpen },
     ],

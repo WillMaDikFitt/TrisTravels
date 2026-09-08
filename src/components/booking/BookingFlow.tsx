@@ -17,12 +17,17 @@ import { Check, CreditCard } from "lucide-react";
 import { confirmPayment, createBooking } from "@/lib/actions/bookings";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type { BookingRecord } from "@/lib/types";
-import { experienceSlots } from "@/lib/experience-slots";
-import { fetchClosuresForExperience } from "@/lib/actions/content-read";
+import {
+  experienceSlotCapacity,
+  experienceSlots,
+  formatExperienceSlotLabel,
+  isWholeDayExperience,
+} from "@/lib/experience-slots";
+import { fetchClosuresForExperience, fetchFleetVehicles } from "@/lib/actions/content-read";
 import { dateIsClosed } from "@/lib/catalog";
 import type { ClosureRecord } from "@/lib/types";
-import { transportVehicleOptions } from "@/data/transport";
-import { adultRate, childRate } from "@/lib/pricing";
+import { transportVehicleOptions, type FleetVehicle } from "@/data/transport";
+import { adultRate, childRate, hasExperienceCosting, quoteExperience } from "@/lib/pricing";
 import { GuestCompositionFields, GettingThereFields, type TransportChoice } from "@/components/booking/GuestTransportFields";
 import { experienceTransportMode } from "@/lib/experience-meta";
 import {
@@ -37,8 +42,6 @@ import { isValidChildAge } from "@/data/child-ages";
 import { site } from "@/data/site";
 import { openRazorpayCheckout } from "@/lib/razorpay-client";
 
-const GST_RATE = 0.05;
-
 function parseAges(raw: string | null, count: number) {
   if (!raw || count <= 0) return [] as number[];
   const parsed = raw
@@ -52,9 +55,13 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const search = useSearchParams();
   const { user, profile } = useAuth();
   const slots = experienceSlots(experience);
+  const wholeDay = isWholeDayExperience(experience);
+  const slotCapacity = experienceSlotCapacity(experience);
+  const partyCap = Math.min(experience.maxGuests, slotCapacity);
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles),
-    [experience.transportPrice, experience.transportVehicles],
+    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles, fleet),
+    [experience.transportPrice, experience.transportVehicles, fleet],
   );
   const minGuests = experience.minGuests ?? 1;
   const initialChildren = Math.max(0, Number(search.get("children") || 0));
@@ -64,17 +71,24 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   );
 
   const transportMode = experienceTransportMode(experience);
+  const usingCosting = hasExperienceCosting(experience);
   const initialTransportChoice: TransportChoice =
-    search.get("transport") === "1" ? "tris" : search.get("transport") === "0" ? "own" : null;
+    transportMode === "required"
+      ? "tris"
+      : search.get("transport") === "1"
+        ? "tris"
+        : search.get("transport") === "0"
+          ? "own"
+          : null;
 
   const [step, setStep] = useState(0);
-  const [slot, setSlot] = useState(search.get("slot") || "");
+  const [slot, setSlot] = useState(search.get("slot") || (wholeDay ? slots[0] ?? "" : ""));
   const [date, setDate] = useState(search.get("date") || "");
   const [adults, setAdults] = useState(
-    Math.min(experience.maxGuests, Math.max(1, initialAdults)),
+    Math.min(partyCap, Math.max(1, initialAdults)),
   );
   const [children, setChildren] = useState(
-    Math.min(experience.maxGuests - 1, initialChildren),
+    Math.min(Math.max(0, partyCap - 1), initialChildren),
   );
   const [childAges, setChildAges] = useState<number[]>(
     parseAges(search.get("childAges"), initialChildren),
@@ -97,6 +111,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   useEffect(() => {
     fetchClosuresForExperience(experience.slug).then(setClosures).catch(() => setClosures([]));
   }, [experience.slug]);
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then(setFleet)
+      .catch(() => setFleet(null));
+  }, []);
+  useEffect(() => {
+    if (wholeDay && slots[0] && !slot) setSlot(slots[0]);
+  }, [wholeDay, slots[0], slot]);
 
   const [done, setDone] = useState(false);
   const [paid, setPaid] = useState(false);
@@ -112,22 +134,27 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const transportation =
     transportMode === "required" || (transportMode === "optional" && transportChoice === "tris");
   const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
-  const guestSubtotal = adultRate(experience) * adults + childRate(experience) * children;
-  const transportFee =
-    transportation && selectedVehicle ? selectedVehicle.price * vehicleCount : 0;
-  const subtotal = guestSubtotal + transportFee;
-  const gst = Math.round(subtotal * GST_RATE);
-  const gross = subtotal + gst;
+  const legacyTransportFee =
+    !usingCosting && transportation && selectedVehicle
+      ? selectedVehicle.price * vehicleCount
+      : 0;
+  const quote = quoteExperience(experience, adults, undefined, children, {
+    trisTransport: transportation,
+    transportFee: legacyTransportFee,
+    vehicleCount,
+  });
+  const gross = quote.customerTotal;
+  const transportFee = quote.transportCost;
 
   const syncChildren = (next: number) => {
-    const capped = Math.min(next, Math.max(0, experience.maxGuests - adults));
+    const capped = Math.min(next, Math.max(0, partyCap - adults));
     setChildren(capped);
     setChildAges((prev) => Array.from({ length: capped }, (_, i) => prev[i] ?? 8));
   };
 
   const syncAdults = (next: number) => {
-    const capped = Math.min(Math.max(1, next), experience.maxGuests);
-    const nextChildren = Math.min(children, Math.max(0, experience.maxGuests - capped));
+    const capped = Math.min(Math.max(1, next), partyCap);
+    const nextChildren = Math.min(children, Math.max(0, partyCap - capped));
     setAdults(capped);
     if (nextChildren !== children) {
       setChildren(nextChildren);
@@ -138,16 +165,18 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const transportReady =
     transportMode === "none"
       ? true
-      : transportMode === "required"
-        ? Boolean(vehicleId)
-        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+      : usingCosting
+        ? transportMode === "required" || transportChoice === "own" || transportChoice === "tris"
+        : transportMode === "required"
+          ? Boolean(vehicleId)
+          : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
 
   const detailsReady =
     Boolean(date) &&
     Boolean(slot) &&
     !dateIsClosed(date, closures, slot) &&
     guests >= minGuests &&
-    guests <= experience.maxGuests &&
+    guests <= partyCap &&
     (children === 0 ||
       (childAges.length === children && childAges.every(isValidChildAge))) &&
     transportReady;
@@ -169,6 +198,11 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       request: requestMode,
       transportation,
       transportVehicle: transportation && vehicleId ? vehicleId : undefined,
+      vehicleCount: transportation
+        ? usingCosting
+          ? quote.vehicleCount || undefined
+          : vehicleCount
+        : undefined,
     });
     if (!result.ok) {
       setError(result.error);
@@ -296,7 +330,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
               </dt>
               <dd className="mt-1 text-sm font-medium text-primary">
                 {date}
-                {slot ? ` · ${slot}` : ""}
+                {slot ? ` · ${formatExperienceSlotLabel(slot, experience)}` : ""}
               </dd>
             </div>
             <div className="border-b border-outline-variant/25 px-5 py-4 sm:border-b-0">
@@ -375,7 +409,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
             <div className="space-y-4">
               <FieldGroup
                 title="Date & travellers"
-                body={`This experience hosts up to ${experience.maxGuests} guests.`}
+                body={`Up to ${partyCap} guests per ${wholeDay ? "day" : "slot"} (max ${experience.maxGuests} in one booking).`}
               >
                 <div className="space-y-5">
                   <FormInput
@@ -391,7 +425,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     adults={adults}
                     children={children}
                     childAges={childAges}
-                    maxGuests={experience.maxGuests}
+                    maxGuests={partyCap}
                     minGuests={minGuests}
                     onAdults={syncAdults}
                     onChildren={syncChildren}
@@ -402,25 +436,41 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                 </div>
               </FieldGroup>
 
-              <FieldGroup title="Start time" body="Unavailable times are disabled.">
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {slots.map((s, index) => (
-                    <button
-                      key={`${s}-${index}`}
-                      type="button"
-                      disabled={!date || dateIsClosed(date, closures, s)}
-                      onClick={() => setSlot(s)}
-                      className={cn(
-                        "rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:border-outline-variant/20 disabled:bg-surface-container disabled:text-on-surface-variant/40",
-                        slot === s
-                          ? "border-primary bg-primary text-on-primary shadow-sm"
-                          : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/50",
-                      )}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
+              <FieldGroup
+                title={wholeDay ? "Schedule" : "Start time"}
+                body={wholeDay ? "This experience runs as a full-day booking." : "Unavailable times are disabled."}
+              >
+                {wholeDay ? (
+                  <p
+                    className={cn(
+                      "rounded-xl border px-4 py-3 text-sm font-semibold",
+                      !date || dateIsClosed(date, closures, slots[0] ?? "")
+                        ? "border-outline-variant/30 text-on-surface-variant"
+                        : "border-primary bg-primary text-on-primary",
+                    )}
+                  >
+                    {formatExperienceSlotLabel(slots[0] ?? "all-day", experience)}
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {slots.map((s, index) => (
+                      <button
+                        key={`${s}-${index}`}
+                        type="button"
+                        disabled={!date || dateIsClosed(date, closures, s)}
+                        onClick={() => setSlot(s)}
+                        className={cn(
+                          "rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:border-outline-variant/20 disabled:bg-surface-container disabled:text-on-surface-variant/40",
+                          slot === s
+                            ? "border-primary bg-primary text-on-primary shadow-sm"
+                            : "border-outline-variant/40 bg-surface-container-lowest text-primary hover:border-primary/50",
+                        )}
+                      >
+                        {formatExperienceSlotLabel(s, experience)}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </FieldGroup>
 
               {transportMode !== "none" && (
@@ -432,12 +482,13 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     vehicleId={vehicleId}
                     vehicleCount={vehicleCount}
                     note={experience.transportNote}
+                    costingTransport={usingCosting}
                     onChoice={(next) => {
                       setTransportChoice(next);
                       if (next !== "tris") setVehicleId("");
                     }}
                     onVehicle={setVehicleId}
-                    onVehicleCount={setVehicleCount}
+                    onVehicleCount={usingCosting ? undefined : setVehicleCount}
                   />
                 </FieldGroup>
               )}
@@ -546,20 +597,41 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       >
         <div className="mt-6 space-y-2 text-sm">
           {date ? <Row label="Date" value={date} /> : null}
-          {slot ? <Row label="Time" value={slot} /> : null}
-          <Row label={`Adults × ${adults}`} value={formatINR(adultRate(experience) * adults)} />
-          {children > 0 && (
-            <Row
-              label={`Children × ${children}`}
-              value={formatINR(childRate(experience) * children)}
-            />
+          {slot ? <Row label="Time" value={formatExperienceSlotLabel(slot, experience)} /> : null}
+          {usingCosting ? (
+            <>
+              <Row label="Adults" value={String(adults)} />
+              {children > 0 ? <Row label="Children" value={String(children)} /> : null}
+              {transportation ? (
+                <Row
+                  label="Transport"
+                  value={
+                    quote.vehicleCount > 1
+                      ? `TRIS · ${quote.vehicleCount} vehicles`
+                      : "TRIS transport"
+                  }
+                />
+              ) : transportMode === "optional" && transportChoice === "own" ? (
+                <Row label="Transport" value="Own arrangement" />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Row label={`Adults × ${adults}`} value={formatINR(adultRate(experience) * adults)} />
+              {children > 0 ? (
+                <Row
+                  label={`Children × ${children}`}
+                  value={formatINR(childRate(experience) * children)}
+                />
+              ) : null}
+              {transportation && selectedVehicle ? (
+                <Row
+                  label={`Transport · ${selectedVehicle.label}${vehicleCount > 1 ? ` × ${vehicleCount}` : ""}`}
+                  value={formatINR(transportFee)}
+                />
+              ) : null}
+            </>
           )}
-          {transportation && selectedVehicle ? (
-            <Row
-              label={`Transport · ${selectedVehicle.label}${vehicleCount > 1 ? ` × ${vehicleCount}` : ""}`}
-              value={formatINR(transportFee)}
-            />
-          ) : null}
           <div className="mt-3 border-t border-outline-variant/25 pt-3">
             <Row label="Total (incl. GST)" value={formatINR(gross)} bold />
           </div>

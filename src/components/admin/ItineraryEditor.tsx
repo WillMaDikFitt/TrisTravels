@@ -343,11 +343,11 @@ function ExperienceItineraryEditor({
   return (
     <EditorShell
       heading="Itinerary"
-      hint="One card per day. Descriptions keep line breaks."
-      emptyTitle="Build the day’s flow"
-      emptyBody="Add each day with a title and description. Guests see this on the experience page."
-      emptyCta="Add day 1"
-      addLabel={`Add day ${items.length + 1}`}
+      hint="One card per stop. Guests see a timeline with a dot and your title — no day numbers."
+      emptyTitle="Build the experience flow"
+      emptyBody="Add each stop with a title and description. Guests see this as a simple timeline on the experience page."
+      emptyCta="Add first stop"
+      addLabel={`Add stop ${items.length + 1}`}
       count={items.length}
       onSeed={() => {
         onChange([blankExperience()]);
@@ -367,8 +367,8 @@ function ExperienceItineraryEditor({
         return (
           <ItineraryCard
             key={`${baseId}-${index}`}
-            badge={`Day ${index + 1}`}
-            title={preview(item.title, "Untitled day")}
+            badge={`${index + 1}`}
+            title={preview(item.title, "Untitled stop")}
             collapsedPreview={item.description.replace(/\s+/g, " ").trim() || "No description yet"}
             open={isOpen}
             panelId={panelId}
@@ -398,7 +398,7 @@ function ExperienceItineraryEditor({
             }}
           >
             <label className="block text-sm font-medium text-[#26352b]">
-              Day title
+              Title
               <input
                 value={item.title}
                 onChange={(e) =>

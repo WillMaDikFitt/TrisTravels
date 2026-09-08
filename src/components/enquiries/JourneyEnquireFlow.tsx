@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { FormInput, FormSelect, FormTextarea } from "@/components/ui/Form";
@@ -8,7 +8,8 @@ import { Check } from "lucide-react";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type { Journey } from "@/data/journeys";
-import { transportVehicleOptions } from "@/data/transport";
+import { transportVehicleOptions, type FleetVehicle } from "@/data/transport";
+import { fetchFleetVehicles } from "@/lib/actions/content-read";
 import { formatINR, cn } from "@/lib/utils";
 import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
 import {
@@ -24,11 +25,18 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
   const { user, profile } = useAuth();
   const fixed = journey.type === "small-group";
   const departureDates = journey.departureSeats?.map((d) => d.date) ?? journey.departures ?? [];
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(journey.transportPrice ?? 3500, journey.transportVehicles),
-    [journey.transportPrice, journey.transportVehicles],
+    () => transportVehicleOptions(journey.transportPrice ?? 3500, journey.transportVehicles, fleet),
+    [journey.transportPrice, journey.transportVehicles, fleet],
   );
   const maxGuests = 12;
+
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then(setFleet)
+      .catch(() => setFleet(null));
+  }, []);
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState(profile?.name ?? "");

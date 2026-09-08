@@ -6,6 +6,8 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import type { ClosureRecord, Experience, Journey, Destination, PlatformSettings } from "@/lib/types";
 import { sortExperiences } from "@/lib/experience-meta";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
+import { hydrateFleetFromDefaults } from "@/data/transport";
+import { hydrateStayStylesFromDefaults } from "@/data/stay-styles";
 import { memoryStore } from "@/lib/store";
 import { normalizeExperience } from "@/lib/normalize-listing";
 
@@ -282,6 +284,18 @@ export async function getSettings(): Promise<PlatformSettings> {
           ...data,
           impact: data.impact?.length ? data.impact : DEFAULT_SETTINGS.impact,
           discountCodes: data.discountCodes ?? DEFAULT_SETTINGS.discountCodes,
+          fleetVehicles: data.fleetVehicles?.length
+            ? hydrateFleetFromDefaults(data.fleetVehicles)
+            : DEFAULT_SETTINGS.fleetVehicles,
+          stayStyles: data.stayStyles?.length
+            ? hydrateStayStylesFromDefaults(data.stayStyles)
+            : DEFAULT_SETTINGS.stayStyles,
+          experienceFaqs: data.experienceFaqs?.length
+            ? data.experienceFaqs
+            : DEFAULT_SETTINGS.experienceFaqs,
+          curatedJourneyFaqs: data.curatedJourneyFaqs?.length
+            ? data.curatedJourneyFaqs
+            : DEFAULT_SETTINGS.curatedJourneyFaqs,
         };
       }
     } catch (err) {

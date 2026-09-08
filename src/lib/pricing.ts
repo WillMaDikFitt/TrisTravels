@@ -1,4 +1,9 @@
 import type { Experience } from "@/data/experiences";
+import {
+  hasExperienceCosting,
+  quoteExperienceCosting,
+  type ExperienceCostingQuote,
+} from "@/data/experience-costing";
 import type { Journey } from "@/data/journeys";
 import {
   normalizePackageTransportId,
@@ -18,8 +23,11 @@ import {
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import type { PlatformSettings } from "@/lib/types";
 
+export type { ExperienceCostingQuote };
+export { hasExperienceCosting, quoteExperienceCosting } from "@/data/experience-costing";
+
 /** Day-rate multipliers vs the legacy tempo rate for larger vehicle options. */
-const PACKAGE_TRANSPORT_RATE_SCALE: Record<PackageTransportId, number> = {
+const PACKAGE_TRANSPORT_RATE_SCALE: Record<string, number> = {
   sedan: 1,
   suv: 1,
   innova: 1,
@@ -47,14 +55,75 @@ export function childRate(experience: Experience) {
   return Math.round(adultRate(experience) * 0.7);
 }
 
+export type ExperienceQuoteOptions = {
+  /** Guest booked TRIS transport (costing engine + legacy add-on). */
+  trisTransport?: boolean;
+  /** Legacy multi-vehicle transfer fee (ignored when costing is configured). */
+  transportFee?: number;
+  /** Legacy vehicle count stored on the booking when transport is selected. */
+  vehicleCount?: number;
+};
+
+export type ExperienceQuote = {
+  engine: "costing" | "legacy";
+  customerTotal: number;
+  base: number;
+  adults: number;
+  children: number;
+  transportCost: number;
+  vehicleCount: number;
+  costing?: ExperienceCostingQuote;
+  internal: {
+    base: number;
+    staffCost: number;
+    serviceFee: number;
+    gst: number;
+    /** Present when engine === "costing" */
+    costing?: ExperienceCostingQuote;
+  };
+};
+
+/**
+ * Experiences quote.
+ * Prefer operational costing (adult/child op cost + capacity components + transport + margin + 5% GST)
+ * when Studio has saved `experience.costing`; otherwise fall back to legacy selling rates.
+ */
 export function quoteExperience(
   experience: Experience,
   guestsOrAdults: number,
   settings: PlatformSettings = DEFAULT_SETTINGS,
   children = 0,
-) {
+  options: ExperienceQuoteOptions = {},
+): ExperienceQuote {
   const adults = Math.max(0, guestsOrAdults);
   const kids = Math.max(0, children);
+  const trisTransport = Boolean(options.trisTransport);
+
+  if (hasExperienceCosting(experience) && experience.costing) {
+    const costing = quoteExperienceCosting(experience.costing, {
+      adults,
+      children: kids,
+      trisTransport,
+    });
+    return {
+      engine: "costing",
+      customerTotal: costing.grossAmount,
+      base: costing.perPersonOperationalCost,
+      adults,
+      children: kids,
+      transportCost: costing.transportCost,
+      vehicleCount: costing.vehicleCount,
+      costing,
+      internal: {
+        base: costing.perPersonOperationalCost,
+        staffCost: costing.capacityComponentsCost,
+        serviceFee: costing.marginAmount,
+        gst: costing.gst,
+        costing,
+      },
+    };
+  }
+
   const totalGuests = adults + kids;
   const exp = experience as Experience & { staffRules?: StaffRule[] };
   const base = adultRate(experience) * adults + childRate(experience) * kids;
@@ -63,12 +132,18 @@ export function quoteExperience(
   const staffCost = rule ? rule.quantity * rule.costPerStaff : 0;
   const serviceFee = Math.round(((base + staffCost) * settings.serviceFeePercent) / 100);
   const gst = Math.round((serviceFee * settings.gstPercent) / 100);
-  const customerTotal = base + staffCost + serviceFee + gst;
+  const transportFee = Math.max(0, Math.round(options.transportFee ?? 0));
+  const vehicleCount =
+    transportFee > 0 ? Math.max(1, Math.min(10, Math.round(options.vehicleCount ?? 1))) : 0;
+  const customerTotal = base + staffCost + serviceFee + gst + transportFee;
   return {
+    engine: "legacy",
     customerTotal,
     base,
     adults,
     children: kids,
+    transportCost: transportFee,
+    vehicleCount,
     internal: { base, staffCost, serviceFee, gst },
   };
 }
@@ -146,7 +221,7 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
   const vehicleCount = Math.max(1, Math.round(input.vehicleCount));
   const rooms = Math.max(1, Math.round(input.rooms));
   const extraMattresses = Math.max(0, Math.round(input.extraMattresses));
-  const capacity = Math.max(1, transportMeta.maxGuests);
+  const capacity = Math.max(1, vehicle.capacity || transportMeta.maxGuests);
   const minVehiclesRequired = minVehiclesForGuests(totalGuests, capacity);
   const capacityOk = totalGuests <= capacity * vehicleCount;
   const dayRate = Math.round(
@@ -189,7 +264,7 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
     days,
     nights,
     vehicleId: packageVehicleId,
-    vehicleLabel: `${transportMeta.label} (Max ${transportMeta.maxGuests})`,
+    vehicleLabel: `${transportMeta.label} (Max ${capacity})`,
     vehicleCount,
     vehicleCapacity: capacity,
     capacityOk,

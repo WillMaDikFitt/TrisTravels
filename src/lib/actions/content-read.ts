@@ -66,3 +66,15 @@ export async function fetchClosuresAdmin() {
 export async function fetchSettingsAdmin() {
   return getSettings();
 }
+
+export async function fetchFleetVehicles() {
+  const settings = await getSettings();
+  const { hydrateFleetFromDefaults, activeFleetVehicles } = await import("@/data/transport");
+  return clean(activeFleetVehicles(hydrateFleetFromDefaults(settings.fleetVehicles)));
+}
+
+export async function fetchStayStyles() {
+  const settings = await getSettings();
+  const { hydrateStayStylesFromDefaults, activeStayStyles } = await import("@/data/stay-styles");
+  return clean(activeStayStyles(hydrateStayStylesFromDefaults(settings.stayStyles)));
+}

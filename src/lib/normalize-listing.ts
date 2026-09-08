@@ -1,6 +1,7 @@
 /** Safe defaults so Studio editors don't crash on sparse Firestore docs. */
 
 import type { Experience } from "@/data/experiences";
+import { normalizeExperienceCosting } from "@/data/experience-costing";
 import type { Journey } from "@/data/journeys";
 import type { Destination } from "@/data/destinations";
 import type { Story } from "@/data/stories";
@@ -56,6 +57,7 @@ export function normalizeExperience(raw: Partial<Experience> | null | undefined,
     priceFrom: asNumber(row.priceFrom, 0),
     priceAdult: row.priceAdult != null ? asNumber(row.priceAdult, 0) : undefined,
     priceChild: row.priceChild != null ? asNumber(row.priceChild, 0) : undefined,
+    costing: normalizeExperienceCosting(row.costing),
     maxGuests: asNumber(row.maxGuests, 10),
     minGuests: asNumber(row.minGuests, 1),
     slots: asArray<string>(row.slots),

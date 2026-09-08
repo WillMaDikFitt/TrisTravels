@@ -6,7 +6,11 @@ import { fetchClosuresAdmin, fetchExperiencesAdmin } from "@/lib/actions/content
 import { deleteClosure, saveClosure } from "@/lib/actions/cms";
 import type { ClosureRecord } from "@/lib/types";
 import { dateIsClosed } from "@/lib/catalog";
-import { experienceSlots } from "@/lib/experience-slots";
+import {
+  experienceSlots,
+  formatExperienceSlotLabel,
+  isWholeDayExperience,
+} from "@/lib/experience-slots";
 import { AdminButton, EmptyState, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
@@ -143,6 +147,7 @@ export default function AdminAvailabilityPage() {
   );
   const selectedExperience = catalog.find((experience) => experience.slug === slug);
   const slots = selectedExperience ? experienceSlots(selectedExperience) : [];
+  const wholeDay = selectedExperience ? isWholeDayExperience(selectedExperience) : false;
   const selectedDates = datesInRange(from, to);
   const singleDay = selectedDates.length === 1 ? selectedDates[0] : "";
   const selectedLabel =
@@ -689,7 +694,9 @@ export default function AdminAvailabilityPage() {
               </span>
             </div>
             <p className="mt-1 text-xs text-[#4a5a50]">
-              Choose Full day, or tap individual times to block / keep open only those slots.
+              {wholeDay
+                ? "This experience is whole-day — block the full day (or the single day slot below)."
+                : "Choose Full day, or tap individual times to block / keep open only those slots."}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               <button
@@ -708,6 +715,9 @@ export default function AdminAvailabilityPage() {
               {slots.map((time) => {
                 const currentlyBlocked = singleDay ? dateIsClosed(singleDay, forExperience, time) || dateIsClosed(singleDay, forExperience) : false;
                 const selected = scope === "slots" && blockedSlots.includes(time);
+                const label = selectedExperience
+                  ? formatExperienceSlotLabel(time, selectedExperience)
+                  : time;
                 return (
                   <button
                     key={time}
@@ -729,7 +739,7 @@ export default function AdminAvailabilityPage() {
                           : "Currently open"
                     }
                   >
-                    {time}
+                    {label}
                   </button>
                 );
               })}

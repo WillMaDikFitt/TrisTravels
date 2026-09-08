@@ -124,8 +124,8 @@ export function Field({
 }) {
   return (
     <label className="block text-sm font-medium text-foreground">
-      {label}
-      {hint && <span className="ml-2 text-xs font-normal text-on-surface-variant">{hint}</span>}
+      <span className="block">{label}</span>
+      {hint ? <span className="mt-0.5 block text-xs font-normal text-on-surface-variant">{hint}</span> : null}
       <div className="mt-1.5">{children}</div>
     </label>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { HeartHandshake, Leaf, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -22,13 +22,16 @@ import {
   type PackageLearnTab,
 } from "@/components/booking/PackageOptionLearn";
 import {
-  PACKAGE_TRANSPORT,
+  packageTransportList,
   packageTransportMeta,
-  STAY_STYLES,
+  stayStyleList,
   stayStyleMeta,
   type PackageTransportId,
   type StayStyleId,
 } from "@/data/journey-options";
+import { fetchFleetVehicles, fetchStayStyles } from "@/lib/actions/content-read";
+import type { FleetVehicle } from "@/data/transport";
+import type { StayStyle } from "@/data/stay-styles";
 import { site } from "@/data/site";
 import { cn, daysFromNow } from "@/lib/utils";
 import { submitEnquiry } from "@/lib/actions/enquiries";
@@ -133,6 +136,8 @@ export default function CraftMyJourneyPage() {
   const [learnTab, setLearnTab] = useState<PackageLearnTab>("stay");
   const [vehicleId, setVehicleId] = useState<PackageTransportId | "">("");
   const [stayStyle, setStayStyle] = useState<StayStyleId | "">("");
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
+  const [stays, setStays] = useState<StayStyle[] | null>(null);
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
@@ -149,25 +154,34 @@ export default function CraftMyJourneyPage() {
     notes: "",
   });
 
-  const transportMeta = vehicleId ? packageTransportMeta(vehicleId) : null;
-  const stayMeta = stayStyle ? stayStyleMeta(stayStyle) : null;
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then(setFleet)
+      .catch(() => setFleet(null));
+    fetchStayStyles()
+      .then(setStays)
+      .catch(() => setStays(null));
+  }, []);
+
+  const transportMeta = vehicleId ? packageTransportMeta(vehicleId, fleet) : null;
+  const stayMeta = stayStyle ? stayStyleMeta(stayStyle, stays) : null;
 
   const transportOptions = useMemo(
     () => [
       { value: "", label: "Select vehicle type" },
-      ...PACKAGE_TRANSPORT.map((t) => ({
+      ...packageTransportList(fleet).map((t) => ({
         value: t.id,
         label: `${t.label} (Max ${t.maxGuests})`,
       })),
     ],
-    [],
+    [fleet],
   );
   const stayOptions = useMemo(
     () => [
       { value: "", label: "Select stay style" },
-      ...STAY_STYLES.map((s) => ({ value: s.id, label: s.label })),
+      ...stayStyleList(stays).map((s) => ({ value: s.id, label: s.label })),
     ],
-    [],
+    [stays],
   );
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -652,6 +666,8 @@ export default function CraftMyJourneyPage() {
         initialTab={learnTab}
         stayId={stayStyle || "barefoot"}
         vehicleId={vehicleId || "sedan"}
+        fleet={fleet}
+        stays={stays}
         onStayChange={(id) => setStayStyle(id)}
         onVehicleChange={(id) => setVehicleId(id)}
       />

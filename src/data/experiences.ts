@@ -1,4 +1,5 @@
 import { listings, media } from "./media";
+import type { ExperienceCosting } from "./experience-costing";
 import type { TransportVehiclePrices } from "./transport";
 
 export type ExperienceCategory =
@@ -17,13 +18,25 @@ export type Difficulty = "Easy" | "Moderate" | "Challenging";
 export type ExperienceStatus = "draft" | "active" | "hidden" | "seasonal" | "soldOut";
 
 export type ExperienceSlotConfig = {
-  mode: "fixed" | "interval";
+  /**
+   * day — one whole-day booking window
+   * fixed — explicit start times
+   * interval — generate times between start/end
+   */
+  mode: "day" | "fixed" | "interval";
   times?: string[];
   start?: string;
   end?: string;
   intervalMinutes?: number;
   /** Optional rest windows. Slot times that fall inside [start, end) are skipped. */
   breaks?: { start: string; end: string }[];
+  /**
+   * Max guests that can occupy each slot across all bookings.
+   * Defaults to listing maxGuests when unset.
+   */
+  capacity?: number;
+  /** Public label for whole-day mode (e.g. "Full day"). */
+  dayLabel?: string;
 };
 
 export type Experience = {
@@ -40,8 +53,15 @@ export type Experience = {
   suitableFor: string[];
   bestSeason: string;
   priceFrom: number;
+  /** @deprecated Prefer costing.adultOperationalCost for booking math. Kept for cards / legacy. */
   priceAdult?: number;
+  /** @deprecated Prefer costing.childOperationalCost for booking math. Kept for legacy. */
   priceChild?: number;
+  /**
+   * Operational cost → margin → GST booking engine (Studio).
+   * When set, createBooking / guest totals use this instead of priceAdult/priceChild.
+   */
+  costing?: ExperienceCosting | null;
   minGuests?: number;
   maxGuests: number;
   /** Legacy explicit time slots; retained for existing Firestore records. */
