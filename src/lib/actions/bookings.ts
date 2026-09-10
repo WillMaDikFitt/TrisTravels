@@ -114,14 +114,14 @@ export async function createBooking(input: {
   );
   const usingCosting = hasExperienceCosting(experience);
   const wantsTransport = Boolean(input.transportation) && transportMode !== "none";
-  const vehicle = wantsTransport && !usingCosting
+  const vehicle = wantsTransport
     ? findTransportVehicle(vehicles, input.transportVehicle) ?? vehicles[0]
     : undefined;
   const vehicleCountInput = Math.max(1, Math.min(10, Math.round(input.vehicleCount ?? 1)));
   if (transportMode === "required" && !wantsTransport) {
     return { ok: false as const, error: "Transport is required for this experience" };
   }
-  if (wantsTransport && !usingCosting && !vehicle) {
+  if (wantsTransport && !vehicle) {
     return { ok: false as const, error: "Choose a vehicle type" };
   }
 
@@ -132,6 +132,7 @@ export async function createBooking(input: {
     trisTransport: wantsTransport,
     transportFee: legacyTransportFee,
     vehicleCount: vehicleCountInput,
+    vehicleId: vehicle?.id,
   });
   const transportPrice = quote.transportCost;
   const vehicleCount = quote.vehicleCount || (wantsTransport ? vehicleCountInput : 0);
@@ -161,11 +162,11 @@ export async function createBooking(input: {
   if (backendId) record.backendId = backendId;
   if (children > 0 && input.childAges) record.childAges = input.childAges;
   if (input.uid) record.uid = input.uid;
-  if (wantsTransport && (usingCosting || vehicle)) {
+  if (wantsTransport && vehicle) {
     record.transportation = {
       requested: true,
-      vehicle: usingCosting ? "tris" : vehicle?.id,
-      vehicleLabel: usingCosting ? "TRIS transport" : vehicle?.label,
+      vehicle: vehicle.id,
+      vehicleLabel: vehicle.label,
       vehicleCount: vehicleCount || 1,
       price: transportPrice,
     };

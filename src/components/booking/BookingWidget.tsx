@@ -98,6 +98,7 @@ export function BookingWidget({ experience }: Props) {
     trisTransport: transportation,
     transportFee: legacyTransportFee,
     vehicleCount,
+    vehicleId: transportation ? vehicleId || selectedVehicle?.id : undefined,
   });
   const gross = quote.customerTotal;
 
@@ -143,18 +144,16 @@ export function BookingWidget({ experience }: Props) {
     });
     if (children > 0) params.set("childAges", childAges.join(","));
     if (transportMode === "optional") {
-      if (transportChoice === "tris" && (usingCosting || vehicleId)) {
+      if (transportChoice === "tris" && vehicleId) {
         params.set("transport", "1");
-        if (!usingCosting && vehicleId) {
-          params.set("vehicle", vehicleId);
-          params.set("vehicles", String(vehicleCount));
-        }
+        params.set("vehicle", vehicleId);
+        params.set("vehicles", String(vehicleCount));
       } else if (transportChoice === "own") {
         params.set("transport", "0");
       }
     } else if (transportMode === "required") {
       params.set("transport", "1");
-      if (!usingCosting && vehicleId) {
+      if (vehicleId) {
         params.set("vehicle", vehicleId);
         params.set("vehicles", String(vehicleCount));
       }
@@ -170,21 +169,19 @@ export function BookingWidget({ experience }: Props) {
       )}
     >
       <div className="shrink-0">
-        <div className="flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <p className="label-caps text-accent">From</p>
-            <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
-              {formatINR(experience.priceFrom || adultRate(experience))}
-              <span className="text-[12px] font-normal text-on-surface-variant">
-                {usingCosting ? " / person" : " / adult"}
-              </span>
-            </p>
-          </div>
-          <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
-            {usingCosting
-              ? `Total updates with guests · max ${partyCap}`
-              : `Child ${formatINR(childRate(experience))} · max ${partyCap}`}
+        <div>
+          <p className="label-caps text-accent">From</p>
+          <p className="mt-0.5 font-display text-xl leading-none text-primary md:text-[1.35rem]">
+            {formatINR(experience.priceFrom || adultRate(experience))}
+            <span className="text-[12px] font-normal text-on-surface-variant">
+              {usingCosting ? " / person" : " / adult"}
+            </span>
           </p>
+          {!usingCosting ? (
+            <p className="mt-1 text-[10px] leading-snug text-on-surface-variant">
+              Child {formatINR(childRate(experience))} · max {partyCap}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -291,7 +288,7 @@ export function BookingWidget({ experience }: Props) {
               if (next !== "tris") setVehicleId("");
             }}
             onVehicle={setVehicleId}
-            onVehicleCount={usingCosting ? undefined : setVehicleCount}
+            onVehicleCount={setVehicleCount}
           />
         )}
       </div>

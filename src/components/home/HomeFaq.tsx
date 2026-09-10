@@ -8,7 +8,7 @@ const faqs = [
   },
   {
     q: "How far ahead should I book?",
-    a: "For day experiences, booking about ten days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
+    a: "For day experiences, booking about five days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
   },
   {
     q: "Who will I travel with?",

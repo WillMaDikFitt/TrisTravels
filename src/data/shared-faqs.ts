@@ -12,7 +12,7 @@ export const DEFAULT_EXPERIENCE_FAQS: SharedFaqItem[] = [
   {
     id: "exp-book-ahead",
     q: "How far ahead should I book an experience?",
-    a: "Booking about ten days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
+    a: "Booking about five days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
     active: true,
     sortOrder: 1,
   },

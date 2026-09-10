@@ -332,28 +332,6 @@ export default function ExperienceEditorPage() {
         </Panel>
 
         <Panel>
-          <SlotScheduleEditor
-            value={{
-              slotConfig: row.slotConfig ?? { mode: "fixed", times: ["08:30", "09:00", "10:00"] },
-              minGuests: row.minGuests ?? 1,
-              maxGuests: row.maxGuests,
-            }}
-            onChange={(next) =>
-              setRow((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      slotConfig: next.slotConfig,
-                      minGuests: next.minGuests,
-                      maxGuests: next.maxGuests,
-                    }
-                  : prev,
-              )
-            }
-          />
-        </Panel>
-
-        <Panel>
           <TransportPricingFields
             variant="experience"
             value={transportEditorFromListing({
@@ -381,7 +359,39 @@ export default function ExperienceEditorPage() {
                   : prev,
               );
             }}
-            hideVehiclePrices={hasExperienceCosting(row)}
+            costingTransport={hasExperienceCosting(row) ? row.costing?.transport : undefined}
+            onCostingTransportChange={
+              hasExperienceCosting(row)
+                ? (transport) =>
+                    setRow((prev) =>
+                      prev?.costing
+                        ? { ...prev, costing: { ...prev.costing, transport } }
+                        : prev,
+                    )
+                : undefined
+            }
+          />
+        </Panel>
+
+        <Panel>
+          <SlotScheduleEditor
+            value={{
+              slotConfig: row.slotConfig ?? { mode: "fixed", times: ["08:30", "09:00", "10:00"] },
+              minGuests: row.minGuests ?? 1,
+              maxGuests: row.maxGuests,
+            }}
+            onChange={(next) =>
+              setRow((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      slotConfig: next.slotConfig,
+                      minGuests: next.minGuests,
+                      maxGuests: next.maxGuests,
+                    }
+                  : prev,
+              )
+            }
           />
         </Panel>
 

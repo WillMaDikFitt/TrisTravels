@@ -223,42 +223,10 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
           </div>
 
           {transportMode !== "none" ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Vehicle cost (₹)" hint="Lump sum per vehicle · not split per guest">
-                <input
-                  type="number"
-                  min={0}
-                  value={costing.transport.vehicleCost}
-                  onChange={(e) =>
-                    onChange({
-                      ...costing,
-                      transport: {
-                        ...costing.transport,
-                        vehicleCost: Math.max(0, Math.round(Number(e.target.value) || 0)),
-                      },
-                    })
-                  }
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Vehicle capacity (guests)" hint="Vehicles = ceil(guests ÷ capacity)">
-                <input
-                  type="number"
-                  min={1}
-                  value={costing.transport.vehicleCapacity}
-                  onChange={(e) =>
-                    onChange({
-                      ...costing,
-                      transport: {
-                        ...costing.transport,
-                        vehicleCapacity: Math.max(1, Math.round(Number(e.target.value) || 1)),
-                      },
-                    })
-                  }
-                  className={inputClass}
-                />
-              </Field>
-            </div>
+            <Notice>
+              Set each vehicle’s operational cost & capacity in the Transportation section below — same
+              per-car style as curated journeys.
+            </Notice>
           ) : (
             <Notice>Transport mode is “not offered” — transport cost stays ₹0.</Notice>
           )}

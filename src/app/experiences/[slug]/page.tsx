@@ -202,8 +202,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
                     items: [
                       `Best season: ${exp.bestSeason}`,
                       `Meeting point: ${exp.meetingPoint}`,
-                      "10+ days ahead: book online",
-                      "Under 10 days: request booking",
+                      "5+ days ahead: book online",
+                      "Under 5 days: request booking",
                     ],
                   },
                 ].map((card) => (

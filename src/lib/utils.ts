@@ -30,7 +30,7 @@ export function daysUntilDate(isoDate: string) {
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
 
-/** Instant online booking requires 10+ days’ notice; closer dates are request-only. */
+/** Instant online booking requires 5+ days’ notice; closer dates are request-only. */
 export const BOOKING_NOTICE_DAYS = 5;
 
 export function isInstantBookingDate(isoDate: string) {

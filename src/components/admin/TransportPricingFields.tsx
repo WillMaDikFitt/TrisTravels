@@ -10,6 +10,7 @@ import {
   type FleetVehicle,
   type TransportVehiclePrices,
 } from "@/data/transport";
+import type { ExperienceCosting, ExperienceVehicleRate } from "@/data/experience-costing";
 import { fetchFleetVehicles } from "@/lib/actions/content-read";
 import { cn, formatINR } from "@/lib/utils";
 
@@ -27,8 +28,12 @@ type Props = {
   variant: "experience" | "journey";
   value: TransportEditorValue;
   onChange: (next: TransportEditorValue) => void;
-  /** When operational costing owns transport price, hide per-vehicle transfer rates. */
-  hideVehiclePrices?: boolean;
+  /**
+   * When set (experience + costing engine), show per-vehicle operational cost & capacity
+   * like curated package vehicle rates — instead of guest-facing selling prices.
+   */
+  costingTransport?: ExperienceCosting["transport"];
+  onCostingTransportChange?: (next: ExperienceCosting["transport"]) => void;
 };
 
 const MODE_OPTIONS = [
@@ -58,18 +63,47 @@ function pricesFromFleet(
   return Object.fromEntries(options.map((o) => [o.id, o.price]));
 }
 
+function rateForVehicle(
+  transport: ExperienceCosting["transport"],
+  vehicleId: string,
+  seatsHint?: number,
+): ExperienceVehicleRate {
+  const mapped = transport.vehicles?.[vehicleId];
+  if (mapped) {
+    return {
+      cost: Math.max(0, Math.round(mapped.cost)),
+      capacity: Math.max(1, Math.round(mapped.capacity) || 1),
+    };
+  }
+  return {
+    cost: Math.max(0, Math.round(transport.vehicleCost ?? 0)),
+    capacity: Math.max(
+      1,
+      Math.round(transport.vehicleCapacity) || Math.round(seatsHint || 6) || 6,
+    ),
+  };
+}
+
 /**
  * Listing-level transport offer + prices.
  * Vehicle catalogue (names, photos, defaults) is managed under Studio → Vehicles.
  */
-export function TransportPricingFields({ variant, value, onChange, hideVehiclePrices }: Props) {
+export function TransportPricingFields({
+  variant,
+  value,
+  onChange,
+  costingTransport,
+  onCostingTransportChange,
+}: Props) {
   const [fleet, setFleet] = useState<FleetVehicle[]>(DEFAULT_FLEET_VEHICLES);
   const offered = variant === "experience" ? value.mode !== "none" : value.available !== false;
+  const useCostingRates = Boolean(costingTransport && onCostingTransportChange);
   const display = useMemo(
     () => pricesFromFleet(fleet, value.prices, value.basePrice),
     [fleet, value.prices, value.basePrice],
   );
   const [fillFrom, setFillFrom] = useState(String(value.basePrice || display.sedan || 2500));
+  const [fillCost, setFillCost] = useState(String(costingTransport?.vehicleCost || 0));
 
   useEffect(() => {
     fetchFleetVehicles()
@@ -78,6 +112,13 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
       })
       .catch(() => undefined);
   }, []);
+
+  const visibleFleet = useMemo(() => {
+    if (!value.offeredVehicleIds?.length) return fleet;
+    const allow = new Set(value.offeredVehicleIds);
+    const filtered = fleet.filter((v) => allow.has(v.id));
+    return filtered.length ? filtered : fleet;
+  }, [fleet, value.offeredVehicleIds]);
 
   const setPrice = (id: string, raw: string) => {
     const amount = Number(raw);
@@ -107,27 +148,65 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
     });
   };
 
+  const setCostingRate = (id: string, patch: Partial<ExperienceVehicleRate>) => {
+    if (!costingTransport || !onCostingTransportChange) return;
+    const current = rateForVehicle(costingTransport, id);
+    const nextVehicles = {
+      ...(costingTransport.vehicles ?? {}),
+      [id]: {
+        cost: patch.cost != null ? Math.max(0, Math.round(patch.cost)) : current.cost,
+        capacity:
+          patch.capacity != null
+            ? Math.max(1, Math.round(patch.capacity) || 1)
+            : current.capacity,
+      },
+    };
+    const first = nextVehicles[visibleFleet[0]?.id ?? id] ?? nextVehicles[id];
+    onCostingTransportChange({
+      ...costingTransport,
+      vehicles: nextVehicles,
+      vehicleCost: first?.cost ?? costingTransport.vehicleCost,
+      vehicleCapacity: first?.capacity ?? costingTransport.vehicleCapacity,
+    });
+  };
+
+  const applyCostingFillAll = () => {
+    if (!costingTransport || !onCostingTransportChange) return;
+    const cost = Math.max(0, Math.round(Number(fillCost) || 0));
+    const nextVehicles: Record<string, ExperienceVehicleRate> = {
+      ...(costingTransport.vehicles ?? {}),
+    };
+    for (const vehicle of visibleFleet) {
+      const prev = rateForVehicle(costingTransport, vehicle.id, vehicle.maxGuests);
+      nextVehicles[vehicle.id] = { cost, capacity: prev.capacity };
+    }
+    onCostingTransportChange({
+      ...costingTransport,
+      vehicleCost: cost,
+      vehicleCapacity: costingTransport.vehicleCapacity,
+      vehicles: nextVehicles,
+    });
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-lg text-[#26352b]">Transportation</h2>
           <p className="mt-1 text-sm text-[#4a5a50]">
-            {hideVehiclePrices
-              ? "Choose whether TRIS transport is required or optional. Vehicle cost & capacity live under Operational costing."
+            {useCostingRates
+              ? "Mode, which cars guests can pick, and each vehicle’s operational cost & capacity (feeds the costing engine)."
               : variant === "experience"
                 ? "Decide if TRIS provides a vehicle, then set prices for this listing."
                 : "Prices shown on the journey enquire form when guests request a transfer."}
           </p>
         </div>
-        {!hideVehiclePrices ? (
-          <Link
-            href="/admin/fleet"
-            className="rounded-full border border-[#c5cbb8] px-3 py-1.5 text-xs font-semibold text-[#364037] hover:border-[#8fa183]"
-          >
-            Manage vehicles & photos
-          </Link>
-        ) : null}
+        <Link
+          href="/admin/fleet"
+          className="rounded-full border border-[#c5cbb8] px-3 py-1.5 text-xs font-semibold text-[#364037] hover:border-[#8fa183]"
+        >
+          Manage vehicles & photos
+        </Link>
       </div>
 
       {variant === "experience" ? (
@@ -244,10 +323,104 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
             </div>
           </div>
 
-          {hideVehiclePrices ? (
-            <p className="rounded-2xl border border-dashed border-[#c5cbb8] bg-[#faf8f3] px-4 py-3 text-sm text-[#4a5a50]">
-              Vehicle cost and capacity for the booking engine are set in Operational costing above.
-            </p>
+          {useCostingRates && costingTransport ? (
+            <>
+              <div className="rounded-2xl border border-[#c5cbb8] bg-[#f6f8f1] p-4">
+                <p className="text-sm font-medium text-[#26352b]">Set the same operational cost for all</p>
+                <p className="mt-0.5 text-xs text-[#4a5a50]">
+                  Then adjust each vehicle card. Capacity stays per vehicle.
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <div className="flex h-11 items-stretch overflow-hidden rounded-xl border border-[#c5cbb8] bg-white">
+                    <span className="grid place-items-center border-r border-[#c5cbb8] bg-[#faf8f3] px-3 text-sm font-semibold text-[#4a5a50]">
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={fillCost}
+                      onChange={(e) => setFillCost(e.target.value)}
+                      className="w-28 border-0 bg-transparent px-3 text-sm text-[#26352b] outline-none"
+                      aria-label="Operational cost in rupees"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={applyCostingFillAll}
+                    className="h-11 rounded-full bg-[#364037] px-4 text-sm font-semibold text-[#f8f6f1]"
+                  >
+                    Apply cost to all
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-[#26352b]">
+                  Vehicle rates (₹ / vehicle) & capacity
+                </h3>
+                <p className="mt-0.5 text-xs text-[#4a5a50]">
+                  Like curated journeys — guests pick a type; vehicles = ceil(guests ÷ capacity) unless they
+                  choose more. Cost is operational (margin + GST applied by the engine).
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {visibleFleet.map((vehicle) => {
+                    const rate = rateForVehicle(costingTransport, vehicle.id, vehicle.maxGuests);
+                    const photo = vehicle.images?.[0] || vehicle.image;
+                    return (
+                      <div key={vehicle.id} className="space-y-2 rounded-2xl border border-[#c5cbb8] bg-white p-4">
+                        <div className="flex gap-3">
+                          <div className="h-14 w-[4.5rem] shrink-0 overflow-hidden rounded-xl bg-[#eef1e6]">
+                            {photo ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={photo} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="grid h-full place-items-center text-[10px] font-semibold tracking-wide text-[#8a9a8c] uppercase">
+                                No photo
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-[#26352b]">{vehicle.label}</p>
+                            <p className="mt-0.5 text-xs text-[#4a5a50]">
+                              {vehicle.seats || `Max ${vehicle.maxGuests}`}
+                            </p>
+                            <p className="mt-1 text-xs font-medium text-[#5a6b5c]">
+                              {formatINR(rate.cost)} · {rate.capacity} guests
+                            </p>
+                          </div>
+                        </div>
+                        <Field label="Cost / vehicle (₹)">
+                          <input
+                            type="number"
+                            min={0}
+                            value={rate.cost}
+                            onChange={(e) =>
+                              setCostingRate(vehicle.id, {
+                                cost: Math.max(0, Math.round(Number(e.target.value) || 0)),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </Field>
+                        <Field label="Capacity (guests)">
+                          <input
+                            type="number"
+                            min={1}
+                            value={rate.capacity}
+                            onChange={(e) =>
+                              setCostingRate(vehicle.id, {
+                                capacity: Math.max(1, Math.round(Number(e.target.value) || 1)),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </Field>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div className="rounded-2xl border border-[#c5cbb8] bg-[#f6f8f1] p-4">
@@ -278,7 +451,7 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                {fleet.map((vehicle) => {
+                {visibleFleet.map((vehicle) => {
                   const amount = value.prices[vehicle.id] ?? display[vehicle.id] ?? 0;
                   const photo = vehicle.images?.[0] || vehicle.image;
                   return (
@@ -316,18 +489,18 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
                   );
                 })}
               </div>
-
-              {!fleet.length ? (
-                <p className="rounded-xl border border-dashed border-[#c5cbb8] px-4 py-4 text-sm text-[#4a5a50]">
-                  No active vehicles.{" "}
-                  <Link href="/admin/fleet" className="font-semibold text-[#364037] underline">
-                    Add vehicles in Studio
-                  </Link>
-                  .
-                </p>
-              ) : null}
             </>
           )}
+
+          {!fleet.length ? (
+            <p className="rounded-xl border border-dashed border-[#c5cbb8] px-4 py-4 text-sm text-[#4a5a50]">
+              No active vehicles.{" "}
+              <Link href="/admin/fleet" className="font-semibold text-[#364037] underline">
+                Add vehicles in Studio
+              </Link>
+              .
+            </p>
+          ) : null}
         </>
       ) : (
         <p className="rounded-2xl border border-dashed border-[#c5cbb8] px-4 py-5 text-sm text-[#4a5a50]">

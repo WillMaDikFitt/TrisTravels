@@ -60,8 +60,10 @@ export type ExperienceQuoteOptions = {
   trisTransport?: boolean;
   /** Legacy multi-vehicle transfer fee (ignored when costing is configured). */
   transportFee?: number;
-  /** Legacy vehicle count stored on the booking when transport is selected. */
+  /** Vehicle count (costing + legacy). */
   vehicleCount?: number;
+  /** Selected fleet vehicle id — used by costing for per-car rates. */
+  vehicleId?: string;
 };
 
 export type ExperienceQuote = {
@@ -104,6 +106,8 @@ export function quoteExperience(
       adults,
       children: kids,
       trisTransport,
+      vehicleId: options.vehicleId,
+      vehicleCount: options.vehicleCount,
     });
     return {
       engine: "costing",
