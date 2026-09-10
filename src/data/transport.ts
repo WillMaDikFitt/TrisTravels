@@ -352,9 +352,14 @@ export function transportVehicleOptions(
   basePrice = 2500,
   overrides?: TransportVehiclePrices | null,
   fleet?: FleetVehicle[] | null,
+  allowedIds?: string[] | null,
 ): TransportVehicleOption[] {
   const safeBase = Math.max(0, Math.round(basePrice));
-  const list = fleet?.length ? transferFleetVehicles(fleet) : transferFleetVehicles(DEFAULT_FLEET_VEHICLES);
+  let list = fleet?.length ? transferFleetVehicles(fleet) : transferFleetVehicles(DEFAULT_FLEET_VEHICLES);
+  if (allowedIds?.length) {
+    const allow = new Set(allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)));
+    list = list.filter((vehicle) => allow.has(vehicle.id));
+  }
   // Map legacy "tempo" override onto tempo12
   const prices = { ...overrides };
   if (prices.tempo != null && prices.tempo12 == null) prices.tempo12 = prices.tempo;

@@ -124,7 +124,10 @@ export default function AdminJourneysPage() {
                         onClick={async () => {
                           if (!confirm(`Remove “${j.name}”?`)) return;
                           await deleteDocument("journeys", j.slug);
-                          setRows((prev) => prev.filter((r) => r.slug !== j.slug));
+                          const { fetchJourneysAdmin } = await import("@/lib/actions/content-read");
+                          const next = await fetchJourneysAdmin().catch(() => null);
+                          if (next) setRows(next);
+                          else setRows((prev) => prev.filter((r) => r.slug !== j.slug));
                         }}
                       >
                         Delete

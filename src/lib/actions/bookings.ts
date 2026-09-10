@@ -110,6 +110,7 @@ export async function createBooking(input: {
     experience.transportPrice,
     experience.transportVehicles,
     settings.fleetVehicles,
+    experience.offeredVehicleIds,
   );
   const usingCosting = hasExperienceCosting(experience);
   const wantsTransport = Boolean(input.transportation) && transportMode !== "none";

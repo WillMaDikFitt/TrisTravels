@@ -60,8 +60,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const partyCap = Math.min(experience.maxGuests, slotCapacity);
   const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles, fleet),
-    [experience.transportPrice, experience.transportVehicles, fleet],
+    () =>
+      transportVehicleOptions(
+        experience.transportPrice,
+        experience.transportVehicles,
+        fleet,
+        experience.offeredVehicleIds,
+      ),
+    [experience.transportPrice, experience.transportVehicles, experience.offeredVehicleIds, fleet],
   );
   const minGuests = experience.minGuests ?? 1;
   const initialChildren = Math.max(0, Number(search.get("children") || 0));
@@ -165,11 +171,9 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const transportReady =
     transportMode === "none"
       ? true
-      : usingCosting
-        ? transportMode === "required" || transportChoice === "own" || transportChoice === "tris"
-        : transportMode === "required"
-          ? Boolean(vehicleId)
-          : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+      : transportMode === "required"
+        ? Boolean(vehicleId)
+        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
 
   const detailsReady =
     Boolean(date) &&
@@ -482,7 +486,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     vehicleId={vehicleId}
                     vehicleCount={vehicleCount}
                     note={experience.transportNote}
-                    costingTransport={usingCosting}
+                    hidePrices={usingCosting}
                     onChoice={(next) => {
                       setTransportChoice(next);
                       if (next !== "tris") setVehicleId("");

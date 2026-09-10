@@ -9,6 +9,7 @@ import {
   DEFAULT_PACKAGE_STAYS,
   DEFAULT_PACKAGE_VEHICLES,
   DEFAULT_TRIS_SERVICE_PERCENT,
+  BOOKING_STAY_STYLE_IDS,
   STAY_PREFERENCE_IDS,
   STAY_PREFERENCE_META,
 } from "@/data/package-pricing";
@@ -16,6 +17,7 @@ import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { normalizeJourney } from "@/lib/normalize-listing";
+import { useStudioListingHydration } from "@/lib/admin/useStudioListingHydration";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField, GalleryField } from "@/components/admin/ImageField";
 import { parseDepartureSeats } from "@/lib/journey-seats";
@@ -111,54 +113,59 @@ export default function JourneyEditorPage() {
   const slugKey = decodeURIComponent(String(params.slug ?? ""));
   const router = useRouter();
   const isNew = slugKey === "new";
-  const [row, setRow] = useState<Journey | null>(() => {
-    if (isNew) return blank();
-    const seeded = getStaticJourney(slugKey);
-    return seeded ? normalizeJourney(seeded, slugKey) : null;
-  });
+  const { row, setRow, hydrated, formKey, loadError, canSave, applySaved } =
+    useStudioListingHydration<Journey>({
+      isNew,
+      slugKey,
+      blank,
+      seedFallback: () => {
+        const seeded = getStaticJourney(slugKey);
+        return seeded ? normalizeJourney(seeded, slugKey) : null;
+      },
+      isRemoved: (journey) => journey.removedFromCatalogue === true,
+      load: async () => {
+        const journey = await fetchJourneyAdmin(slugKey);
+        return journey ? normalizeJourney(journey, slugKey) : null;
+      },
+    });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isNew) return;
-    const seeded = getStaticJourney(slugKey);
-    let cancelled = false;
+    if (loadError) setNote(loadError);
+  }, [loadError]);
 
-    fetchJourneyAdmin(slugKey)
-      .then((j) => {
-        if (cancelled) return;
-        if (j?.name?.trim()) setRow(normalizeJourney(j, slugKey));
-        else if (seeded) setRow(normalizeJourney(seeded, slugKey));
-        else if (j) setRow(normalizeJourney(j, slugKey));
-        else setRow(blank());
-      })
-      .catch(() => {
-        if (!cancelled) setRow(seeded ? normalizeJourney(seeded, slugKey) : blank());
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isNew, slugKey]);
-
-  if (!row) return <p className="text-sm text-[#4a5a50]">Loading editor…</p>;
+  if (!hydrated) return <p className="text-sm text-[#4a5a50]">Loading saved content…</p>;
+  if (!row) return <p className="text-sm text-[#4a5a50]">{note || "Loading editor…"}</p>;
 
   return (
     <div>
       <PageHeader
         eyebrow="Catalogue"
         title={isNew ? "New journey" : row.name || "Edit journey"}
+        description="Edits load from live Studio data before this form opens, so seed defaults cannot overwrite your work."
         actions={
           <AdminButton variant="ghost" onClick={() => router.push("/admin/journeys")}>
             Back to list
           </AdminButton>
         }
       />
+      {note ? (
+        <div className="mb-4">
+          <Notice tone={note.startsWith("Saved") ? "ok" : note.includes("Do not save") ? "warn" : "info"}>
+            {note}
+          </Notice>
+        </div>
+      ) : null}
       <form
-        key={row.slug}
+        key={formKey}
         className="space-y-6"
         onSubmit={async (e) => {
           e.preventDefault();
+          if (!canSave) {
+            setNote("Still loading saved content — wait a moment, then try Save again.");
+            return;
+          }
           const fd = new FormData(e.currentTarget);
           const nextSlug = isNew ? slugify(String(fd.get("name") || "")) || `journey-${Date.now()}` : row.slug;
           const next: Journey = {
@@ -176,6 +183,9 @@ export default function JourneyEditorPage() {
             transportPrice: row.transportPrice,
             transportNote: row.transportNote ?? "",
             transportVehicles: row.transportVehicles,
+            offeredVehicleIds: row.offeredVehicleIds?.length ? row.offeredVehicleIds : undefined,
+            offeredStayStyleIds: row.offeredStayStyleIds?.length ? row.offeredStayStyleIds : undefined,
+            removedFromCatalogue: false,
             season: String(fd.get("season")),
             overview: String(fd.get("overview")),
             image: (() => {
@@ -216,11 +226,19 @@ export default function JourneyEditorPage() {
             }
           }
           setBusy(true);
-          const res = await saveDocument("journeys", nextSlug, next as unknown as Record<string, unknown>);
+          const res = await saveDocument("journeys", nextSlug, {
+            ...(next as unknown as Record<string, unknown>),
+            offeredVehicleIds: row.offeredVehicleIds?.length ? row.offeredVehicleIds : null,
+            offeredStayStyleIds: row.offeredStayStyleIds?.length ? row.offeredStayStyleIds : null,
+          });
           setBusy(false);
-          setNote(res.ok ? "Saved." : res.error ?? "Could not save.");
-          if (res.ok && isNew) router.replace(`/admin/journeys/${nextSlug}`);
-          else setRow(next);
+          if (res.ok) {
+            setNote("Saved. Your edits are stored live — refresh to confirm they stuck.");
+            applySaved(next);
+            if (isNew) router.replace(`/admin/journeys/${nextSlug}`);
+          } else {
+            setNote(res.error ?? "Could not save.");
+          }
         }}
       >
         <Panel>
@@ -285,7 +303,10 @@ export default function JourneyEditorPage() {
             <Field label="Price from (₹)">
               <input name="priceFrom" type="number" defaultValue={row.priceFrom} className={inputClass} />
             </Field>
-            <Field label="Child price (₹)" hint="blank = 70% of adult">
+            <Field
+              label="Child price (₹)"
+              hint="Used on enquire. Enter the child rate — no automatic 70% fallback (blank = ₹0 for children)."
+            >
               <input name="priceChild" type="number" min="0" defaultValue={row.priceChild ?? ""} className={inputClass} />
             </Field>
             <Field label="Price note">
@@ -329,6 +350,7 @@ export default function JourneyEditorPage() {
               transportPrice: row.transportPrice,
               transportNote: row.transportNote,
               transportVehicles: row.transportVehicles,
+              offeredVehicleIds: row.offeredVehicleIds,
             })}
             onChange={(next) => {
               const fields = transportFieldsFromEditor(next);
@@ -340,12 +362,66 @@ export default function JourneyEditorPage() {
                       transportPrice: fields.transportPrice,
                       transportNote: fields.transportNote,
                       transportVehicles: fields.transportVehicles,
+                      offeredVehicleIds: fields.offeredVehicleIds,
                     }
                   : prev,
               );
             }}
           />
         </Panel>
+
+        {row.type === "curated" ? (
+          <Panel>
+            <h2 className="mb-2 font-display text-lg">Stay styles on Book now</h2>
+            <p className="mb-4 text-sm text-[#4a5a50]">
+              Choose which Studio stay categories guests can pick on this journey. Photos come from Studio → Stays.
+              Leave all ticked to offer every booking-enabled stay.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {BOOKING_STAY_STYLE_IDS.map((id) => {
+                const meta = STAY_PREFERENCE_META[id];
+                const selected =
+                  !row.offeredStayStyleIds?.length || row.offeredStayStyleIds.includes(id);
+                return (
+                  <label
+                    key={id}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm ${
+                      selected
+                        ? "border-[#364037] bg-white text-[#26352b]"
+                        : "border-[#d5dbc8] bg-[#f3f5ef] text-[#4a5a50]"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => {
+                        const allIds = [...BOOKING_STAY_STYLE_IDS];
+                        const current = row.offeredStayStyleIds?.length
+                          ? [...row.offeredStayStyleIds]
+                          : [...allIds];
+                        const next = current.includes(id)
+                          ? current.filter((item) => item !== id)
+                          : [...current, id];
+                        setRow((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                offeredStayStyleIds:
+                                  next.length === 0 || next.length === allIds.length
+                                    ? undefined
+                                    : next,
+                              }
+                            : prev,
+                        );
+                      }}
+                    />
+                    <span className="font-medium">{meta?.label ?? id}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </Panel>
+        ) : null}
 
         {row.type === "curated" ? (
           <Panel>
@@ -531,7 +607,7 @@ export default function JourneyEditorPage() {
           </div>
         </Panel>
         {note && <Notice tone={note === "Saved." ? "ok" : "warn"}>{note}</Notice>}
-        <AdminButton type="submit" disabled={busy}>
+        <AdminButton type="submit" disabled={busy || !canSave}>
           {busy ? "Saving…" : "Save journey"}
         </AdminButton>
       </form>

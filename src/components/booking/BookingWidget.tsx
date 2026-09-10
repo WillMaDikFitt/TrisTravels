@@ -47,8 +47,14 @@ export function BookingWidget({ experience }: Props) {
   const usingCosting = hasExperienceCosting(experience);
   const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(experience.transportPrice, experience.transportVehicles, fleet),
-    [experience.transportPrice, experience.transportVehicles, fleet],
+    () =>
+      transportVehicleOptions(
+        experience.transportPrice,
+        experience.transportVehicles,
+        fleet,
+        experience.offeredVehicleIds,
+      ),
+    [experience.transportPrice, experience.transportVehicles, experience.offeredVehicleIds, fleet],
   );
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState(wholeDay ? slots[0] ?? "" : "");
@@ -111,11 +117,9 @@ export function BookingWidget({ experience }: Props) {
   const transportReady =
     transportMode === "none"
       ? true
-      : usingCosting
-        ? transportMode === "required" || transportChoice === "own" || transportChoice === "tris"
-        : transportMode === "required"
-          ? Boolean(vehicleId)
-          : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+      : transportMode === "required"
+        ? Boolean(vehicleId)
+        : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
 
   const canContinue =
     Boolean(date) &&
@@ -281,7 +285,7 @@ export function BookingWidget({ experience }: Props) {
             vehicleId={vehicleId}
             vehicleCount={vehicleCount}
             note={experience.transportNote}
-            costingTransport={usingCosting}
+            hidePrices={usingCosting}
             onChoice={(next) => {
               setTransportChoice(next);
               if (next !== "tris") setVehicleId("");

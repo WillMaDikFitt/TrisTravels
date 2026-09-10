@@ -83,13 +83,24 @@ export const PACKAGE_TRANSPORT: PackageTransportMeta[] = DEFAULT_FLEET_VEHICLES.
 
 export const PACKAGE_TRANSPORT_IDS = PACKAGE_TRANSPORT.map((t) => t.id);
 
-export function packageTransportList(fleet?: FleetVehicle[] | null): PackageTransportMeta[] {
-  const list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
+export function packageTransportList(
+  fleet?: FleetVehicle[] | null,
+  allowedIds?: string[] | null,
+): PackageTransportMeta[] {
+  let list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
+  if (allowedIds?.length) {
+    const allow = new Set(allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)));
+    list = list.filter((vehicle) => allow.has(vehicle.id));
+  }
   return list.map(fleetVehicleToPackageMeta);
 }
 
-export function packageTransportMeta(id: string, fleet?: FleetVehicle[] | null) {
-  const list = packageTransportList(fleet);
+export function packageTransportMeta(
+  id: string,
+  fleet?: FleetVehicle[] | null,
+  allowedIds?: string[] | null,
+) {
+  const list = packageTransportList(fleet, allowedIds);
   const normalized = id === "tempo" ? "tempo12" : id;
   return list.find((t) => t.id === normalized) ?? list[0] ?? PACKAGE_TRANSPORT[0];
 }

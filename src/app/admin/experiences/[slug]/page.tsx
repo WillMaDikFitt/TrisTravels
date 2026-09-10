@@ -9,6 +9,7 @@ import { fetchExperienceAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
 import { slugify } from "@/lib/slug";
 import { normalizeExperience } from "@/lib/normalize-listing";
+import { useStudioListingHydration } from "@/lib/admin/useStudioListingHydration";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 import { ImageField, GalleryField } from "@/components/admin/ImageField";
 import {
@@ -74,38 +75,34 @@ export default function ExperienceEditorPage() {
   const slugKey = decodeURIComponent(String(params.slug ?? ""));
   const router = useRouter();
   const isNew = slugKey === "new";
-  const [row, setRow] = useState<Experience | null>(() => {
-    if (isNew) return blank();
-    const seeded = getStaticExperience(slugKey);
-    return seeded ? normalizeExperience(seeded, slugKey) : null;
-  });
+  const { row, setRow, hydrated, formKey, loadError, canSave, applySaved } =
+    useStudioListingHydration<Experience>({
+      isNew,
+      slugKey,
+      blank: () => blank(isNew ? "" : slugKey),
+      seedFallback: () => {
+        const seeded = getStaticExperience(slugKey);
+        return seeded ? normalizeExperience(seeded, slugKey) : null;
+      },
+      isRemoved: (exp) => exp.removedFromCatalogue === true,
+      load: async () => {
+        const exp = await fetchExperienceAdmin(slugKey);
+        return exp ? normalizeExperience(exp, slugKey) : null;
+      },
+    });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isNew) return;
-    const seeded = getStaticExperience(slugKey);
-    let cancelled = false;
+    if (loadError) setNote(loadError);
+  }, [loadError]);
 
-    fetchExperienceAdmin(slugKey)
-      .then((exp) => {
-        if (cancelled) return;
-        if (exp?.name?.trim()) setRow(normalizeExperience(exp, slugKey));
-        else if (seeded) setRow(normalizeExperience(seeded, slugKey));
-        else if (exp) setRow(normalizeExperience(exp, slugKey));
-        else setRow(blank(slugKey));
-      })
-      .catch(() => {
-        if (!cancelled) setRow(seeded ? normalizeExperience(seeded, slugKey) : blank(slugKey));
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isNew, slugKey]);
+  if (!hydrated) {
+    return <p className="text-sm text-[#4a5a50]">Loading saved content…</p>;
+  }
 
   if (!row) {
-    return <p className="text-sm text-[#4a5a50]">Loading editor…</p>;
+    return <p className="text-sm text-[#4a5a50]">{note || "Loading editor…"}</p>;
   }
 
   return (
@@ -116,7 +113,7 @@ export default function ExperienceEditorPage() {
         description={
           !row.name.trim() && !isNew
             ? "This listing has no saved content yet. If it should be a seed experience, check the URL slug matches the list."
-            : "Public pages show active and seasonal experiences. Drafts stay in the studio."
+            : "Edits load from live Studio data before this form opens, so seed defaults cannot overwrite your work."
         }
         actions={
           <AdminButton variant="ghost" onClick={() => router.push("/admin/experiences")}>
@@ -124,11 +121,22 @@ export default function ExperienceEditorPage() {
           </AdminButton>
         }
       />
+      {note ? (
+        <div className="mb-4">
+          <Notice tone={note.startsWith("Saved") ? "ok" : note.includes("Do not save") ? "warn" : "info"}>
+            {note}
+          </Notice>
+        </div>
+      ) : null}
       <form
-        key={row.slug}
+        key={formKey}
         className="space-y-6"
         onSubmit={async (e) => {
           e.preventDefault();
+          if (!canSave) {
+            setNote("Still loading saved content — wait a moment, then try Save again.");
+            return;
+          }
           const fd = new FormData(e.currentTarget);
           const nextSlug = isNew ? slugify(String(fd.get("name") || "")) || `exp-${Date.now()}` : row.slug;
           const next: Experience = {
@@ -159,13 +167,13 @@ export default function ExperienceEditorPage() {
               ...(row.slotConfig ?? { mode: "fixed" as const, times: ["08:30", "09:00", "10:00"] }),
               capacity: row.slotConfig?.capacity ?? row.maxGuests,
             },
-            transportMode: row.transportMode ?? (row.transportAvailable ? "optional" : "none"),
-            transportAvailable: ["optional", "required"].includes(
-              row.transportMode ?? (row.transportAvailable ? "optional" : "none"),
-            ),
+            transportMode: row.transportMode ?? "optional",
+            transportAvailable: ["optional", "required"].includes(row.transportMode ?? "optional"),
             transportPrice: row.transportPrice,
             transportNote: row.transportNote ?? "",
             transportVehicles: row.transportVehicles,
+            offeredVehicleIds: row.offeredVehicleIds?.length ? row.offeredVehicleIds : undefined,
+            removedFromCatalogue: false,
             status: String(fd.get("status")) as ExperienceStatus,
             backendId: String(fd.get("backendId") || "").trim() || undefined,
             image: (() => {
@@ -190,11 +198,22 @@ export default function ExperienceEditorPage() {
             seo: { title: String(fd.get("seoTitle") || ""), description: String(fd.get("seoDescription") || "") },
           };
           setBusy(true);
-          const res = await saveDocument("experiences", nextSlug, next as unknown as Record<string, unknown>);
+          const res = await saveDocument(
+            "experiences",
+            nextSlug,
+            {
+              ...(next as unknown as Record<string, unknown>),
+              offeredVehicleIds: row.offeredVehicleIds?.length ? row.offeredVehicleIds : null,
+            },
+          );
           setBusy(false);
-          setNote(res.ok ? "Saved." : res.error ?? "Could not save.");
-          if (res.ok && isNew) router.replace(`/admin/experiences/${nextSlug}`);
-          else setRow(next);
+          if (res.ok) {
+            setNote("Saved. Your edits are stored live — refresh to confirm they stuck.");
+            applySaved(next);
+            if (isNew) router.replace(`/admin/experiences/${nextSlug}`);
+          } else {
+            setNote(res.error ?? "Could not save.");
+          }
         }}
       >
         <Panel>
@@ -344,6 +363,7 @@ export default function ExperienceEditorPage() {
               transportPrice: row.transportPrice,
               transportNote: row.transportNote,
               transportVehicles: row.transportVehicles,
+              offeredVehicleIds: row.offeredVehicleIds,
             })}
             onChange={(next) => {
               const fields = transportFieldsFromEditor(next);
@@ -356,6 +376,7 @@ export default function ExperienceEditorPage() {
                       transportPrice: fields.transportPrice,
                       transportNote: fields.transportNote,
                       transportVehicles: fields.transportVehicles,
+                      offeredVehicleIds: fields.offeredVehicleIds,
                     }
                   : prev,
               );
@@ -422,8 +443,12 @@ export default function ExperienceEditorPage() {
           </div>
         </Panel>
 
-        {note && <Notice tone={note === "Saved." ? "ok" : "warn"}>{note}</Notice>}
-        <AdminButton type="submit" disabled={busy}>
+        {note ? (
+          <Notice tone={note.startsWith("Saved") ? "ok" : note.includes("Do not save") ? "warn" : "info"}>
+            {note}
+          </Notice>
+        ) : null}
+        <AdminButton type="submit" disabled={busy || !canSave}>
           {busy ? "Saving…" : "Save experience"}
         </AdminButton>
       </form>

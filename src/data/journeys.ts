@@ -25,6 +25,16 @@ export type Journey = {
   transportPrice?: number;
   transportNote?: string;
   transportVehicles?: TransportVehiclePrices;
+  /**
+   * Vehicle ids offered on enquire / learn-more for this journey.
+   * Empty / unset = all transfer-enabled fleet vehicles.
+   */
+  offeredVehicleIds?: string[];
+  /**
+   * Stay style ids offered on curated Book now.
+   * Empty / unset = all booking-enabled stay styles from Studio.
+   */
+  offeredStayStyleIds?: string[];
   image: string;
   /** Optional hero carousel stills (cover is prepended on the public page). */
   gallery?: string[];
@@ -70,6 +80,8 @@ export type Journey = {
   tourHighlights?: string[];
   whyTitle?: string;
   status?: "draft" | "active" | "hidden";
+  /** Soft-delete tombstone — seed cannot resurrect this slug. */
+  removedFromCatalogue?: boolean;
   /** External / ops backend product ID (entered in Studio). */
   backendId?: string;
   /** External payment URL TRIS can raise per journey (Razorpay / UPI / bank link). */

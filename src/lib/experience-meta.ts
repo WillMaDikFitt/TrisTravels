@@ -11,7 +11,9 @@ export function experienceTransportMode(
   exp: Pick<Experience, "transportMode" | "transportAvailable">,
 ): ExperienceTransportMode {
   if (exp.transportMode) return exp.transportMode;
-  return exp.transportAvailable ? "optional" : "none";
+  // Explicit false keeps transport off; otherwise show options (optional).
+  if (exp.transportAvailable === false) return "none";
+  return "optional";
 }
 
 export function experienceSortKey(exp: Pick<Experience, "sortOrder" | "name">, index: number) {

@@ -183,7 +183,9 @@ export default function AdminExperiencesPage() {
                         onClick={async () => {
                           if (!confirm(`Remove “${e.name}” from the catalogue?`)) return;
                           await deleteDocument("experiences", e.slug);
-                          setRows((prev) => prev.filter((r) => r.slug !== e.slug));
+                          const next = await fetchExperiencesAdmin().catch(() => null);
+                          if (next) setRows(next);
+                          else setRows((prev) => prev.filter((r) => r.slug !== e.slug));
                         }}
                       >
                         Delete

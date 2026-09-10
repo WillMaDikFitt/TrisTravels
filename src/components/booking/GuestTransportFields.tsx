@@ -348,6 +348,8 @@ type GettingThereFieldsProps = {
   compact?: boolean;
   /** Operational costing: Book TRIS / own only — no vehicle type or count picker. */
   costingTransport?: boolean;
+  /** Hide per-vehicle prices (e.g. when costing engine owns the total). */
+  hidePrices?: boolean;
 };
 
 function VehicleGrid({
@@ -355,11 +357,13 @@ function VehicleGrid({
   vehicleId,
   onVehicle,
   compact,
+  hidePrices,
 }: {
   options: TransportVehicleOption[];
   vehicleId: string;
   onVehicle: (id: string) => void;
   compact?: boolean;
+  hidePrices?: boolean;
 }) {
   return compact ? (
     <div className="grid grid-cols-2 gap-2">
@@ -383,7 +387,9 @@ function VehicleGrid({
             ) : null}
             <p className="text-xs font-semibold">{option.label}</p>
             <p className="mt-0.5 text-[10px] leading-snug text-on-surface-variant">{option.idealFor}</p>
-            <p className="mt-1 text-[10px] font-medium text-primary">{formatINR(option.price)}</p>
+            {!hidePrices ? (
+              <p className="mt-1 text-[10px] font-medium text-primary">{formatINR(option.price)}</p>
+            ) : null}
           </button>
         );
       })}
@@ -420,7 +426,11 @@ function VehicleGrid({
             ) : null}
             <p className="pr-8 text-sm font-semibold">{option.label}</p>
             <p className="mt-0.5 text-xs text-on-surface-variant">{option.idealFor}</p>
-            <p className="mt-3 text-lg font-semibold text-primary">{formatINR(option.price)}</p>
+            {!hidePrices ? (
+              <p className="mt-3 text-lg font-semibold text-primary">{formatINR(option.price)}</p>
+            ) : (
+              <p className="mt-3 text-xs font-medium text-on-surface-variant">Included in total</p>
+            )}
           </button>
         );
       })}
@@ -440,6 +450,7 @@ export function GettingThereFields({
   onVehicleCount,
   compact,
   costingTransport,
+  hidePrices,
 }: GettingThereFieldsProps) {
   const lowestPrice = options.length ? Math.min(...options.map((o) => o.price)) : 0;
 
@@ -448,17 +459,26 @@ export function GettingThereFields({
   if (costingTransport) {
     if (mode === "required") {
       return (
-        <div
-          className={cn(
-            "rounded-2xl border border-primary/30 bg-secondary-container/40 text-primary",
-            compact ? "px-3 py-2.5 text-xs" : "px-4 py-3 text-sm",
-          )}
-        >
-          <p className="font-semibold">TRIS transport is included</p>
-          <p className={cn("mt-1 text-on-surface-variant", compact ? "text-[10px]" : "text-xs")}>
-            Vehicles are arranged for your group size.
-            {note ? ` ${note}` : ""}
-          </p>
+        <div className={cn("space-y-3", compact && "space-y-2")}>
+          <div
+            className={cn(
+              "rounded-2xl border border-primary/30 bg-secondary-container/40 text-primary",
+              compact ? "px-3 py-2.5 text-xs" : "px-4 py-3 text-sm",
+            )}
+          >
+            <p className="font-semibold">TRIS transport is included</p>
+            <p className={cn("mt-1 text-on-surface-variant", compact ? "text-[10px]" : "text-xs")}>
+              Choose a vehicle type for your group.
+              {note ? ` ${note}` : ""}
+            </p>
+          </div>
+          <VehicleGrid
+            options={options}
+            vehicleId={vehicleId}
+            onVehicle={onVehicle}
+            compact={compact}
+            hidePrices
+          />
         </div>
       );
     }
@@ -521,6 +541,15 @@ export function GettingThereFields({
             );
           })}
         </div>
+        {choice === "tris" ? (
+          <VehicleGrid
+            options={options}
+            vehicleId={vehicleId}
+            onVehicle={onVehicle}
+            compact={compact}
+            hidePrices
+          />
+        ) : null}
         {note ? (
           <p className={cn("text-on-surface-variant", compact ? "text-[10px]" : "text-xs")}>{note}</p>
         ) : null}
@@ -538,7 +567,13 @@ export function GettingThereFields({
         <p className={cn("font-medium text-primary", compact ? "text-xs" : "text-sm")}>
           Select your transport
         </p>
-        <VehicleGrid options={options} vehicleId={vehicleId} onVehicle={onVehicle} compact={compact} />
+        <VehicleGrid
+          options={options}
+          vehicleId={vehicleId}
+          onVehicle={onVehicle}
+          compact={compact}
+          hidePrices={hidePrices}
+        />
         {onVehicleCount ? (
           <div className="flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3">
             <span className="text-sm font-medium text-primary">Number of vehicles</span>
@@ -584,7 +619,11 @@ export function GettingThereFields({
           {
             id: "tris" as const,
             title: "Book TRIS transport",
-            body: lowestPrice ? `From ${formatINR(lowestPrice)}` : "Choose a vehicle below",
+            body: hidePrices
+              ? "Choose a vehicle below · included in total"
+              : lowestPrice
+                ? `From ${formatINR(lowestPrice)}`
+                : "Choose a vehicle below",
           },
         ].map((item) => {
           const active = choice === item.id;
@@ -622,7 +661,13 @@ export function GettingThereFields({
       </div>
       {choice === "tris" ? (
         <>
-          <VehicleGrid options={options} vehicleId={vehicleId} onVehicle={onVehicle} compact={compact} />
+          <VehicleGrid
+            options={options}
+            vehicleId={vehicleId}
+            onVehicle={onVehicle}
+            compact={compact}
+            hidePrices={hidePrices}
+          />
           {onVehicleCount ? (
             <div className="flex items-center justify-between rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3">
               <span className="text-sm font-medium text-primary">Number of vehicles</span>

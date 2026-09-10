@@ -74,7 +74,15 @@ export type Experience = {
   transportNote?: string;
   /** Optional per-vehicle transfer prices. Missing ids fall back to transportPrice multipliers. */
   transportVehicles?: TransportVehiclePrices;
+  /**
+   * Vehicle ids offered on this listing. Empty / unset = all transfer-enabled fleet vehicles.
+   */
+  offeredVehicleIds?: string[];
   status?: ExperienceStatus;
+  /**
+   * Soft-delete tombstone. When true, seed cannot resurrect this slug and it stays off public/admin lists.
+   */
+  removedFromCatalogue?: boolean;
   /** External / ops backend product ID (entered in Studio). */
   backendId?: string;
   staffRules?: {

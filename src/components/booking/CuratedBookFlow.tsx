@@ -160,20 +160,22 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const transportOptions = useMemo(
     () => [
       { value: "", label: "Select vehicle type" },
-      ...packageTransportList(fleet).map((t) => ({
+      ...packageTransportList(fleet, journey.offeredVehicleIds).map((t) => ({
         value: t.id,
         label: `${t.label} (Max ${t.maxGuests})`,
       })),
     ],
-    [fleet],
+    [fleet, journey.offeredVehicleIds],
   );
-  const stayOptions = useMemo(
-    () => [
+  const stayOptions = useMemo(() => {
+    const allowed = journey.offeredStayStyleIds?.length
+      ? bookingStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
+      : bookingStayStyles(stays);
+    return [
       { value: "", label: "Select stay style" },
-      ...bookingStayStyles(stays).map((s) => ({ value: s.id, label: s.label })),
-    ],
-    [stays],
-  );
+      ...allowed.map((s) => ({ value: s.id, label: s.label })),
+    ];
+  }, [stays, journey.offeredStayStyleIds]);
 
   useEffect(() => {
     if (profile?.name) setName((n) => n || profile.name);
@@ -984,10 +986,21 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         initialTab={learnTab}
         stayId={stayStyle || "barefoot"}
         vehicleId={(vehicleId || "sedan") as PackageTransportId}
-        fleet={fleet}
-        stays={stays}
+        fleet={
+          journey.offeredVehicleIds?.length
+            ? (fleet ?? []).filter((v) => journey.offeredVehicleIds!.includes(v.id))
+            : fleet
+        }
+        stays={
+          journey.offeredStayStyleIds?.length
+            ? (stays ?? []).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
+            : stays
+        }
         onStayChange={(id) => {
-          if (bookingStayStyles(stays).some((s) => s.id === id)) {
+          const allowed = journey.offeredStayStyleIds?.length
+            ? bookingStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
+            : bookingStayStyles(stays);
+          if (allowed.some((s) => s.id === id)) {
             setStayStyle(id as BookingStayStyleId);
           }
         }}

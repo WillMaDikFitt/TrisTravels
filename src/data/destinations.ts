@@ -26,6 +26,8 @@ export type Destination = {
   sourceUrl: string;
   /** When `hidden` or `draft`, the place is omitted from public pages. */
   status?: "active" | "draft" | "hidden";
+  /** Soft-delete tombstone — seed cannot resurrect this slug. */
+  removedFromCatalogue?: boolean;
 };
 
 /**

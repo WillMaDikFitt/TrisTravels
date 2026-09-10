@@ -15,11 +15,12 @@ function docSlug(item: { slug?: string; id?: string }) {
   return item.slug ?? item.id ?? "";
 }
 
-function isEmptyOverlay(value: unknown) {
-  if (value === undefined || value === null) return true;
-  if (typeof value === "string" && value.trim() === "") return true;
-  if (Array.isArray(value) && value.length === 0) return true;
-  return false;
+/**
+ * Values that mean “this key was not provided by Firestore”.
+ * Empty strings and empty arrays from Studio MUST win over seed (clears stick).
+ */
+function isMissingRemoteValue(value: unknown) {
+  return value === undefined;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -53,22 +54,41 @@ function sanitizeOverlay(value: unknown): unknown {
   return out;
 }
 
-/** Firestore wins over seed. Seed only fills gaps / missing docs. */
+/**
+ * Firestore wins over seed — including explicit empty strings / empty arrays.
+ * Seed only fills keys that are missing on the remote doc (undefined).
+ */
 function mergeRecord<T extends object>(base: T | undefined, remote: Partial<T>, slug: string): T {
   const out = { ...(base ?? {}), slug } as T & { slug: string };
   for (const [key, value] of Object.entries(remote)) {
     if (key === "slug" || key === "id") continue;
-    if (isEmptyOverlay(value)) continue;
+    if (isMissingRemoteValue(value)) continue;
+    // null = explicit clear
+    if (value === null) {
+      const baseVal = (base as Record<string, unknown> | undefined)?.[key];
+      (out as Record<string, unknown>)[key] = Array.isArray(baseVal) ? [] : "";
+      continue;
+    }
+    // Booleans (incl. false) and removed flags must always apply.
+    if (typeof value === "boolean") {
+      (out as Record<string, unknown>)[key] = value;
+      continue;
+    }
     // Ignore old Unsplash / Wix placeholders if we already have a real seed image.
     if (base && ["image", "gallery", "guideQuote"].includes(key) && containsStockMedia(value)) continue;
     const clean = sanitizeOverlay(value);
-    if (isEmptyOverlay(clean)) continue;
+    if (isMissingRemoteValue(clean)) continue;
     (out as Record<string, unknown>)[key] = clean;
   }
   return out as T;
 }
 
+function isCatalogueRemoved(item: { removedFromCatalogue?: boolean }) {
+  return item.removedFromCatalogue === true;
+}
+
 function isPublicJourney(j: Journey) {
+  if (isCatalogueRemoved(j)) return false;
   const status = j.status ?? "active";
   if (status === "draft" || status === "hidden") return false;
   if (!j.slug || !j.name?.trim()) return false;
@@ -78,11 +98,13 @@ function isPublicJourney(j: Journey) {
 }
 
 function isPublicExperience(e: Experience) {
+  if (isCatalogueRemoved(e)) return false;
   const status = e.status ?? "active";
   return status === "active" || status === "seasonal";
 }
 
-function isPublicListing(item: { status?: string }) {
+function isPublicListing(item: { status?: string; removedFromCatalogue?: boolean }) {
+  if (isCatalogueRemoved(item)) return false;
   const status = item.status ?? "active";
   return status !== "draft" && status !== "hidden";
 }
@@ -133,7 +155,7 @@ export async function listExperiences(): Promise<Experience[]> {
 
 export async function listAllExperiencesAdmin(): Promise<Experience[]> {
   const remote = await collectionDocs<Experience & { slug?: string; id?: string }>("experiences");
-  return sortExperiences(mergeCatalog(experiences, remote));
+  return sortExperiences(mergeCatalog(experiences, remote)).filter((item) => !isCatalogueRemoved(item));
 }
 
 async function loadExperience(slug: string): Promise<Experience | undefined> {
@@ -172,7 +194,7 @@ export async function listJourneys(): Promise<Journey[]> {
 
 export async function listAllJourneysAdmin(): Promise<Journey[]> {
   const remote = await collectionDocs<Journey & { slug?: string; id?: string }>("journeys");
-  return mergeCatalog(journeys, remote);
+  return mergeCatalog(journeys, remote).filter((item) => !isCatalogueRemoved(item));
 }
 
 async function loadJourney(slug: string): Promise<Journey | undefined> {
@@ -209,7 +231,7 @@ export async function listDestinations(): Promise<Destination[]> {
 
 export async function listAllDestinationsAdmin(): Promise<Destination[]> {
   const remote = await collectionDocs<Destination & { slug?: string; id?: string }>("destinations");
-  return mergeCatalog(destinations, remote);
+  return mergeCatalog(destinations, remote).filter((item) => !isCatalogueRemoved(item));
 }
 
 async function loadDestination(slug: string): Promise<Destination | undefined> {
@@ -244,7 +266,7 @@ export async function listStories(): Promise<Story[]> {
 
 export async function listAllStoriesAdmin(): Promise<Story[]> {
   const remote = await collectionDocs<Story & { slug?: string; id?: string }>("stories");
-  return mergeCatalog(stories, remote);
+  return mergeCatalog(stories, remote).filter((item) => !isCatalogueRemoved(item));
 }
 
 async function loadStory(slug: string): Promise<Story | undefined> {

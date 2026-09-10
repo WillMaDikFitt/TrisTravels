@@ -19,6 +19,8 @@ export type TransportEditorValue = {
   note: string;
   prices: TransportVehiclePrices;
   basePrice?: number;
+  /** Empty / undefined = offer all transfer fleet vehicles. */
+  offeredVehicleIds?: string[];
 };
 
 type Props = {
@@ -192,9 +194,59 @@ export function TransportPricingFields({ variant, value, onChange, hideVehiclePr
             />
           </Field>
 
+          <div className="rounded-2xl border border-[#c5cbb8] bg-[#faf8f3] p-4">
+            <p className="text-sm font-semibold text-[#26352b]">Vehicles shown to guests</p>
+            <p className="mt-0.5 text-xs text-[#4a5a50]">
+              Tick which fleet vehicles appear on this listing. Leave all ticked to offer the full transfer fleet.
+              Photos are managed under Studio → Vehicles.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {fleet.map((vehicle) => {
+                const selected =
+                  !value.offeredVehicleIds?.length || value.offeredVehicleIds.includes(vehicle.id);
+                return (
+                  <label
+                    key={vehicle.id}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm",
+                      selected
+                        ? "border-[#364037] bg-white text-[#26352b]"
+                        : "border-[#d5dbc8] bg-[#f3f5ef] text-[#4a5a50]",
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => {
+                        const allIds = fleet.map((v) => v.id);
+                        const current = value.offeredVehicleIds?.length
+                          ? [...value.offeredVehicleIds]
+                          : [...allIds];
+                        const next = current.includes(vehicle.id)
+                          ? current.filter((id) => id !== vehicle.id)
+                          : [...current, vehicle.id];
+                        onChange({
+                          ...value,
+                          offeredVehicleIds:
+                            next.length === 0 || next.length === allIds.length ? undefined : next,
+                        });
+                      }}
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-medium">{vehicle.label}</span>
+                      <span className="block text-xs text-[#4a5a50]">
+                        {vehicle.seats || `Max ${vehicle.maxGuests}`}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
           {hideVehiclePrices ? (
             <p className="rounded-2xl border border-dashed border-[#c5cbb8] bg-[#faf8f3] px-4 py-3 text-sm text-[#4a5a50]">
-              Vehicle cost and capacity for this booking engine are set in Operational costing above.
+              Vehicle cost and capacity for the booking engine are set in Operational costing above.
             </p>
           ) : (
             <>
@@ -292,13 +344,14 @@ export function transportEditorFromListing(input: {
   transportPrice?: number;
   transportNote?: string;
   transportVehicles?: TransportVehiclePrices;
+  offeredVehicleIds?: string[];
   variant: "experience" | "journey";
   fleet?: FleetVehicle[];
 }): TransportEditorValue {
   const mode =
     input.variant === "experience"
       ? ((input.transportMode as TransportEditorValue["mode"]) ??
-        (input.transportAvailable ? "optional" : "none"))
+        (input.transportAvailable === false ? "none" : "optional"))
       : input.transportAvailable === false
         ? "none"
         : "optional";
@@ -311,6 +364,7 @@ export function transportEditorFromListing(input: {
     note: input.transportNote ?? "",
     basePrice: base,
     prices,
+    offeredVehicleIds: input.offeredVehicleIds?.length ? [...input.offeredVehicleIds] : undefined,
   };
 }
 
@@ -330,5 +384,6 @@ export function transportFieldsFromEditor(value: TransportEditorValue) {
     transportPrice: basePrice && basePrice > 0 ? basePrice : undefined,
     transportNote: value.note.trim(),
     transportVehicles: Object.keys(prices).length ? prices : undefined,
+    offeredVehicleIds: value.offeredVehicleIds?.length ? [...value.offeredVehicleIds] : undefined,
   };
 }

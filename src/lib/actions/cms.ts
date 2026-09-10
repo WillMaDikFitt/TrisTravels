@@ -59,11 +59,31 @@ export async function setListingVisibility(
   return saveDocument(collection, id, { status: visible ? "active" : "hidden" });
 }
 
+/**
+ * Remove a catalogue listing.
+ * Seed-backed catalogues use a tombstone so static seed cannot resurrect them.
+ */
 export async function deleteDocument(collection: string, id: string) {
   const db = getAdminDb();
   if (!db) return { ok: false as const, error: SAVE_UNAVAILABLE };
   try {
-    await db.collection(collection).doc(id).delete();
+    if (
+      collection === "experiences" ||
+      collection === "journeys" ||
+      collection === "destinations" ||
+      collection === "stories"
+    ) {
+      await db.collection(collection).doc(id).set(
+        {
+          slug: id,
+          removedFromCatalogue: true,
+          status: "hidden",
+        },
+        { merge: true },
+      );
+    } else {
+      await db.collection(collection).doc(id).delete();
+    }
     revalidateListingPaths(collection, id);
     return { ok: true as const };
   } catch (err) {

@@ -27,8 +27,8 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
   const departureDates = journey.departureSeats?.map((d) => d.date) ?? journey.departures ?? [];
   const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(journey.transportPrice ?? 3500, journey.transportVehicles, fleet),
-    [journey.transportPrice, journey.transportVehicles, fleet],
+    () => transportVehicleOptions(journey.transportPrice ?? 3500, journey.transportVehicles, fleet, journey.offeredVehicleIds),
+    [journey.transportPrice, journey.transportVehicles, journey.offeredVehicleIds, fleet],
   );
   const maxGuests = 12;
 
@@ -59,7 +59,10 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
   const [refId, setRefId] = useState("");
 
   const selectedVehicle = vehicles.find((v) => v.id === vehicleId) ?? vehicles[0];
-  const childRate = journey.priceChild ?? Math.round(journey.priceFrom * 0.7);
+  const childRate =
+    journey.priceChild != null && Number.isFinite(journey.priceChild)
+      ? Math.max(0, journey.priceChild)
+      : 0;
   const guestSubtotal = journey.priceFrom * adults + childRate * children;
   const transportFee = transportation ? selectedVehicle?.price ?? 0 : 0;
   const estimatedTotal = guestSubtotal + transportFee;
