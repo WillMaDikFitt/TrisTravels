@@ -251,8 +251,10 @@ export function Header() {
   return (
     <header
       className={cn(
+        // Only apply transform while hiding. A persistent translate creates a containing
+        // block for position:fixed children and collapses the mobile menu to ~0 height.
         "fixed top-0 z-[70] w-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-        hidden && !open ? "-translate-y-full" : "translate-y-0",
+        hidden && !open && "-translate-y-full",
         reduceMotion && "transition-none",
       )}
     >
@@ -264,7 +266,7 @@ export function Header() {
             : "border-b border-transparent bg-transparent",
         )}
       >
-        <div className="flex h-[5.75rem] w-full items-center justify-between gap-4 px-5 md:h-[6.5rem] md:px-8 lg:h-[6.75rem] lg:gap-8 lg:px-10 xl:px-12">
+        <div className="relative z-[80] flex h-[5.75rem] w-full items-center justify-between gap-4 px-5 md:h-[6.5rem] md:px-8 lg:h-[6.75rem] lg:gap-8 lg:px-10 xl:px-12">
           <Link
             href="/"
             className="relative z-10 flex shrink-0 items-center pt-1 md:pt-1.5 md:pl-1"
@@ -371,7 +373,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
             transition={{ duration: reduceMotion ? 0.01 : 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-x-0 bottom-0 top-[5.75rem] z-[70] overflow-y-auto bg-surface px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-[6.5rem] lg:hidden"
+            className="fixed inset-x-0 bottom-0 top-[5.75rem] z-[60] overflow-y-auto overscroll-contain bg-surface px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:top-[6.5rem] lg:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
