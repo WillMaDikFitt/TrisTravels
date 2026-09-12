@@ -149,6 +149,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     trisTransport: transportation,
     transportFee: legacyTransportFee,
     vehicleCount,
+    vehicleId: transportation ? vehicleId || selectedVehicle?.id : undefined,
   });
   const gross = quote.customerTotal;
   const transportFee = quote.transportCost;
@@ -496,7 +497,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                       if (next !== "tris") setVehicleId("");
                     }}
                     onVehicle={setVehicleId}
-                    onVehicleCount={usingCosting ? undefined : setVehicleCount}
+                    onVehicleCount={setVehicleCount}
                   />
                   {transportation && (
                     <FormInput

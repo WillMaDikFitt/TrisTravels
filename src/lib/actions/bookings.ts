@@ -123,7 +123,7 @@ export async function createBooking(input: {
   if (transportMode === "required" && !wantsTransport) {
     return { ok: false as const, error: "Transport is required for this experience" };
   }
-  if (wantsTransport && !usingCosting && !vehicle) {
+  if (wantsTransport && !vehicle) {
     return { ok: false as const, error: "Choose a vehicle type" };
   }
   const pickupAddress = (input.pickupAddress ?? "").trim().slice(0, 300);
@@ -138,6 +138,7 @@ export async function createBooking(input: {
     trisTransport: wantsTransport,
     transportFee: legacyTransportFee,
     vehicleCount: vehicleCountInput,
+    vehicleId: vehicle?.id,
   });
   const transportPrice = quote.transportCost;
   const vehicleCount = quote.vehicleCount || (wantsTransport ? vehicleCountInput : 0);
@@ -167,7 +168,7 @@ export async function createBooking(input: {
   if (backendId) record.backendId = backendId;
   if (children > 0 && input.childAges) record.childAges = input.childAges;
   if (input.uid) record.uid = input.uid;
-  if (wantsTransport && (usingCosting || vehicle)) {
+  if (wantsTransport && vehicle) {
     record.transportation = {
       requested: true,
       // Costing sets the price, but ops still need to know which vehicle the guest picked.

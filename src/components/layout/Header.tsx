@@ -90,7 +90,7 @@ function navLinkClass(active: boolean, onLight = false) {
         : "text-primary/85 hover:text-primary"
       : active
         ? "text-white"
-        : "text-white/65 hover:text-white",
+        : "text-white/80 hover:text-white",
   );
 }
 
@@ -245,8 +245,9 @@ export function Header() {
   }, [open]);
 
   const solid = !isHome || scrolled || open;
-  const logoSrc = solid ? TRIS_LOGO_ON_DARK : TRIS_LOGO_ON_LIGHT;
+  // Transparent home hero → green menu text; solid dark bar → white.
   const onLight = !solid;
+  const logoSrc = solid ? TRIS_LOGO_ON_DARK : TRIS_LOGO_ON_LIGHT;
 
   return (
     <header
@@ -300,10 +301,11 @@ export function Header() {
                     href="/admin"
                     size="sm"
                     variant="secondary"
+                    // ! overrides Button secondary text-primary (cn has no twMerge).
                     className={
                       onLight
-                        ? "border-primary/35 bg-transparent text-primary hover:bg-primary/5"
-                        : "border-white/35 bg-transparent text-white hover:bg-white/10"
+                        ? "border-primary/35 !bg-transparent !text-primary hover:!bg-primary/5"
+                        : "border-white/40 !bg-transparent !text-white hover:!bg-white/10"
                     }
                   >
                     Studio
@@ -315,8 +317,8 @@ export function Header() {
                   variant="secondary"
                   className={
                     onLight
-                      ? "border-primary/35 bg-transparent text-primary hover:bg-primary/5"
-                      : "border-white/35 bg-transparent text-white hover:bg-white/10"
+                      ? "border-primary/35 !bg-transparent !text-primary hover:!bg-primary/5"
+                      : "border-white/40 !bg-transparent !text-white hover:!bg-white/10"
                   }
                 >
                   {profile?.name?.split(" ")[0] || "Account"}
@@ -330,8 +332,8 @@ export function Header() {
                   variant="secondary"
                   className={
                     onLight
-                      ? "border-primary/40 bg-transparent text-primary hover:border-primary hover:bg-primary/5"
-                      : "border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10"
+                      ? "border-primary/40 !bg-transparent !text-primary hover:border-primary hover:!bg-primary/5"
+                      : "border-white/40 !bg-transparent !text-white hover:border-white hover:!bg-white/10"
                   }
               >
                 Log in / Sign up

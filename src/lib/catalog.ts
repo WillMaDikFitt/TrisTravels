@@ -35,7 +35,7 @@ import { DEFAULT_TESTIMONIALS } from "@/data/testimonials";
 export const DEFAULT_SLOTS = ["08:30", "09:00", "10:00"];
 
 export const DEFAULT_SETTINGS = {
-  minAdvanceDays: 10,
+  minAdvanceDays: 5,
   holdMinutes: 30,
   serviceFeePercent: 5,
   gstPercent: 18,

@@ -68,7 +68,7 @@ export const media = {
   groupTrail: local.groupTrail,
   faqSectionBg: "/images/faq-section-bg-v2.jpg",
   aboutSectionBg: "/images/about-section-bg-v2.jpg",
-  whyTrisBg: "/images/why-tris-bg-v2.jpg",
+  whyTrisBg: "/images/why-tris-bg-v5.png",
   departures: local.ridgeLight,
   valueAuthentic: local.raksan01,
   valueCommunity: local.tishu02,

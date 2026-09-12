@@ -3,16 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Leaf } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { media } from "@/data/media";
 import type { Testimonial } from "@/data/testimonials";
 
 const OWNER_QUOTE = {
-  lines: [
-    "Travel is personal.",
-    "And the best journeys stay with you long after you return home",
-  ],
+  lead: "Travel is personal.",
+  support: "And the best journeys stay with you long after you return home.",
 };
 
 /** Keep in sync with images.remotePatterns in next.config.ts. */
@@ -53,55 +51,62 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
     const el = scrollerRef.current;
     if (!el) return;
     const card = el.querySelector<HTMLElement>("[data-testimonial-card]");
-    const gap = 16;
+    const gap = 20;
     const amount = (card?.offsetWidth ?? 280) + gap;
     el.scrollBy({ left: direction * amount, behavior: "smooth" });
   };
 
   return (
     <section className="home-snap-section relative h-[100svh] max-h-[100svh] w-full overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden bg-primary-container">
-        <Image
-          src={media.whyTrisBg}
-          alt=""
-          fill
-          className="scale-[1.12] object-cover object-[center_22%]"
-          sizes="100vw"
-          quality={90}
-        />
+      {/* Soft off-white + visible faded landscape (not a heavy cream wash) */}
+      <div className="absolute inset-0 bg-[#f7f5f1]">
+        <div
+          className="absolute inset-0"
+          style={{
+            WebkitMaskImage: [
+              "linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+              "linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%)",
+            ].join(", "),
+            maskImage: [
+              "linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+              "linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%)",
+            ].join(", "),
+            WebkitMaskComposite: "source-in",
+            maskComposite: "intersect",
+          }}
+        >
+          <Image
+            src={media.whyTrisBg}
+            alt=""
+            fill
+            className="object-cover object-center opacity-[0.52]"
+            sizes="100vw"
+            quality={90}
+            priority={false}
+          />
+        </div>
       </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-primary-container/42" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(to bottom, rgba(54,64,55,0.35) 0%, rgba(54,64,55,0.2) 45%, rgba(54,64,55,0.55) 100%)",
-        }}
-      />
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-container-max flex-col items-center justify-center gap-5 px-margin-mobile py-6 md:gap-7 md:px-margin-desktop md:py-8">
-        <div className="w-full shrink-0 text-center">
-          <div className="ink-rule mx-auto bg-surface-container-lowest/40" />
-          <p className="label-caps mt-2 text-surface-container-lowest/70">Travellers</p>
-          <h2 className="mt-1.5 font-[family-name:var(--font-playfair)] text-[clamp(1.9rem,3.6vw,2.85rem)] leading-tight text-surface-container-lowest">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-container-max flex-col items-center justify-center gap-4 px-margin-mobile py-5 md:gap-5 md:px-margin-desktop md:py-7">
+        <header className="w-full shrink-0 text-center">
+          <p className={cn("label-caps text-primary/80", textGlow)}>Travellers</p>
+          <h2
+            className={cn(
+              "mt-2 font-[family-name:var(--font-playfair)] text-[clamp(2rem,4vw,3rem)] leading-tight text-primary",
+              textGlow,
+            )}
+          >
             Why TRIS
           </h2>
-          <blockquote className="mx-auto mt-3 max-w-2xl font-[family-name:var(--font-playfair)] text-[clamp(1rem,1.9vw,1.45rem)] leading-snug text-surface-container-lowest/92 italic">
-            {OWNER_QUOTE.lines.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </blockquote>
-          <Link
-            href="/journeys"
-            className="group mt-4 inline-flex items-center gap-2.5 rounded-lg bg-surface-container-lowest px-6 py-3 text-xs font-bold tracking-[0.16em] text-primary uppercase shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:bg-surface-container-lowest/92 hover:shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+          <p
+            className={cn(
+              "mx-auto mt-2 max-w-lg text-sm leading-relaxed text-primary/80 md:text-[15px]",
+              textGlow,
+            )}
           >
-            Explore our journeys
-            <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-          </Link>
-        </div>
+            Notes from travellers who&apos;ve experienced Meghalaya with us
+          </p>
+        </header>
 
         {testimonials.length ? (
           <div className="w-full shrink-0">

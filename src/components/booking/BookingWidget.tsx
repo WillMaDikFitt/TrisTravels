@@ -98,6 +98,7 @@ export function BookingWidget({ experience }: Props) {
     trisTransport: transportation,
     transportFee: legacyTransportFee,
     vehicleCount,
+    vehicleId: transportation ? vehicleId || selectedVehicle?.id : undefined,
   });
   const gross = quote.customerTotal;
 
@@ -143,18 +144,16 @@ export function BookingWidget({ experience }: Props) {
     });
     if (children > 0) params.set("childAges", childAges.join(","));
     if (transportMode === "optional") {
-      if (transportChoice === "tris" && (usingCosting || vehicleId)) {
+      if (transportChoice === "tris" && vehicleId) {
         params.set("transport", "1");
-        if (!usingCosting && vehicleId) {
-          params.set("vehicle", vehicleId);
-          params.set("vehicles", String(vehicleCount));
-        }
+        params.set("vehicle", vehicleId);
+        params.set("vehicles", String(vehicleCount));
       } else if (transportChoice === "own") {
         params.set("transport", "0");
       }
     } else if (transportMode === "required") {
       params.set("transport", "1");
-      if (!usingCosting && vehicleId) {
+      if (vehicleId) {
         params.set("vehicle", vehicleId);
         params.set("vehicles", String(vehicleCount));
       }
@@ -291,7 +290,7 @@ export function BookingWidget({ experience }: Props) {
               if (next !== "tris") setVehicleId("");
             }}
             onVehicle={setVehicleId}
-            onVehicleCount={usingCosting ? undefined : setVehicleCount}
+            onVehicleCount={setVehicleCount}
           />
         )}
       </div>
