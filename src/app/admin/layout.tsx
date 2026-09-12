@@ -26,6 +26,8 @@ import {
   CarFront,
   BedDouble,
   CircleHelp,
+  CreditCard,
+  HandHeart,
 } from "lucide-react";
 
 const sections: { label: string; links: { href: string; label: string; icon: typeof LayoutDashboard }[] }[] = [
@@ -34,6 +36,7 @@ const sections: { label: string; links: { href: string; label: string; icon: typ
     links: [
       { href: "/admin", label: "Overview", icon: LayoutDashboard },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+      { href: "/admin/manual-bookings", label: "Manual bookings", icon: CreditCard },
       { href: "/admin/enquiries", label: "Enquiries", icon: Inbox },
       { href: "/admin/story-submissions", label: "Guest stories", icon: PenLine },
       { href: "/admin/availability", label: "Availability", icon: CalendarOff },
@@ -47,6 +50,7 @@ const sections: { label: string; links: { href: string; label: string; icon: typ
       { href: "/admin/fleet", label: "Vehicles", icon: CarFront },
       { href: "/admin/stays", label: "Stays", icon: BedDouble },
       { href: "/admin/faqs", label: "FAQs", icon: CircleHelp },
+      { href: "/admin/testimonials", label: "Testimonials", icon: HandHeart },
       { href: "/admin/places", label: "Places", icon: MapPin },
       { href: "/admin/journal", label: "Journal", icon: BookOpen },
     ],

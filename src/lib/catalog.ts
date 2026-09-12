@@ -28,7 +28,9 @@ import { DEFAULT_STAY_STYLES } from "@/data/stay-styles";
 import {
   DEFAULT_CURATED_JOURNEY_FAQS,
   DEFAULT_EXPERIENCE_FAQS,
+  DEFAULT_HOME_FAQS,
 } from "@/data/shared-faqs";
+import { DEFAULT_TESTIMONIALS } from "@/data/testimonials";
 
 export const DEFAULT_SLOTS = ["08:30", "09:00", "10:00"];
 
@@ -48,6 +50,8 @@ export const DEFAULT_SETTINGS = {
   stayStyles: DEFAULT_STAY_STYLES,
   experienceFaqs: DEFAULT_EXPERIENCE_FAQS,
   curatedJourneyFaqs: DEFAULT_CURATED_JOURNEY_FAQS,
+  homeFaqs: DEFAULT_HOME_FAQS,
+  homeTestimonials: DEFAULT_TESTIMONIALS,
   impact: [
     {
       id: "partners",

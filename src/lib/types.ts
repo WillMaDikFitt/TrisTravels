@@ -21,6 +21,45 @@ export type StaffNote = {
   text: string;
 };
 
+export type ManualProductType = "experience" | "curated" | "fixed" | "craft";
+export type ManualPaymentType = "advance" | "full" | "balance" | "custom";
+export type ManualBookingStatus = "pending" | "paid" | "cancelled";
+
+/** Booking entered by staff for a direct enquiry, paid through a private client link. */
+export type ManualBookingRecord = {
+  id: string;
+  /** Unguessable code in the client link (/pay/<token>). */
+  token: string;
+  productType: ManualProductType;
+  /** Listing slug; empty for Craft My Journey, which has no listing. */
+  productSlug?: string;
+  productName: string;
+  productSubheading: string;
+  travellerName: string;
+  travellerEmail: string;
+  travellerPhone: string;
+  journeyDate: string;
+  adults: number;
+  children: number;
+  totalAmount: number;
+  paymentType: ManualPaymentType;
+  /** Amount collected through this link. */
+  paymentRequested: number;
+  /** Paid before this link (balance links only). */
+  alreadyPaid: number;
+  /** Still due after this link is paid. */
+  balanceAmount: number;
+  paymentDueDate?: string;
+  /** For staff only; not shown on the client page. */
+  remarks?: string;
+  status: ManualBookingStatus;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  paidAt?: string;
+  createdAt: string;
+  createdBy?: string;
+};
+
 export type BookingStatus = "hold" | "requested" | "confirmed" | "expired" | "cancelled";
 
 export type BookingRecord = {
@@ -41,6 +80,8 @@ export type BookingRecord = {
     vehicleLabel?: string;
     vehicleCount?: number;
     price: number;
+    /** Where TRIS should collect the guest: hotel name, area or full address. */
+    pickupAddress?: string;
   };
   status: BookingStatus;
   customerName: string;
@@ -122,6 +163,10 @@ export type PlatformSettings = {
   experienceFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
   /** Shared FAQs linked from every curated journey page (Studio → FAQs). */
   curatedJourneyFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
+  /** "Questions before you go" on the homepage. */
+  homeFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
+  /** "From our travellers" quotes in the homepage Why TRIS section. */
+  homeTestimonials?: import("@/data/testimonials").Testimonial[];
 };
 
 export type JourneyDepartureSeat = {

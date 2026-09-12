@@ -45,6 +45,7 @@ export async function createBooking(input: {
   transportation?: boolean;
   transportVehicle?: string;
   vehicleCount?: number;
+  pickupAddress?: string;
 }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date)) {
     return { ok: false as const, error: "Choose a valid date first" };
@@ -114,15 +115,20 @@ export async function createBooking(input: {
   );
   const usingCosting = hasExperienceCosting(experience);
   const wantsTransport = Boolean(input.transportation) && transportMode !== "none";
-  const vehicle = wantsTransport && !usingCosting
-    ? findTransportVehicle(vehicles, input.transportVehicle) ?? vehicles[0]
+  const chosenVehicle = wantsTransport
+    ? findTransportVehicle(vehicles, input.transportVehicle)
     : undefined;
+  const vehicle = wantsTransport && !usingCosting ? chosenVehicle ?? vehicles[0] : undefined;
   const vehicleCountInput = Math.max(1, Math.min(10, Math.round(input.vehicleCount ?? 1)));
   if (transportMode === "required" && !wantsTransport) {
     return { ok: false as const, error: "Transport is required for this experience" };
   }
   if (wantsTransport && !usingCosting && !vehicle) {
     return { ok: false as const, error: "Choose a vehicle type" };
+  }
+  const pickupAddress = (input.pickupAddress ?? "").trim().slice(0, 300);
+  if (wantsTransport && !pickupAddress) {
+    return { ok: false as const, error: "Add your pickup address for TRIS transport" };
   }
 
   const instant = daysUntilDate(input.date) >= settings.minAdvanceDays;
@@ -164,10 +170,12 @@ export async function createBooking(input: {
   if (wantsTransport && (usingCosting || vehicle)) {
     record.transportation = {
       requested: true,
-      vehicle: usingCosting ? "tris" : vehicle?.id,
-      vehicleLabel: usingCosting ? "TRIS transport" : vehicle?.label,
+      // Costing sets the price, but ops still need to know which vehicle the guest picked.
+      vehicle: usingCosting ? chosenVehicle?.id ?? "tris" : vehicle?.id,
+      vehicleLabel: usingCosting ? chosenVehicle?.label ?? "TRIS transport" : vehicle?.label,
       vehicleCount: vehicleCount || 1,
       price: transportPrice,
+      pickupAddress,
     };
   }
   if (status === "hold") record.expiresAt = expires.toISOString();

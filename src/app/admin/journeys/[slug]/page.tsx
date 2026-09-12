@@ -187,6 +187,7 @@ export default function JourneyEditorPage() {
             offeredStayStyleIds: row.offeredStayStyleIds?.length ? row.offeredStayStyleIds : undefined,
             removedFromCatalogue: false,
             season: String(fd.get("season")),
+            totalDistance: String(fd.get("totalDistance") || "").trim(),
             overview: String(fd.get("overview")),
             image: (() => {
               const cover = String(fd.get("image") || "").trim();
@@ -314,6 +315,13 @@ export default function JourneyEditorPage() {
             </Field>
             <Field label="Season">
               <input name="season" defaultValue={row.season} className={inputClass} />
+            </Field>
+            <Field label="Total travelling distance" hint="e.g. 540 km — shown in Journey at a glance">
+              <input
+                name="totalDistance"
+                defaultValue={row.totalDistance ?? ""}
+                className={inputClass}
+              />
             </Field>
             <Field label="Group size" hint="small-group">
               <input name="groupSize" defaultValue={row.groupSize ?? ""} className={inputClass} />

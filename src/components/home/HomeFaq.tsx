@@ -1,34 +1,15 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { media } from "@/data/media";
+import type { SharedFaqItem } from "@/data/shared-faqs";
 
-const faqs = [
-  {
-    q: "What’s the difference between an experience and a journey?",
-    a: "An experience is a few hours to a full day — a trek, a kitchen, a village stay. A journey is longer: a curated package we shape with you, or a small-group departure with a set date.",
-  },
-  {
-    q: "How far ahead should I book?",
-    a: "For day experiences, booking about ten days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
-  },
-  {
-    q: "Who will I travel with?",
-    a: "Khasi hosts and local guides. Days are community-led — you eat, walk, and rest with people who live here, not a generic tour group.",
-  },
-  {
-    q: "Can you plan something just for us?",
-    a: "Yes. Send a brief through Craft my journey — dates, pace, who you’re travelling with — and we’ll shape the week around you.",
-  },
-  {
-    q: "What’s usually included?",
-    a: "Each page lists what’s in and what’s extra. Day experiences typically cover the host or guide, the activity, and often a meal. Journeys add stays and transfers as described.",
-  },
-  {
-    q: "How do I pay?",
-    a: "Day experiences can be booked online. Journeys and last-minute requests are confirmed by our team first, then we share how to pay.",
-  },
-];
+/** Homepage FAQ strip. Questions are managed in Studio → FAQs → Home page. */
+/** The homepage shows this many; the full list lives on /faqs. */
+const HOME_FAQ_LIMIT = 6;
 
-export function HomeFaq() {
+export function HomeFaq({ items }: { items: SharedFaqItem[] }) {
+  const shown = items.slice(0, HOME_FAQ_LIMIT);
   return (
     <section className="relative flex h-full min-h-0 flex-1 flex-col justify-center overflow-hidden py-5 md:py-6">
       <Image
@@ -54,9 +35,9 @@ export function HomeFaq() {
         </div>
 
         <div className="mx-auto mt-4 w-full max-w-3xl space-y-2 md:mt-5 md:space-y-2.5">
-          {faqs.map((item, index) => (
+          {shown.map((item, index) => (
             <details
-              key={item.q}
+              key={item.id}
               className="group rounded-xl border border-outline-variant/30 bg-surface-container-lowest/95 shadow-[0_4px_14px_rgba(54,64,55,0.05)] backdrop-blur-[2px] transition open:border-highlight/35 open:shadow-[0_8px_22px_rgba(54,64,55,0.08)] md:rounded-2xl"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 marker:content-none focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:gap-4 md:px-5 md:py-3">
@@ -79,13 +60,24 @@ export function HomeFaq() {
                 </span>
               </summary>
               <div className="border-t border-outline-variant/20 px-3.5 pb-3 pt-2 md:px-5 md:pb-4 md:pt-3">
-                <p className="pl-8 text-xs leading-relaxed text-on-surface-variant md:pl-10 md:text-sm">
+                <p className="whitespace-pre-line pl-8 text-xs leading-relaxed text-on-surface-variant md:pl-10 md:text-sm">
                   {item.a}
                 </p>
               </div>
             </details>
           ))}
         </div>
+
+        {items.length > HOME_FAQ_LIMIT ? (
+          <div className="mt-4 text-center md:mt-5">
+            <Link
+              href="/faqs"
+              className="label-caps inline-flex items-center gap-2 rounded-full border border-primary/20 bg-surface-container-lowest/90 px-5 py-2.5 font-semibold text-primary shadow-sm transition hover:bg-surface-container-lowest"
+            >
+              View all {items.length} questions <ArrowRight size={16} />
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );

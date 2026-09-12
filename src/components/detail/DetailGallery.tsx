@@ -17,7 +17,8 @@ type Tile = { src: string; index: number; tall: boolean };
 /**
  * The supplied photo library mixes tall phone shots with ultrawide panoramas, so the
  * mosaic is built around each photo instead of forcing everything into one crop:
- * a wide photo anchors the feature tile and portraits fill full-height columns.
+ * a wide photo anchors the feature tile and the two columns beside it are filled
+ * one at a time — a portrait at full height, or two photos stacked — so no cell is left empty.
  */
 function buildMosaic(slides: string[]) {
   const wideIndex = slides.findIndex((src) => isWide(src));
@@ -31,20 +32,35 @@ function buildMosaic(slides: string[]) {
   }
 
   const feature = { src: slides[wideIndex], index: wideIndex };
+  const queue: Tile[] = slides
+    .map((src, index) => ({ src, index, tall: isPortrait(src) }))
+    .filter((tile) => tile.index !== wideIndex);
 
-  // Two columns of two rows remain beside the feature tile; portraits take a whole column.
-  let capacity = 4;
-  const tiles: Tile[] = [];
-  slides.forEach((src, index) => {
-    if (index === wideIndex || capacity <= 0) return;
-    const tall = isPortrait(src);
-    const cost = tall ? 2 : 1;
-    if (cost > capacity) return;
-    capacity -= cost;
-    tiles.push({ src, index, tall });
-  });
+  const columns: Tile[][] = [];
+  while (columns.length < 2 && queue.length) {
+    const first = queue.shift()!;
+    if (first.tall) {
+      columns.push([first]);
+      continue;
+    }
+    // Stack a landscape with another landscape when there is one. A portrait in the
+    // half-height cell is nearly square, so it crops lightly — but in the first column
+    // only take one if a photo is still left over for the second column.
+    const landscapeAt = queue.findIndex((tile) => !tile.tall);
+    const partnerAt =
+      landscapeAt !== -1 ? landscapeAt : columns.length === 1 || queue.length >= 2 ? 0 : -1;
+    const partner = partnerAt === -1 ? undefined : queue.splice(partnerAt, 1)[0];
+    columns.push(
+      partner
+        ? [
+            { ...first, tall: false },
+            { ...partner, tall: false },
+          ]
+        : [{ ...first, tall: true }],
+    );
+  }
 
-  return { mode: "mosaic" as const, feature, tiles, filled: capacity === 0 };
+  return { mode: "mosaic" as const, feature, columns };
 }
 
 export function DetailGallery({ images, alt, children }: Props) {
@@ -124,7 +140,7 @@ export function DetailGallery({ images, alt, children }: Props) {
                 aria-label="Open photo gallery"
                 className={cn(
                   "group relative col-span-4 row-span-2 overflow-hidden bg-surface-container",
-                  mosaic.tiles.length > 0 && "md:col-span-2",
+                  mosaic.columns.length > 0 && "md:col-span-2",
                 )}
               >
                 <Image
@@ -137,28 +153,38 @@ export function DetailGallery({ images, alt, children }: Props) {
                 />
               </button>
 
-              {mosaic.tiles.map((tile) => (
-                <button
-                  key={`${tile.src}-${tile.index}`}
-                  type="button"
-                  onClick={() => setLightboxAt(tile.index)}
-                  aria-label={`Open photo ${tile.index + 1}`}
-                  className={cn(
-                    "group relative hidden overflow-hidden bg-surface-container md:block",
-                    tile.tall ? "row-span-2" : "row-span-1",
-                    // A single companion photo stretches across both remaining columns.
-                    !mosaic.filled && mosaic.tiles.length === 1 && "md:col-span-2",
-                  )}
-                >
-                  <Image
-                    src={tile.src}
-                    alt=""
-                    fill
-                    className="object-cover transition duration-500 group-hover:brightness-95"
-                    sizes="25vw"
-                  />
-                </button>
-              ))}
+              {mosaic.columns.map((column, col) =>
+                column.map((tile, row) => (
+                  <button
+                    key={`${tile.src}-${tile.index}`}
+                    type="button"
+                    onClick={() => setLightboxAt(tile.index)}
+                    aria-label={`Open photo ${tile.index + 1}`}
+                    className={cn(
+                      "group relative hidden overflow-hidden bg-surface-container md:block",
+                      // Explicit cells: auto-flow would put a stacked photo beside its partner.
+                      mosaic.columns.length === 1
+                        ? "md:col-span-2 md:col-start-3" // a lone column stretches across both
+                        : col === 0
+                          ? "md:col-start-3"
+                          : "md:col-start-4",
+                      column.length === 1
+                        ? "md:row-span-2 md:row-start-1"
+                        : row === 0
+                          ? "md:row-start-1"
+                          : "md:row-start-2",
+                    )}
+                  >
+                    <Image
+                      src={tile.src}
+                      alt=""
+                      fill
+                      className="object-cover transition duration-500 group-hover:brightness-95"
+                      sizes={mosaic.columns.length === 1 ? "50vw" : "25vw"}
+                    />
+                  </button>
+                )),
+              )}
             </div>
           )}
 

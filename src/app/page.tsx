@@ -11,7 +11,9 @@ import { stories } from "@/data/stories";
 import { media } from "@/data/media";
 import { StoryCard } from "@/components/listings/StoryCard";
 import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
-import { listStories } from "@/lib/data/repo";
+import { getSettings, listStories } from "@/lib/data/repo";
+import { activeSharedFaqs, DEFAULT_HOME_FAQS } from "@/data/shared-faqs";
+import { activeTestimonials, DEFAULT_TESTIMONIALS } from "@/data/testimonials";
 
 const typeVisuals: Record<string, string> = {
   adventure: media.typeAdventure,
@@ -23,8 +25,15 @@ const typeVisuals: Record<string, string> = {
   creative: media.typeCreative,
 };
 
+/** Pick up Studio edits (home FAQs, stories) without waiting for a full redeploy. */
+export const revalidate = 60;
+
 export default async function HomePage() {
-  const allStories = await listStories().catch(() => stories);
+  const [allStories, settings] = await Promise.all([
+    listStories().catch(() => stories),
+    getSettings().catch(() => null),
+  ]);
+  const homeFaqs = activeSharedFaqs(settings?.homeFaqs, DEFAULT_HOME_FAQS);
 
   return (
     <HomeSnapRoot>
@@ -210,7 +219,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <WhyTrisTestimonials />
+      <WhyTrisTestimonials
+        testimonials={activeTestimonials(settings?.homeTestimonials, DEFAULT_TESTIMONIALS)}
+      />
 
       <section className="home-snap-section relative flex min-h-[100svh] items-center overflow-hidden py-10 md:py-12">
         <Image
@@ -381,9 +392,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="home-snap-section flex h-[100svh] max-h-[100svh] flex-col overflow-hidden">
-        <HomeFaq />
-      </div>
+      {homeFaqs.length ? (
+        <div className="home-snap-section flex h-[100svh] max-h-[100svh] flex-col overflow-hidden">
+          <HomeFaq items={homeFaqs} />
+        </div>
+      ) : null}
 
       <div className="home-snap-section flex min-h-[100svh] flex-col justify-center">
         <CtaBand

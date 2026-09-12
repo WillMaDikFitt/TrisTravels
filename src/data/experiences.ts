@@ -46,8 +46,11 @@ export type Experience = {
   category: ExperienceCategory;
   tags: string[];
   location: string;
+  /** Free text shown on the detail page, e.g. "65 km". */
+  distanceFromShillong?: string;
   region: string;
   duration: string;
+  /** Time spent on the activity itself. Shown as "Activity duration" on the detail page. */
   durationHours: number;
   difficulty: Difficulty;
   suitableFor: string[];
@@ -214,6 +217,7 @@ export const experiences: Experience[] = [
     category: "Adventure",
     tags: ["Trek", "Heritage", "Nature"],
     location: "Nongriat",
+    distanceFromShillong: "65 km",
     region: "Sohra",
     duration: "Full day",
     durationHours: 8,
@@ -290,6 +294,7 @@ export const experiences: Experience[] = [
     category: "Adventure",
     tags: ["River", "Adventure", "Community-Led"],
     location: "Mawlongbna / Mawsynram",
+    distanceFromShillong: "61 km",
     region: "East Khasi Hills",
     duration: "Full day",
     durationHours: 7,
@@ -370,6 +375,7 @@ export const experiences: Experience[] = [
     category: "Culture & Heritage",
     tags: ["Culture", "Nature", "Slow"],
     location: "Mawphlang",
+    distanceFromShillong: "~25 km",
     region: "East Khasi Hills",
     duration: "Half day",
     durationHours: 3,
@@ -473,6 +479,7 @@ export const experiences: Experience[] = [
     category: "Nature",
     tags: ["Sohra", "Viewpoints", "Caves"],
     location: "Sohra (Cherrapunjee)",
+    distanceFromShillong: "54 km",
     region: "Sohra",
     duration: "Full day",
     durationHours: 8,
@@ -533,6 +540,7 @@ export const experiences: Experience[] = [
     category: "Adventure",
     tags: ["Caves", "Geology", "Adventure"],
     location: "Mawsynram",
+    distanceFromShillong: "61 km",
     region: "East Khasi Hills",
     duration: "Half day",
     durationHours: 4,
@@ -581,6 +589,7 @@ export const experiences: Experience[] = [
     category: "Food & Local Life",
     tags: ["Village", "Community-Led", "Family Friendly"],
     location: "Mawlynnong",
+    distanceFromShillong: "79 km",
     region: "East Khasi Hills",
     duration: "Overnight",
     durationHours: 20,

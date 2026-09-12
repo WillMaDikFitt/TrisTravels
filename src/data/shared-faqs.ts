@@ -6,7 +6,53 @@ export type SharedFaqItem = {
   sortOrder?: number;
 };
 
-export type SharedFaqKind = "experiences" | "curatedJourneys";
+export type SharedFaqKind = "experiences" | "curatedJourneys" | "home";
+
+/** Homepage "Questions before you go" — seeded with the copy that used to be hard-coded. */
+export const DEFAULT_HOME_FAQS: SharedFaqItem[] = [
+  {
+    id: "home-difference",
+    q: "What’s the difference between an experience and a journey?",
+    a: "An experience is a few hours to a full day — a trek, a kitchen, a village stay. A journey is longer: a curated package we shape with you, or a small-group departure with a set date.",
+    active: true,
+    sortOrder: 1,
+  },
+  {
+    id: "home-book-ahead",
+    q: "How far ahead should I book?",
+    a: "For day experiences, booking about ten days ahead lets us confirm hosts and keep the day unhurried. Closer dates are still welcome — send a request and we’ll see what’s possible.",
+    active: true,
+    sortOrder: 2,
+  },
+  {
+    id: "home-who",
+    q: "Who will I travel with?",
+    a: "Khasi hosts and local guides. Days are community-led — you eat, walk, and rest with people who live here, not a generic tour group.",
+    active: true,
+    sortOrder: 3,
+  },
+  {
+    id: "home-custom",
+    q: "Can you plan something just for us?",
+    a: "Yes. Send a brief through Craft my journey — dates, pace, who you’re travelling with — and we’ll shape the week around you.",
+    active: true,
+    sortOrder: 4,
+  },
+  {
+    id: "home-included",
+    q: "What’s usually included?",
+    a: "Each page lists what’s in and what’s extra. Day experiences typically cover the host or guide, the activity, and often a meal. Journeys add stays and transfers as described.",
+    active: true,
+    sortOrder: 5,
+  },
+  {
+    id: "home-pay",
+    q: "How do I pay?",
+    a: "Day experiences can be booked online. Journeys and last-minute requests are confirmed by our team first, then we share how to pay.",
+    active: true,
+    sortOrder: 6,
+  },
+];
 
 export const DEFAULT_EXPERIENCE_FAQS: SharedFaqItem[] = [
   {

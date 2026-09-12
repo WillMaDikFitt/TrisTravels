@@ -52,6 +52,8 @@ export default function AdminSettingsPage() {
             stayStyles: settings.stayStyles ?? DEFAULT_SETTINGS.stayStyles,
             experienceFaqs: settings.experienceFaqs ?? DEFAULT_SETTINGS.experienceFaqs,
             curatedJourneyFaqs: settings.curatedJourneyFaqs ?? DEFAULT_SETTINGS.curatedJourneyFaqs,
+            homeFaqs: settings.homeFaqs ?? DEFAULT_SETTINGS.homeFaqs,
+            homeTestimonials: settings.homeTestimonials ?? DEFAULT_SETTINGS.homeTestimonials,
             minAdvanceDays: Number(fd.get("minAdvanceDays")),
             holdMinutes: Number(fd.get("holdMinutes")),
             serviceFeePercent: Number(fd.get("serviceFeePercent")),

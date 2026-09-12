@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { CalendarDays, Clock, MapPin, Users, Star, Check } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Route, Star, Check, Timer } from "lucide-react";
 import { experiences } from "@/data/experiences";
 import { detailImages } from "@/data/media";
 import { findExperience } from "@/lib/data/repo";
+import { BOOKING_NOTICE_DAYS } from "@/lib/utils";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { FadeIn } from "@/components/motion/Motion";
 import { BreathSection } from "@/components/ui/BreathSection";
@@ -32,9 +33,18 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
   const metaItems = [
     { icon: Clock, label: "Duration", value: exp.duration },
+    ...(exp.durationHours > 0
+      ? [
+          {
+            icon: Timer,
+            label: "Activity duration",
+            value: `${exp.durationHours} ${exp.durationHours === 1 ? "hour" : "hours"}`,
+          },
+        ]
+      : []),
     { icon: CalendarDays, label: "Best time to visit", value: exp.bestSeason },
     { icon: MapPin, label: "Location", value: exp.location },
-    { icon: Users, label: "Group size", value: `Max ${exp.maxGuests}` },
+    { icon: Route, label: "Distance from Shillong", value: exp.distanceFromShillong || "On request" },
   ];
 
   return (
@@ -60,22 +70,33 @@ export default async function ExperienceDetailPage({ params }: Props) {
       </DetailGallery>
 
       <div className="mx-auto max-w-container-max px-margin-mobile md:px-margin-desktop">
-        <div className="relative z-10 -mt-12 grid gap-6 pb-8 md:-mt-16 md:grid-cols-[minmax(0,1fr)_340px] md:items-start md:gap-8 md:pb-10">
+        <div className="relative z-10 grid gap-6 pb-8 md:grid-cols-[minmax(0,1fr)_340px] md:items-start md:gap-8 md:pb-10">
           <aside className="hidden md:sticky md:top-[calc(var(--header-offset)+0.5rem)] md:col-start-2 md:row-start-1 md:block md:self-start">
             <BookingWidget experience={exp} />
           </aside>
 
           <div className="space-y-10 md:col-start-1 md:row-start-1">
-            <div className="grid overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest shadow-[0_12px_35px_rgba(42,46,31,0.06)] md:grid-cols-4">
+            {/* gap-px over a tinted ground draws the dividers, so rows can wrap cleanly. */}
+            <div
+              className={`grid gap-px overflow-hidden rounded-2xl border border-outline-variant/25 bg-outline-variant/20 shadow-[0_12px_35px_rgba(42,46,31,0.06)] sm:grid-cols-2 ${
+                metaItems.length > 4 ? "xl:grid-cols-5" : "xl:grid-cols-4"
+              }`}
+            >
               {metaItems.map(({ icon: Icon, label, value }) => (
                 <div
                   key={label}
-                  className="flex gap-3 border-b border-outline-variant/20 p-5 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
+                  className={`flex gap-3 bg-surface-container-lowest px-5 py-4 xl:flex-col xl:gap-2 xl:px-4 ${
+                    metaItems.length % 2 === 1 ? "sm:last:col-span-2 xl:last:col-span-1" : ""
+                  }`}
                 >
-                  <Icon className="mt-0.5 shrink-0 text-accent" size={18} />
-                  <div>
-                    <p className="label-caps text-[10px] text-on-surface-variant">{label}</p>
-                    <p className="mt-1 font-medium text-primary">{value}</p>
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent">
+                    <Icon size={14} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] leading-tight font-semibold tracking-[0.12em] text-on-surface-variant/75 uppercase">
+                      {label}
+                    </p>
+                    <p className="mt-1 font-serif text-[15px] leading-snug break-words text-primary">{value}</p>
                   </div>
                 </div>
               ))}
@@ -202,8 +223,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
                     items: [
                       `Best season: ${exp.bestSeason}`,
                       `Meeting point: ${exp.meetingPoint}`,
-                      "10+ days ahead: book online",
-                      "Under 10 days: request booking",
+                      `${BOOKING_NOTICE_DAYS}+ days ahead: book online`,
+                      `Under ${BOOKING_NOTICE_DAYS} days: request booking`,
                     ],
                   },
                 ].map((card) => (

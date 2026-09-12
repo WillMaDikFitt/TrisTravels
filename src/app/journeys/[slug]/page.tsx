@@ -35,7 +35,16 @@ const GLANCE_ICONS: Record<string, LucideIcon> = {
   "Not suitable for": Ban,
   "Group size": Users,
   "Starting point": MapPin,
+  "Total travelling distance": Route,
 };
+
+const LG_COLS: Record<number, string> = {
+  1: "lg:grid-cols-1",
+  2: "lg:grid-cols-2",
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+};
+const LG_SPAN: Record<number, string> = { 1: "lg:col-span-1", 2: "lg:col-span-2", 3: "lg:col-span-3" };
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -75,7 +84,19 @@ export default async function JourneyDetailPage({ params }: Props) {
     ...(isFixed && journey.startingPoint
       ? [{ label: "Starting point", value: journey.startingPoint }]
       : []),
+    ...(journey.totalDistance
+      ? [{ label: "Total travelling distance", value: journey.totalDistance }]
+      : []),
   ].filter((item) => item.label !== "Duration" && item.label !== "From price");
+
+  // Four tiles sit in one row; other counts use three across, and the last tile
+  // stretches over any empty cells so no row is left half-filled.
+  const lgCols = glance.length === 4 ? 4 : Math.min(3, Math.max(1, glance.length));
+  const lgRemainder = glance.length % lgCols;
+  const lastTileSpan = [
+    glance.length % 2 === 1 ? "sm:col-span-2" : "",
+    LG_SPAN[lgRemainder === 0 ? 1 : lgCols - lgRemainder + 1],
+  ].join(" ");
 
   return (
     <div className="bg-surface text-foreground">
@@ -118,22 +139,25 @@ export default async function JourneyDetailPage({ params }: Props) {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3">
-            {glance.map((item) => {
+          {/* gap-px over a tinted ground draws the dividers, so rows can wrap cleanly. */}
+          <div className={`grid gap-px bg-outline-variant/20 sm:grid-cols-2 ${LG_COLS[lgCols]}`}>
+            {glance.map((item, index) => {
               const Icon = GLANCE_ICONS[item.label] ?? Compass;
               return (
                 <div
                   key={item.label}
-                  className="flex gap-3.5 border-b border-outline-variant/20 p-5 last:border-b-0 sm:odd:border-r lg:border-r lg:[&:nth-child(3n)]:border-r-0 md:p-6"
+                  className={`flex gap-3 bg-surface-container-lowest px-4 py-4 md:px-5 ${
+                    index === glance.length - 1 ? lastTileSpan : ""
+                  }`}
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-highlight/12 text-highlight">
-                    <Icon size={18} strokeWidth={1.75} />
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-highlight/12 text-highlight">
+                    <Icon size={16} strokeWidth={1.75} />
                   </span>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-semibold tracking-[0.14em] text-on-surface-variant uppercase">
+                    <p className="text-[10px] font-semibold tracking-[0.12em] text-on-surface-variant uppercase">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-sm leading-snug font-medium text-primary md:text-[0.95rem]">
+                    <p className="mt-0.5 text-sm leading-snug font-medium text-primary">
                       {item.value}
                     </p>
                   </div>

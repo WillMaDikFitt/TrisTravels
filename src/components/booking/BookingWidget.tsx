@@ -182,7 +182,7 @@ export function BookingWidget({ experience }: Props) {
           </div>
           <p className="max-w-[9.5rem] text-right text-[10px] leading-snug text-on-surface-variant">
             {usingCosting
-              ? `Total updates with guests · max ${partyCap}`
+              ? `Maximum Guest ${partyCap} Pax at a time`
               : `Child ${formatINR(childRate(experience))} · max ${partyCap}`}
           </p>
         </div>

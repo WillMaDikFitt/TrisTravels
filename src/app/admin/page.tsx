@@ -2,7 +2,6 @@ import Link from "next/link";
 import { listBookings } from "@/lib/actions/bookings";
 import { listEnquiries } from "@/lib/actions/enquiries";
 import { listExperiences, listJourneys } from "@/lib/data/repo";
-import { seedStudioDemo } from "@/lib/actions/studio-demo";
 import { OverviewCharts, type OverviewChartData } from "@/components/admin/OverviewCharts";
 import { Badge, PageHeader, Panel, StatCard, bookingTone } from "@/components/admin/ui";
 import { formatINR } from "@/lib/utils";
@@ -131,15 +130,6 @@ export default async function AdminDashboard() {
     ]);
   } catch (err) {
     console.error("Admin overview load failed:", err);
-  }
-
-  if (!bookings.length && !enquiries.length) {
-    try {
-      await seedStudioDemo();
-      [bookings, enquiries] = await Promise.all([listBookings(), listEnquiries()]);
-    } catch (err) {
-      console.error("Admin overview demo seed failed:", err);
-    }
   }
 
   const needsConfirm = bookings.filter((b) => b.status === "requested" || b.status === "hold");

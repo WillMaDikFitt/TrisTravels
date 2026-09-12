@@ -104,6 +104,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
   const [vehicleCount, setVehicleCount] = useState(
     Math.max(1, Number(search.get("vehicles") || 1)),
   );
+  const [pickupAddress, setPickupAddress] = useState("");
   const [name, setName] = useState(profile?.name ?? "");
   const [email, setEmail] = useState(profile?.email ?? user?.email ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
@@ -168,12 +169,14 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     }
   };
 
-  const transportReady =
+  const vehicleReady =
     transportMode === "none"
       ? true
       : transportMode === "required"
         ? Boolean(vehicleId)
         : transportChoice === "own" || (transportChoice === "tris" && Boolean(vehicleId));
+  // TRIS collects the guest, so a pickup point is needed before they can continue.
+  const transportReady = vehicleReady && (!transportation || Boolean(pickupAddress.trim()));
 
   const detailsReady =
     Boolean(date) &&
@@ -202,6 +205,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
       request: requestMode,
       transportation,
       transportVehicle: transportation && vehicleId ? vehicleId : undefined,
+      pickupAddress: transportation ? pickupAddress.trim() : undefined,
       vehicleCount: transportation
         ? usingCosting
           ? quote.vehicleCount || undefined
@@ -494,6 +498,19 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     onVehicle={setVehicleId}
                     onVehicleCount={usingCosting ? undefined : setVehicleCount}
                   />
+                  {transportation && (
+                    <FormInput
+                      className="mt-5"
+                      label="Pickup address"
+                      name="pickupAddress"
+                      value={pickupAddress}
+                      onChange={setPickupAddress}
+                      required
+                      autoComplete="street-address"
+                      placeholder="e.g. Hotel name / area or address"
+                      hint="Where should the TRIS vehicle pick you up?"
+                    />
+                  )}
                 </FieldGroup>
               )}
             </div>
@@ -611,8 +628,8 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                   label="Transport"
                   value={
                     quote.vehicleCount > 1
-                      ? `TRIS · ${quote.vehicleCount} vehicles`
-                      : "TRIS transport"
+                      ? `${selectedVehicle?.label ?? "TRIS"} × ${quote.vehicleCount}`
+                      : selectedVehicle?.label ?? "TRIS transport"
                   }
                 />
               ) : transportMode === "optional" && transportChoice === "own" ? (

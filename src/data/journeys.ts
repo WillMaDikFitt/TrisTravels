@@ -55,6 +55,8 @@ export type Journey = {
     overnight?: string;
   }[];
   route?: string;
+  /** Free text shown in "Journey at a glance", e.g. "540 km". */
+  totalDistance?: string;
   stays: string[];
   inclusions: string[];
   exclusions?: string[];

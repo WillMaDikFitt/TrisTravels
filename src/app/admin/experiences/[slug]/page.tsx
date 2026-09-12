@@ -146,6 +146,7 @@ export default function ExperienceEditorPage() {
             tagline: String(fd.get("tagline")),
             category: String(fd.get("category")) as ExperienceCategory,
             location: String(fd.get("location")),
+            distanceFromShillong: String(fd.get("distanceFromShillong") || "").trim(),
             region: String(fd.get("region")),
             duration: String(fd.get("duration")),
             durationHours: Number(fd.get("durationHours") || 8),
@@ -252,14 +253,28 @@ export default function ExperienceEditorPage() {
             <Field label="Location">
               <input name="location" defaultValue={row.location} className={inputClass} />
             </Field>
+            <Field label="Distance from Shillong" hint="e.g. 65 km — shown on the experience page">
+              <input
+                name="distanceFromShillong"
+                defaultValue={row.distanceFromShillong ?? ""}
+                className={inputClass}
+              />
+            </Field>
             <Field label="Region">
               <input name="region" defaultValue={row.region} className={inputClass} />
             </Field>
             <Field label="Duration label">
               <input name="duration" defaultValue={row.duration} className={inputClass} />
             </Field>
-            <Field label="Duration (hours)">
-              <input name="durationHours" type="number" defaultValue={row.durationHours} className={inputClass} />
+            <Field label="Duration (hours)" hint="Shown as Activity duration on the experience page">
+              <input
+                name="durationHours"
+                type="number"
+                min={0}
+                step={0.5}
+                defaultValue={row.durationHours}
+                className={inputClass}
+              />
             </Field>
             <Field label="Difficulty">
               <select name="difficulty" defaultValue={row.difficulty} className={inputClass}>

@@ -318,6 +318,10 @@ export async function getSettings(): Promise<PlatformSettings> {
           curatedJourneyFaqs: data.curatedJourneyFaqs?.length
             ? data.curatedJourneyFaqs
             : DEFAULT_SETTINGS.curatedJourneyFaqs,
+          homeFaqs: data.homeFaqs?.length ? data.homeFaqs : DEFAULT_SETTINGS.homeFaqs,
+          homeTestimonials: data.homeTestimonials?.length
+            ? data.homeTestimonials
+            : DEFAULT_SETTINGS.homeTestimonials,
         };
       }
     } catch (err) {
