@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { media } from "@/data/media";
 import type { Testimonial } from "@/data/testimonials";
 
+/** Soft white halo so the heading stays readable over the photo. */
+const textGlow = "[text-shadow:0_1px_12px_rgba(255,255,255,0.9),0_0_28px_rgba(255,255,255,0.65)]";
+
 const OWNER_QUOTE = {
   lead: "Travel is personal.",
   support: "And the best journeys stay with you long after you return home.",
@@ -110,56 +113,34 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
 
         {testimonials.length ? (
           <div className="w-full shrink-0">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-surface-container-lowest/55 uppercase">
-                From our travellers
-              </p>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => scrollByCard(-1)}
-                  aria-label="Previous testimonials"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-container-lowest/30 text-surface-container-lowest transition hover:border-surface-container-lowest hover:bg-surface-container-lowest/10"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollByCard(1)}
-                  aria-label="Next testimonials"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-surface-container-lowest/30 text-surface-container-lowest transition hover:border-surface-container-lowest hover:bg-surface-container-lowest/10"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-
             <div
               ref={scrollerRef}
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-5 [&::-webkit-scrollbar]:hidden"
             >
-              {testimonials.map((item, i) => (
+              {testimonials.map((item) => (
                 <article
                   key={item.id}
                   data-testimonial-card
-                  className={cn(
-                    "flex w-[min(76vw,17.5rem)] shrink-0 snap-start flex-col rounded-xl border border-outline-variant/20 bg-surface-container-lowest/95 p-3.5 shadow-[0_8px_22px_rgba(54,64,55,0.14)] backdrop-blur-[2px] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]",
-                    i % 3 === 1 && "md:rotate-[0.25deg]",
-                    i % 3 === 2 && "md:-rotate-[0.2deg]",
-                  )}
+                  className="flex w-[min(78vw,18.5rem)] shrink-0 snap-start flex-col rounded-2xl border border-white/70 bg-white/92 p-5 shadow-[0_12px_32px_rgba(54,64,55,0.1)] backdrop-blur-sm sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
                 >
-                  <p className="line-clamp-3 flex-1 font-[family-name:var(--font-playfair)] text-[0.88rem] leading-relaxed text-on-surface italic">
-                    &ldquo;{item.quote}&rdquo;
+                  <span
+                    aria-hidden
+                    className="font-[family-name:var(--font-playfair)] text-3xl leading-none text-primary/40"
+                  >
+                    &ldquo;
+                  </span>
+                  <p className="mt-1 line-clamp-4 flex-1 font-[family-name:var(--font-playfair)] text-[0.95rem] leading-relaxed text-primary/90 italic">
+                    {item.quote}
                   </p>
-                  <div className="mt-3 flex items-center gap-2.5">
-                    <span className="relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary-container text-[10px] font-semibold text-primary">
+                  <div className="mt-5 flex items-center gap-3">
+                    <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary-container text-[11px] font-semibold text-primary ring-1 ring-primary/10">
                       {item.image ? (
                         <Image
                           src={item.image}
                           alt=""
                           fill
                           className="object-cover"
-                          sizes="32px"
+                          sizes="36px"
                           unoptimized={!canOptimize(item.image)}
                         />
                       ) : (
@@ -167,17 +148,59 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
                       )}
                     </span>
                     <span>
-                      <span className="block text-xs font-semibold text-primary">{item.name}</span>
+                      <span className="block text-sm font-semibold text-primary">{item.name}</span>
                       {item.place ? (
-                        <span className="block text-[10px] text-on-surface-variant">{item.place}</span>
+                        <span className="block text-xs text-on-surface-variant">{item.place}</span>
                       ) : null}
                     </span>
                   </div>
                 </article>
               ))}
             </div>
+
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => scrollByCard(-1)}
+                aria-label="Previous testimonials"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/25 bg-white/85 text-primary shadow-sm backdrop-blur-sm transition hover:border-primary/50 hover:bg-white"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCard(1)}
+                aria-label="Next testimonials"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/25 bg-white/85 text-primary shadow-sm backdrop-blur-sm transition hover:border-primary/50 hover:bg-white"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         ) : null}
+
+        <div className="w-full shrink-0 text-center">
+          <div className="mx-auto max-w-xl rounded-3xl bg-white/78 px-6 py-5 shadow-[0_8px_32px_rgba(54,64,55,0.08)] ring-1 ring-white/60 backdrop-blur-md">
+            <Leaf aria-hidden size={16} strokeWidth={1.5} className="mx-auto text-primary/70" />
+            <p className="mt-3 font-[family-name:var(--font-playfair)] text-[clamp(1.25rem,2.4vw,1.75rem)] leading-snug text-primary">
+              {OWNER_QUOTE.lead}
+            </p>
+            <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-primary/80 md:text-[15px]">
+              {OWNER_QUOTE.support}
+            </p>
+            <Link
+              href="/journeys"
+              className={cn(
+                "group mt-4 inline-flex items-center gap-2 border-b border-primary/55 pb-1",
+                "text-[11px] font-bold tracking-[0.16em] text-primary uppercase transition",
+                "hover:border-primary",
+              )}
+            >
+              Explore our journeys
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
