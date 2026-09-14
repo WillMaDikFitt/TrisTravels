@@ -149,7 +149,7 @@ export default function TestimonialsAdminPage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_16rem]">
+              <div className="grid gap-4">
                 <div className="grid gap-3">
                   <Field label="Quote" hint="About 2–3 lines — longer quotes are cut off on the card">
                     <textarea

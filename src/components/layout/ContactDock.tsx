@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { site } from "@/data/site";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ function FacebookIcon({ size = 16 }: { size?: number }) {
 
 const items = [
   { href: "/contact", label: "Contact", Icon: Phone, external: false },
-  { href: site.whatsappUrl, label: "WhatsApp", Icon: MessageCircle, external: true },
+  { href: site.whatsappUrl, label: "WhatsApp", Icon: WhatsAppIcon, external: true },
   { href: `mailto:${site.email}`, label: "Email", Icon: Mail, external: true },
   { href: site.instagramUrl, label: "Instagram", Icon: InstagramIcon, external: true },
   { href: site.facebookUrl, label: "Facebook", Icon: FacebookIcon, external: true },

@@ -52,6 +52,7 @@ export const DEFAULT_SETTINGS = {
   curatedJourneyFaqs: DEFAULT_CURATED_JOURNEY_FAQS,
   homeFaqs: DEFAULT_HOME_FAQS,
   homeTestimonials: DEFAULT_TESTIMONIALS,
+  impactImage: "",
   impact: [
     {
       id: "partners",

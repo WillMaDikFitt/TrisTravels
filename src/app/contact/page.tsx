@@ -16,7 +16,8 @@ import {
 import { media } from "@/data/media";
 import { site } from "@/data/site";
 import { getCraftProduct } from "@/data/artisans";
-import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { submitEnquiry } from "@/lib/actions/enquiries";
 
 export default function ContactPage() {
@@ -77,7 +78,7 @@ function ContactPageInner() {
               href: `mailto:${site.email}`,
             },
             {
-              icon: MessageCircle,
+              icon: WhatsAppIcon,
               label: "WhatsApp",
               value: site.phoneDisplay,
               href: site.whatsappUrl,

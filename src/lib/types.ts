@@ -135,7 +135,8 @@ export type ImpactStat = {
   id: string;
   value: string;
   label: string;
-  description: string;
+  /** Legacy field from older Studio saves — no longer shown. */
+  description?: string;
 };
 
 export type DiscountCode = {
@@ -153,6 +154,8 @@ export type PlatformSettings = {
   serviceFeePercent: number;
   gstPercent: number;
   impact: ImpactStat[];
+  /** Background still for the impact band (Drive: The Impact). */
+  impactImage?: string;
   /** Optional promo codes editable in admin. */
   discountCodes?: DiscountCode[];
   /** Transfer fleet for experiences / journey enquire (Studio → Vehicles). */

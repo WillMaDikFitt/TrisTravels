@@ -10,11 +10,14 @@ import {
 } from "@/lib/actions/studio-demo";
 import { DEFAULT_SETTINGS } from "@/lib/catalog";
 import type { ImpactStat, PlatformSettings } from "@/lib/types";
+import { ImageField } from "@/components/admin/ImageField";
 import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
   const [impact, setImpact] = useState<ImpactStat[]>(DEFAULT_SETTINGS.impact);
+  const [impactImage, setImpactImage] = useState(DEFAULT_SETTINGS.impactImage ?? "");
+  const [impactReady, setImpactReady] = useState(false);
   const [note, setNote] = useState("");
   const [impactNote, setImpactNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,6 +30,8 @@ export default function AdminSettingsPage() {
     fetchSettingsAdmin().then((next) => {
       setSettings(next);
       setImpact(next.impact?.length ? next.impact : DEFAULT_SETTINGS.impact);
+      setImpactImage(next.impactImage ?? "");
+      setImpactReady(true);
     });
     getStudioDemoStatus().then((status) => setDemoSeeded(status.seeded));
   }, []);
@@ -36,7 +41,7 @@ export default function AdminSettingsPage() {
       <PageHeader
         eyebrow="System"
         title="Settings"
-        description="Booking rules, fee maths, and About-page impact numbers you can update anytime."
+        description="Booking rules, fee maths, and impact numbers you can update anytime."
       />
       <form
         key={`${settings.minAdvanceDays}-${settings.holdMinutes}-${settings.serviceFeePercent}-${settings.gstPercent}`}
@@ -47,6 +52,7 @@ export default function AdminSettingsPage() {
           const next: PlatformSettings = {
             ...settings,
             impact,
+            impactImage,
             discountCodes: settings.discountCodes ?? [],
             fleetVehicles: settings.fleetVehicles ?? DEFAULT_SETTINGS.fleetVehicles,
             stayStyles: settings.stayStyles ?? DEFAULT_SETTINGS.stayStyles,
@@ -239,11 +245,22 @@ export default function AdminSettingsPage() {
 
       <Panel className="mt-10 max-w-3xl space-y-5">
         <div>
-          <h2 className="font-display text-lg text-[#26352b]">About — Our Impact</h2>
+          <h2 className="font-display text-lg text-[#26352b]">Our Impact</h2>
           <p className="mt-1 text-sm text-[#4a5a50]">
-            Numbers and labels on the About page. Update these as partnerships and travellers grow.
+            Numbers and labels on the homepage and About page. Update these as partnerships and
+            travellers grow.
           </p>
         </div>
+        {impactReady ? (
+          <ImageField
+            name="impactImage"
+            label="Background photo"
+            hint="Drive file named The Impact — keep it a light wash behind the numbers."
+            defaultValue={impactImage}
+            purpose="impact"
+            onChange={setImpactImage}
+          />
+        ) : null}
         <div className="space-y-4">
           {impact.map((stat, index) => (
             <div
@@ -272,19 +289,6 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </Field>
-              <div className="sm:col-span-2">
-                <Field label="Description">
-                  <textarea
-                    className={`${inputClass} min-h-[4.5rem]`}
-                    value={stat.description}
-                    onChange={(e) => {
-                      const next = [...impact];
-                      next[index] = { ...stat, description: e.target.value };
-                      setImpact(next);
-                    }}
-                  />
-                </Field>
-              </div>
             </div>
           ))}
         </div>
@@ -296,7 +300,7 @@ export default function AdminSettingsPage() {
           disabled={impactBusy}
           onClick={async () => {
             setImpactBusy(true);
-            const next: PlatformSettings = { ...settings, impact };
+            const next: PlatformSettings = { ...settings, impact, impactImage };
             const res = await saveSettings(next);
             setImpactBusy(false);
             if (res.ok) {

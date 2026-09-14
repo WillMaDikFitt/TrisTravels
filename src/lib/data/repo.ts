@@ -305,6 +305,7 @@ export async function getSettings(): Promise<PlatformSettings> {
           ...DEFAULT_SETTINGS,
           ...data,
           impact: data.impact?.length ? data.impact : DEFAULT_SETTINGS.impact,
+          impactImage: data.impactImage?.trim() || DEFAULT_SETTINGS.impactImage,
           discountCodes: data.discountCodes ?? DEFAULT_SETTINGS.discountCodes,
           fleetVehicles: data.fleetVehicles?.length
             ? hydrateFleetFromDefaults(data.fleetVehicles)

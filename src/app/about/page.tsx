@@ -1,7 +1,8 @@
 import Image from "next/image";
-import { HandHeart, Heart, Home, Leaf, Sprout, Users } from "lucide-react";
+import { Backpack, HandHeart, Hammer, Heart, Home, Leaf, Music, Sprout, Users } from "lucide-react";
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { CtaBand } from "@/components/ui/CtaBand";
+import { ImpactSection } from "@/components/sections/ImpactSection";
 import { media } from "@/data/media";
 import { getSettings } from "@/lib/data/repo";
 import { cn } from "@/lib/utils";
@@ -35,11 +36,11 @@ const storyMoments = [
 ];
 
 const communityWays = [
-  "Trekking with local guides",
-  "Listening to folklore and traditional music",
-  "Staying in welcoming village homestays",
-  "Learning to braid a living root bridge",
-  "Supporting skilled local artisans",
+  { label: "Trekking with local guides", Icon: Backpack },
+  { label: "Listening to folklore and traditional music", Icon: Music },
+  { label: "Staying in welcoming village homestays", Icon: Home },
+  { label: "Learning to braid a living root bridge", Icon: Sprout },
+  { label: "Supporting skilled local artisans", Icon: Hammer },
 ];
 
 const heartbeat = [
@@ -80,12 +81,11 @@ const values = [
     title: "Slow & Thoughtful Travel",
     tagline: "Go deeper, not faster.",
     body: "We believe the best journeys leave room to pause, listen, explore, and connect. We thoughtfully bring experiences, stays, people, and places together rather than simply moving you from one attraction to another.",
-    image: media.cliffs,
+    image: media.valueSlow,
     Icon: Leaf,
   },
 ] as const;
 
-const IMPACT_ICONS = [Users, Leaf, Home, Users, HandHeart] as const;
 
 export default async function AboutPage() {
   const settings = await getSettings();
@@ -144,47 +144,38 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Story narrative */}
-      <section className="mx-auto w-full max-w-container-max space-y-14 px-margin-mobile py-14 md:space-y-20 md:px-margin-desktop md:py-20">
+      {/* Story narrative — small photos and tight spacing so all three moments read on one screen */}
+      <section className="mx-auto w-full max-w-container-max space-y-6 px-margin-mobile py-10 md:space-y-8 md:px-margin-desktop md:py-12">
         {storyMoments.map((moment) => (
           <div
             key={moment.alt}
             className={cn(
-              "grid items-center gap-8 md:grid-cols-12 md:gap-12",
+              "grid items-center gap-5 md:grid-cols-12 md:gap-8",
               moment.flip && "md:[&>*:first-child]:order-2",
             )}
           >
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:col-span-7">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:col-span-5 md:aspect-[2/1]">
               <Image
                 src={moment.image}
                 alt={moment.alt}
                 fill
                 className="object-cover"
-                sizes="(max-width:768px) 100vw, 58vw"
+                sizes="(max-width:768px) 100vw, 40vw"
               />
             </div>
-            <FadeIn className="md:col-span-5">
-              <Leaf
-                aria-hidden
-                className="mb-4 h-4 w-4 text-highlight"
-                strokeWidth={1.5}
-              />
+            <FadeIn className="md:col-span-7">
+              <Leaf aria-hidden className="mb-2.5 h-4 w-4 text-highlight" strokeWidth={1.5} />
               {moment.lead ? (
-                <p
-                  className={cn(
-                    serif,
-                    "text-[1.2rem] leading-snug text-primary md:text-[1.4rem]",
-                  )}
-                >
+                <p className={cn(serif, "text-[1.05rem] leading-snug text-primary md:text-[1.25rem]")}>
                   {moment.lead}
                 </p>
               ) : null}
               <p
                 className={cn(
-                  "leading-[1.8] text-on-surface-variant",
+                  "leading-[1.7] text-on-surface-variant",
                   moment.lead
-                    ? "mt-4 text-[0.95rem] md:text-base"
-                    : cn(serif, "text-[1.2rem] leading-snug text-primary md:text-[1.4rem]"),
+                    ? "mt-2.5 text-sm md:text-[0.95rem]"
+                    : cn(serif, "text-[1.05rem] leading-snug text-primary md:text-[1.25rem]"),
                 )}
               >
                 {moment.body}
@@ -194,40 +185,47 @@ export default async function AboutPage() {
         ))}
       </section>
 
-      {/* Community ways + heartbeat */}
-      <section className="border-y border-outline-variant/25 bg-surface-container-lowest/70 px-margin-mobile py-14 md:px-margin-desktop md:py-16">
+      {/* Ways to travel with the community, the line that ties them together, then why it matters.
+          Kept on the same surface as the story above so it reads as one continuous piece. */}
+      <section className="px-margin-mobile pb-14 md:px-margin-desktop md:pb-16">
         <div className="mx-auto w-full max-w-container-max">
-          <p
-            className={cn(
-              serif,
-              "mx-auto max-w-2xl text-center text-[clamp(1.45rem,2.6vw,2rem)] leading-snug text-primary",
-            )}
-          >
-            Every TRIS journey is shaped by the community.
-          </p>
-
-          <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
-            {communityWays.map((label) => (
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
+            {communityWays.map(({ label, Icon }) => (
               <li
                 key={label}
-                className="flex flex-col items-center gap-3 text-center text-sm leading-snug text-on-surface-variant md:text-[0.95rem]"
+                className="flex items-center gap-3 rounded-2xl border border-outline-variant/25 bg-surface-container-lowest/70 px-4 py-3.5 text-sm leading-snug text-on-surface-variant lg:flex-col lg:gap-2.5 lg:px-3 lg:py-5 lg:text-center"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant/40 text-highlight">
-                  <Leaf aria-hidden className="h-4 w-4" strokeWidth={1.5} />
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-outline-variant/40 text-highlight">
+                  <Icon aria-hidden className="h-4 w-4" strokeWidth={1.5} />
                 </span>
                 {label}
               </li>
             ))}
           </ul>
 
-          <div className="mt-14 grid gap-6 md:grid-cols-3 md:gap-5">
+          <div className="my-10 flex items-center gap-4 md:my-12">
+            <span aria-hidden className="h-px flex-1 bg-outline-variant/40" />
+            <p
+              className={cn(
+                serif,
+                "max-w-2xl text-center text-[clamp(1.35rem,2.4vw,1.85rem)] leading-snug text-primary",
+              )}
+            >
+              Every TRIS journey is shaped by the community.
+            </p>
+            <span aria-hidden className="h-px flex-1 bg-outline-variant/40" />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3 md:gap-5">
             {heartbeat.map(({ text, Icon, ...rest }) => (
               <div
                 key={text}
-                className="rounded-2xl border border-outline-variant/25 bg-surface px-5 py-6 text-center shadow-[0_8px_24px_rgba(54,64,55,0.04)]"
+                className="flex items-start gap-4 rounded-2xl border border-outline-variant/25 bg-surface-container-lowest/70 px-5 py-5 shadow-[0_8px_24px_rgba(54,64,55,0.04)]"
               >
-                <Icon aria-hidden className="mx-auto h-6 w-6 text-highlight" strokeWidth={1.5} />
-                <p className="mt-4 text-[0.95rem] leading-relaxed text-on-surface-variant">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-highlight">
+                  <Icon aria-hidden className="h-5 w-5" strokeWidth={1.5} />
+                </span>
+                <p className="text-[0.95rem] leading-relaxed text-on-surface-variant">
                   {text}
                   {"emphasis" in rest && rest.emphasis ? (
                     <>
@@ -242,8 +240,8 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Our values — 3 columns */}
-      <section className="relative overflow-hidden px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+      {/* Values + impact in one viewport: smaller photos and compact stats. */}
+      <section className="relative overflow-hidden py-8 md:py-9">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-60"
@@ -252,44 +250,44 @@ export default async function AboutPage() {
               "radial-gradient(ellipse at 10% 0%, rgba(122,163,90,0.1), transparent 40%), radial-gradient(ellipse at 90% 100%, rgba(54,64,55,0.05), transparent 45%)",
           }}
         />
-        <div className="relative mx-auto w-full max-w-container-max">
-          <p className="label-caps text-highlight">Our values</p>
+        <div className="relative mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop">
+          <p className="label-caps text-highlight">Our values & impact</p>
           <h2
             className={cn(
               serif,
               "mt-3 max-w-xl text-[clamp(1.9rem,3.5vw,2.85rem)] leading-tight font-medium text-primary",
             )}
           >
-            What guides the way we travel.
+            What guides the way we travel
           </h2>
 
-          <StaggerChildren className="mt-12 grid gap-8 md:grid-cols-3 md:gap-6 lg:gap-8">
+          <StaggerChildren className="mt-6 grid gap-6 md:grid-cols-3 md:gap-5 lg:gap-6">
             {values.map((value) => (
               <StaggerItem key={value.n}>
-                <article className="flex h-full flex-col">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-                    <Image
-                      src={value.image}
-                      alt={value.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width:768px) 100vw, 33vw"
-                      quality={88}
-                    />
-                    <span className="absolute bottom-0 left-1/2 flex h-9 w-9 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-primary text-[11px] font-bold tracking-wide text-white">
+                <article className="relative flex h-full flex-col">
+                  <div className="relative">
+                    <div className="relative aspect-[2/1] overflow-hidden rounded-2xl">
+                      <Image
+                        src={value.image}
+                        alt={value.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width:768px) 100vw, 33vw"
+                        quality={88}
+                      />
+                    </div>
+                    <span className="absolute bottom-0 left-1/2 z-10 flex h-9 w-9 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full bg-primary text-[11px] font-bold tracking-wide text-white">
                       {value.n}
                     </span>
                   </div>
                   <div className="mt-8 flex flex-1 flex-col px-1 text-center">
-                    <value.Icon
-                      aria-hidden
-                      className="mx-auto h-5 w-5 text-highlight"
-                      strokeWidth={1.5}
-                    />
+                    <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-secondary-container text-highlight">
+                      <value.Icon aria-hidden className="h-4 w-4" strokeWidth={1.5} />
+                    </span>
                     <h3
                       className={cn(
                         serif,
-                        "mt-3 text-[1.35rem] leading-tight text-primary md:text-[1.45rem]",
+                        "mt-3 text-[1.3rem] leading-tight text-primary md:text-[1.45rem]",
                       )}
                     >
                       {value.title}
@@ -297,7 +295,7 @@ export default async function AboutPage() {
                     <p className="mt-2 text-sm leading-snug text-highlight italic md:text-[0.95rem]">
                       {value.tagline}
                     </p>
-                    <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                    <p className="mt-2.5 text-sm leading-relaxed text-on-surface-variant">
                       {value.body}
                     </p>
                   </div>
@@ -306,71 +304,13 @@ export default async function AboutPage() {
             ))}
           </StaggerChildren>
         </div>
+
+        <ImpactSection
+          impact={impact}
+          compact
+          backgroundImage={settings.impactImage}
+        />
       </section>
-
-      {/* Our impact */}
-      {impact.length > 0 ? (
-        <section className="relative overflow-hidden border-t border-outline-variant/25 bg-surface-container-lowest px-margin-mobile py-16 md:px-margin-desktop md:py-20">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.35]"
-            style={{
-              backgroundImage:
-                "radial-gradient(ellipse at 0% 50%, rgba(54,64,55,0.06), transparent 35%), radial-gradient(ellipse at 100% 40%, rgba(122,163,90,0.1), transparent 35%)",
-            }}
-          />
-          <div className="relative mx-auto w-full max-w-container-max text-center">
-            <p className="label-caps text-highlight">Our impact</p>
-            <h2
-              className={cn(
-                serif,
-                "mt-3 text-[clamp(1.9rem,3.5vw,2.75rem)] leading-tight font-medium text-primary",
-              )}
-            >
-              The impact you make.
-            </h2>
-            <Leaf aria-hidden className="mx-auto mt-4 h-5 w-5 text-highlight" strokeWidth={1.5} />
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-on-surface-variant md:text-base">
-              Every journey creates ripples beyond the traveller.
-            </p>
-
-            <dl className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {impact.map((stat, index) => {
-                const Icon = IMPACT_ICONS[index % IMPACT_ICONS.length];
-                return (
-                  <div
-                    key={stat.id}
-                    className="rounded-2xl border border-outline-variant/25 bg-surface px-4 py-6 shadow-[0_8px_24px_rgba(54,64,55,0.04)]"
-                  >
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd>
-                      <Icon
-                        aria-hidden
-                        className="mx-auto h-5 w-5 text-highlight"
-                        strokeWidth={1.5}
-                      />
-                      <p className={cn(serif, "mt-3 text-[2rem] leading-none text-primary md:text-[2.25rem]")}>
-                        {stat.value}
-                      </p>
-                      <p className="mt-3 text-sm font-semibold text-highlight">{stat.label}</p>
-                      <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
-                        {stat.description}
-                      </p>
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
-
-            <div className="mt-12 flex flex-col items-center gap-2">
-              <Heart aria-hidden className="h-5 w-5 text-highlight" strokeWidth={1.5} />
-              <p className={cn(serif, "text-base text-primary italic md:text-lg")}>
-                When we grow, we grow together.
-              </p>
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <CtaBand
         tone="light"

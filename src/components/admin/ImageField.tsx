@@ -99,7 +99,7 @@ export function ImageField({
 
       <input type="hidden" name={name} value={url} />
 
-      <div className="mt-3 overflow-hidden rounded-2xl border border-[#dde1d0] bg-[#f8f6f1]/p-4">
+      <div className="mt-3 overflow-hidden rounded-2xl border border-[#dde1d0] bg-[#f8f6f1] p-4">
         {url ? (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <PreviewThumb url={url} className="h-36 w-full sm:h-32 sm:w-48" />
