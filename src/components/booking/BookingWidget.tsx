@@ -23,7 +23,7 @@ import {
 } from "@/lib/experience-slots";
 import { transportVehicleOptions, type FleetVehicle } from "@/data/transport";
 import { adultRate, childRate, hasExperienceCosting, quoteExperience } from "@/lib/pricing";
-import { isValidChildAge } from "@/data/child-ages";
+import { EXPERIENCE_CHILD_AGE_MIN, isValidExperienceChildAge } from "@/data/child-ages";
 import {
   GuestCompositionFields,
   GettingThereFields,
@@ -130,7 +130,7 @@ export function BookingWidget({ experience }: Props) {
     guests >= minGuests &&
     guests <= partyCap &&
     (children === 0 ||
-      (childAges.length === children && childAges.every(isValidChildAge))) &&
+      (childAges.length === children && childAges.every(isValidExperienceChildAge))) &&
     transportReady;
 
   const startBooking = () => {
@@ -262,6 +262,7 @@ export function BookingWidget({ experience }: Props) {
         </div>
 
         <GuestCompositionFields
+          childAgeMin={EXPERIENCE_CHILD_AGE_MIN}
           compact
           adults={adults}
           children={children}

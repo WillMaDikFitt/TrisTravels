@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Field, inputClass } from "@/components/admin/ui";
 import {
   DEFAULT_FLEET_VEHICLES,
+  activeFleetVehicles,
   transferFleetVehicles,
   transportVehicleOptions,
   type FleetVehicle,
@@ -108,10 +109,13 @@ export function TransportPricingFields({
   useEffect(() => {
     fetchFleetVehicles()
       .then((rows) => {
-        if (rows?.length) setFleet(transferFleetVehicles(rows));
+        // Journeys price and offer the whole active fleet; day transfers keep the transfer flag.
+        if (rows?.length) {
+          setFleet(variant === "journey" ? activeFleetVehicles(rows) : transferFleetVehicles(rows));
+        }
       })
       .catch(() => undefined);
-  }, []);
+  }, [variant]);
 
   const visibleFleet = useMemo(() => {
     if (!value.offeredVehicleIds?.length) return fleet;

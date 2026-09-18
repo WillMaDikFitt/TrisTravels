@@ -12,6 +12,8 @@ import {
   BOOKING_STAY_STYLE_IDS,
   STAY_PREFERENCE_IDS,
   STAY_PREFERENCE_META,
+  legacyRateKeyFor,
+  resolveFleetPackageRates,
 } from "@/data/package-pricing";
 import { fetchJourneyAdmin } from "@/lib/actions/content-read";
 import { saveDocument } from "@/lib/actions/cms";
@@ -27,7 +29,8 @@ import {
   ItineraryEditor,
 } from "@/components/admin/ItineraryEditor";
 import { TransportPricingFields, transportEditorFromListing, transportFieldsFromEditor } from "@/components/admin/TransportPricingFields";
-import { TRANSPORT_VEHICLE_IDS, TRANSPORT_VEHICLE_META } from "@/data/transport";
+import type { FleetVehicle } from "@/data/transport";
+import { fetchFleetVehicles } from "@/lib/actions/content-read";
 
 function blank(): Journey {
   return {
@@ -59,27 +62,37 @@ function blank(): Journey {
   };
 }
 
+/** Fallback slug for a brand-new journey when the name doesn't slugify. */
+function newJourneySlug(name: string) {
+  return slugify(name) || `journey-${Date.now()}`;
+}
+
 const lines = (v: string) =>
   v
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
 
-function readPackagePricing(fd: FormData, type: Journey["type"]): Journey["packagePricing"] {
+function readPackagePricing(
+  fd: FormData,
+  type: Journey["type"],
+  vehicleIds: string[],
+): Journey["packagePricing"] {
   if (type !== "curated") return undefined;
   const vehicles: NonNullable<Journey["packagePricing"]>["vehicles"] = {};
-  for (const id of TRANSPORT_VEHICLE_IDS) {
-    const cost = Number(fd.get(`pkgVehicle_${id}_cost`) || "");
-    const capacity = Number(fd.get(`pkgVehicle_${id}_capacity`) || "");
-    if (Number.isFinite(cost) || Number.isFinite(capacity)) {
-      vehicles[id] = {
-        costPerDay: Number.isFinite(cost) && cost >= 0 ? Math.round(cost) : DEFAULT_PACKAGE_VEHICLES[id].costPerDay,
-        capacity:
-          Number.isFinite(capacity) && capacity > 0
-            ? Math.round(capacity)
-            : DEFAULT_PACKAGE_VEHICLES[id].capacity,
-      };
-    }
+  for (const id of vehicleIds) {
+    const rawCost = String(fd.get(`pkgVehicle_${id}_cost`) ?? "").trim();
+    const rawCapacity = String(fd.get(`pkgVehicle_${id}_capacity`) ?? "").trim();
+    // Left blank = keep falling back to the legacy rate for this size of vehicle.
+    if (!rawCost && !rawCapacity) continue;
+    const cost = Number(rawCost);
+    const capacity = Number(rawCapacity);
+    const fallback = DEFAULT_PACKAGE_VEHICLES[legacyRateKeyFor(id)];
+    vehicles[id] = {
+      costPerDay: Number.isFinite(cost) && cost >= 0 ? Math.round(cost) : fallback.costPerDay,
+      capacity:
+        Number.isFinite(capacity) && capacity > 0 ? Math.round(capacity) : fallback.capacity,
+    };
   }
   const stays: NonNullable<Journey["packagePricing"]>["stays"] = {};
   for (const id of STAY_PREFERENCE_IDS) {
@@ -130,13 +143,23 @@ export default function JourneyEditorPage() {
     });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
 
   useEffect(() => {
     if (loadError) setNote(loadError);
   }, [loadError]);
 
+  useEffect(() => {
+    fetchFleetVehicles()
+      .then((rows) => setFleet(rows?.length ? rows : null))
+      .catch(() => setFleet(null));
+  }, []);
+
   if (!hydrated) return <p className="text-sm text-[#4a5a50]">Loading saved content…</p>;
   if (!row) return <p className="text-sm text-[#4a5a50]">{note || "Loading editor…"}</p>;
+
+  // A rate card per fleet vehicle, pre-filled from this journey or the standard rate for its size.
+  const packageRates = resolveFleetPackageRates(fleet, row.packagePricing?.vehicles);
 
   return (
     <div>
@@ -167,7 +190,7 @@ export default function JourneyEditorPage() {
             return;
           }
           const fd = new FormData(e.currentTarget);
-          const nextSlug = isNew ? slugify(String(fd.get("name") || "")) || `journey-${Date.now()}` : row.slug;
+          const nextSlug = isNew ? newJourneySlug(String(fd.get("name") || "")) : row.slug;
           const next: Journey = {
             ...row,
             slug: nextSlug,
@@ -187,6 +210,7 @@ export default function JourneyEditorPage() {
             offeredStayStyleIds: row.offeredStayStyleIds?.length ? row.offeredStayStyleIds : undefined,
             removedFromCatalogue: false,
             season: String(fd.get("season")),
+            route: String(fd.get("route") || "").trim(),
             totalDistance: String(fd.get("totalDistance") || "").trim(),
             overview: String(fd.get("overview")),
             image: (() => {
@@ -201,7 +225,11 @@ export default function JourneyEditorPage() {
             stays: lines(String(fd.get("stays") || "")),
             inclusions: lines(String(fd.get("inclusions") || "")),
             exclusions: lines(String(fd.get("exclusions") || "")),
-            packagePricing: readPackagePricing(fd, String(fd.get("type")) as Journey["type"]),
+            packagePricing: readPackagePricing(
+              fd,
+              String(fd.get("type")) as Journey["type"],
+              packageRates.map(({ vehicle }) => vehicle.id),
+            ),
             nextDeparture: String(fd.get("nextDeparture") || ""),
             departures: String(fd.get("departures") || "")
               .split(",")
@@ -312,6 +340,17 @@ export default function JourneyEditorPage() {
             </Field>
             <Field label="Price note">
               <input name="priceNote" defaultValue={row.priceNote ?? ""} className={inputClass} />
+            </Field>
+            <Field
+              label="Route"
+              hint="Shown in Journey at a glance, e.g. 2 Nights in Sohra → 1 Night in Nongriat"
+            >
+              <input
+                name="route"
+                defaultValue={row.route ?? ""}
+                placeholder="2 Nights in Sohra → 1 Night in Nongriat → 1 Night in Shillong"
+                className={inputClass}
+              />
             </Field>
             <Field label="Season">
               <input name="season" defaultValue={row.season} className={inputClass} />
@@ -472,12 +511,28 @@ export default function JourneyEditorPage() {
               </Field>
             </div>
             <h4 className="mt-5 text-sm font-semibold text-[#26352b]">A · Vehicle rates (₹ / day) & capacity</h4>
+            <p className="mt-1 text-xs text-[#4a5a50]">
+              Every vehicle in Studio → Vehicles. Tick which ones guests can pick in the
+              Transportation panel above; rates left untouched follow the standard rate for that size.
+            </p>
             <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {TRANSPORT_VEHICLE_IDS.map((id) => {
-                const rate = row.packagePricing?.vehicles?.[id] ?? DEFAULT_PACKAGE_VEHICLES[id];
+              {packageRates.map(({ vehicle, rate }) => {
+                const id = vehicle.id;
+                const offered =
+                  !row.offeredVehicleIds?.length || row.offeredVehicleIds.includes(id);
                 return (
                   <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                    <p className="text-sm font-medium text-[#26352b]">{TRANSPORT_VEHICLE_META[id].label}</p>
+                    <p className="text-sm font-medium text-[#26352b]">
+                      {vehicle.label}{" "}
+                      <span className="font-normal text-[#4a5a50]">
+                        · {vehicle.seats || `Max ${vehicle.maxGuests}`}
+                      </span>
+                    </p>
+                    {offered ? null : (
+                      <p className="text-[11px] font-semibold tracking-wide text-[#8a6a3a] uppercase">
+                        Not shown to guests
+                      </p>
+                    )}
                     <Field label="Cost / day">
                       <input
                         name={`pkgVehicle_${id}_cost`}

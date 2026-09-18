@@ -33,6 +33,8 @@ export type ManualBookingRecord = {
   productType: ManualProductType;
   /** Listing slug; empty for Craft My Journey, which has no listing. */
   productSlug?: string;
+  /** Ops / backend catalogue ID copied from the listing at booking time. */
+  backendId?: string;
   productName: string;
   productSubheading: string;
   travellerName: string;
@@ -170,6 +172,8 @@ export type PlatformSettings = {
   homeFaqs?: import("@/data/shared-faqs").SharedFaqItem[];
   /** "From our travellers" quotes in the homepage Why TRIS section. */
   homeTestimonials?: import("@/data/testimonials").Testimonial[];
+  /** The About page story (Studio → Our story). */
+  aboutStory?: import("@/data/about-story").StoryMoment[];
 };
 
 export type JourneyDepartureSeat = {

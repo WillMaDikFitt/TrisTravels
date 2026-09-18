@@ -45,11 +45,11 @@ export function ContactDock({ className }: { className?: string }) {
     >
       <nav
         aria-label="Contact and social"
-        className="pointer-events-auto flex flex-col gap-1 rounded-full border border-outline-variant/20 bg-surface-container-lowest/80 p-1 shadow-[0_8px_24px_rgba(54,64,55,0.1)] backdrop-blur-md"
+        className="pointer-events-auto flex flex-col gap-0.5 rounded-full border border-outline-variant/20 bg-surface-container-lowest/80 p-0.5 shadow-[0_8px_24px_rgba(54,64,55,0.1)] backdrop-blur-md md:gap-1 md:p-1"
       >
         {items.map(({ href, label, Icon, external }) => {
           const itemClass =
-            "flex h-9 w-9 items-center justify-center rounded-full text-primary/75 transition hover:bg-primary/8 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+            "flex h-7 w-7 items-center justify-center rounded-full text-primary/75 transition hover:bg-primary/8 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 md:h-9 md:w-9";
           if (external) {
             return (
               <a
@@ -61,13 +61,13 @@ export function ContactDock({ className }: { className?: string }) {
                 title={label}
                 className={itemClass}
               >
-                <Icon size={16} />
+                <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </a>
             );
           }
           return (
             <Link key={label} href={href} aria-label={label} title={label} className={itemClass}>
-              <Icon size={16} />
+              <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
             </Link>
           );
         })}

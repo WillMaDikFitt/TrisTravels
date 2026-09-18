@@ -38,7 +38,7 @@ import {
   FlowSummary,
   SecureNote,
 } from "@/components/forms/FlowUI";
-import { isValidChildAge } from "@/data/child-ages";
+import { EXPERIENCE_CHILD_AGE_MIN, isValidExperienceChildAge } from "@/data/child-ages";
 import { site } from "@/data/site";
 import { openRazorpayCheckout } from "@/lib/razorpay-client";
 
@@ -47,7 +47,7 @@ function parseAges(raw: string | null, count: number) {
   const parsed = raw
     .split(",")
     .map((v) => Number(v.trim()))
-    .filter((v) => isValidChildAge(v));
+    .filter((v) => isValidExperienceChildAge(v));
   return Array.from({ length: count }, (_, i) => parsed[i] ?? NaN);
 }
 
@@ -186,7 +186,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
     guests >= minGuests &&
     guests <= partyCap &&
     (children === 0 ||
-      (childAges.length === children && childAges.every(isValidChildAge))) &&
+      (childAges.length === children && childAges.every(isValidExperienceChildAge))) &&
     transportReady;
 
   const contactReady = Boolean(name.trim() && phone.trim() && (!email.trim() || email.includes("@")));
@@ -431,6 +431,7 @@ export function BookingFlow({ experience }: { experience: Experience }) {
                     required
                   />
                   <GuestCompositionFields
+                    childAgeMin={EXPERIENCE_CHILD_AGE_MIN}
                     adults={adults}
                     children={children}
                     childAges={childAges}

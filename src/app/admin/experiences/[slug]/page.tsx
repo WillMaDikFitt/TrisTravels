@@ -144,6 +144,7 @@ export default function ExperienceEditorPage() {
             slug: nextSlug,
             name: String(fd.get("name")),
             tagline: String(fd.get("tagline")),
+            taglineBold: fd.get("taglineBold") === "on",
             category: String(fd.get("category")) as ExperienceCategory,
             location: String(fd.get("location")),
             distanceFromShillong: String(fd.get("distanceFromShillong") || "").trim(),
@@ -242,6 +243,14 @@ export default function ExperienceEditorPage() {
             </Field>
             <Field label="Tagline" hint="One line under the name">
               <input name="tagline" defaultValue={row.tagline} className={inputClass} />
+              <label className="mt-2 flex items-center gap-2 text-xs font-medium text-[#364037]">
+                <input
+                  type="checkbox"
+                  name="taglineBold"
+                  defaultChecked={row.taglineBold === true}
+                />
+                Show this tagline in bold
+              </label>
             </Field>
             <Field label="Type">
               <select name="category" defaultValue={row.category} className={inputClass}>

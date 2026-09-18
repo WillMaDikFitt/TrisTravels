@@ -33,10 +33,11 @@ const isIsoDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
 async function productCatalogue(): Promise<ManualProductCatalogue> {
   const [experiences, journeys] = await Promise.all([listAllExperiencesAdmin(), listAllJourneysAdmin()]);
-  const option = (item: { slug: string; name: string; tagline: string }) => ({
+  const option = (item: { slug: string; name: string; tagline: string; backendId?: string }) => ({
     slug: item.slug,
     name: item.name,
     subheading: item.tagline,
+    backendId: item.backendId?.trim() || undefined,
   });
   return {
     experience: experiences.map(option),
@@ -82,12 +83,14 @@ export async function createManualBooking(idToken: string, input: ManualBookingI
   let productName = text(input.productName);
   let productSubheading = text(input.productSubheading, 300);
   let productSlug: string | undefined;
+  let backendId: string | undefined;
   if (productType !== "craft") {
     // Resolve the listing on the server so the name always matches the catalogue.
     const match = (await productCatalogue())[productType].find((o) => o.slug === input.productSlug);
     if (!match) return fail("Choose which listing this booking is for");
     productName = match.name;
     productSlug = match.slug;
+    backendId = match.backendId;
     productSubheading = productSubheading || match.subheading;
   }
   if (!productName) return fail("Add the trip name");
@@ -142,6 +145,7 @@ export async function createManualBooking(idToken: string, input: ManualBookingI
     createdBy: gate.staff.name || gate.staff.email || undefined,
   };
   if (productSlug) record.productSlug = productSlug;
+  if (backendId) record.backendId = backendId;
   if (paymentDueDate) record.paymentDueDate = paymentDueDate;
   if (remarks) record.remarks = remarks;
 

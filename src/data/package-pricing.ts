@@ -1,4 +1,9 @@
-import type { TransportVehicleId } from "./transport";
+  import {
+  activeFleetVehicles,
+  DEFAULT_FLEET_VEHICLES,
+  type FleetVehicle,
+  type TransportVehicleId,
+} from "./transport";
 
 export type StayPreferenceId =
   | "homestay"
@@ -25,7 +30,12 @@ export type PackageStayRate = {
 };
 
 export type CuratedPackagePricing = {
-  vehicles?: Partial<Record<TransportVehicleId, PackageVehicleRate>>;
+  /**
+   * Day rate per vehicle, keyed by fleet vehicle id (Studio → Vehicles).
+   * The legacy keys sedan / suv / innova / tempo still apply to any vehicle
+   * that has no rate of its own.
+   */
+  vehicles?: Partial<Record<string, PackageVehicleRate>>;
   stays?: Partial<Record<StayPreferenceId, PackageStayRate>>;
   /** Activities & other cost per guest for the whole journey (C) */
   activityCostPerGuest?: number;
@@ -91,6 +101,53 @@ export function resolvePackageVehicles(
     innova: { ...DEFAULT_PACKAGE_VEHICLES.innova, ...override?.innova },
     tempo: { ...DEFAULT_PACKAGE_VEHICLES.tempo, ...override?.tempo },
   };
+}
+
+/** Day-rate multipliers used for fleet vehicles a journey hasn't priced yet. */
+export const PACKAGE_VEHICLE_RATE_SCALE: Record<string, number> = {
+  sedan: 1,
+  suv: 1,
+  innova: 1,
+  tempo10: 0.92,
+  tempo12: 1,
+  tempo15: 1.12,
+  urbania10: 1.18,
+  urbania12: 1.32,
+};
+
+/** Which of the four legacy rate keys stands in for a fleet vehicle. */
+export function legacyRateKeyFor(vehicleId: string): TransportVehicleId {
+  if (vehicleId === "sedan" || vehicleId === "suv" || vehicleId === "innova") return vehicleId;
+  return "tempo";
+}
+
+/** A vehicle's own rate when Studio set one, else the legacy rate scaled for its size. */
+export function packageVehicleRate(
+  vehicle: Pick<FleetVehicle, "id" | "maxGuests">,
+  override?: CuratedPackagePricing["vehicles"],
+): PackageVehicleRate {
+  const own = override?.[vehicle.id];
+  if (own) {
+    return {
+      costPerDay: Math.max(0, Math.round(own.costPerDay)),
+      capacity: Math.max(1, Math.round(own.capacity) || 1),
+    };
+  }
+  const legacyKey = legacyRateKeyFor(vehicle.id);
+  const base = { ...DEFAULT_PACKAGE_VEHICLES[legacyKey], ...override?.[legacyKey] };
+  return {
+    costPerDay: Math.max(0, Math.round(base.costPerDay * (PACKAGE_VEHICLE_RATE_SCALE[vehicle.id] ?? 1))),
+    capacity: Math.max(1, Math.round(vehicle.maxGuests || base.capacity) || 1),
+  };
+}
+
+/** Rates for every active fleet vehicle, filling gaps from the legacy rates. */
+export function resolveFleetPackageRates(
+  fleet?: FleetVehicle[] | null,
+  override?: CuratedPackagePricing["vehicles"],
+): { vehicle: FleetVehicle; rate: PackageVehicleRate }[] {
+  const list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
+  return list.map((vehicle) => ({ vehicle, rate: packageVehicleRate(vehicle, override) }));
 }
 
 export function resolvePackageStays(

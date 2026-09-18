@@ -323,6 +323,7 @@ export async function getSettings(): Promise<PlatformSettings> {
           homeTestimonials: data.homeTestimonials?.length
             ? data.homeTestimonials
             : DEFAULT_SETTINGS.homeTestimonials,
+          aboutStory: data.aboutStory?.length ? data.aboutStory : DEFAULT_SETTINGS.aboutStory,
         };
       }
     } catch (err) {

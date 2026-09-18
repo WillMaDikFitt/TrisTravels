@@ -3,6 +3,7 @@ import { Backpack, HandHeart, Hammer, Heart, Home, Leaf, Music, Sprout, Users } 
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/motion/Motion";
 import { CtaBand } from "@/components/ui/CtaBand";
 import { ImpactSection } from "@/components/sections/ImpactSection";
+import { activeStoryMoments, DEFAULT_STORY_MOMENTS } from "@/data/about-story";
 import { media } from "@/data/media";
 import { getSettings } from "@/lib/data/repo";
 import { cn } from "@/lib/utils";
@@ -10,30 +11,6 @@ import { cn } from "@/lib/utils";
 export const metadata = { title: "About" };
 
 const serif = "font-[family-name:var(--font-playfair)]";
-
-const storyMoments = [
-  {
-    image: media.kitchen,
-    alt: "Hospitality by the fire in Meghalaya",
-    lead: "Born in Mairang, Mei-ieid embodied true Khasi hospitality — generous, hard-working, and unconditionally caring.",
-    body: "She never spoke the language of business, but she understood the importance of hospitality — welcoming every guest with an open heart and genuine care.",
-    flip: false,
-  },
-  {
-    image: media.craft,
-    alt: "Shared meals and local hospitality",
-    lead: null as string | null,
-    body: "TRIS is more than a name. It is a promise to carry her spirit forward — through every homestay, every meal, every guide, and every journey we craft for you.",
-    flip: true,
-  },
-  {
-    image: media.heroRoots,
-    alt: "Travellers on a living root bridge trail",
-    lead: "At TRIS Travels, we create immersive journeys that go beyond sightseeing.",
-    body: "While conventional tours can rush you through places, we believe in slowing travel down so you can connect more deeply with the people, culture, and landscapes of Meghalaya.",
-    flip: false,
-  },
-];
 
 const communityWays = [
   { label: "Trekking with local guides", Icon: Backpack },
@@ -90,6 +67,7 @@ const values = [
 export default async function AboutPage() {
   const settings = await getSettings();
   const impact = settings.impact?.length ? settings.impact : [];
+  const storyMoments = activeStoryMoments(settings.aboutStory, DEFAULT_STORY_MOMENTS);
 
   return (
     <div className="bg-surface text-foreground">
@@ -146,24 +124,27 @@ export default async function AboutPage() {
 
       {/* Story narrative — small photos and tight spacing so all three moments read on one screen */}
       <section className="mx-auto w-full max-w-container-max space-y-6 px-margin-mobile py-10 md:space-y-8 md:px-margin-desktop md:py-12">
-        {storyMoments.map((moment) => (
+        {storyMoments.map((moment, index) => (
           <div
-            key={moment.alt}
+            key={moment.id}
             className={cn(
               "grid items-center gap-5 md:grid-cols-12 md:gap-8",
-              moment.flip && "md:[&>*:first-child]:order-2",
+              // Alternate which side the photo sits on.
+              index % 2 === 1 && "md:[&>*:first-child]:order-2",
             )}
           >
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:col-span-5 md:aspect-[2/1]">
-              <Image
-                src={moment.image}
-                alt={moment.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width:768px) 100vw, 40vw"
-              />
-            </div>
-            <FadeIn className="md:col-span-7">
+            {moment.image ? (
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl md:col-span-5 md:aspect-[2/1]">
+                <Image
+                  src={moment.image}
+                  alt={moment.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:768px) 100vw, 40vw"
+                />
+              </div>
+            ) : null}
+            <FadeIn className={moment.image ? "md:col-span-7" : "md:col-span-12"}>
               <Leaf aria-hidden className="mb-2.5 h-4 w-4 text-highlight" strokeWidth={1.5} />
               {moment.lead ? (
                 <p className={cn(serif, "text-[1.05rem] leading-snug text-primary md:text-[1.25rem]")}>

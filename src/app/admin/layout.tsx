@@ -28,6 +28,7 @@ import {
   CircleHelp,
   CreditCard,
   HandHeart,
+  Heart,
 } from "lucide-react";
 
 const sections: { label: string; links: { href: string; label: string; icon: typeof LayoutDashboard }[] }[] = [
@@ -51,6 +52,7 @@ const sections: { label: string; links: { href: string; label: string; icon: typ
       { href: "/admin/stays", label: "Stays", icon: BedDouble },
       { href: "/admin/faqs", label: "FAQs", icon: CircleHelp },
       { href: "/admin/testimonials", label: "Testimonials", icon: HandHeart },
+      { href: "/admin/our-story", label: "Our story", icon: Heart },
       { href: "/admin/places", label: "Places", icon: MapPin },
       { href: "/admin/journal", label: "Journal", icon: BookOpen },
     ],

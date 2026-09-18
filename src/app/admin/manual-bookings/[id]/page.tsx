@@ -167,6 +167,9 @@ export default function ManualBookingDetailPage() {
                 {booking.productName}{" "}
                 <span className="text-[#4a5a50]">· {manualProductLabel(booking.productType)}</span>
               </DetailRow>
+              {booking.backendId ? (
+                <DetailRow label="Backend ID">{booking.backendId}</DetailRow>
+              ) : null}
               {booking.productSubheading ? (
                 <DetailRow label="Subheading">{booking.productSubheading}</DetailRow>
               ) : null}

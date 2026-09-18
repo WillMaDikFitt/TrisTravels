@@ -45,8 +45,9 @@ export function ExperienceCard({ experience, className }: Props) {
         <Link
           href={`/experiences/${experience.slug}`}
           className={cn(
-            "absolute right-3.5 bottom-3.5 z-20 inline-flex items-center gap-1.5 rounded-full bg-cta px-4 py-2.5 text-on-cta shadow-[0_8px_20px_rgba(54,64,55,0.28)] transition hover:brightness-110",
-            CARD_TYPE.button,
+            // Lighter, smaller pill so it sits over the photo without competing with it.
+            "absolute right-3 bottom-3 z-20 inline-flex items-center gap-1 rounded-full bg-primary/55 px-3 py-1.5 text-on-primary shadow-[0_4px_14px_rgba(54,64,55,0.18)] backdrop-blur-[3px] transition hover:bg-primary/75",
+            "font-sans text-[9px] font-bold tracking-[0.12em] uppercase",
           )}
         >
           View experience <span aria-hidden>→</span>

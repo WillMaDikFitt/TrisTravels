@@ -43,6 +43,8 @@ export type Experience = {
   slug: string;
   name: string;
   tagline: string;
+  /** Show the tagline in bold on the experience page. */
+  taglineBold?: boolean;
   category: ExperienceCategory;
   tags: string[];
   location: string;

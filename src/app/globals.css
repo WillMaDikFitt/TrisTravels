@@ -131,6 +131,17 @@
     font-family: var(--font-manrope), system-ui, sans-serif;
   }
 
+  /*
+    No sideways scrolling of the page itself on phones — a single wide element
+    (a long word, a fixed-width block) shouldn't shift the whole layout.
+    `clip` rather than `hidden`, so sticky sidebars and scroll-snap keep working;
+    carousels scroll inside their own overflow-x-auto containers.
+  */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   ::selection {
     background: var(--highlight);
     color: var(--on-highlight);

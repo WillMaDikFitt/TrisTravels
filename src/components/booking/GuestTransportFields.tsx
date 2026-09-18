@@ -2,7 +2,7 @@
 
 import { Check, Minus, Plus, UsersRound, CarFront } from "lucide-react";
 import { FormSelect } from "@/components/ui/Form";
-import { CHILD_AGE_SELECT_OPTIONS } from "@/data/child-ages";
+import { CHILD_AGE_MIN, childAgeNote, childAgeOptions } from "@/data/child-ages";
 import { formatINR, cn } from "@/lib/utils";
 import type { TransportVehicleOption } from "@/data/transport";
 import type { ExperienceTransportMode } from "@/lib/experience-meta";
@@ -17,6 +17,8 @@ type GuestFieldsProps = {
   onChildren: (n: number) => void;
   onChildAge: (index: number, age: number) => void;
   compact?: boolean;
+  /** Youngest age offered. Experiences start at 3; journeys allow under 1. */
+  childAgeMin?: number;
 };
 
 function Counter({
@@ -50,10 +52,17 @@ function Counter({
           </span>
         )}
         <div className="min-w-0">
-          <p className={cn("font-semibold text-primary", compact ? "text-xs" : "text-sm")}>{label}</p>
           <p
             className={cn(
-              "text-on-surface-variant",
+              "font-semibold whitespace-nowrap text-primary",
+              compact ? "text-xs" : "text-sm",
+            )}
+          >
+            {label}
+          </p>
+          <p
+            className={cn(
+              "whitespace-nowrap text-on-surface-variant",
               compact ? "mt-0 text-[10px] leading-tight" : "mt-0.5 text-[11px]",
             )}
           >
@@ -104,12 +113,14 @@ export function GuestCompositionFields({
   onChildren,
   onChildAge,
   compact,
+  childAgeMin = CHILD_AGE_MIN,
 }: GuestFieldsProps) {
   const remainingForKids = Math.max(0, maxGuests - adults);
 
   return (
     <div className={cn("space-y-3", compact && "space-y-2")}>
-      <div className={cn("grid gap-2.5", compact ? "grid-cols-2" : "gap-3 sm:grid-cols-2")}>
+      {/* Stacked in the sidebar widget — side by side squeezed the labels. */}
+      <div className={cn("grid gap-2.5", compact ? "grid-cols-1" : "gap-3 sm:grid-cols-2")}>
         <Counter
           compact={compact}
           label="Adults"
@@ -122,7 +133,7 @@ export function GuestCompositionFields({
         <Counter
           compact={compact}
           label="Children"
-          note={compact ? "Under 1–9" : "Ages under 1 (−1) to 9 years"}
+          note={childAgeNote(childAgeMin, compact)}
           value={children}
           min={0}
           max={remainingForKids}
@@ -140,7 +151,7 @@ export function GuestCompositionFields({
               required
               options={[
                 { value: "", label: "Select age" },
-                ...CHILD_AGE_SELECT_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+                ...childAgeOptions(childAgeMin).map((o) => ({ value: o.value, label: o.label })),
               ]}
               value={Number.isFinite(childAges[index]) ? String(childAges[index]) : ""}
               onChange={(v) => onChildAge(index, v === "" ? NaN : Number(v))}

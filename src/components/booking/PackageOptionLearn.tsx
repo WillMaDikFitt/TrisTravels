@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import {
   packageTransportList,
@@ -102,29 +103,56 @@ function SubTabs({
 
 function ImageCarousel({ images, label }: { images: string[]; label: string }) {
   const [index, setIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const total = images.length;
 
   useEffect(() => {
     setIndex(0);
+    setZoomed(false);
   }, [label, images]);
 
-  if (!total) return null;
+  const go = useCallback(
+    (dir: -1 | 1) => setIndex((i) => (total ? (i + dir + total) % total : 0)),
+    [total],
+  );
 
-  const go = (dir: -1 | 1) => {
-    setIndex((i) => (i + dir + total) % total);
-  };
+  useEffect(() => {
+    if (!zoomed) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        // Capture phase + stop, so the surrounding modal's own Escape doesn't close everything.
+        event.stopImmediatePropagation();
+        setZoomed(false);
+      } else if (event.key === "ArrowLeft") {
+        go(-1);
+      } else if (event.key === "ArrowRight") {
+        go(1);
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [zoomed, go]);
+
+  if (!total) return null;
 
   return (
     <div className="space-y-2.5">
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-surface-container">
-        <Image
-          src={images[index]}
-          alt={`${label} reference ${index + 1}`}
-          fill
-          className="object-cover"
-          sizes="(max-width:768px) 100vw, 55vw"
-          priority={index === 0}
-        />
+        <button
+          type="button"
+          onClick={() => setZoomed(true)}
+          aria-label={`View ${label} image ${index + 1} full screen`}
+          className="absolute inset-0 cursor-zoom-in"
+        >
+          <Image
+            src={images[index]}
+            alt={`${label} reference ${index + 1}`}
+            fill
+            className="object-cover"
+            sizes="(max-width:768px) 100vw, 55vw"
+            priority={index === 0}
+          />
+        </button>
         {total > 1 ? (
           <>
             <button
@@ -171,6 +199,72 @@ function ImageCarousel({ images, label }: { images: string[]; label: string }) {
           ))}
         </div>
       ) : null}
+
+      {/* Full view — portalled above the modal (z-80) so nothing clips it */}
+      {zoomed && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${label} image ${index + 1} of ${total}`}
+              className="fixed inset-0 z-[120] flex flex-col bg-primary/95 backdrop-blur-sm"
+              onClick={() => setZoomed(false)}
+            >
+              <div className="flex shrink-0 items-center justify-between px-4 py-4 text-on-primary">
+                <p className="text-sm text-on-primary/75">
+                  {index + 1} / {total}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setZoomed(false)}
+                  aria-label="Close full view"
+                  className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-white/15"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div
+                className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-6 md:px-16"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="relative h-full w-full max-w-5xl">
+                  <Image
+                    key={images[index]}
+                    src={images[index]}
+                    alt={`${label} reference ${index + 1}`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    quality={90}
+                  />
+                </div>
+
+                {total > 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => go(-1)}
+                      aria-label="Previous image"
+                      className="absolute top-1/2 left-2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-on-primary transition hover:bg-white/25 md:left-6"
+                    >
+                      <ChevronLeft size={22} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => go(1)}
+                      aria-label="Next image"
+                      className="absolute top-1/2 right-2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-on-primary transition hover:bg-white/25 md:right-6"
+                    >
+                      <ChevronRight size={22} />
+                    </button>
+                  </>
+                ) : null}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

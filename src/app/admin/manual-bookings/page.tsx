@@ -80,7 +80,10 @@ export default function ManualBookingsPage() {
                 >
                   <td className="px-4 py-3">
                     <p className="font-medium">{b.productName}</p>
-                    <p className="mt-0.5 text-xs text-[#4a5a50]">{manualProductLabel(b.productType)}</p>
+                    <p className="mt-0.5 text-xs text-[#4a5a50]">
+                      {manualProductLabel(b.productType)}
+                      {b.backendId ? ` · ID ${b.backendId}` : ""}
+                    </p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{b.travellerName}</p>

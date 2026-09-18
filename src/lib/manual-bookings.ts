@@ -18,7 +18,13 @@ export const MANUAL_PAYMENT_TYPES: { id: ManualPaymentType; label: string; hint:
   { id: "custom", label: "Custom", hint: "Any amount you set" },
 ];
 
-export type ManualProductOption = { slug: string; name: string; subheading: string };
+export type ManualProductOption = {
+  slug: string;
+  name: string;
+  subheading: string;
+  /** Ops / backend catalogue ID from the listing, copied onto the booking. */
+  backendId?: string;
+};
 
 /** Listings staff can pick from; Craft My Journey has none, so its name is typed in. */
 export type ManualProductCatalogue = Record<Exclude<ManualProductType, "craft">, ManualProductOption[]>;

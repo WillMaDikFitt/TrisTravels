@@ -61,7 +61,7 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
 
   return (
     <section className="home-snap-section relative h-[100svh] max-h-[100svh] w-full overflow-hidden">
-      {/* Soft off-white + visible faded landscape (not a heavy cream wash) */}
+      {/* Soft off-white + a warm, desaturated landscape — the photo's blue sky was tinting the section */}
       <div className="absolute inset-0 bg-[#f7f5f1]">
         <div
           className="absolute inset-0"
@@ -82,7 +82,7 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
             src={media.whyTrisBg}
             alt=""
             fill
-            className="object-cover object-center opacity-[0.52]"
+            className="object-cover object-center opacity-[0.45] saturate-[0.2] sepia-[0.3]"
             sizes="100vw"
             quality={90}
             priority={false}

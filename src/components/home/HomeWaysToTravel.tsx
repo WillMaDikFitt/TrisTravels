@@ -54,7 +54,7 @@ export function HomeWaysToTravel() {
           <p className="text-[11px] font-semibold tracking-[0.22em] text-highlight uppercase md:text-xs">
             Four ways to travel with TRIS
           </p>
-          <h2 className="mt-3 font-display text-[clamp(1.5rem,3.2vw,2.65rem)] leading-tight whitespace-nowrap text-primary max-[420px]:whitespace-normal">
+          <h2 className="mt-3 font-display text-[clamp(1.5rem,3.2vw,2.65rem)] leading-tight whitespace-nowrap text-primary max-[560px]:whitespace-normal">
             Choose the way that suits you best
           </h2>
         </FadeIn>

@@ -64,7 +64,11 @@ export default async function ExperienceDetailPage({ params }: Props) {
         <h1 className="mt-4 font-display text-4xl leading-[1.02] text-balance text-primary md:text-5xl lg:text-6xl">
           {exp.name}
         </h1>
-        <p className="mt-4 max-w-4xl text-base leading-relaxed text-pretty text-on-surface-variant md:text-lg">
+        <p
+          className={`mt-4 max-w-4xl text-base leading-relaxed text-pretty md:text-lg ${
+            exp.taglineBold ? "font-bold text-primary" : "text-on-surface-variant"
+          }`}
+        >
           {exp.tagline}
         </p>
       </DetailGallery>

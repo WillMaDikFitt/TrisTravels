@@ -220,7 +220,9 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
   const packageVehicleId = normalizePackageTransportId(input.vehicleId);
   const transportMeta = packageTransportMeta(packageVehicleId);
   const legacyVehicleId = toLegacyTransportId(packageVehicleId);
-  const vehicle = vehicles[legacyVehicleId] ?? vehicles.sedan;
+  // Studio can price each fleet vehicle; anything unpriced falls back to the legacy rate.
+  const ownRate = pricing.vehicles?.[packageVehicleId];
+  const vehicle = ownRate ?? vehicles[legacyVehicleId] ?? vehicles.sedan;
   const stay = stays[input.stayPreference] ?? stays.barefoot ?? stays.homestay;
   const vehicleCount = Math.max(1, Math.round(input.vehicleCount));
   const rooms = Math.max(1, Math.round(input.rooms));
@@ -228,9 +230,9 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
   const capacity = Math.max(1, vehicle.capacity || transportMeta.maxGuests);
   const minVehiclesRequired = minVehiclesForGuests(totalGuests, capacity);
   const capacityOk = totalGuests <= capacity * vehicleCount;
-  const dayRate = Math.round(
-    vehicle.costPerDay * (PACKAGE_TRANSPORT_RATE_SCALE[packageVehicleId] ?? 1),
-  );
+  const dayRate = ownRate
+    ? Math.max(0, Math.round(ownRate.costPerDay))
+    : Math.round(vehicle.costPerDay * (PACKAGE_TRANSPORT_RATE_SCALE[packageVehicleId] ?? 1));
 
   const activityCostPerGuest =
     pricing.activityCostPerGuest != null && Number.isFinite(pricing.activityCostPerGuest)

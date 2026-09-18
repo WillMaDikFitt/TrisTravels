@@ -160,9 +160,18 @@ function MoreMenu({ onLight = false }: { onLight?: boolean }) {
   );
 }
 
-function DesktopNav({ onLight = false }: { onLight?: boolean }) {
+/**
+ * Split from DesktopNav so the Suspense fallback can render the same links.
+ * useSearchParams suspends, and an empty fallback left the menu blank until hydration.
+ */
+function DesktopNavLinks({
+  onLight = false,
+  journeyType,
+}: {
+  onLight?: boolean;
+  journeyType: string | null;
+}) {
   const pathname = usePathname();
-  const journeyType = useSearchParams().get("type");
 
   return (
     <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:gap-2 lg:flex">
@@ -182,6 +191,11 @@ function DesktopNav({ onLight = false }: { onLight?: boolean }) {
       <MoreMenu onLight={onLight} />
     </nav>
   );
+}
+
+function DesktopNav({ onLight = false }: { onLight?: boolean }) {
+  const journeyType = useSearchParams().get("type");
+  return <DesktopNavLinks onLight={onLight} journeyType={journeyType} />;
 }
 
 export function Header() {
@@ -261,7 +275,8 @@ export function Header() {
     >
       <div
         className={cn(
-          "transition-[background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          // Same duration as the link colours (300ms) — a slower bar left dark text on a dark bar mid-fade.
+          "transition-[background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           solid
             ? "border-b border-white/10 bg-primary-container shadow-[0_8px_28px_rgba(38,53,43,0.18)]"
             : "border-b border-transparent bg-transparent",
@@ -289,7 +304,7 @@ export function Header() {
             </span>
           </Link>
 
-          <Suspense fallback={<nav className="hidden lg:flex" aria-hidden />}>
+          <Suspense fallback={<DesktopNavLinks onLight={onLight} journeyType={null} />}>
             <DesktopNav onLight={onLight} />
           </Suspense>
 

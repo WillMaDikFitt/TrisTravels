@@ -15,6 +15,11 @@ import { memoryStore, uid } from "@/lib/store";
 import type { BookingRecord, BookingStatus } from "@/lib/types";
 import { daysUntilDate } from "@/lib/utils";
 import { dateIsClosed } from "@/lib/catalog";
+import {
+  CHILD_AGE_MAX,
+  EXPERIENCE_CHILD_AGE_MIN,
+  isValidExperienceChildAge,
+} from "@/data/child-ages";
 import { experienceSlotCapacity, experienceSlots } from "@/lib/experience-slots";
 import { findTransportVehicle, transportVehicleOptions } from "@/data/transport";
 import { experienceTransportMode } from "@/lib/experience-meta";
@@ -59,8 +64,11 @@ export async function createBooking(input: {
   const guests = adults + children;
   if (children > 0) {
     const ages = input.childAges ?? [];
-    if (ages.length !== children || ages.some((age) => !Number.isFinite(age) || age < 0 || age > 17)) {
-      return { ok: false as const, error: "Add an age (0–17) for each child" };
+    if (ages.length !== children || ages.some((age) => !isValidExperienceChildAge(age))) {
+      return {
+        ok: false as const,
+        error: `Add an age (${EXPERIENCE_CHILD_AGE_MIN}–${CHILD_AGE_MAX}) for each child`,
+      };
     }
   }
 
