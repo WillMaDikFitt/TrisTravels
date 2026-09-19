@@ -70,7 +70,7 @@ export const media = {
   groupTrail: local.groupTrail,
   faqSectionBg: "/images/faq-section-bg-v2.jpg",
   aboutSectionBg: "/images/about-section-bg-v2.jpg",
-  whyTrisBg: "/images/why-tris-bg-v5.png",
+  whyTrisBg: "/images/why-tris-bg-v6.png",
   departures: local.ridgeLight,
   /** Drive folder Heart behind TRIS → WGTT. */
   valueAuthentic: "/images/WGTT Authentic encounters.jpeg",
@@ -107,6 +107,8 @@ export const media = {
   typeFoodLocalLife: local.categoryFoodLocalLife,
   typeWellness: local.categoryWellness,
   typeCreative: local.categoryCreative,
+  /** Backdrop behind the homepage "Pick how a day should feel" cards. */
+  experienceTypesBg: "/images/experience-types-bg-v2.png",
   /** Curated local stills for detail carousels */
   local,
 } as const;

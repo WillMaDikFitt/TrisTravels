@@ -36,7 +36,8 @@ export type CuratedPackagePricing = {
    * that has no rate of its own.
    */
   vehicles?: Partial<Record<string, PackageVehicleRate>>;
-  stays?: Partial<Record<StayPreferenceId, PackageStayRate>>;
+  /** Room rate per stay style id (Studio → Stays). Legacy keys cover styles without one. */
+  stays?: Partial<Record<string, PackageStayRate>>;
   /** Activities & other cost per guest for the whole journey (C) */
   activityCostPerGuest?: number;
   /** TRIS services percent applied to (A+B+C) → D */
@@ -148,6 +149,34 @@ export function resolveFleetPackageRates(
 ): { vehicle: FleetVehicle; rate: PackageVehicleRate }[] {
   const list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
   return list.map((vehicle) => ({ vehicle, rate: packageVehicleRate(vehicle, override) }));
+}
+
+/** Which legacy rate key stands in for a stay style that has no rate of its own. */
+export function legacyStayRateKeyFor(stayId: string): StayPreferenceId {
+  if (stayId in DEFAULT_PACKAGE_STAYS) return stayId as StayPreferenceId;
+  if (stayId === "luxury") return "resort";
+  if (stayId === "flexible") return "homestay";
+  return "homestay";
+}
+
+/** A stay style's own room rate when Studio set one, else the legacy rate it maps to. */
+export function packageStayRate(
+  stayId: string,
+  override?: CuratedPackagePricing["stays"],
+): PackageStayRate {
+  const own = override?.[stayId];
+  if (own) {
+    return {
+      roomCost: Math.max(0, Math.round(own.roomCost)),
+      extraMattressPerPerson: Math.max(0, Math.round(own.extraMattressPerPerson)),
+    };
+  }
+  const legacyKey = legacyStayRateKeyFor(stayId);
+  const base = { ...DEFAULT_PACKAGE_STAYS[legacyKey], ...override?.[legacyKey] };
+  return {
+    roomCost: Math.max(0, Math.round(base.roomCost)),
+    extraMattressPerPerson: Math.max(0, Math.round(base.extraMattressPerPerson)),
+  };
 }
 
 export function resolvePackageStays(

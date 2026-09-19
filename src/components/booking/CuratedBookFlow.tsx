@@ -25,7 +25,8 @@ import {
   packageTransportMeta,
   toLegacyTransportId,
   normalizePackageTransportId,
-  bookingStayStyles,
+  activeStayStyles,
+
   stayStyleMeta,
   type PackageTransportId,
 } from "@/data/journey-options";
@@ -168,9 +169,10 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
     [fleet, journey.offeredVehicleIds],
   );
   const stayOptions = useMemo(() => {
+    // Studio → Stays is the source: every active style shows unless this journey narrows it.
     const allowed = journey.offeredStayStyleIds?.length
-      ? bookingStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
-      : bookingStayStyles(stays);
+      ? activeStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
+      : activeStayStyles(stays);
     return [
       { value: "", label: "Select stay style" },
       ...allowed.map((s) => ({ value: s.id, label: s.label })),
@@ -998,8 +1000,8 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
         }
         onStayChange={(id) => {
           const allowed = journey.offeredStayStyleIds?.length
-            ? bookingStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
-            : bookingStayStyles(stays);
+            ? activeStayStyles(stays).filter((s) => journey.offeredStayStyleIds!.includes(s.id))
+            : activeStayStyles(stays);
           if (allowed.some((s) => s.id === id)) {
             setStayStyle(id as BookingStayStyleId);
           }

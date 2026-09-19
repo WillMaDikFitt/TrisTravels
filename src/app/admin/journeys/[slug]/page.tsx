@@ -9,10 +9,9 @@ import {
   DEFAULT_PACKAGE_STAYS,
   DEFAULT_PACKAGE_VEHICLES,
   DEFAULT_TRIS_SERVICE_PERCENT,
-  BOOKING_STAY_STYLE_IDS,
-  STAY_PREFERENCE_IDS,
-  STAY_PREFERENCE_META,
   legacyRateKeyFor,
+  legacyStayRateKeyFor,
+  packageStayRate,
   resolveFleetPackageRates,
 } from "@/data/package-pricing";
 import { fetchJourneyAdmin } from "@/lib/actions/content-read";
@@ -30,7 +29,8 @@ import {
 } from "@/components/admin/ItineraryEditor";
 import { TransportPricingFields, transportEditorFromListing, transportFieldsFromEditor } from "@/components/admin/TransportPricingFields";
 import type { FleetVehicle } from "@/data/transport";
-import { fetchFleetVehicles } from "@/lib/actions/content-read";
+import { fetchFleetVehicles, fetchStayStyles } from "@/lib/actions/content-read";
+import { activeStayStyles, type StayStyle } from "@/data/stay-styles";
 
 function blank(): Journey {
   return {
@@ -77,6 +77,7 @@ function readPackagePricing(
   fd: FormData,
   type: Journey["type"],
   vehicleIds: string[],
+  stayIds: string[],
 ): Journey["packagePricing"] {
   if (type !== "curated") return undefined;
   const vehicles: NonNullable<Journey["packagePricing"]>["vehicles"] = {};
@@ -95,17 +96,19 @@ function readPackagePricing(
     };
   }
   const stays: NonNullable<Journey["packagePricing"]>["stays"] = {};
-  for (const id of STAY_PREFERENCE_IDS) {
+  for (const id of stayIds) {
     const roomCost = Number(fd.get(`pkgStay_${id}_room`) || "");
     const mattress = Number(fd.get(`pkgStay_${id}_mattress`) || "");
     if (Number.isFinite(roomCost) || Number.isFinite(mattress)) {
       stays[id] = {
         roomCost:
-          Number.isFinite(roomCost) && roomCost >= 0 ? Math.round(roomCost) : DEFAULT_PACKAGE_STAYS[id].roomCost,
+          Number.isFinite(roomCost) && roomCost >= 0
+            ? Math.round(roomCost)
+            : DEFAULT_PACKAGE_STAYS[legacyStayRateKeyFor(id)].roomCost,
         extraMattressPerPerson:
           Number.isFinite(mattress) && mattress >= 0
             ? Math.round(mattress)
-            : DEFAULT_PACKAGE_STAYS[id].extraMattressPerPerson,
+            : DEFAULT_PACKAGE_STAYS[legacyStayRateKeyFor(id)].extraMattressPerPerson,
       };
     }
   }
@@ -144,6 +147,7 @@ export default function JourneyEditorPage() {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
+  const [stayStyles, setStayStyles] = useState<StayStyle[] | null>(null);
 
   useEffect(() => {
     if (loadError) setNote(loadError);
@@ -153,6 +157,9 @@ export default function JourneyEditorPage() {
     fetchFleetVehicles()
       .then((rows) => setFleet(rows?.length ? rows : null))
       .catch(() => setFleet(null));
+    fetchStayStyles()
+      .then((rows) => setStayStyles(rows?.length ? rows : null))
+      .catch(() => setStayStyles(null));
   }, []);
 
   if (!hydrated) return <p className="text-sm text-[#4a5a50]">Loading saved content…</p>;
@@ -160,6 +167,12 @@ export default function JourneyEditorPage() {
 
   // A rate card per fleet vehicle, pre-filled from this journey or the standard rate for its size.
   const packageRates = resolveFleetPackageRates(fleet, row.packagePricing?.vehicles);
+  // Every stay style from Studio → Stays, so Luxury and mixed stays can be offered and priced.
+  const stayStyleOptions = activeStayStyles(stayStyles);
+  const stayRates = stayStyleOptions.map((style) => ({
+    style,
+    rate: packageStayRate(style.id, row.packagePricing?.stays),
+  }));
 
   return (
     <div>
@@ -229,6 +242,7 @@ export default function JourneyEditorPage() {
               fd,
               String(fd.get("type")) as Journey["type"],
               packageRates.map(({ vehicle }) => vehicle.id),
+              stayRates.map(({ style }) => style.id),
             ),
             nextDeparture: String(fd.get("nextDeparture") || ""),
             departures: String(fd.get("departures") || "")
@@ -425,8 +439,9 @@ export default function JourneyEditorPage() {
               Leave all ticked to offer every booking-enabled stay.
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
-              {BOOKING_STAY_STYLE_IDS.map((id) => {
-                const meta = STAY_PREFERENCE_META[id];
+              {stayStyleOptions.map((style) => {
+                const id = style.id;
+                const meta = { label: style.label, hint: style.short };
                 const selected =
                   !row.offeredStayStyleIds?.length || row.offeredStayStyleIds.includes(id);
                 return (
@@ -442,7 +457,7 @@ export default function JourneyEditorPage() {
                       type="checkbox"
                       checked={selected}
                       onChange={() => {
-                        const allIds = [...BOOKING_STAY_STYLE_IDS];
+                        const allIds = stayStyleOptions.map((s) => s.id);
                         const current = row.offeredStayStyleIds?.length
                           ? [...row.offeredStayStyleIds]
                           : [...allIds];
@@ -453,10 +468,9 @@ export default function JourneyEditorPage() {
                           prev
                             ? {
                                 ...prev,
-                                offeredStayStyleIds:
-                                  next.length === 0 || next.length === allIds.length
-                                    ? undefined
-                                    : next,
+                                // Keep the explicit list even when all are ticked, so styles that
+                                // aren't flagged globally (Luxury, mixed) still reach guests.
+                                offeredStayStyleIds: next.length === 0 ? undefined : next,
                               }
                             : prev,
                         );
@@ -560,11 +574,18 @@ export default function JourneyEditorPage() {
               Room cost is for the whole journey. Extra mattress is charged per person per night × nights.
             </p>
             <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {STAY_PREFERENCE_IDS.map((id) => {
-                const rate = row.packagePricing?.stays?.[id] ?? DEFAULT_PACKAGE_STAYS[id];
+              {stayRates.map(({ style, rate }) => {
+                const id = style.id;
+                const offered =
+                  !row.offeredStayStyleIds?.length || row.offeredStayStyleIds.includes(id);
                 return (
                   <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                    <p className="text-sm font-medium text-[#26352b]">{STAY_PREFERENCE_META[id].label}</p>
+                    <p className="text-sm font-medium text-[#26352b]">{style.label}</p>
+                    {offered ? null : (
+                      <p className="text-[11px] font-semibold tracking-wide text-[#8a6a3a] uppercase">
+                        Not shown to guests
+                      </p>
+                    )}
                     <Field label="Room cost (₹ / journey)">
                       <input
                         name={`pkgStay_${id}_room`}

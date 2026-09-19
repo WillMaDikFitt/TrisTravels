@@ -16,7 +16,8 @@ import {
   DEFAULT_PACKAGE_GST_PERCENT,
   DEFAULT_TRIS_SERVICE_PERCENT,
   minVehiclesForGuests,
-  resolvePackageStays,
+  packageStayRate,
+
   resolvePackageVehicles,
   type StayPreferenceId,
 } from "@/data/package-pricing";
@@ -134,12 +135,16 @@ export function quoteExperience(
   const rules = exp.staffRules ?? [];
   const rule = rules.find((r) => totalGuests >= r.minGuests && totalGuests <= r.maxGuests);
   const staffCost = rule ? rule.quantity * rule.costPerStaff : 0;
-  const serviceFee = Math.round(((base + staffCost) * settings.serviceFeePercent) / 100);
-  const gst = Math.round((serviceFee * settings.gstPercent) / 100);
   const transportFee = Math.max(0, Math.round(options.transportFee ?? 0));
   const vehicleCount =
     transportFee > 0 ? Math.max(1, Math.min(10, Math.round(options.vehicleCount ?? 1))) : 0;
-  const customerTotal = base + staffCost + serviceFee + gst + transportFee;
+  // Transport now sits inside the service-fee base, so it carries margin and the GST
+  // charged on that fee. (GST stays on the fee here — settings.gstPercent is 18, meant
+  // for the service component, not the whole bill.)
+  const operational = base + staffCost + transportFee;
+  const serviceFee = Math.round((operational * settings.serviceFeePercent) / 100);
+  const gst = Math.round((serviceFee * settings.gstPercent) / 100);
+  const customerTotal = operational + serviceFee + gst;
   return {
     engine: "legacy",
     customerTotal,
@@ -216,14 +221,14 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
   const nights = Math.max(0, journey.nights);
   const pricing = journey.packagePricing ?? {};
   const vehicles = resolvePackageVehicles(pricing.vehicles);
-  const stays = resolvePackageStays(pricing.stays);
   const packageVehicleId = normalizePackageTransportId(input.vehicleId);
   const transportMeta = packageTransportMeta(packageVehicleId);
   const legacyVehicleId = toLegacyTransportId(packageVehicleId);
   // Studio can price each fleet vehicle; anything unpriced falls back to the legacy rate.
   const ownRate = pricing.vehicles?.[packageVehicleId];
   const vehicle = ownRate ?? vehicles[legacyVehicleId] ?? vehicles.sedan;
-  const stay = stays[input.stayPreference] ?? stays.barefoot ?? stays.homestay;
+  // Each stay style can carry its own room rate; unpriced ones fall back to a legacy key.
+  const stay = packageStayRate(input.stayPreference, pricing.stays);
   const vehicleCount = Math.max(1, Math.round(input.vehicleCount));
   const rooms = Math.max(1, Math.round(input.rooms));
   const extraMattresses = Math.max(0, Math.round(input.extraMattresses));

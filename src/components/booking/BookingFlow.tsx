@@ -448,7 +448,11 @@ export function BookingFlow({ experience }: { experience: Experience }) {
 
               <FieldGroup
                 title={wholeDay ? "Schedule" : "Start time"}
-                body={wholeDay ? "This experience runs as a full-day booking." : "Unavailable times are disabled."}
+                body={
+                  wholeDay
+                    ? "This experience runs as a full-day booking."
+                    : "Please select your preferred start time for the experience. Travel time is excluded."
+                }
               >
                 {wholeDay ? (
                   <p

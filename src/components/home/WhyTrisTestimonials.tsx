@@ -82,7 +82,7 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
             src={media.whyTrisBg}
             alt=""
             fill
-            className="object-cover object-center opacity-[0.45] saturate-[0.2] sepia-[0.3]"
+            className="object-cover object-center opacity-[0.72] saturate-[0.6] sepia-[0.12]"
             sizes="100vw"
             quality={90}
             priority={false}

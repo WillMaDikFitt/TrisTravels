@@ -7,26 +7,16 @@ import { HomeFaq } from "@/components/home/HomeFaq";
 import { HomeSnapRoot } from "@/components/home/HomeSnapRoot";
 import { HomeStory } from "@/components/home/HomeStory";
 import { HomeWaysToTravel } from "@/components/home/HomeWaysToTravel";
+import { HomeExperienceTypes } from "@/components/home/HomeExperienceTypes";
 import { WhyTrisTestimonials } from "@/components/home/WhyTrisTestimonials";
 import { HomeClosing } from "@/components/home/HomeClosing";
 import { ImpactSection } from "@/components/sections/ImpactSection";
 import { stories } from "@/data/stories";
 import { media } from "@/data/media";
 import { StoryCard } from "@/components/listings/StoryCard";
-import { EXPERIENCE_CATEGORIES } from "@/lib/catalog";
 import { getSettings, listStories } from "@/lib/data/repo";
 import { activeSharedFaqs, DEFAULT_HOME_FAQS } from "@/data/shared-faqs";
 import { activeTestimonials, DEFAULT_TESTIMONIALS } from "@/data/testimonials";
-
-const typeVisuals: Record<string, string> = {
-  adventure: media.typeAdventure,
-  nature: media.typeNature,
-  wildlife: media.typeWildlife,
-  "culture-heritage": media.typeCultureHeritage,
-  "food-local-life": media.typeFoodLocalLife,
-  wellness: media.typeWellness,
-  creative: media.typeCreative,
-};
 
 /** Pick up Studio edits (home FAQs, stories) without waiting for a full redeploy. */
 export const revalidate = 60;
@@ -44,86 +34,7 @@ export default async function HomePage() {
 
       <HomeWaysToTravel />
 
-      <section className="home-snap-section flex h-[100svh] max-h-[100svh] flex-col overflow-hidden bg-primary-container text-primary-fixed">
-        <div className="mx-auto flex h-full w-full max-w-container-max flex-col px-margin-mobile py-5 md:px-margin-desktop md:py-6 lg:py-7">
-          <div className="shrink-0">
-            <div className="ink-rule" />
-            <p className="label-caps mt-2 text-highlight">Experience types</p>
-            <h2 className="mt-1.5 font-[family-name:var(--font-playfair)] text-[clamp(1.55rem,2.8vw,2.4rem)] leading-tight font-semibold tracking-[-0.02em]">
-              Pick how a day should feel
-            </h2>
-            <p className="mt-1 max-w-xl font-[family-name:var(--font-manrope)] text-sm text-primary-fixed/75">
-              From adventure to quiet moments, choose the kind of day that speaks to you.
-            </p>
-          </div>
-          <div className="mt-4 flex min-h-0 flex-1 flex-col gap-2.5 sm:gap-3 lg:mt-5">
-            <div className="grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 lg:gap-3.5">
-              {EXPERIENCE_CATEGORIES.slice(0, 4).map((c, i) => (
-                <Link
-                  key={c.id}
-                  href={`/experiences?type=${c.slug}`}
-                  className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
-                >
-                  <Image
-                    src={typeVisuals[c.slug] ?? media.forest}
-                    alt=""
-                    fill
-                    className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-                    sizes="25vw"
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
-                  />
-                  <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="relative z-10 mt-auto">
-                    <h3 className="font-[family-name:var(--font-playfair)] text-[1.05rem] leading-tight text-white drop-shadow-sm sm:text-[1.15rem] lg:text-[1.25rem]">
-                      {c.id}
-                    </h3>
-                    <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.68rem] leading-snug text-white/85 sm:text-[0.75rem]">
-                      {c.blurb}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="grid min-h-0 flex-1 grid-cols-2 gap-2.5 sm:gap-3 lg:mx-auto lg:max-w-[75%] lg:grid-cols-3 lg:gap-3.5">
-              {EXPERIENCE_CATEGORIES.slice(4).map((c, i) => (
-                <Link
-                  key={c.id}
-                  href={`/experiences?type=${c.slug}`}
-                  className="group relative flex min-h-0 flex-col justify-between overflow-hidden rounded-xl p-3 sm:rounded-2xl sm:p-4"
-                >
-                  <Image
-                    src={typeVisuals[c.slug] ?? media.forest}
-                    alt=""
-                    fill
-                    className="object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-                    sizes="25vw"
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition duration-500 group-hover:from-black/70 group-hover:via-black/25"
-                  />
-                  <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/35 font-[family-name:var(--font-playfair)] text-xs text-white/80">
-                    {String(i + 5).padStart(2, "0")}
-                  </span>
-                  <div className="relative z-10 mt-auto">
-                    <h3 className="font-[family-name:var(--font-playfair)] text-[1.05rem] leading-tight text-white drop-shadow-sm sm:text-[1.15rem] lg:text-[1.25rem]">
-                      {c.id}
-                    </h3>
-                    <p className="mt-1 line-clamp-2 font-[family-name:var(--font-manrope)] text-[0.68rem] leading-snug text-white/85 sm:text-[0.75rem]">
-                      {c.blurb}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeExperienceTypes />
 
       <WhyTrisTestimonials
         testimonials={activeTestimonials(settings?.homeTestimonials, DEFAULT_TESTIMONIALS)}
