@@ -81,20 +81,23 @@ function isMoreActive(pathname: string) {
   return moreHrefs.some((href) => pathMatches(pathname, href));
 }
 
-function navLinkClass(active: boolean, onLight = false) {
+/**
+ * Colour comes from the header's data-solid attribute, not a prop. The nav lives inside
+ * a Suspense boundary (useSearchParams), so in a production build its prerendered
+ * fallback HTML stays on screen after the bar has already turned solid — a prop-driven
+ * colour froze at hero-green on a dark bar. CSS re-colours it the instant the attribute
+ * flips, stale render or not.
+ */
+function navLinkClass(active: boolean) {
   return cn(
     "inline-flex h-11 items-center whitespace-nowrap px-2.5 text-[13px] font-bold tracking-[0.1em] uppercase transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] xl:px-3 xl:text-[14px]",
-    onLight
-      ? active
-        ? "text-primary"
-        : "text-primary/85 hover:text-primary"
-      : active
-        ? "text-white"
-        : "text-white/80 hover:text-white",
+    active
+      ? "text-primary group-data-[solid=true]/hdr:text-white"
+      : "text-primary/85 hover:text-primary group-data-[solid=true]/hdr:text-white/80 group-data-[solid=true]/hdr:hover:text-white",
   );
 }
 
-function MoreMenu({ onLight = false }: { onLight?: boolean }) {
+function MoreMenu() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const active = isMoreActive(pathname);
@@ -111,7 +114,7 @@ function MoreMenu({ onLight = false }: { onLight?: boolean }) {
     >
       <button
         type="button"
-        className={navLinkClass(active, onLight)}
+        className={navLinkClass(active)}
         aria-expanded={open}
         aria-haspopup="true"
         aria-current={active ? "true" : undefined}
@@ -164,13 +167,7 @@ function MoreMenu({ onLight = false }: { onLight?: boolean }) {
  * Split from DesktopNav so the Suspense fallback can render the same links.
  * useSearchParams suspends, and an empty fallback left the menu blank until hydration.
  */
-function DesktopNavLinks({
-  onLight = false,
-  journeyType,
-}: {
-  onLight?: boolean;
-  journeyType: string | null;
-}) {
+function DesktopNavLinks({ journeyType }: { journeyType: string | null }) {
   const pathname = usePathname();
 
   return (
@@ -181,21 +178,21 @@ function DesktopNavLinks({
           <Link
             key={item.label}
             href={item.href}
-            className={navLinkClass(active, onLight)}
+            className={navLinkClass(active)}
             aria-current={active ? "page" : undefined}
           >
             {item.label}
           </Link>
         );
       })}
-      <MoreMenu onLight={onLight} />
+      <MoreMenu />
     </nav>
   );
 }
 
-function DesktopNav({ onLight = false }: { onLight?: boolean }) {
+function DesktopNav() {
   const journeyType = useSearchParams().get("type");
-  return <DesktopNavLinks onLight={onLight} journeyType={journeyType} />;
+  return <DesktopNavLinks journeyType={journeyType} />;
 }
 
 export function Header() {
@@ -265,10 +262,12 @@ export function Header() {
 
   return (
     <header
+      // Read by the nav links' group-data variants so their colour cannot lag the bar.
+      data-solid={solid ? "true" : "false"}
       className={cn(
         // Only apply transform while hiding. A persistent translate creates a containing
         // block for position:fixed children and collapses the mobile menu to ~0 height.
-        "fixed top-0 z-[70] w-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "group/hdr fixed top-0 z-[70] w-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
         hidden && !open && "-translate-y-full",
         reduceMotion && "transition-none",
       )}
@@ -278,7 +277,7 @@ export function Header() {
           // Same duration as the link colours (300ms) — a slower bar left dark text on a dark bar mid-fade.
           "transition-[background-color,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           solid
-            ? "border-b border-white/10 bg-primary-container shadow-[0_8px_28px_rgba(38,53,43,0.18)]"
+            ? "border-b border-white/10 bg-primary shadow-[0_8px_28px_rgba(31,78,61,0.22)]"
             : "border-b border-transparent bg-transparent",
         )}
       >
@@ -304,8 +303,8 @@ export function Header() {
             </span>
           </Link>
 
-          <Suspense fallback={<DesktopNavLinks onLight={onLight} journeyType={null} />}>
-            <DesktopNav onLight={onLight} />
+          <Suspense fallback={<DesktopNavLinks journeyType={null} />}>
+            <DesktopNav />
           </Suspense>
 
           <div className="flex shrink-0 items-center gap-2">

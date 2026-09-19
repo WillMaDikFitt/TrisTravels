@@ -108,7 +108,7 @@ export const media = {
   typeWellness: local.categoryWellness,
   typeCreative: local.categoryCreative,
   /** Backdrop behind the homepage "Pick how a day should feel" cards. */
-  experienceTypesBg: "/images/experience-types-bg-v2.png",
+  experienceTypesBg: "/images/bg-1.png",
   /** Curated local stills for detail carousels */
   local,
 } as const;

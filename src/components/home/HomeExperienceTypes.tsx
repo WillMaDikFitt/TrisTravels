@@ -37,9 +37,10 @@ export function HomeExperienceTypes() {
         src={media.experienceTypesBg}
         alt=""
         fill
-        // Phones: cover, so the artwork keeps its proportions instead of being squeezed.
-        // Wider screens: fill + a slight stretch keeps the side text on screen.
-        className="object-cover object-center md:object-fill md:scale-x-105"
+        // Phones: contain, so the whole artwork (including the script) stays visible
+        // and undistorted. Wider screens: fill, then pushed a little past both edges so
+        // the scene reads wider than the panel.
+        className="scale-110 object-contain object-center md:scale-x-[1.02] md:scale-y-100 md:object-fill"
         sizes="100vw"
         quality={85}
       />
