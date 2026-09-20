@@ -93,6 +93,8 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
+  /** The code the server accepted — shown in the quote, so it survives casing/typos. */
+  const [appliedCode, setAppliedCode] = useState("");
   const [discountNote, setDiscountNote] = useState("");
   const [discountBusy, setDiscountBusy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -777,6 +779,7 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                         setDiscountCode(v.toUpperCase());
                         setDiscountPercent(0);
                         setDiscountNote("");
+                        setAppliedCode("");
                       }}
                       placeholder="e.g. TRIS10"
                     />
@@ -791,10 +794,12 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
                         setDiscountBusy(false);
                         if (!res.ok) {
                           setDiscountPercent(0);
+                          setAppliedCode("");
                           setDiscountNote(res.error);
                           return;
                         }
                         setDiscountPercent(res.percent);
+                        setAppliedCode(res.code);
                         setDiscountNote(
                           res.saved > 0
                             ? `${res.percent}% off · you save ${formatINR(res.saved)}`
@@ -954,7 +959,14 @@ export function CuratedBookFlow({ journey }: { journey: Journey }) {
 
             <div className="mt-4 space-y-2.5 border-t border-outline-variant/25 pt-4">
               {priced?.saved ? (
-                <Row label="Discount saved" value={formatINR(priced.saved)} />
+                <Row
+                  label={
+                    appliedCode
+                      ? `Coupon ${appliedCode} applied — you save`
+                      : "Discount saved"
+                  }
+                  value={formatINR(priced.saved)}
+                />
               ) : null}
               <Row
                 label="Total (Inclusive of GST)"

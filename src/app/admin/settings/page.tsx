@@ -172,29 +172,36 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </Field>
-              <div className="flex items-end gap-2">
-                <label className="flex items-center gap-2 text-sm text-[#26352b]">
-                  <input
-                    type="checkbox"
-                    checked={row.active}
-                    onChange={(e) => {
-                      const next = [...(settings.discountCodes ?? [])];
-                      next[index] = { ...row, active: e.target.checked };
+              <div className="flex flex-col justify-end">
+                {/* Blank label line + input-height row, so the checkbox and Remove sit
+                    level with the three fields beside them. */}
+                <span aria-hidden className="hidden text-sm font-medium sm:block">
+                  &nbsp;
+                </span>
+                <div className="flex min-h-[2.625rem] items-center gap-3 sm:mt-1.5">
+                  <label className="inline-flex shrink-0 items-center gap-2 text-sm whitespace-nowrap text-[#26352b]">
+                    <input
+                      type="checkbox"
+                      checked={row.active}
+                      onChange={(e) => {
+                        const next = [...(settings.discountCodes ?? [])];
+                        next[index] = { ...row, active: e.target.checked };
+                        setSettings({ ...settings, discountCodes: next });
+                      }}
+                    />
+                    Active
+                  </label>
+                  <AdminButton
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      const next = (settings.discountCodes ?? []).filter((_, i) => i !== index);
                       setSettings({ ...settings, discountCodes: next });
                     }}
-                  />
-                  Active
-                </label>
-                <AdminButton
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    const next = (settings.discountCodes ?? []).filter((_, i) => i !== index);
-                    setSettings({ ...settings, discountCodes: next });
-                  }}
-                >
-                  Remove
-                </AdminButton>
+                  >
+                    Remove
+                  </AdminButton>
+                </div>
               </div>
             </div>
           ))}
