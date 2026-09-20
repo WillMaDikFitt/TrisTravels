@@ -103,8 +103,7 @@ export function WhyTrisTestimonials({ testimonials }: { testimonials: Testimonia
           </h2>
           <p
             className={cn(
-              "mx-auto mt-2 max-w-lg text-sm leading-relaxed text-primary/80 md:text-[15px]",
-              textGlow,
+              "mx-auto mt-2 inline-block max-w-lg rounded-full bg-white/85 px-4 py-1.5 text-sm leading-relaxed text-primary/80 shadow-sm backdrop-blur-sm md:text-[15px]",
             )}
           >
             Notes from travellers who&apos;ve experienced Meghalaya with us
