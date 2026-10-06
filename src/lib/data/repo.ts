@@ -324,6 +324,9 @@ export async function getSettings(): Promise<PlatformSettings> {
             ? data.homeTestimonials
             : DEFAULT_SETTINGS.homeTestimonials,
           aboutStory: data.aboutStory?.length ? data.aboutStory : DEFAULT_SETTINGS.aboutStory,
+          craftProducts: data.craftProducts?.length
+            ? data.craftProducts
+            : DEFAULT_SETTINGS.craftProducts,
         };
       }
     } catch (err) {

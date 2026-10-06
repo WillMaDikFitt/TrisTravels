@@ -103,6 +103,7 @@ export async function saveSettings(settings: PlatformSettings) {
     revalidatePath("/journeys/faqs");
     revalidatePath("/experiences");
     revalidatePath("/journeys");
+    revalidatePath("/artisans");
   } catch (err) {
     console.error("revalidatePath after saveSettings failed:", err);
   }

@@ -1,3 +1,4 @@
+import { slugify } from "@/lib/slug";
 import { listings, media } from "./media";
 
 /**
@@ -41,9 +42,13 @@ export type CraftProduct = {
   makerNote?: string;
   bestSeller?: boolean;
   sourceUrl: string;
+  /** Unticked in Studio → Crafts to hide the card without deleting it. */
+  active?: boolean;
+  sortOrder?: number;
 };
 
-export const craftProducts: CraftProduct[] = [
+/** Seeded with the catalogue that used to be hard-coded on /artisans (Studio → Crafts). */
+export const DEFAULT_CRAFT_PRODUCTS: CraftProduct[] = [
   {
     slug: "besli-local-flute",
     name: "Besli: Local flute of Meghalaya",
@@ -213,6 +218,63 @@ export const craftProcess = [
   },
 ];
 
-export function getCraftProduct(slug: string) {
-  return craftProducts.find((p) => p.slug === slug);
+export function blankCraftProduct(index = 0): CraftProduct {
+  return {
+    slug: "",
+    name: "",
+    category: "Arts & Crafts",
+    image: "",
+    blurb: "",
+    makerNote: "",
+    bestSeller: false,
+    sourceUrl: "",
+    active: true,
+    sortOrder: index + 1,
+  };
+}
+
+/**
+ * Cleans Studio rows: drops nameless ones, fills missing slugs from the name
+ * (kept unique, since the contact form links crafts by slug) and sorts.
+ */
+export function normalizeCraftProducts(
+  rows: CraftProduct[] | null | undefined,
+  fallback: CraftProduct[],
+): CraftProduct[] {
+  if (!rows?.length) return fallback.map((item) => ({ ...item }));
+  const used = new Set<string>();
+  return rows
+    .map((row, index) => ({
+      slug: String(row.slug || "").trim(),
+      name: String(row.name || "").trim(),
+      category: craftCategories.includes(row.category) ? row.category : craftCategories[0],
+      image: String(row.image || "").trim(),
+      blurb: String(row.blurb || "").trim(),
+      makerNote: String(row.makerNote || "").trim(),
+      bestSeller: row.bestSeller === true,
+      sourceUrl: String(row.sourceUrl || "").trim(),
+      active: row.active !== false,
+      sortOrder: Number.isFinite(row.sortOrder) ? Number(row.sortOrder) : index + 1,
+    }))
+    .filter((row) => row.name)
+    .map((row) => {
+      const base = slugify(row.slug || row.name) || "craft";
+      let slug = base;
+      for (let n = 2; used.has(slug); n++) slug = `${base}-${n}`;
+      used.add(slug);
+      return { ...row, slug };
+    })
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+}
+
+/** Published crafts with a photo — what guests see on /artisans. */
+export function activeCraftProducts(
+  rows: CraftProduct[] | null | undefined,
+  fallback: CraftProduct[],
+): CraftProduct[] {
+  return normalizeCraftProducts(rows, fallback).filter((row) => row.active !== false && row.image);
+}
+
+export function getCraftProduct(slug: string, products: CraftProduct[] = DEFAULT_CRAFT_PRODUCTS) {
+  return products.find((p) => p.slug === slug);
 }

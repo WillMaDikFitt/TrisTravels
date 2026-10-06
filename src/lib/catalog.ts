@@ -31,6 +31,7 @@ import {
   DEFAULT_HOME_FAQS,
 } from "@/data/shared-faqs";
 import { DEFAULT_TESTIMONIALS } from "@/data/testimonials";
+import { DEFAULT_CRAFT_PRODUCTS } from "@/data/artisans";
 import { DEFAULT_STORY_MOMENTS } from "@/data/about-story";
 
 export const DEFAULT_SLOTS = ["08:30", "09:00", "10:00"];
@@ -53,6 +54,7 @@ export const DEFAULT_SETTINGS = {
   curatedJourneyFaqs: DEFAULT_CURATED_JOURNEY_FAQS,
   homeFaqs: DEFAULT_HOME_FAQS,
   homeTestimonials: DEFAULT_TESTIMONIALS,
+  craftProducts: DEFAULT_CRAFT_PRODUCTS,
   aboutStory: DEFAULT_STORY_MOMENTS,
   impactImage: "",
   impact: [

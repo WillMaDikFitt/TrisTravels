@@ -56,7 +56,7 @@ export function CraftCard({ product, className }: Props) {
 
         <div className="mt-4 border-t border-outline-variant/25 pt-3">
           <Link
-            href={`/contact?craft=${product.slug}`}
+            href={`/contact?${new URLSearchParams({ craft: product.slug, craftName: product.name })}`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-4 py-2.5 text-[11px] font-bold tracking-[0.12em] text-on-accent uppercase"
           >
             <Handshake size={14} aria-hidden />

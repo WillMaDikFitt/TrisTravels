@@ -6,8 +6,8 @@ import {
   artisanHub,
   craftCategories,
   craftProcess,
-  craftProducts,
   type CraftCategory,
+  type CraftProduct,
 } from "@/data/artisans";
 import { media } from "@/data/media";
 import { cn } from "@/lib/utils";
@@ -17,14 +17,14 @@ import { BreathSection } from "@/components/ui/BreathSection";
 import { Button } from "@/components/ui/Button";
 import { CraftCard } from "@/components/listings/CraftCard";
 
-export function ArtisansPageClient() {
+export function ArtisansPageClient({ products }: { products: CraftProduct[] }) {
   const [category, setCategory] = useState<CraftCategory | "All" | "Best Sellers">("All");
 
   const filtered = useMemo(() => {
-    if (category === "All") return craftProducts;
-    if (category === "Best Sellers") return craftProducts.filter((p) => p.bestSeller);
-    return craftProducts.filter((p) => p.category === category);
-  }, [category]);
+    if (category === "All") return products;
+    if (category === "Best Sellers") return products.filter((p) => p.bestSeller);
+    return products.filter((p) => p.category === category);
+  }, [category, products]);
 
   return (
     <div className="bg-background">

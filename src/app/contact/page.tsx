@@ -29,7 +29,12 @@ export default function ContactPage() {
 }
 
 function ContactPageInner() {
-  const craft = getCraftProduct(useSearchParams().get("craft") ?? "");
+  const params = useSearchParams();
+  const craftSlug = params.get("craft") ?? "";
+  const craftName = params.get("craftName")?.trim();
+  // Crafts are edited in Studio, so trust the name the card passed over the bundled list.
+  const craft =
+    craftSlug && craftName ? { slug: craftSlug, name: craftName } : getCraftProduct(craftSlug);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

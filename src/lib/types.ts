@@ -174,6 +174,8 @@ export type PlatformSettings = {
   homeTestimonials?: import("@/data/testimonials").Testimonial[];
   /** The About page story (Studio → Our story). */
   aboutStory?: import("@/data/about-story").StoryMoment[];
+  /** Craft cards on /artisans (Studio → Crafts). */
+  craftProducts?: import("@/data/artisans").CraftProduct[];
 };
 
 export type JourneyDepartureSeat = {
