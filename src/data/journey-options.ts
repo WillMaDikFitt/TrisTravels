@@ -16,7 +16,11 @@ export function daysUntilDate(isoDate: string) {
   const target = new Date(`${isoDate}T12:00:00`);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const end = new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    target.getDate(),
+  );
   return Math.round((end.getTime() - today.getTime()) / 86_400_000);
 }
 
@@ -60,7 +64,9 @@ export type PackageTransportMeta = {
   images: string[];
 };
 
-export function fleetVehicleToPackageMeta(vehicle: FleetVehicle): PackageTransportMeta {
+export function fleetVehicleToPackageMeta(
+  vehicle: FleetVehicle,
+): PackageTransportMeta {
   const images = vehicleImages(vehicle);
   return {
     id: vehicle.id,
@@ -79,7 +85,8 @@ export function fleetVehicleToPackageMeta(vehicle: FleetVehicle): PackageTranspo
 }
 
 /** Code defaults — prefer Studio fleet at runtime via packageTransportMeta(..., fleet). */
-export const PACKAGE_TRANSPORT: PackageTransportMeta[] = DEFAULT_FLEET_VEHICLES.map(fleetVehicleToPackageMeta);
+export const PACKAGE_TRANSPORT: PackageTransportMeta[] =
+  DEFAULT_FLEET_VEHICLES.map(fleetVehicleToPackageMeta);
 
 export const PACKAGE_TRANSPORT_IDS = PACKAGE_TRANSPORT.map((t) => t.id);
 
@@ -87,9 +94,13 @@ export function packageTransportList(
   fleet?: FleetVehicle[] | null,
   allowedIds?: string[] | null,
 ): PackageTransportMeta[] {
-  let list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
+  let list = fleet?.length
+    ? activeFleetVehicles(fleet)
+    : DEFAULT_FLEET_VEHICLES;
   if (allowedIds?.length) {
-    const allow = new Set(allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)));
+    const allow = new Set(
+      allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)),
+    );
     list = list.filter((vehicle) => allow.has(vehicle.id));
   }
   return list.map(fleetVehicleToPackageMeta);
@@ -102,7 +113,9 @@ export function packageTransportMeta(
 ) {
   const list = packageTransportList(fleet, allowedIds);
   const normalized = id === "tempo" ? "tempo12" : id;
-  return list.find((t) => t.id === normalized) ?? list[0] ?? PACKAGE_TRANSPORT[0];
+  return (
+    list.find((t) => t.id === normalized) ?? list[0] ?? PACKAGE_TRANSPORT[0]
+  );
 }
 
 /** Map legacy transport ids used in older package pricing. */
@@ -113,7 +126,10 @@ export function normalizePackageTransportId(id: string): PackageTransportId {
 }
 
 function listHasId(id: string) {
-  return PACKAGE_TRANSPORT_IDS.includes(id) || DEFAULT_FLEET_VEHICLES.some((v) => v.id === id);
+  return (
+    PACKAGE_TRANSPORT_IDS.includes(id) ||
+    DEFAULT_FLEET_VEHICLES.some((v) => v.id === id)
+  );
 }
 
 /** Bridge to older TransportVehicleId for pricing maps that still use 4 keys. */

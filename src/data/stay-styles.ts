@@ -1,7 +1,8 @@
 import { media } from "./media";
 
 /** Known stay style ids — Studio may add more as free-form strings. */
-export type StayStyleId = "barefoot" | "signature" | "offbeat" | "luxury" | "flexible" | (string & {});
+export type StayStyleId =
+  "barefoot" | "signature" | "offbeat" | "luxury" | "flexible" | (string & {});
 
 export type StayStyle = {
   id: string;
@@ -32,7 +33,8 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     short:
       "Comfortable, thoughtfully chosen stays that offer a genuine local experience while keeping your journey easy on the budget.",
     bestFor: "Budget travellers · Families · Explorers",
-    think: "I want a good, authentic place to stay without paying for extra frills.",
+    think:
+      "I want a good, authentic place to stay without paying for extra frills.",
     expect: [
       "Clean, safe and comfortable stays",
       "Genuine local character",
@@ -41,7 +43,13 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     ],
     learnIntro:
       "Good value, thoughtfully chosen. Comfortable stays with genuine local character, selected for travellers who want a good place to stay while keeping more of their budget for experiences.",
-    images: [media.kitchen, media.canopy, media.valueCommunity, media.craft, media.forest],
+    images: [
+      media.kitchen,
+      media.canopy,
+      media.valueCommunity,
+      media.craft,
+      media.forest,
+    ],
     offerOnBooking: true,
     active: true,
     sortOrder: 1,
@@ -61,7 +69,13 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     ],
     learnIntro:
       "More comfort. More character. Handpicked stays offering added comfort plus something memorable — boutique setting, heritage home, viewpoint, waterfall, riverside, or distinctive architecture.",
-    images: [media.packages, media.aboutPortrait, media.familyWaterfall, media.heroMist, media.water],
+    images: [
+      media.packages,
+      media.aboutPortrait,
+      media.familyWaterfall,
+      media.heroMist,
+      media.water,
+    ],
     offerOnBooking: true,
     active: true,
     sortOrder: 2,
@@ -72,7 +86,8 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     short:
       "Thoughtfully chosen stays in quieter, less-busy locations — in a village, on the edge of a town or slightly outside main tourist areas.",
     bestFor: "Slow travellers · Nature lovers · Peace seekers",
-    think: "I want to stay somewhere quieter, experience local life more closely, and enjoy a slower pace.",
+    think:
+      "I want to stay somewhere quieter, experience local life more closely, and enjoy a slower pace.",
     expect: [
       "Peaceful surroundings away from busy tourist areas",
       "Clean, safe stays with essential comforts",
@@ -83,7 +98,13 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     ],
     learnIntro:
       "Stay away from the crowds. Thoughtfully chosen stays in quieter locations with a simple, authentic and immersive local experience.",
-    images: [media.forest, media.trail, media.heroMist, media.canopy, media.cliffs],
+    images: [
+      media.forest,
+      media.trail,
+      media.heroMist,
+      media.canopy,
+      media.cliffs,
+    ],
     offerOnBooking: true,
     active: true,
     sortOrder: 3,
@@ -103,7 +124,13 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     ],
     learnIntro:
       "Luxury Stays are upscale accommodations offering top-notch comfort, premium locations, personalized service, fine dining, and modern amenities.",
-    images: [media.packages, media.aboutPortrait, media.rideAlt, media.heroMist, media.water],
+    images: [
+      media.packages,
+      media.aboutPortrait,
+      media.rideAlt,
+      media.heroMist,
+      media.water,
+    ],
     offerOnBooking: false,
     active: true,
     sortOrder: 4,
@@ -113,7 +140,8 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     label: "I'm open to mixed stays",
     short:
       "You’re open to any type of accommodation based on availability, value, and location — we’ll recommend what fits your style and budget.",
-    bestFor: "Travellers happy for us to mix stay types to suit the route and budget.",
+    bestFor:
+      "Travellers happy for us to mix stay types to suit the route and budget.",
     think: "I'm open — recommend what works best for the journey.",
     expect: [
       "Stay mix based on route and availability",
@@ -122,7 +150,13 @@ export const DEFAULT_STAY_STYLES: StayStyle[] = [
     ],
     learnIntro:
       "You’re open to any type of accommodation based on availability, value, and location. This option allows us to recommend the best available stay that fits your overall travel style and budget.",
-    images: [media.kitchen, media.packages, media.forest, media.canopy, media.craft],
+    images: [
+      media.kitchen,
+      media.packages,
+      media.forest,
+      media.canopy,
+      media.craft,
+    ],
     offerOnBooking: false,
     active: true,
     sortOrder: 5,
@@ -133,7 +167,11 @@ export const STAY_STYLES = DEFAULT_STAY_STYLES;
 export const STAY_STYLE_IDS = DEFAULT_STAY_STYLES.map((s) => s.id);
 
 /** Stay styles used in curated online booking when Studio flags are missing. */
-export const BOOKING_STAY_STYLE_IDS = ["barefoot", "signature", "offbeat"] as const;
+export const BOOKING_STAY_STYLE_IDS = [
+  "barefoot",
+  "signature",
+  "offbeat",
+] as const;
 
 export function stayImages(style: Pick<StayStyle, "images">) {
   return (style.images ?? []).map((u) => u.trim()).filter(Boolean);
@@ -141,7 +179,11 @@ export function stayImages(style: Pick<StayStyle, "images">) {
 
 export function mergeStayStyles(custom?: StayStyle[] | null): StayStyle[] {
   if (!custom?.length) {
-    return DEFAULT_STAY_STYLES.map((s) => ({ ...s, images: [...s.images], expect: [...s.expect] }));
+    return DEFAULT_STAY_STYLES.map((s) => ({
+      ...s,
+      images: [...s.images],
+      expect: [...s.expect],
+    }));
   }
   return custom
     .map((row, index) => {
@@ -167,13 +209,18 @@ export function mergeStayStyles(custom?: StayStyle[] | null): StayStyle[] {
 }
 
 /** Merge Studio edits with the full learn-more catalogue when rows are missing. */
-export function hydrateStayStylesFromDefaults(custom?: StayStyle[] | null): StayStyle[] {
+export function hydrateStayStylesFromDefaults(
+  custom?: StayStyle[] | null,
+): StayStyle[] {
   const current = mergeStayStyles(custom);
   const byId = new Map(current.map((s) => [s.id, s]));
   const merged = DEFAULT_STAY_STYLES.map((seed) => {
     const existing = byId.get(seed.id);
-    if (!existing) return { ...seed, images: [...seed.images], expect: [...seed.expect] };
-    const images = stayImages(existing).length ? stayImages(existing) : [...seed.images];
+    if (!existing)
+      return { ...seed, images: [...seed.images], expect: [...seed.expect] };
+    const images = stayImages(existing).length
+      ? stayImages(existing)
+      : [...seed.images];
     const expect = existing.expect.length ? existing.expect : [...seed.expect];
     return {
       ...seed,
@@ -203,18 +250,34 @@ export function bookingStayStyles(custom?: StayStyle[] | null): StayStyle[] {
   const list = stayStyleList(custom);
   const flagged = list.filter((s) => s.offerOnBooking);
   if (flagged.length) return flagged;
-  return list.filter((s) => (BOOKING_STAY_STYLE_IDS as readonly string[]).includes(s.id));
+  return list.filter((s) =>
+    (BOOKING_STAY_STYLE_IDS as readonly string[]).includes(s.id),
+  );
 }
 
-export function stayStyleMeta(id: string, custom?: StayStyle[] | null): StayStyle {
+export function stayStyleMeta(
+  id: string,
+  custom?: StayStyle[] | null,
+): StayStyle {
   const list = stayStyleList(custom);
   const normalized = normalizeStayStyleId(id);
-  return list.find((s) => s.id === normalized || s.id === id) ?? list[0] ?? DEFAULT_STAY_STYLES[0];
+  return (
+    list.find((s) => s.id === normalized || s.id === id) ??
+    list[0] ??
+    DEFAULT_STAY_STYLES[0]
+  );
 }
 
 export function normalizeStayStyleId(id: string): StayStyleId {
-  if (id === "barefoot" || id === "homestay" || id === "camping") return "barefoot";
-  if (id === "signature" || id === "hotel" || id === "boutique" || id === "resort") return "signature";
+  if (id === "barefoot" || id === "homestay" || id === "camping")
+    return "barefoot";
+  if (
+    id === "signature" ||
+    id === "hotel" ||
+    id === "boutique" ||
+    id === "resort"
+  )
+    return "signature";
   if (id === "offbeat") return "offbeat";
   if (id === "luxury") return "luxury";
   if (id === "flexible") return "flexible";

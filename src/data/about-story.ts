@@ -71,7 +71,9 @@ export function normalizeStoryMoments(
       lead: String(row.lead || "").trim(),
       body: String(row.body || "").trim(),
       active: row.active !== false,
-      sortOrder: Number.isFinite(row.sortOrder) ? Number(row.sortOrder) : index + 1,
+      sortOrder: Number.isFinite(row.sortOrder)
+        ? Number(row.sortOrder)
+        : index + 1,
     }))
     .filter((row) => row.body || row.lead)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
@@ -81,5 +83,7 @@ export function activeStoryMoments(
   rows: StoryMoment[] | null | undefined,
   fallback: StoryMoment[],
 ): StoryMoment[] {
-  return normalizeStoryMoments(rows, fallback).filter((row) => row.active !== false);
+  return normalizeStoryMoments(rows, fallback).filter(
+    (row) => row.active !== false,
+  );
 }

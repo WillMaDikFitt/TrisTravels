@@ -1,10 +1,7 @@
 import { listings, media } from "./media";
 
 export type DestinationRegion =
-  | "East Khasi Hills"
-  | "West Khasi Hills"
-  | "West Jaintia Hills"
-  | "Ri Bhoi";
+  "East Khasi Hills" | "West Khasi Hills" | "West Jaintia Hills" | "Ri Bhoi";
 
 export type Destination = {
   slug: string;
@@ -59,7 +56,10 @@ export const destinations: Destination[] = [
     },
     image: listings.destination("mawlynnong"),
     gallery: [media.forest, media.trail, media.heroMist],
-    relatedExperienceSlugs: ["mawlynnong-village-stay", "offbeat-living-root-bridge"],
+    relatedExperienceSlugs: [
+      "mawlynnong-village-stay",
+      "offbeat-living-root-bridge",
+    ],
     sourceUrl: "https://www.trismeghalaya.com/destination/mawlynnong",
   },
   {
@@ -109,7 +109,10 @@ export const destinations: Destination[] = [
     },
     image: listings.destination("nongriat"),
     gallery: [media.canopy, media.trail, media.forest],
-    relatedExperienceSlugs: ["double-decker-living-root-bridge", "offbeat-living-root-bridge"],
+    relatedExperienceSlugs: [
+      "double-decker-living-root-bridge",
+      "offbeat-living-root-bridge",
+    ],
     sourceUrl: "https://www.trismeghalaya.com/destination/nongriat",
   },
   {
@@ -158,13 +161,15 @@ export const destinations: Destination[] = [
     image: listings.destination("laitlum"),
     gallery: [media.peaks, media.mountains, media.heroMist],
     relatedExperienceSlugs: ["offbeat-living-root-bridge"],
-    sourceUrl: "https://www.trismeghalaya.com/destinations/categories/east-khasi-hills",
+    sourceUrl:
+      "https://www.trismeghalaya.com/destinations/categories/east-khasi-hills",
   },
   {
     slug: "sohra",
     name: "Sohra (Cherrapunji)",
     region: "East Khasi Hills",
-    tagline: "One of the wettest places on earth — cliffs, falls, and living root bridges.",
+    tagline:
+      "One of the wettest places on earth — cliffs, falls, and living root bridges.",
     overview:
       "Sohra, earlier known as Cherrapunjee, is one of the wettest places on earth. Due to the wet climatic conditions, the vegetation remains full of greens and blooms throughout the year, favouring rich wild habitats. It is famous for its living bridges from rubber wood. The sky never remains the same — one minute perfect blue, the next golden yellow — giving the whole area a dreamy shade and colour.",
     highlights: [
@@ -206,7 +211,8 @@ export const destinations: Destination[] = [
     image: listings.destination("mawphlang"),
     gallery: [media.canopy, media.heroForest, media.trail],
     relatedExperienceSlugs: ["mawphlang-sacred-forest"],
-    sourceUrl: "https://www.trismeghalaya.com/destinations/categories/west-khasi-hills",
+    sourceUrl:
+      "https://www.trismeghalaya.com/destinations/categories/west-khasi-hills",
   },
 ];
 

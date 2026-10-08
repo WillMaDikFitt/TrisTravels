@@ -1,4 +1,4 @@
-  import {
+import {
   activeFleetVehicles,
   DEFAULT_FLEET_VEHICLES,
   type FleetVehicle,
@@ -50,45 +50,73 @@ export const STAY_PREFERENCE_META: Record<
   StayPreferenceId,
   { label: string; hint: string }
 > = {
-  homestay: { label: "Barefoot Stays", hint: "Good value, genuine local character" },
+  homestay: {
+    label: "Barefoot Stays",
+    hint: "Good value, genuine local character",
+  },
   hotel: { label: "Signature Stays", hint: "More comfort, memorable settings" },
-  boutique: { label: "Signature Stays", hint: "More comfort, memorable settings" },
-  resort: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  boutique: {
+    label: "Signature Stays",
+    hint: "More comfort, memorable settings",
+  },
+  resort: {
+    label: "Signature Stays",
+    hint: "More comfort, memorable settings",
+  },
   camping: { label: "Offbeat Stays", hint: "Quieter locations, slower pace" },
-  barefoot: { label: "Barefoot Stays", hint: "Good value, genuine local character" },
-  signature: { label: "Signature Stays", hint: "More comfort, memorable settings" },
+  barefoot: {
+    label: "Barefoot Stays",
+    hint: "Good value, genuine local character",
+  },
+  signature: {
+    label: "Signature Stays",
+    hint: "More comfort, memorable settings",
+  },
   offbeat: { label: "Offbeat Stays", hint: "Quieter locations, slower pace" },
 };
 
 /** Public stay styles shown in the book flow (maps onto pricing keys). */
-export const BOOKING_STAY_STYLE_IDS = ["barefoot", "signature", "offbeat"] as const;
+export const BOOKING_STAY_STYLE_IDS = [
+  "barefoot",
+  "signature",
+  "offbeat",
+] as const;
 export type BookingStayStyleId = (typeof BOOKING_STAY_STYLE_IDS)[number];
 
-export const BOOKING_STAY_TO_RATE_KEY: Record<BookingStayStyleId, StayPreferenceId> = {
+export const BOOKING_STAY_TO_RATE_KEY: Record<
+  BookingStayStyleId,
+  StayPreferenceId
+> = {
   barefoot: "homestay",
   signature: "boutique",
   offbeat: "camping",
 };
 
-export const STAY_PREFERENCE_IDS = Object.keys(STAY_PREFERENCE_META) as StayPreferenceId[];
+export const STAY_PREFERENCE_IDS = Object.keys(
+  STAY_PREFERENCE_META,
+) as StayPreferenceId[];
 
-export const DEFAULT_PACKAGE_VEHICLES: Record<TransportVehicleId, PackageVehicleRate> = {
+export const DEFAULT_PACKAGE_VEHICLES: Record<
+  TransportVehicleId,
+  PackageVehicleRate
+> = {
   sedan: { costPerDay: 3500, capacity: 4 },
   suv: { costPerDay: 4500, capacity: 5 },
   innova: { costPerDay: 5500, capacity: 6 },
   tempo: { costPerDay: 8000, capacity: 12 },
 };
 
-export const DEFAULT_PACKAGE_STAYS: Record<StayPreferenceId, PackageStayRate> = {
-  homestay: { roomCost: 5000, extraMattressPerPerson: 1600 },
-  hotel: { roomCost: 7000, extraMattressPerPerson: 2000 },
-  boutique: { roomCost: 9000, extraMattressPerPerson: 2400 },
-  resort: { roomCost: 12000, extraMattressPerPerson: 3000 },
-  camping: { roomCost: 3000, extraMattressPerPerson: 1000 },
-  barefoot: { roomCost: 5000, extraMattressPerPerson: 1600 },
-  signature: { roomCost: 9000, extraMattressPerPerson: 2400 },
-  offbeat: { roomCost: 3000, extraMattressPerPerson: 1000 },
-};
+export const DEFAULT_PACKAGE_STAYS: Record<StayPreferenceId, PackageStayRate> =
+  {
+    homestay: { roomCost: 5000, extraMattressPerPerson: 1600 },
+    hotel: { roomCost: 7000, extraMattressPerPerson: 2000 },
+    boutique: { roomCost: 9000, extraMattressPerPerson: 2400 },
+    resort: { roomCost: 12000, extraMattressPerPerson: 3000 },
+    camping: { roomCost: 3000, extraMattressPerPerson: 1000 },
+    barefoot: { roomCost: 5000, extraMattressPerPerson: 1600 },
+    signature: { roomCost: 9000, extraMattressPerPerson: 2400 },
+    offbeat: { roomCost: 3000, extraMattressPerPerson: 1000 },
+  };
 
 export const DEFAULT_TRIS_SERVICE_PERCENT = 10;
 export const DEFAULT_PACKAGE_GST_PERCENT = 5;
@@ -118,7 +146,8 @@ export const PACKAGE_VEHICLE_RATE_SCALE: Record<string, number> = {
 
 /** Which of the four legacy rate keys stands in for a fleet vehicle. */
 export function legacyRateKeyFor(vehicleId: string): TransportVehicleId {
-  if (vehicleId === "sedan" || vehicleId === "suv" || vehicleId === "innova") return vehicleId;
+  if (vehicleId === "sedan" || vehicleId === "suv" || vehicleId === "innova")
+    return vehicleId;
   return "tempo";
 }
 
@@ -135,9 +164,17 @@ export function packageVehicleRate(
     };
   }
   const legacyKey = legacyRateKeyFor(vehicle.id);
-  const base = { ...DEFAULT_PACKAGE_VEHICLES[legacyKey], ...override?.[legacyKey] };
+  const base = {
+    ...DEFAULT_PACKAGE_VEHICLES[legacyKey],
+    ...override?.[legacyKey],
+  };
   return {
-    costPerDay: Math.max(0, Math.round(base.costPerDay * (PACKAGE_VEHICLE_RATE_SCALE[vehicle.id] ?? 1))),
+    costPerDay: Math.max(
+      0,
+      Math.round(
+        base.costPerDay * (PACKAGE_VEHICLE_RATE_SCALE[vehicle.id] ?? 1),
+      ),
+    ),
     capacity: Math.max(1, Math.round(vehicle.maxGuests || base.capacity) || 1),
   };
 }
@@ -147,8 +184,13 @@ export function resolveFleetPackageRates(
   fleet?: FleetVehicle[] | null,
   override?: CuratedPackagePricing["vehicles"],
 ): { vehicle: FleetVehicle; rate: PackageVehicleRate }[] {
-  const list = fleet?.length ? activeFleetVehicles(fleet) : DEFAULT_FLEET_VEHICLES;
-  return list.map((vehicle) => ({ vehicle, rate: packageVehicleRate(vehicle, override) }));
+  const list = fleet?.length
+    ? activeFleetVehicles(fleet)
+    : DEFAULT_FLEET_VEHICLES;
+  return list.map((vehicle) => ({
+    vehicle,
+    rate: packageVehicleRate(vehicle, override),
+  }));
 }
 
 /** Which legacy rate key stands in for a stay style that has no rate of its own. */
@@ -168,14 +210,23 @@ export function packageStayRate(
   if (own) {
     return {
       roomCost: Math.max(0, Math.round(own.roomCost)),
-      extraMattressPerPerson: Math.max(0, Math.round(own.extraMattressPerPerson)),
+      extraMattressPerPerson: Math.max(
+        0,
+        Math.round(own.extraMattressPerPerson),
+      ),
     };
   }
   const legacyKey = legacyStayRateKeyFor(stayId);
-  const base = { ...DEFAULT_PACKAGE_STAYS[legacyKey], ...override?.[legacyKey] };
+  const base = {
+    ...DEFAULT_PACKAGE_STAYS[legacyKey],
+    ...override?.[legacyKey],
+  };
   return {
     roomCost: Math.max(0, Math.round(base.roomCost)),
-    extraMattressPerPerson: Math.max(0, Math.round(base.extraMattressPerPerson)),
+    extraMattressPerPerson: Math.max(
+      0,
+      Math.round(base.extraMattressPerPerson),
+    ),
   };
 }
 

@@ -118,7 +118,10 @@ const fixedInclusions = [
 function activityFor(priceFrom: number, days: number) {
   const vehicle = DEFAULT_PACKAGE_VEHICLES.sedan.costPerDay * days;
   const rooms = DEFAULT_PACKAGE_STAYS.homestay.roomCost * 2;
-  const multiplier = 1 + (DEFAULT_TRIS_SERVICE_PERCENT / 100) * (1 + DEFAULT_PACKAGE_GST_PERCENT / 100);
+  const multiplier =
+    1 +
+    (DEFAULT_TRIS_SERVICE_PERCENT / 100) *
+      (1 + DEFAULT_PACKAGE_GST_PERCENT / 100);
   const targetSubtotal = (priceFrom * 4) / multiplier;
   return Math.max(0, Math.round((targetSubtotal - vehicle - rooms) / 4));
 }
@@ -146,15 +149,29 @@ const journeySeeds: Journey[] = [
       "Flexible stays and vehicle options",
       "Local insights on routes most travellers miss",
     ],
-    experienceHighlights: ["Living Root Bridges", "Waterfalls", "Caves", "Laitlum"],
+    experienceHighlights: [
+      "Living Root Bridges",
+      "Waterfalls",
+      "Caves",
+      "Laitlum",
+    ],
     itinerary: [
-      { day: 1, title: "Into Sohra", summary: "Arrive and settle; viewpoints and cliff light." },
+      {
+        day: 1,
+        title: "Into Sohra",
+        summary: "Arrive and settle; viewpoints and cliff light.",
+      },
       {
         day: 2,
         title: "Choose your trail",
-        summary: "Waterfalls, caves, or living root bridges — paced to your group.",
+        summary:
+          "Waterfalls, caves, or living root bridges — paced to your group.",
       },
-      { day: 3, title: "Laitlum & out", summary: "Canyon views before transfer out." },
+      {
+        day: 3,
+        title: "Laitlum & out",
+        summary: "Canyon views before transfer out.",
+      },
     ],
     stays: ["Hand-picked homestays, hotels & cosy cottages"],
     inclusions: packageInclusions,
@@ -173,7 +190,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 11100,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("mawphanlur-meadows-escape"),
-    gallery: [media.local.meadowWalk, media.local.kyllangRock, media.local.ridgeLight, media.local.homestay],
+    gallery: [
+      media.local.meadowWalk,
+      media.local.kyllangRock,
+      media.local.ridgeLight,
+      media.local.homestay,
+    ],
     style: ["Highlands", "Village", "Slow"],
     season: "August to April",
     overview:
@@ -184,10 +206,23 @@ const journeySeeds: Journey[] = [
       "Sacred forest walk",
       "Quiet highland pacing",
     ],
-    experienceHighlights: ["River Island", "Valleys", "Village Stay", "Sacred Forest"],
+    experienceHighlights: [
+      "River Island",
+      "Valleys",
+      "Village Stay",
+      "Sacred Forest",
+    ],
     itinerary: [
-      { day: 1, title: "Highlands arrival", summary: "Transfer into Mawphanlur country." },
-      { day: 2, title: "Island & meadows", summary: "Nongkhnum soft hike and valley time." },
+      {
+        day: 1,
+        title: "Highlands arrival",
+        summary: "Transfer into Mawphanlur country.",
+      },
+      {
+        day: 2,
+        title: "Island & meadows",
+        summary: "Nongkhnum soft hike and valley time.",
+      },
       { day: 3, title: "Return", summary: "Breakfast and transfer out." },
     ],
     stays: ["Village stay", "Hand-picked cottages"],
@@ -207,7 +242,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 14000,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("mawsynram-adventures"),
-    gallery: [media.local.trailMist, media.local.riverStones, media.local.bridgeTrail, media.local.campfire],
+    gallery: [
+      media.local.trailMist,
+      media.local.riverStones,
+      media.local.bridgeTrail,
+      media.local.campfire,
+    ],
     style: ["Adventure", "River", "Caves"],
     season: "July to April",
     overview:
@@ -218,15 +258,29 @@ const journeySeeds: Journey[] = [
       "Sacred forest & village stay",
       "Caving, kayaking & canyon hikes",
     ],
-    experienceHighlights: ["River Trekking", "Split Rock", "Caving", "Village Stay"],
+    experienceHighlights: [
+      "River Trekking",
+      "Split Rock",
+      "Caving",
+      "Village Stay",
+    ],
     itinerary: [
-      { day: 1, title: "Toward the rains", summary: "Sacred forest and transfer into Mawsynram." },
+      {
+        day: 1,
+        title: "Toward the rains",
+        summary: "Sacred forest and transfer into Mawsynram.",
+      },
       {
         day: 2,
         title: "Water & rock",
-        summary: "River trek, Split Rock, and waterfall country around Mawlongbna.",
+        summary:
+          "River trek, Split Rock, and waterfall country around Mawlongbna.",
       },
-      { day: 3, title: "Caves & out", summary: "Optional caving before return." },
+      {
+        day: 3,
+        title: "Caves & out",
+        summary: "Optional caving before return.",
+      },
     ],
     stays: ["Village homestay (Mawlongbna area)"],
     inclusions: packageInclusions,
@@ -245,7 +299,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 25990,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("sohra-trekkers-delight"),
-    gallery: [media.local.livingBridge, media.local.forestLight, media.local.villagePath, media.local.waterfallPool],
+    gallery: [
+      media.local.livingBridge,
+      media.local.forestLight,
+      media.local.villagePath,
+      media.local.waterfallPool,
+    ],
     style: ["Trek", "Roots", "Adventure"],
     season: "Mid October to March",
     overview:
@@ -256,16 +315,34 @@ const journeySeeds: Journey[] = [
       "Trek to the Double Decker living root bridges",
       "Nongriat homestay or camping night",
     ],
-    experienceHighlights: ["Mawmluh Caving", "Waterfalls", "Double Decker", "Nongriat Stay"],
+    experienceHighlights: [
+      "Mawmluh Caving",
+      "Waterfalls",
+      "Double Decker",
+      "Nongriat Stay",
+    ],
     itinerary: [
-      { day: 1, title: "Sohra arrival", summary: "Settle in; cliff and waterfall orientation." },
-      { day: 2, title: "Caves & falls", summary: "Mawmluh caving and waterfall time." },
+      {
+        day: 1,
+        title: "Sohra arrival",
+        summary: "Settle in; cliff and waterfall orientation.",
+      },
+      {
+        day: 2,
+        title: "Caves & falls",
+        summary: "Mawmluh caving and waterfall time.",
+      },
       {
         day: 3,
         title: "Into Nongriat",
-        summary: "Descend toward living root bridges; overnight in village or camp.",
+        summary:
+          "Descend toward living root bridges; overnight in village or camp.",
       },
-      { day: 4, title: "Root bridges", summary: "Double Decker and forest trails." },
+      {
+        day: 4,
+        title: "Root bridges",
+        summary: "Double Decker and forest trails.",
+      },
       { day: 5, title: "Ascent & out", summary: "Climb out and transfer." },
     ],
     stays: ["Sohra stay", "Nongriat homestay or camping"],
@@ -285,7 +362,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 22100,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("meghalaya-escape-the-ordinary"),
-    gallery: [media.local.waterfallPool, media.local.campfire, media.local.groupTrail, media.local.tishu01],
+    gallery: [
+      media.local.waterfallPool,
+      media.local.campfire,
+      media.local.groupTrail,
+      media.local.tishu01,
+    ],
     style: ["Offbeat", "Camping", "Village"],
     season: "Mid-October to March",
     overview:
@@ -296,13 +378,26 @@ const journeySeeds: Journey[] = [
       "Hiking in the valleys of Mawphanlur",
       "Offbeat caves, clear rivers & waterfalls",
     ],
-    experienceHighlights: ["Nohkalikai Crest", "Riverside Camping", "Mawphanlur", "Caves"],
+    experienceHighlights: [
+      "Nohkalikai Crest",
+      "Riverside Camping",
+      "Mawphanlur",
+      "Caves",
+    ],
     itinerary: [
       { day: 1, title: "Arrive", summary: "Land and settle into the hills." },
-      { day: 2, title: "Crests & cliffs", summary: "Nohkalikai Crest and Sohra light." },
+      {
+        day: 2,
+        title: "Crests & cliffs",
+        summary: "Nohkalikai Crest and Sohra light.",
+      },
       { day: 3, title: "Riverside camp", summary: "Camp by clear water." },
       { day: 4, title: "Village life", summary: "Host time and local food." },
-      { day: 5, title: "Mawphanlur valleys", summary: "Highland hiking and caves." },
+      {
+        day: 5,
+        title: "Mawphanlur valleys",
+        summary: "Highland hiking and caves.",
+      },
       { day: 6, title: "Departure", summary: "Transfer out." },
     ],
     stays: ["Homestays", "Riverside camping", "Cottages"],
@@ -322,7 +417,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 22300,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("the-pine-and-the-river"),
-    gallery: [media.local.riverStones, media.local.forestLight, media.local.raksan03, media.local.highlandRoad],
+    gallery: [
+      media.local.riverStones,
+      media.local.forestLight,
+      media.local.raksan03,
+      media.local.highlandRoad,
+    ],
     style: ["Balanced", "Sacred groves", "Kayak"],
     season: "Mid-October to March",
     overview:
@@ -337,9 +437,21 @@ const journeySeeds: Journey[] = [
     itinerary: [
       { day: 1, title: "Arrival", summary: "Orient and rest." },
       { day: 2, title: "Falls day", summary: "Phephe and canyon country." },
-      { day: 3, title: "Crest & roots", summary: "Nohkalikai Crest and forest trails." },
-      { day: 4, title: "Sacred grove", summary: "Quiet forest walk with local hosts." },
-      { day: 5, title: "Dawki", summary: "Umngot river time and kayaking options." },
+      {
+        day: 3,
+        title: "Crest & roots",
+        summary: "Nohkalikai Crest and forest trails.",
+      },
+      {
+        day: 4,
+        title: "Sacred grove",
+        summary: "Quiet forest walk with local hosts.",
+      },
+      {
+        day: 5,
+        title: "Dawki",
+        summary: "Umngot river time and kayaking options.",
+      },
       { day: 6, title: "Out", summary: "Transfer and farewell." },
     ],
     stays: ["Village stay", "Camping", "Riverside lodges"],
@@ -359,7 +471,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 22250,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("essence-of-meghalaya"),
-    gallery: [media.local.meadowWalk, media.local.marketDay, media.local.homestay, media.local.landscapePanorama],
+    gallery: [
+      media.local.meadowWalk,
+      media.local.marketDay,
+      media.local.homestay,
+      media.local.landscapePanorama,
+    ],
     style: ["Classic", "Comfort", "Family-friendly"],
     season: "January to December",
     overview:
@@ -370,12 +487,33 @@ const journeySeeds: Journey[] = [
       "Living root bridge",
       "Sohra & Umngot river (Dawki)",
     ],
-    experienceHighlights: ["Shillong", "Mawlynnong", "Living Root Bridge", "Dawki"],
+    experienceHighlights: [
+      "Shillong",
+      "Mawlynnong",
+      "Living Root Bridge",
+      "Dawki",
+    ],
     itinerary: [
-      { day: 1, title: "Shillong", summary: "Arrive and ease into the capital." },
-      { day: 2, title: "Sohra", summary: "Cliffs, caves, and waterfall country." },
-      { day: 3, title: "Root bridges", summary: "Living root bridge day at a gentle pace." },
-      { day: 4, title: "Mawlynnong", summary: "Village stay in Asia’s cleanest village." },
+      {
+        day: 1,
+        title: "Shillong",
+        summary: "Arrive and ease into the capital.",
+      },
+      {
+        day: 2,
+        title: "Sohra",
+        summary: "Cliffs, caves, and waterfall country.",
+      },
+      {
+        day: 3,
+        title: "Root bridges",
+        summary: "Living root bridge day at a gentle pace.",
+      },
+      {
+        day: 4,
+        title: "Mawlynnong",
+        summary: "Village stay in Asia’s cleanest village.",
+      },
       { day: 5, title: "Dawki", summary: "Umngot river and border views." },
       { day: 6, title: "Departure", summary: "Return via Shillong." },
     ],
@@ -396,7 +534,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 30150,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("wild-monsoon-trail"),
-    gallery: [media.local.forestLight, media.local.trailMist, media.local.bridgeTrail, media.local.detail02],
+    gallery: [
+      media.local.forestLight,
+      media.local.trailMist,
+      media.local.bridgeTrail,
+      media.local.detail02,
+    ],
     style: ["Monsoon", "Offbeat", "Adventure"],
     season: "Mid-May to September",
     overview:
@@ -407,13 +550,38 @@ const journeySeeds: Journey[] = [
       "Mawphanlur & sacred forests",
       "Living root bridges and caves",
     ],
-    experienceHighlights: ["Hidden Waterfalls", "River Trekking", "Sacred Forests", "Root Bridges"],
+    experienceHighlights: [
+      "Hidden Waterfalls",
+      "River Trekking",
+      "Sacred Forests",
+      "Root Bridges",
+    ],
     itinerary: [
-      { day: 1, title: "Arrive in rain country", summary: "Settle in as weather sets the mood." },
-      { day: 2, title: "Sacred forests", summary: "Grove walks with local interpretation." },
-      { day: 3, title: "Hidden falls", summary: "Trail days for monsoon waterfalls." },
-      { day: 4, title: "River trek", summary: "Water-level adventure with guides." },
-      { day: 5, title: "Root bridges", summary: "Living architecture in the mist." },
+      {
+        day: 1,
+        title: "Arrive in rain country",
+        summary: "Settle in as weather sets the mood.",
+      },
+      {
+        day: 2,
+        title: "Sacred forests",
+        summary: "Grove walks with local interpretation.",
+      },
+      {
+        day: 3,
+        title: "Hidden falls",
+        summary: "Trail days for monsoon waterfalls.",
+      },
+      {
+        day: 4,
+        title: "River trek",
+        summary: "Water-level adventure with guides.",
+      },
+      {
+        day: 5,
+        title: "Root bridges",
+        summary: "Living architecture in the mist.",
+      },
       { day: 6, title: "Highlands", summary: "Mawphanlur and caves." },
       { day: 7, title: "Out", summary: "Transfer and close." },
     ],
@@ -434,7 +602,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 49350,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("kaziranga-to-khasi-hills"),
-    gallery: [media.local.cliffView, media.local.landscapePanorama, media.local.raksan06, media.local.livingBridge],
+    gallery: [
+      media.local.cliffView,
+      media.local.landscapePanorama,
+      media.local.raksan06,
+      media.local.livingBridge,
+    ],
     style: ["Safari", "Culture", "Nature"],
     season: "Mid-October to March",
     overview:
@@ -445,16 +618,37 @@ const journeySeeds: Journey[] = [
       "Living root bridges",
       "Umngot river (Dawki) & local Khasi cuisine",
     ],
-    experienceHighlights: ["Kaziranga Safari", "Sacred Forest", "Root Bridges", "Dawki"],
+    experienceHighlights: [
+      "Kaziranga Safari",
+      "Sacred Forest",
+      "Root Bridges",
+      "Dawki",
+    ],
     itinerary: [
       { day: 1, title: "Arrive Assam", summary: "Settle near Kaziranga." },
-      { day: 2, title: "Safari", summary: "Morning and evening wildlife drives." },
-      { day: 3, title: "Toward the hills", summary: "Transfer into Meghalaya." },
+      {
+        day: 2,
+        title: "Safari",
+        summary: "Morning and evening wildlife drives.",
+      },
+      {
+        day: 3,
+        title: "Toward the hills",
+        summary: "Transfer into Meghalaya.",
+      },
       { day: 4, title: "Sacred forest", summary: "Quiet grove walk." },
       { day: 5, title: "Root bridges", summary: "Living architecture day." },
-      { day: 6, title: "Caves & falls", summary: "Sohra circuit at an easy pace." },
+      {
+        day: 6,
+        title: "Caves & falls",
+        summary: "Sohra circuit at an easy pace.",
+      },
       { day: 7, title: "Dawki", summary: "Umngot river time." },
-      { day: 8, title: "Village & food", summary: "Khasi cuisine and host time." },
+      {
+        day: 8,
+        title: "Village & food",
+        summary: "Khasi cuisine and host time.",
+      },
       { day: 9, title: "Departure", summary: "Transfer out." },
     ],
     stays: ["Safari lodge", "Homestays", "Hill cottages"],
@@ -474,7 +668,12 @@ const journeySeeds: Journey[] = [
     priceFrom: 38730,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("family-sojourn"),
-    gallery: [media.local.waterfallPool, media.local.groupTrail, media.local.homestay, media.local.portraitWarm],
+    gallery: [
+      media.local.waterfallPool,
+      media.local.groupTrail,
+      media.local.homestay,
+      media.local.portraitWarm,
+    ],
     style: ["Family", "Gentle pace", "Seniors"],
     season: "October to April",
     overview:
@@ -485,14 +684,39 @@ const journeySeeds: Journey[] = [
       "Valleys and Umngot river (Dawki)",
       "Living root bridges at a comfortable pace",
     ],
-    experienceHighlights: ["Sunset Cruise", "Sacred Forests", "Caves", "Root Bridges"],
+    experienceHighlights: [
+      "Sunset Cruise",
+      "Sacred Forests",
+      "Caves",
+      "Root Bridges",
+    ],
     itinerary: [
-      { day: 1, title: "Guwahati", summary: "Arrive; Brahmaputra sunset cruise." },
-      { day: 2, title: "Into the hills", summary: "Transfer to Shillong / Sohra region." },
+      {
+        day: 1,
+        title: "Guwahati",
+        summary: "Arrive; Brahmaputra sunset cruise.",
+      },
+      {
+        day: 2,
+        title: "Into the hills",
+        summary: "Transfer to Shillong / Sohra region.",
+      },
       { day: 3, title: "Easy nature", summary: "Viewpoints and short walks." },
-      { day: 4, title: "Sacred forest", summary: "Gentle grove interpretation." },
-      { day: 5, title: "Caves & falls", summary: "Accessible chambers and waterfalls." },
-      { day: 6, title: "Root bridges", summary: "Living roots with support and pacing." },
+      {
+        day: 4,
+        title: "Sacred forest",
+        summary: "Gentle grove interpretation.",
+      },
+      {
+        day: 5,
+        title: "Caves & falls",
+        summary: "Accessible chambers and waterfalls.",
+      },
+      {
+        day: 6,
+        title: "Root bridges",
+        summary: "Living roots with support and pacing.",
+      },
       { day: 7, title: "Dawki", summary: "Umngot river day." },
       { day: 8, title: "Village day", summary: "Host kitchen and rest." },
       { day: 9, title: "Departure", summary: "Transfer to airport." },
@@ -514,7 +738,13 @@ const journeySeeds: Journey[] = [
     priceFrom: 68250,
     priceNote: "per person, based on a group of 4",
     image: listings.journey("soul-trails"),
-    gallery: [media.local.villagePath, media.local.bridgeTrail, media.local.tishu02, media.local.raksan04, media.local.campfire],
+    gallery: [
+      media.local.villagePath,
+      media.local.bridgeTrail,
+      media.local.tishu02,
+      media.local.raksan04,
+      media.local.campfire,
+    ],
     style: ["Immersive", "Offbeat", "Culture"],
     season: "Mid October to March",
     overview:
@@ -525,20 +755,37 @@ const journeySeeds: Journey[] = [
       "River trekking & offbeat caves",
       "Waterfalls, canyons, culture & tradition",
     ],
-    experienceHighlights: ["Offbeat Root Bridges", "Whistling Village", "River Trekking", "Caves"],
+    experienceHighlights: [
+      "Offbeat Root Bridges",
+      "Whistling Village",
+      "River Trekking",
+      "Caves",
+    ],
     itinerary: [
       { day: 1, title: "Arrive", summary: "Settle into Meghalaya time." },
       { day: 2, title: "City & hills", summary: "Shillong orientation." },
       { day: 3, title: "Sacred forests", summary: "Grove walks and folklore." },
       { day: 4, title: "Whistling village", summary: "Community encounter." },
       { day: 5, title: "Canyons", summary: "Laitlum and open views." },
-      { day: 6, title: "Offbeat roots I", summary: "Quieter living root bridge country." },
+      {
+        day: 6,
+        title: "Offbeat roots I",
+        summary: "Quieter living root bridge country.",
+      },
       { day: 7, title: "Offbeat roots II", summary: "Deeper forest trails." },
       { day: 8, title: "River trek", summary: "Water-level adventure day." },
       { day: 9, title: "Caves", summary: "Offbeat cave exploration." },
       { day: 10, title: "Waterfalls", summary: "Hidden falls and rest." },
-      { day: 11, title: "Village immersion", summary: "Homestay and local food." },
-      { day: 12, title: "Culture day", summary: "Craft, music, or host kitchen." },
+      {
+        day: 11,
+        title: "Village immersion",
+        summary: "Homestay and local food.",
+      },
+      {
+        day: 12,
+        title: "Culture day",
+        summary: "Craft, music, or host kitchen.",
+      },
       { day: 13, title: "Departure", summary: "Transfer out." },
     ],
     stays: ["Homestays", "Village guesthouses", "Selected cottages"],
@@ -556,10 +803,16 @@ const journeySeeds: Journey[] = [
     nights: 6,
     priceFrom: 38299,
     image: listings.journey("womens-soulful-escape"),
-    gallery: [media.local.ridgeLight, media.local.groupTrail, media.local.raksan07, media.local.tishu03],
+    gallery: [
+      media.local.ridgeLight,
+      media.local.groupTrail,
+      media.local.raksan07,
+      media.local.tishu03,
+    ],
     style: ["Women-only", "Small group", "Sisterhood"],
     season: "Multiple dates · Oct–Dec",
-    overview: "Ladies-only small-group journey across Meghalaya — Laitlum, Phe Phe, Krangshuri, Dawki, Mawlynnong, and Mawsynram.",
+    overview:
+      "Ladies-only small-group journey across Meghalaya — Laitlum, Phe Phe, Krangshuri, Dawki, Mawlynnong, and Mawsynram.",
     highlights: [],
     itinerary: [],
     stays: ["Cottage, guest house & homestays"],
@@ -609,7 +862,12 @@ const journeySeeds: Journey[] = [
     nights: 1,
     priceFrom: 6990,
     image: listings.journey("offbeat-living-root-bridge"),
-    gallery: [media.local.livingBridge, media.local.bridgeTrail, media.local.forestLight, media.local.homestay],
+    gallery: [
+      media.local.livingBridge,
+      media.local.bridgeTrail,
+      media.local.forestLight,
+      media.local.homestay,
+    ],
     style: ["Roots", "Small group", "Offbeat"],
     season: "Weekly Mondays · 12 Jan 2026 — 6 Apr 2026",
     overview:
@@ -634,16 +892,37 @@ const journeySeeds: Journey[] = [
           "Offbeat Rangthylliang–Mawkyrnot trail — up to six living bridges; return via Pynursla to Shillong.",
       },
     ],
-    route: "Shillong → Laitlum → Krangshuri → Dawki → Mawlynnong → Pynursla → Shillong",
-    stays: ["Village homestay at Mawlynnong (double-sharing; upgrades on request)"],
+    route:
+      "Shillong → Laitlum → Krangshuri → Dawki → Mawlynnong → Pynursla → Shillong",
+    stays: [
+      "Village homestay at Mawlynnong (double-sharing; upgrades on request)",
+    ],
     inclusions: fixedInclusions,
     nextDeparture: "Every Monday · register with no upfront payment",
     groupSize: "4–10 persons",
     notSuitableFor: ["Limited mobility"],
     departureSeats: [
-      { date: "2026-08-17", seats: 10, held: 0, booked: 6, note: "Monday departure" },
-      { date: "2026-08-24", seats: 10, held: 1, booked: 3, note: "Monday departure" },
-      { date: "2026-08-31", seats: 10, held: 0, booked: 1, note: "Monday departure" },
+      {
+        date: "2026-08-17",
+        seats: 10,
+        held: 0,
+        booked: 6,
+        note: "Monday departure",
+      },
+      {
+        date: "2026-08-24",
+        seats: 10,
+        held: 1,
+        booked: 3,
+        note: "Monday departure",
+      },
+      {
+        date: "2026-08-31",
+        seats: 10,
+        held: 0,
+        booked: 1,
+        note: "Monday departure",
+      },
     ],
     sourceUrl:
       "https://www.trismeghalaya.com/fixed-departures/rooted-trails%3A-the-offbeat-living-root-bridge-experience",
@@ -665,7 +944,9 @@ function applyCuratedPatch(journey: Journey): Journey {
     experienceHighlights: patch.experienceHighlights,
     highlights: patch.highlights,
     itinerary: patch.itinerary,
-    ...(patch.notSuitableFor?.length ? { notSuitableFor: patch.notSuitableFor } : {}),
+    ...(patch.notSuitableFor?.length
+      ? { notSuitableFor: patch.notSuitableFor }
+      : {}),
   };
   if (journey.packagePricing) {
     next.packagePricing = {
@@ -699,7 +980,9 @@ function applyFixedPatch(journey: Journey): Journey {
     itinerary: patch.itinerary,
     inclusions: patch.inclusions,
     exclusions: patch.exclusions,
-    ...(patch.notSuitableFor?.length ? { notSuitableFor: patch.notSuitableFor } : {}),
+    ...(patch.notSuitableFor?.length
+      ? { notSuitableFor: patch.notSuitableFor }
+      : {}),
     departureSeats: patch.departureSeats,
     nextDeparture: patch.nextDeparture,
   };

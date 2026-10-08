@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { FormInput, FormSuccess, FormTextarea } from "@/components/ui/Form";
 import { submitEnquiry } from "@/lib/actions/enquiries";
+import { compressImage } from "@/lib/compress-image";
 import { X } from "lucide-react";
 
 const MAX_FILES = 5;
@@ -47,12 +48,14 @@ export function ShareStoryForm() {
         }
 
         const photoUrls: string[] = [];
-        for (const file of files) {
-          if (!file.type.startsWith("image/")) {
+        for (const picked of files) {
+          if (!picked.type.startsWith("image/")) {
             setBusy(false);
             setError("Photos only — JPG, PNG, or WebP.");
             return;
           }
+          // Shrink big phone photos to under 2MB before checking the limit.
+          const file = await compressImage(picked);
           if (file.size > MAX_MB * 1024 * 1024) {
             setBusy(false);
             setError(`Each photo must be under ${MAX_MB}MB.`);

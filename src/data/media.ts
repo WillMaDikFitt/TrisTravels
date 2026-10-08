@@ -119,10 +119,11 @@ export const listings = {
   journey: (slug: string) => `/images/listings/journeys/${slug}.jpg`,
   destination: (slug: string) => `/images/listings/destinations/${slug}.jpg`,
   story: (slug: string) => `/images/listings/stories/${slug}.jpg`,
-  artisan: (slug: string) => `/images/listings/artisans/${slug}.jpg`,
 } as const;
 
 /** Deduped cover + gallery helper for detail heroes. */
 export function detailImages(cover: string, gallery: string[] = []) {
-  return [cover, ...gallery].filter((src, index, all) => src && all.indexOf(src) === index);
+  return [cover, ...gallery].filter(
+    (src, index, all) => src && all.indexOf(src) === index,
+  );
 }

@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ImageField } from "@/components/admin/ImageField";
-import { AdminButton, Field, Notice, PageHeader, Panel, inputClass } from "@/components/admin/ui";
+import {
+  AdminButton,
+  Field,
+  Notice,
+  PageHeader,
+  Panel,
+  inputClass,
+} from "@/components/admin/ui";
 import {
   blankCraftProduct,
   craftCategories,
@@ -34,7 +41,11 @@ export default function CraftEditorPage() {
       .then((list) => {
         if (cancelled) return;
         setAll(list);
-        setCraft(isNew ? blankCraftProduct(list.length) : (list.find((c) => c.slug === slugKey) ?? null));
+        setCraft(
+          isNew
+            ? blankCraftProduct(list.length)
+            : (list.find((c) => c.slug === slugKey) ?? null),
+        );
         setFormKey((k) => k + 1);
       })
       .catch(() => {
@@ -49,7 +60,10 @@ export default function CraftEditorPage() {
     setCraft((prev) => (prev ? { ...prev, ...patch } : prev));
 
   const back = (
-    <AdminButton variant="ghost" onClick={() => router.push("/admin/crafts")}>
+    <AdminButton
+      variant="ghost"
+      onClick={() => router.push("/admin/crafts?tab=crafts")}
+    >
       Back to crafts
     </AdminButton>
   );
@@ -62,7 +76,9 @@ export default function CraftEditorPage() {
     return (
       <div>
         <PageHeader eyebrow="Catalogue" title="Craft" actions={back} />
-        <p className="text-sm text-[#4a5a50]">This craft no longer exists — it may have been removed.</p>
+        <p className="text-sm text-[#4a5a50]">
+          This craft no longer exists — it may have been removed.
+        </p>
       </div>
     );
   }
@@ -79,10 +95,13 @@ export default function CraftEditorPage() {
     if (isNew) {
       const base = slugify(name) || "craft";
       slug = base;
-      for (let n = 2; others.some((c) => c.slug === slug); n++) slug = `${base}-${n}`;
+      for (let n = 2; others.some((c) => c.slug === slug); n++)
+        slug = `${base}-${n}`;
     }
     const saved: CraftProduct = { ...craft, name, slug };
-    const nextList = isNew ? [...all, saved] : all.map((c) => (c.slug === slugKey ? saved : c));
+    const nextList = isNew
+      ? [...all, saved]
+      : all.map((c) => (c.slug === slugKey ? saved : c));
 
     setBusy(true);
     setNote("");
@@ -93,22 +112,33 @@ export default function CraftEditorPage() {
       return;
     }
     const done = `Saved ${name} — the Artisan’s Hub page updates within a minute.${
-      saved.active !== false && !saved.image ? " Add a photo to show it on the site." : ""
+      saved.active !== false && !saved.image
+        ? " It shows a placeholder until you add a photo."
+        : ""
     }`;
-    router.push(`/admin/crafts?${new URLSearchParams({ note: done })}`);
+    router.push(
+      `/admin/crafts?${new URLSearchParams({ tab: "crafts", note: done })}`,
+    );
   };
 
   const remove = async () => {
     if (all.length <= 1) {
-      setNote("Keep at least one craft. To hide this one, untick “Show on site” and save.");
+      setNote(
+        "Keep at least one craft. To hide this one, untick “Show on site” and save.",
+      );
       return;
     }
-    if (!confirm(`Remove ${craft.name}? It disappears from the site right away.`)) return;
+    if (
+      !confirm(`Remove ${craft.name}? It disappears from the site right away.`)
+    )
+      return;
     setBusy(true);
     const res = await saveCraftProducts(all.filter((c) => c.slug !== slugKey));
     setBusy(false);
     if (res.ok) {
-      router.push(`/admin/crafts?${new URLSearchParams({ note: `${craft.name} removed.` })}`);
+      router.push(
+        `/admin/crafts?${new URLSearchParams({ tab: "crafts", note: `${craft.name} removed.` })}`,
+      );
     } else {
       setNote(res.error);
     }
@@ -143,7 +173,9 @@ export default function CraftEditorPage() {
           <Field label="Category">
             <select
               value={craft.category}
-              onChange={(e) => update({ category: e.target.value as CraftCategory })}
+              onChange={(e) =>
+                update({ category: e.target.value as CraftCategory })
+              }
               className={inputClass}
             >
               {craftCategories.map((c) => (
@@ -153,7 +185,10 @@ export default function CraftEditorPage() {
               ))}
             </select>
           </Field>
-          <Field label="Maker note" hint="Small line under the category, e.g. “Crochet artisans”">
+          <Field
+            label="Maker note"
+            hint="Small line under the category, e.g. “Crochet artisans”"
+          >
             <input
               value={craft.makerNote ?? ""}
               onChange={(e) => update({ makerNote: e.target.value })}
@@ -164,12 +199,17 @@ export default function CraftEditorPage() {
             <input
               type="number"
               value={craft.sortOrder ?? ""}
-              onChange={(e) => update({ sortOrder: Math.round(Number(e.target.value) || 0) })}
+              onChange={(e) =>
+                update({ sortOrder: Math.round(Number(e.target.value) || 0) })
+              }
               className={inputClass}
             />
           </Field>
         </div>
-        <Field label="Short description" hint="About two lines — longer text is cut off on the card">
+        <Field
+          label="Short description"
+          hint="About two lines — longer text is cut off on the card"
+        >
           <textarea
             rows={3}
             value={craft.blurb}
@@ -181,7 +221,7 @@ export default function CraftEditorPage() {
           key={`craft-image-${formKey}`}
           name="image"
           label="Photo"
-          hint="Landscape (4:3) works best. Crafts without a photo are not shown on the site."
+          hint="Landscape (4:3) works best. Crafts without a photo show a placeholder."
           defaultValue={craft.image}
           purpose="crafts"
           onChange={(url) => update({ image: url })}
@@ -210,7 +250,11 @@ export default function CraftEditorPage() {
             {busy ? "Saving…" : isNew ? "Add craft" : "Save craft"}
           </AdminButton>
           {!isNew ? (
-            <AdminButton variant="ghost" onClick={() => void remove()} disabled={busy}>
+            <AdminButton
+              variant="ghost"
+              onClick={() => void remove()}
+              disabled={busy}
+            >
               Remove
             </AdminButton>
           ) : null}
@@ -219,7 +263,9 @@ export default function CraftEditorPage() {
 
       {note ? (
         <div className="mt-6">
-          <Notice tone={note.startsWith("Saved") ? "ok" : "warn"}>{note}</Notice>
+          <Notice tone={note.startsWith("Saved") ? "ok" : "warn"}>
+            {note}
+          </Notice>
         </div>
       ) : null}
     </div>

@@ -20,7 +20,8 @@ export type Story = {
 export const stories: Story[] = [
   {
     slug: "two-days-in-mawsynram",
-    title: "Two Days in Mawsynram — Rain, Rivers & Adventures in the Wettest Place on Earth",
+    title:
+      "Two Days in Mawsynram — Rain, Rivers & Adventures in the Wettest Place on Earth",
     excerpt:
       "Some journeys leave rain in your hair, river on your skin, and laughter that returns without warning — even weeks later.",
     author: "Rose Christine Kharsyntiew",

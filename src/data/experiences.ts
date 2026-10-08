@@ -15,7 +15,8 @@ export type ExperienceTransportMode = "none" | "optional" | "required";
 
 export type Difficulty = "Easy" | "Moderate" | "Challenging";
 
-export type ExperienceStatus = "draft" | "active" | "hidden" | "seasonal" | "soldOut";
+export type ExperienceStatus =
+  "draft" | "active" | "hidden" | "seasonal" | "soldOut";
 
 export type ExperienceSlotConfig = {
   /**
@@ -149,7 +150,12 @@ export const experiences: Experience[] = [
     transportPrice: 2500,
     transportNote: "Shared pickup from Shillong",
     image: listings.experience("offbeat-living-root-bridge"),
-    gallery: [media.local.bridgeTrail, media.local.forestLight, media.local.villagePath, media.local.raksan02],
+    gallery: [
+      media.local.bridgeTrail,
+      media.local.forestLight,
+      media.local.villagePath,
+      media.local.raksan02,
+    ],
     communityLed: true,
     overview:
       "Root Trails is designed for travellers who want Meghalaya beyond the postcard route. Stay in a village, walk quiet forest paths, and visit living root bridges most travellers never reach. Groups remain small — 4 to 10 — so experiences stay personal, safe, and open to connection.",
@@ -167,7 +173,11 @@ export const experiences: Experience[] = [
       "Shared transport & local driver",
       "Breakfast, dinner & accommodation",
     ],
-    excluded: ["Personal expenses", "Village lunch shopping", "Travel insurance"],
+    excluded: [
+      "Personal expenses",
+      "Village lunch shopping",
+      "Travel insurance",
+    ],
     whatToBring: [
       "Sturdy walking shoes with grip",
       "Rain jacket",
@@ -215,7 +225,8 @@ export const experiences: Experience[] = [
   {
     slug: "double-decker-living-root-bridge",
     name: "Double Decker Living Root Bridge",
-    tagline: "Descend to Nongriat’s famous living architecture — grown across generations.",
+    tagline:
+      "Descend to Nongriat’s famous living architecture — grown across generations.",
     category: "Adventure",
     tags: ["Trek", "Heritage", "Nature"],
     location: "Nongriat",
@@ -236,7 +247,11 @@ export const experiences: Experience[] = [
       breaks: [{ start: "09:00", end: "09:30" }],
     },
     image: listings.experience("double-decker-living-root-bridge"),
-    gallery: [media.local.livingBridge, media.local.waterfallPool, media.local.ridgeLight],
+    gallery: [
+      media.local.livingBridge,
+      media.local.waterfallPool,
+      media.local.ridgeLight,
+    ],
     communityLed: true,
     overview:
       "Nongriat is famous for living root bridges of the banyan (Ficus elastica). The Double Decker is not to be missed — traditional Khasi architecture woven from one generation to the next until the bridge is complete.",
@@ -316,7 +331,11 @@ export const experiences: Experience[] = [
     transportMode: "optional",
     transportPrice: 1800,
     image: listings.experience("mawsynram-river-trek"),
-    gallery: [media.local.riverStones, media.local.cliffView, media.local.trailMist],
+    gallery: [
+      media.local.riverStones,
+      media.local.cliffView,
+      media.local.trailMist,
+    ],
     communityLed: true,
     overview:
       "A day shaped by Split Rock — believed formed in the 1897 Assam earthquake — and a river trek through narrow stone walls to a waterfall reward. Immersive, grounding, and unhurried.",
@@ -328,8 +347,16 @@ export const experiences: Experience[] = [
       "Optional canoeing toward Umkhakoi Dam",
       "Local lunch after the trail",
     ],
-    included: ["Local adventure guide", "Safety briefing", "Trail coordination"],
-    excluded: ["Meals", "Transport to trailhead", "Personal gear & rain protection"],
+    included: [
+      "Local adventure guide",
+      "Safety briefing",
+      "Trail coordination",
+    ],
+    excluded: [
+      "Meals",
+      "Transport to trailhead",
+      "Personal gear & rain protection",
+    ],
     whatToBring: [
       "Quick-dry clothes + spare set",
       "Good-grip trekking shoes",
@@ -351,7 +378,8 @@ export const experiences: Experience[] = [
       {
         time: "13:00",
         title: "Local lunch",
-        description: "Simple, warm, nourishing — tastes better after adventure.",
+        description:
+          "Simple, warm, nourishing — tastes better after adventure.",
       },
       {
         time: "14:00",
@@ -387,7 +415,11 @@ export const experiences: Experience[] = [
     priceFrom: 2600,
     maxGuests: 12,
     image: listings.experience("mawphlang-sacred-forest"),
-    gallery: [media.local.forestLight, media.local.detail01, media.local.raksan05],
+    gallery: [
+      media.local.forestLight,
+      media.local.detail01,
+      media.local.raksan05,
+    ],
     sustainabilityFocus: true,
     overview:
       "Walking inside Mawphlang’s sacred forest feels like stepping into an unspoken past. Roots twist like ancient scripts; nothing may be taken — not even a fallen leaf — because this isn’t just land, it is heritage.",
@@ -401,7 +433,11 @@ export const experiences: Experience[] = [
     ],
     included: ["Local guide", "Interpretation"],
     excluded: ["Transport", "Meals", "Personal expenses"],
-    whatToBring: ["Modest clothing", "Quiet shoes", "Respect for no-take forest rules"],
+    whatToBring: [
+      "Modest clothing",
+      "Quiet shoes",
+      "Respect for no-take forest rules",
+    ],
     meetingPoint: "Mawphlang Sacred Grove entrance",
     itinerary: [
       {
@@ -423,7 +459,8 @@ export const experiences: Experience[] = [
   {
     slug: "umngot-dawki",
     name: "Dawki — Umngot River",
-    tagline: "Crystal-clear waters, border views, and boat time with local crews.",
+    tagline:
+      "Crystal-clear waters, border views, and boat time with local crews.",
     category: "Nature",
     tags: ["Water", "Family Friendly", "Sustainability Focus"],
     location: "Dawki",
@@ -436,7 +473,11 @@ export const experiences: Experience[] = [
     priceFrom: 2800,
     maxGuests: 10,
     image: listings.experience("umngot-dawki"),
-    gallery: [media.local.waterfallPool, media.local.landscapePanorama, media.local.groupTrail],
+    gallery: [
+      media.local.waterfallPool,
+      media.local.landscapePanorama,
+      media.local.groupTrail,
+    ],
     sustainabilityFocus: true,
     overview:
       "A calm river day on the Umngot at Dawki — clear water, cliff light, and time to simply float with local boatmen who know this river’s moods.",
@@ -450,7 +491,11 @@ export const experiences: Experience[] = [
     ],
     included: ["Boat & local crew", "Life jackets", "Coordination"],
     excluded: ["Transport to Dawki", "Meals", "Border permits (if applicable)"],
-    whatToBring: ["Sun protection", "Dry bag for phones", "Swimwear (optional)"],
+    whatToBring: [
+      "Sun protection",
+      "Dry bag for phones",
+      "Swimwear (optional)",
+    ],
     meetingPoint: "Dawki riverside jetty",
     itinerary: [
       {
@@ -477,7 +522,8 @@ export const experiences: Experience[] = [
   {
     slug: "short-escape-sohra-day",
     name: "Short Escape – Sohra",
-    tagline: "A customizable Sohra day — Nohkalikai Crest, caves, and waterfall country.",
+    tagline:
+      "A customizable Sohra day — Nohkalikai Crest, caves, and waterfall country.",
     category: "Nature",
     tags: ["Sohra", "Viewpoints", "Caves"],
     location: "Sohra (Cherrapunjee)",
@@ -494,7 +540,11 @@ export const experiences: Experience[] = [
     transportPrice: 3500,
     transportNote: "Private vehicle with driver for the full day",
     image: listings.experience("short-escape-sohra-day"),
-    gallery: [media.local.cliffView, media.local.meadowWalk, media.local.valleyGreen],
+    gallery: [
+      media.local.cliffView,
+      media.local.meadowWalk,
+      media.local.valleyGreen,
+    ],
     overview:
       "Drawn from TRIS’s Short Escape – Sohra package: a stunning getaway into Sohra with options spanning waterfalls, caves, Laitlum canyons, and living root bridge approaches.",
     trisStory:
@@ -511,7 +561,11 @@ export const experiences: Experience[] = [
       "Sightseeing entries as planned",
     ],
     excluded: ["Meals", "Personal expenses", "Accommodation"],
-    whatToBring: ["Layered clothing for mist", "Comfortable shoes", "Rain jacket"],
+    whatToBring: [
+      "Layered clothing for mist",
+      "Comfortable shoes",
+      "Rain jacket",
+    ],
     meetingPoint: "Shillong or Sohra (shared on confirmation)",
     itinerary: [
       {
@@ -527,7 +581,8 @@ export const experiences: Experience[] = [
       {
         time: "13:00",
         title: "Caves or crest",
-        description: "Choose caves or Nohkalikai Crest based on weather and interest.",
+        description:
+          "Choose caves or Nohkalikai Crest based on weather and interest.",
       },
     ],
     faqs: [],
@@ -538,7 +593,8 @@ export const experiences: Experience[] = [
   {
     slug: "krem-puri-cave",
     name: "Krem Puri",
-    tagline: "One of the world’s longest sandstone caves — cool air, silence, and deep time.",
+    tagline:
+      "One of the world’s longest sandstone caves — cool air, silence, and deep time.",
     category: "Adventure",
     tags: ["Caves", "Geology", "Adventure"],
     location: "Mawsynram",
@@ -552,7 +608,11 @@ export const experiences: Experience[] = [
     priceFrom: 3200,
     maxGuests: 8,
     image: listings.experience("krem-puri-cave"),
-    gallery: [media.local.bridgeTrail, media.local.detail03, media.local.campfire],
+    gallery: [
+      media.local.bridgeTrail,
+      media.local.detail03,
+      media.local.campfire,
+    ],
     overview:
       "Trek toward Krem Puri — one of the longest sandstone caves in the world, stretching over 24 kilometres. Inside, cool ancient air, wet walls, and silence that feels far from the noise outside.",
     trisStory:
@@ -565,7 +625,11 @@ export const experiences: Experience[] = [
     ],
     included: ["Local cave guide", "Coordination"],
     excluded: ["Transport to Mawsynram", "Meals", "Headlamp (optional backup)"],
-    whatToBring: ["Closed shoes with grip", "Light jacket", "Headlamp (optional backup)"],
+    whatToBring: [
+      "Closed shoes with grip",
+      "Light jacket",
+      "Headlamp (optional backup)",
+    ],
     meetingPoint: "Mawsynram area (shared on confirmation)",
     itinerary: [
       {
@@ -587,7 +651,8 @@ export const experiences: Experience[] = [
   {
     slug: "mawlynnong-village-stay",
     name: "Mawlynnong Village Stay",
-    tagline: "Asia’s cleanest village — overnight hosts, heritage walks, and quiet evenings.",
+    tagline:
+      "Asia’s cleanest village — overnight hosts, heritage walks, and quiet evenings.",
     category: "Food & Local Life",
     tags: ["Village", "Community-Led", "Family Friendly"],
     location: "Mawlynnong",
@@ -601,7 +666,12 @@ export const experiences: Experience[] = [
     priceFrom: 4800,
     maxGuests: 8,
     image: listings.experience("mawlynnong-village-stay"),
-    gallery: [media.local.homestay, media.local.marketDay, media.local.tishu02, media.local.portraitWarm],
+    gallery: [
+      media.local.homestay,
+      media.local.marketDay,
+      media.local.tishu02,
+      media.local.portraitWarm,
+    ],
     communityLed: true,
     overview:
       "Featured across TRIS fixed departures and classic packages — Mawlynnong overnight stays put you with local hosts in Asia’s cleanest village, with guided village walks and heritage house visits.",
@@ -613,9 +683,21 @@ export const experiences: Experience[] = [
       "Heritage house visit",
       "Optional living root bridge day-trips nearby",
     ],
-    included: ["Homestay (double-sharing base)", "Local host orientation", "Village walk"],
-    excluded: ["Transport to Mawlynnong", "Meals beyond host breakfast", "Personal expenses"],
-    whatToBring: ["Respectful clothing", "Cash for crafts & snacks", "Mosquito protection"],
+    included: [
+      "Homestay (double-sharing base)",
+      "Local host orientation",
+      "Village walk",
+    ],
+    excluded: [
+      "Transport to Mawlynnong",
+      "Meals beyond host breakfast",
+      "Personal expenses",
+    ],
+    whatToBring: [
+      "Respectful clothing",
+      "Cash for crafts & snacks",
+      "Mosquito protection",
+    ],
     meetingPoint: "Mawlynnong village (transfer options available)",
     itinerary: [
       {

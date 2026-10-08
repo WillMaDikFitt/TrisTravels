@@ -79,8 +79,10 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     luggage: "1 large + 1 small suitcase, or up to 3 small bags",
     ac: "Yes",
     bestFor: "Small groups looking for a comfortable and economical vehicle.",
-    goodToKnow: "Boot space is limited, so this option may not be suitable for travellers carrying a lot of luggage.",
-    examples: "Maruti Suzuki Dzire, Honda City, Hyundai Verna, Maruti Suzuki Ciaz",
+    goodToKnow:
+      "Boot space is limited, so this option may not be suitable for travellers carrying a lot of luggage.",
+    examples:
+      "Maruti Suzuki Dzire, Honda City, Hyundai Verna, Maruti Suzuki Ciaz",
     summary:
       "A comfortable option for smaller groups, sedans offer good legroom, air conditioning and a smooth ride on highways and hilly roads.",
     images: [media.ride, media.rideAlt],
@@ -97,8 +99,10 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     idealFor: "Up to 4 adults for more comfort",
     luggage: "3 large + 2 small bags",
     ac: "Yes",
-    bestFor: "Small groups looking for a comfortable and practical vehicle for exploring Meghalaya.",
-    goodToKnow: "Luggage capacity may vary depending on the vehicle model and number of passengers.",
+    bestFor:
+      "Small groups looking for a comfortable and practical vehicle for exploring Meghalaya.",
+    goodToKnow:
+      "Luggage capacity may vary depending on the vehicle model and number of passengers.",
     examples: "Mahindra Xylo, Mahindra Bolero, Maruti Suzuki Ertiga or similar",
     summary:
       "A practical option for small groups, SUVs offer a comfortable cabin, good ground clearance and flexibility for Meghalaya’s hilly roads.",
@@ -116,7 +120,8 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     idealFor: "Up to 4 adults",
     luggage: "3 large + 2 small bags",
     ac: "Yes",
-    bestFor: "Families and small groups looking for extra space and comfort on longer journeys.",
+    bestFor:
+      "Families and small groups looking for extra space and comfort on longer journeys.",
     goodToKnow:
       "Additional luggage space may be available when the rear seats are folded, subject to seating needs.",
     summary:
@@ -136,7 +141,8 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     luggage: "8–10 medium to large bags",
     ac: "Yes",
     bestFor: "Groups looking for a spacious and economical travel option.",
-    goodToKnow: "Good overhead and rear luggage storage for family and group tours.",
+    goodToKnow:
+      "Good overhead and rear luggage storage for family and group tours.",
     summary:
       "A practical and spacious option for small to medium-sized groups, with comfortable seating and air conditioning.",
     images: [media.departures, media.groupTrail],
@@ -154,7 +160,8 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     luggage: "9–12 medium to large bags",
     ac: "Yes",
     bestFor: "Groups looking for a spacious and economical option.",
-    goodToKnow: "A popular choice for medium to large groups and educational travel.",
+    goodToKnow:
+      "A popular choice for medium to large groups and educational travel.",
     summary:
       "A popular option for medium to large groups — spacious seating, air conditioning, and good luggage storage.",
     images: [media.groupTrail, media.departures],
@@ -191,7 +198,8 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     ac: "Yes",
     windows: "Non-opening",
     bestFor: "Travellers looking for a more comfortable and modern vehicle.",
-    goodToKnow: "Windows do not open — climate is managed via air conditioning.",
+    goodToKnow:
+      "Windows do not open — climate is managed via air conditioning.",
     summary:
       "A modern and comfortable Force Urbania for smaller groups — spacious seating and a refined travel experience.",
     images: [media.rideAlt, media.packages],
@@ -209,8 +217,10 @@ export const DEFAULT_FLEET_VEHICLES: FleetVehicle[] = [
     luggage: "10–12 medium to large bags",
     ac: "Yes",
     windows: "Non-opening",
-    bestFor: "Medium-sized groups looking for a comfortable and modern travel experience.",
-    goodToKnow: "Windows do not open — climate is managed via air conditioning.",
+    bestFor:
+      "Medium-sized groups looking for a comfortable and modern travel experience.",
+    goodToKnow:
+      "Windows do not open — climate is managed via air conditioning.",
     summary:
       "A modern and spacious Force Urbania for medium-sized groups — comfort and luggage space for longer journeys.",
     images: [media.packages, media.departures],
@@ -253,7 +263,9 @@ export const TRANSPORT_VEHICLE_META = {
   },
 } as const;
 
-export const TRANSPORT_VEHICLE_IDS = Object.keys(TRANSPORT_VEHICLE_META) as LegacyTransportVehicleId[];
+export const TRANSPORT_VEHICLE_IDS = Object.keys(
+  TRANSPORT_VEHICLE_META,
+) as LegacyTransportVehicleId[];
 
 export function vehicleImages(vehicle: Pick<FleetVehicle, "images" | "image">) {
   const gallery = (vehicle.images ?? []).map((u) => u.trim()).filter(Boolean);
@@ -262,20 +274,26 @@ export function vehicleImages(vehicle: Pick<FleetVehicle, "images" | "image">) {
   return [] as string[];
 }
 
-export function mergeFleetVehicles(custom?: FleetVehicle[] | null): FleetVehicle[] {
-  if (!custom?.length) return DEFAULT_FLEET_VEHICLES.map((v) => ({ ...v, images: [...v.images] }));
+export function mergeFleetVehicles(
+  custom?: FleetVehicle[] | null,
+): FleetVehicle[] {
+  if (!custom?.length)
+    return DEFAULT_FLEET_VEHICLES.map((v) => ({ ...v, images: [...v.images] }));
   return custom
     .map((row, index) => {
       const images = vehicleImages(row);
       const maxGuests =
-        row.maxGuests != null && Number.isFinite(row.maxGuests) && row.maxGuests > 0
+        row.maxGuests != null &&
+        Number.isFinite(row.maxGuests) &&
+        row.maxGuests > 0
           ? Math.round(row.maxGuests)
           : 4;
       return {
         id: String(row.id || "").trim() || `vehicle-${index + 1}`,
         label: String(row.label || "").trim() || "Vehicle",
         maxGuests,
-        seats: String(row.seats || "").trim() || `Up to ${maxGuests} travellers`,
+        seats:
+          String(row.seats || "").trim() || `Up to ${maxGuests} travellers`,
         summary: String(row.summary || "").trim(),
         idealFor: String(row.idealFor || "").trim(),
         luggage: String(row.luggage || "").trim(),
@@ -287,11 +305,15 @@ export function mergeFleetVehicles(custom?: FleetVehicle[] | null): FleetVehicle
         images,
         image: images[0],
         defaultPrice:
-          row.defaultPrice != null && Number.isFinite(row.defaultPrice) && row.defaultPrice >= 0
+          row.defaultPrice != null &&
+          Number.isFinite(row.defaultPrice) &&
+          row.defaultPrice >= 0
             ? Math.round(row.defaultPrice)
             : undefined,
         multiplier:
-          row.multiplier != null && Number.isFinite(row.multiplier) && row.multiplier > 0
+          row.multiplier != null &&
+          Number.isFinite(row.multiplier) &&
+          row.multiplier > 0
             ? row.multiplier
             : undefined,
         offerOnTransfers: row.offerOnTransfers !== false,
@@ -306,13 +328,17 @@ export function mergeFleetVehicles(custom?: FleetVehicle[] | null): FleetVehicle
  * If Studio still has the short 4-car list (no learn-more catalogue),
  * merge in missing package vehicles from defaults while keeping edits.
  */
-export function hydrateFleetFromDefaults(custom?: FleetVehicle[] | null): FleetVehicle[] {
+export function hydrateFleetFromDefaults(
+  custom?: FleetVehicle[] | null,
+): FleetVehicle[] {
   const current = mergeFleetVehicles(custom);
   const byId = new Map(current.map((v) => [v.id, v]));
   const merged = DEFAULT_FLEET_VEHICLES.map((seed) => {
     const existing = byId.get(seed.id);
     if (!existing) return { ...seed, images: [...seed.images] };
-    const images = vehicleImages(existing).length ? vehicleImages(existing) : [...seed.images];
+    const images = vehicleImages(existing).length
+      ? vehicleImages(existing)
+      : [...seed.images];
     return {
       ...seed,
       ...existing,
@@ -332,17 +358,29 @@ export function hydrateFleetFromDefaults(custom?: FleetVehicle[] | null): FleetV
   return mergeFleetVehicles(merged);
 }
 
-export function activeFleetVehicles(custom?: FleetVehicle[] | null): FleetVehicle[] {
+export function activeFleetVehicles(
+  custom?: FleetVehicle[] | null,
+): FleetVehicle[] {
   return mergeFleetVehicles(custom).filter((v) => v.active !== false);
 }
 
-export function transferFleetVehicles(custom?: FleetVehicle[] | null): FleetVehicle[] {
-  return activeFleetVehicles(custom).filter((v) => v.offerOnTransfers !== false);
+export function transferFleetVehicles(
+  custom?: FleetVehicle[] | null,
+): FleetVehicle[] {
+  return activeFleetVehicles(custom).filter(
+    (v) => v.offerOnTransfers !== false,
+  );
 }
 
-function priceForVehicle(vehicle: FleetVehicle, basePrice: number, override?: number) {
-  if (override != null && Number.isFinite(override) && override >= 0) return Math.round(override);
-  if (vehicle.defaultPrice != null && vehicle.defaultPrice >= 0) return Math.round(vehicle.defaultPrice);
+function priceForVehicle(
+  vehicle: FleetVehicle,
+  basePrice: number,
+  override?: number,
+) {
+  if (override != null && Number.isFinite(override) && override >= 0)
+    return Math.round(override);
+  if (vehicle.defaultPrice != null && vehicle.defaultPrice >= 0)
+    return Math.round(vehicle.defaultPrice);
   const multiplier = vehicle.multiplier ?? LEGACY_MULTIPLIERS[vehicle.id] ?? 1;
   return Math.round(Math.max(0, basePrice) * multiplier);
 }
@@ -355,14 +393,19 @@ export function transportVehicleOptions(
   allowedIds?: string[] | null,
 ): TransportVehicleOption[] {
   const safeBase = Math.max(0, Math.round(basePrice));
-  let list = fleet?.length ? transferFleetVehicles(fleet) : transferFleetVehicles(DEFAULT_FLEET_VEHICLES);
+  let list = fleet?.length
+    ? transferFleetVehicles(fleet)
+    : transferFleetVehicles(DEFAULT_FLEET_VEHICLES);
   if (allowedIds?.length) {
-    const allow = new Set(allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)));
+    const allow = new Set(
+      allowedIds.map((id) => (id === "tempo" ? "tempo12" : id)),
+    );
     list = list.filter((vehicle) => allow.has(vehicle.id));
   }
   // Map legacy "tempo" override onto tempo12
   const prices = { ...overrides };
-  if (prices.tempo != null && prices.tempo12 == null) prices.tempo12 = prices.tempo;
+  if (prices.tempo != null && prices.tempo12 == null)
+    prices.tempo12 = prices.tempo;
 
   return list.map((vehicle) => {
     const images = vehicleImages(vehicle);
@@ -387,7 +430,10 @@ export function findTransportVehicle(
 ): TransportVehicleOption | undefined {
   if (!id) return undefined;
   const normalized = id === "tempo" ? "tempo12" : id;
-  return options.find((option) => option.id === normalized) ?? options.find((option) => option.id === id);
+  return (
+    options.find((option) => option.id === normalized) ??
+    options.find((option) => option.id === id)
+  );
 }
 
 export function slugifyVehicleId(label: string) {
@@ -401,7 +447,9 @@ export function slugifyVehicleId(label: string) {
 }
 
 /** Read Studio form fields named transportSedan, transportSuv, etc. (legacy). */
-export function readTransportVehiclePrices(fd: FormData): TransportVehiclePrices | undefined {
+export function readTransportVehiclePrices(
+  fd: FormData,
+): TransportVehiclePrices | undefined {
   const prices: TransportVehiclePrices = {};
   let any = false;
   for (const id of TRANSPORT_VEHICLE_IDS) {

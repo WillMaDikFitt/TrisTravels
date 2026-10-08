@@ -108,7 +108,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Guwahati → Mawphanlur",
         summary:
           "Drive into the hills via Umiam Lake and Mawphlang Sacred Forest, then settle into a Mawphanlur village stay.",
-        activities: "Umiam Lake, Mawphlang Sacred Forest, Mawphanlur village stay",
+        activities:
+          "Umiam Lake, Mawphlang Sacred Forest, Mawphanlur village stay",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Easy",
         overnight: "Mawphanlur",
@@ -126,7 +127,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 3,
         title: "Mawphanlur → Guwahati",
-        summary: "Descend via Markham Valley and continue to Guwahati for departure.",
+        summary:
+          "Descend via Markham Valley and continue to Guwahati for departure.",
         activities: "Markham Valley",
         meals: "Breakfast",
         overnight: "Departure",
@@ -173,7 +175,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Mawlongbna Adventure Day",
         summary:
           "A full day of kayaking, fossil exploration, caving or river treks, and a village lunch — intensity matched to conditions.",
-        activities: "Kayaking, fossil exploration, caving/river treks, village lunch",
+        activities:
+          "Kayaking, fossil exploration, caving/river treks, village lunch",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Moderate–Challenging",
         overnight: "Mawsynram",
@@ -183,7 +186,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Cliff Canyons, Natural Pool & Return",
         summary:
           "Morning cliff canyon hike and natural pool swim, optional Lum Symper, then drive back to Guwahati.",
-        activities: "Cliff canyon hike, natural pool, optional Lum Symper, drive Guwahati",
+        activities:
+          "Cliff canyon hike, natural pool, optional Lum Symper, drive Guwahati",
         meals: "Breakfast",
         overnight: "Departure",
       },
@@ -228,7 +232,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Sohra Local Excursions",
         summary:
           "Dedicated caving day at Mawmluh Cave (UNESCO/IUGS heritage) plus time to explore Sohra.",
-        activities: "5-hr caving Mawmluh Cave (UNESCO/IUGS heritage) & explore Sohra",
+        activities:
+          "5-hr caving Mawmluh Cave (UNESCO/IUGS heritage) & explore Sohra",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Intermediate",
         overnight: "Sohra",
@@ -257,7 +262,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 5,
         title: "Shillong → Guwahati",
-        summary: "Transfer to Guwahati with an optional Umiam Lake stop before departure.",
+        summary:
+          "Transfer to Guwahati with an optional Umiam Lake stop before departure.",
         activities: "Optional Umiam",
         meals: "Breakfast",
         overnight: "Departure",
@@ -295,7 +301,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 1,
         title: "Guwahati → Shillong",
-        summary: "Arrive via Umiam Lake and settle at Windermere Resort for a Shillong overnight.",
+        summary:
+          "Arrive via Umiam Lake and settle at Windermere Resort for a Shillong overnight.",
         activities: "Umiam Lake, Windermere Resort",
         meals: "Dinner",
         overnight: "Shillong",
@@ -313,7 +320,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 3,
         title: "Krem Lymput Cave Hike → Camp",
-        summary: "Cave trail day with lunch back at camp and a second riverside overnight.",
+        summary:
+          "Cave trail day with lunch back at camp and a second riverside overnight.",
         activities: "Cave trail, lunch at camp",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Intermediate",
@@ -332,7 +340,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 5,
         title: "Mawthadraishan & Mawlai Syiem Hike",
-        summary: "Four-to-five-hour guided trek with packed lunch through highland ridges.",
+        summary:
+          "Four-to-five-hour guided trek with packed lunch through highland ridges.",
         activities: "4–5 hr guided trek, packed lunch",
         meals: "Breakfast, Packed Lunch & Dinner",
         trekDifficulty: "Moderate",
@@ -341,8 +350,7 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 6,
         title: "Mawphanlur → Guwahati",
-        summary:
-          "Drive to Guwahati for flights after roughly 4:30–5:00 PM.",
+        summary: "Drive to Guwahati for flights after roughly 4:30–5:00 PM.",
         activities: "Transfer to Guwahati",
         meals: "Breakfast",
         overnight: "Departure",
@@ -360,7 +368,12 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
     nights: 5,
     route:
       "1 Night in Shillong Outskirt → 2 Nights Village near Dawki → 1 Night in Sohra → 1 Night in Mawphlang/Mylliem",
-    stays: ["Shillong Outskirt", "Village near Dawki", "Sohra", "Mawphlang/Mylliem"],
+    stays: [
+      "Shillong Outskirt",
+      "Village near Dawki",
+      "Sohra",
+      "Mawphlang/Mylliem",
+    ],
     experienceHighlights: [
       "Amkoi & Phe Phe falls",
       "Nohkalikai crest",
@@ -378,7 +391,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 1,
         title: "Guwahati → Shillong Outskirt",
-        summary: "About four hours to a Shillong outskirt stay with an Umiam Lake stop.",
+        summary:
+          "About four hours to a Shillong outskirt stay with an Umiam Lake stop.",
         activities: "Umiam Lake",
         meals: "Dinner",
         overnight: "Shillong Outskirt",
@@ -396,7 +410,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 3,
         title: "Dawki adventure",
-        summary: "Amkoi trek plus riverside boating and kayaking from the village base.",
+        summary:
+          "Amkoi trek plus riverside boating and kayaking from the village base.",
         activities: "Amkoi trek, riverside boating & kayaking",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Moderate–Challenging",
@@ -424,7 +439,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 6,
         title: "→ Guwahati",
-        summary: "About four hours to Guwahati with an optional Umiam stop before departure.",
+        summary:
+          "About four hours to Guwahati with an optional Umiam stop before departure.",
         activities: "Optional Umiam",
         meals: "Breakfast",
         overnight: "Departure",
@@ -440,7 +456,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       "Six days of Meghalaya essentials: two nights in Cherrapunjee, a Mawlynnong homestay, Dawki's Umngot, and Shillong sightseeing before Guwahati.",
     days: 6,
     nights: 5,
-    route: "2 Nights in Cherrapunjee → 1 Night in Mawlynnong → 2 Nights in Shillong",
+    route:
+      "2 Nights in Cherrapunjee → 1 Night in Mawlynnong → 2 Nights in Shillong",
     stays: ["Cherrapunjee", "Mawlynnong", "Shillong"],
     experienceHighlights: [
       "Shillong city",
@@ -575,7 +592,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Mawlongbna → Garden of Caves → Sohra",
         summary:
           "Garden of Caves, a short living root bridge hike, and Nohkalikai viewpoint (80 km / 3.5 hrs) into Sohra.",
-        activities: "Garden of Caves, short living root bridge hike, Nohkalikai viewpoint",
+        activities:
+          "Garden of Caves, short living root bridge hike, Nohkalikai viewpoint",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Easy–Moderate",
         overnight: "Sohra",
@@ -895,7 +913,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 3,
         title: "Mawphanlur Full-Day",
-        summary: "Ridge hikes, community time, and Khasi meals around Mawphanlur.",
+        summary:
+          "Ridge hikes, community time, and Khasi meals around Mawphanlur.",
         activities: "Ridge hikes, community, Khasi meals",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Easy–Moderate",
@@ -916,7 +935,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Shnongpdeng Adventure",
         summary:
           "Kayaking, snorkeling, cliff-jumping, picnic, and a cultural evening by the river.",
-        activities: "Kayaking, snorkeling, cliff-jumping, picnic, cultural evening",
+        activities:
+          "Kayaking, snorkeling, cliff-jumping, picnic, cultural evening",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Easy–Moderate",
         overnight: "Shnongpdeng",
@@ -934,7 +954,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 7,
         title: "Pynursla Immersion",
-        summary: "Hidden root bridges hike and a cooking session deep in Pynursla.",
+        summary:
+          "Hidden root bridges hike and a cooking session deep in Pynursla.",
         activities: "Hidden root bridges hike, cooking session",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Moderate–Extreme",
@@ -973,7 +994,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
       {
         day: 11,
         title: "Nongriat Full-Day",
-        summary: "Hidden pools and cultural exchange with a second Nongriat overnight.",
+        summary:
+          "Hidden pools and cultural exchange with a second Nongriat overnight.",
         activities: "Hidden pools, cultural exchange",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Moderate–Extreme",
@@ -994,7 +1016,8 @@ export const CURATED_JOURNEY_PATCHES: Record<string, CuratedJourneyPatch> = {
         title: "Shillong Local",
         summary:
           "Ward's Lake, Don Bosco, cafés, shopping, and an optional cultural show.",
-        activities: "Ward's Lake, Don Bosco, cafés, shopping, optional cultural show",
+        activities:
+          "Ward's Lake, Don Bosco, cafés, shopping, optional cultural show",
         meals: "Breakfast & Dinner",
         overnight: "Shillong",
       },

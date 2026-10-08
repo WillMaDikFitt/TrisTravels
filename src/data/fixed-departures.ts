@@ -27,7 +27,13 @@ export type FixedDeparturePatch = {
   itinerary: FixedDayPlan[];
   inclusions: string[];
   exclusions: string[];
-  departureSeats: { date: string; seats: number; held: number; booked: number; note?: string }[];
+  departureSeats: {
+    date: string;
+    seats: number;
+    held: number;
+    booked: number;
+    note?: string;
+  }[];
   nextDeparture: string;
   ctaRegister: string;
   ctaCustomise: string;
@@ -105,7 +111,8 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         title: "Lady Explorer's Adventure Day",
         summary:
           "Split rocks, cave trails, jungle streams, or river trekking — adventure tailor-made for your comfort and thrill level. Your local woman guide leads the way.",
-        activities: "Split rock, cave trails, jungle streams, or river trekking",
+        activities:
+          "Split rock, cave trails, jungle streams, or river trekking",
         meals: "Breakfast, Lunch & Dinner",
         trekDifficulty: "Moderate",
         overnight: "Cottage, village near Mawsynram",
@@ -194,7 +201,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         day: 1,
         title: "Arrival in Guwahati – Drive to Shillong",
         summary:
-          "Arrive in Guwahati and drive through scenic hills to Shillong — the \"Scotland of the East\" (100 km | approx. 3.5 hrs). Settle in and unwind, or take a casual stroll through the buzzing local markets or nearby cafés.",
+          'Arrive in Guwahati and drive through scenic hills to Shillong — the "Scotland of the East" (100 km | approx. 3.5 hrs). Settle in and unwind, or take a casual stroll through the buzzing local markets or nearby cafés.',
         activities: "Scenic drive to Shillong, optional market/café stroll",
         meals: "Dinner",
         overnight: "Shillong",
@@ -204,7 +211,8 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         title: "Sacred Forest Walk & Cherry Blossom Music Festival",
         summary:
           "Start with a visit to the Don Bosco Museum, then experience a guided walk in the Sacred Forest of Mawphlang, a place of ancient legends and biodiversity. In the evening, head to the Cherry Blossom Festival – a unique blend of music, lights, and floral magic. Festival ticket cost is additional and subject to availability.",
-        activities: "Don Bosco Museum, Mawphlang Sacred Forest, Cherry Blossom Music Festival",
+        activities:
+          "Don Bosco Museum, Mawphlang Sacred Forest, Cherry Blossom Music Festival",
         meals: "Breakfast, Traditional Khasi Lunch",
         trekDifficulty: "Easy (Sacred Grove Trail approx. 2 hours)",
         overnight: "Shillong",
@@ -214,7 +222,8 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         title: "Canyons & Cherry Blossoms",
         summary:
           "Enjoy a morning drive to the stunning Laitlum Canyons (50 km round trip), perfect for panoramic views and quiet contemplation. Return to Shillong to wander around Ward's Lake, Polo Grounds, or Shillong Golf Course, where cherry blossoms bloom in full glory.",
-        activities: "Laitlum Canyons, Ward's Lake / Polo Grounds / Shillong Golf Course",
+        activities:
+          "Laitlum Canyons, Ward's Lake / Polo Grounds / Shillong Golf Course",
         meals: "Breakfast",
         overnight: "Shillong",
       },
@@ -242,7 +251,8 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         title: "Cherrapunjee – Arwah Cave – Mawlynnong – Dawki",
         summary:
           "Visit Arwah Cave, filled with fossil impressions and limestone formations, then continue to Mawlynnong – Asia's cleanest village (90 km | approx. 3.5 hrs drive time). Walk to the Living Root Bridge before heading to Dawki, where riverside calm awaits.",
-        activities: "Arwah Cave, Mawlynnong, Living Root Bridge, Dawki riverside",
+        activities:
+          "Arwah Cave, Mawlynnong, Living Root Bridge, Dawki riverside",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Easy cave exploration",
         overnight: "Riverside stay in Dawki with bonfire",
@@ -252,7 +262,8 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
         title: "Dawki – Krang Shuri – Phe Phe Falls Hike",
         summary:
           "Begin your day with boating or kayaking on the crystal-clear Umngot River, then drive towards Amlarem and marvel at the turquoise cascades of Krang Shuri Falls (90 km | 4 hrs drive). Finish with a guided hike to the lesser-known but majestic Phe Phe Falls, before returning to Shillong.",
-        activities: "Umngot River boating/kayaking, Krang Shuri Falls, Phe Phe Falls hike",
+        activities:
+          "Umngot River boating/kayaking, Krang Shuri Falls, Phe Phe Falls hike",
         meals: "Breakfast & Dinner",
         trekDifficulty: "Moderate (Phe Phe Hike 1.5 hrs approx)",
         overnight: "Shillong",
@@ -301,8 +312,7 @@ export const FIXED_DEPARTURE_PATCHES: Record<string, FixedDeparturePatch> = {
 export const FIXED_LISTING_INTRO = {
   eyebrow: "Fixed departures",
   title: "Some Journeys Are Better Shared",
-  lead:
-    "Whether you're chasing clouds in the Khasi Hills, dancing at a local festival, or hiking to ancient living root bridges — some experiences are just richer when shared.",
+  lead: "Whether you're chasing clouds in the Khasi Hills, dancing at a local festival, or hiking to ancient living root bridges — some experiences are just richer when shared.",
   body: [
     "Our fixed departure tours are more than just set schedule. They're thoughtfully crafted group experiences — some made especially for women, others for seasonal festivals or themed adventures.",
     "You'll join a small group of like-hearted travelers, discover Meghalaya through local stories, and enjoy the comfort of a well-planned itinerary — all without the stress of planning it yourself.",
@@ -310,7 +320,11 @@ export const FIXED_LISTING_INTRO = {
   closing: "Just show up with your curiosity —\nwe'll handle the rest.",
   whyTitle: "Why You'll Love Fixed Departures",
   why: [
-    { title: "Just Show Up", body: "Dates, stays, and plans? Already sorted", icon: "calendar" },
+    {
+      title: "Just Show Up",
+      body: "Dates, stays, and plans? Already sorted",
+      icon: "calendar",
+    },
     {
       title: "Solo, Not Alone",
       body: "Travel independently with the comfort of a group",
@@ -321,7 +335,11 @@ export const FIXED_LISTING_INTRO = {
       body: "Share costs, not experiences. Quality stays & activities, no cutbacks",
       icon: "value",
     },
-    { title: "Go Local", body: "Rooted in culture, led by locals, made for connection", icon: "local" },
+    {
+      title: "Go Local",
+      body: "Rooted in culture, led by locals, made for connection",
+      icon: "local",
+    },
     {
       title: "Built-in Sisterhood",
       body: "Especially in our ladies-only groups — find your tribe",

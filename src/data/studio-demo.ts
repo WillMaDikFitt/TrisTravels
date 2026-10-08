@@ -1,4 +1,9 @@
-import type { BookingRecord, ClosureRecord, EnquiryRecord, UserRole } from "@/lib/types";
+import type {
+  BookingRecord,
+  ClosureRecord,
+  EnquiryRecord,
+  UserRole,
+} from "@/lib/types";
 
 function isoDaysFromNow(days: number) {
   const d = new Date();
@@ -94,7 +99,13 @@ export const DEMO_BOOKINGS: BookingRecord[] = [
     customerTotal: 18000,
     transportation: { requested: true, price: 2500 },
     paymentRef: "UPI-TRIS-88421",
-    notes: [{ at: createdDaysAgo(2, 11), by: "Studio", text: "Confirmed · transport from Shillong" }],
+    notes: [
+      {
+        at: createdDaysAgo(2, 11),
+        by: "Studio",
+        text: "Confirmed · transport from Shillong",
+      },
+    ],
     createdAt: createdDaysAgo(3, 9),
   },
   {
@@ -112,7 +123,13 @@ export const DEMO_BOOKINGS: BookingRecord[] = [
     customerPhone: "+91 98200 44556",
     uid: "demo_user_vikram",
     customerTotal: 9000,
-    notes: [{ at: createdDaysAgo(1, 16), by: "Mei", text: "Waiting on host confirmation" }],
+    notes: [
+      {
+        at: createdDaysAgo(1, 16),
+        by: "Mei",
+        text: "Waiting on host confirmation",
+      },
+    ],
     createdAt: createdDaysAgo(1, 15),
   },
   {
@@ -165,7 +182,9 @@ export const DEMO_BOOKINGS: BookingRecord[] = [
     customerEmail: "guest.demo@example.com",
     customerPhone: "+91 90000 11111",
     customerTotal: 7000,
-    notes: [{ at: createdDaysAgo(4, 12), text: "Guest cancelled — weather concerns" }],
+    notes: [
+      { at: createdDaysAgo(4, 12), text: "Guest cancelled — weather concerns" },
+    ],
     createdAt: createdDaysAgo(5, 10),
   },
   {
@@ -213,7 +232,8 @@ export const DEMO_ENQUIRIES: EnquiryRecord[] = [
     name: "Ananya Rao",
     email: "ananya.rao@example.com",
     phone: "+91 98100 11223",
-    message: "Looking for a 6-day family trip with kids aged 6 and 9. Prefer soft adventure and homestays.",
+    message:
+      "Looking for a 6-day family trip with kids aged 6 and 9. Prefer soft adventure and homestays.",
     payload: {
       adults: "2",
       children: "2",
@@ -248,7 +268,9 @@ export const DEMO_ENQUIRIES: EnquiryRecord[] = [
       airportTransfer: "Yes",
     },
     status: "in-progress",
-    notes: [{ at: createdDaysAgo(0, 9), by: "Mei", text: "Checking seat inventory" }],
+    notes: [
+      { at: createdDaysAgo(0, 9), by: "Mei", text: "Checking seat inventory" },
+    ],
     createdAt: createdDaysAgo(2, 17),
     uid: "demo_user_vikram",
   },
@@ -258,7 +280,8 @@ export const DEMO_ENQUIRIES: EnquiryRecord[] = [
     name: "Priya Nair",
     email: "priya.nair@example.com",
     phone: "+91 98765 44321",
-    message: "Do you arrange private transfers from Guwahati airport for a group of 5?",
+    message:
+      "Do you arrange private transfers from Guwahati airport for a group of 5?",
     status: "new",
     createdAt: createdDaysAgo(0, 14),
     uid: "demo_user_priya",
@@ -269,7 +292,8 @@ export const DEMO_ENQUIRIES: EnquiryRecord[] = [
     name: "Bamboo Nest Homestay",
     email: "host@bamboonest.example.com",
     phone: "+91 98620 33445",
-    message: "We would like to partner as a stay + village walk host near Sohra.",
+    message:
+      "We would like to partner as a stay + village walk host near Sohra.",
     payload: {
       serviceType: "Homestay",
       location: "Sohra",
@@ -305,7 +329,13 @@ export const DEMO_ENQUIRIES: EnquiryRecord[] = [
       bookingType: "curated-journey-enquiry",
     },
     status: "closed",
-    notes: [{ at: createdDaysAgo(8, 12), by: "Studio", text: "Quoted and closed — guest booked elsewhere" }],
+    notes: [
+      {
+        at: createdDaysAgo(8, 12),
+        by: "Studio",
+        text: "Quoted and closed — guest booked elsewhere",
+      },
+    ],
     createdAt: createdDaysAgo(10, 11),
   },
 ];

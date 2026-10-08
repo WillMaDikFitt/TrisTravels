@@ -176,6 +176,10 @@ export type PlatformSettings = {
   aboutStory?: import("@/data/about-story").StoryMoment[];
   /** Craft cards on /artisans (Studio → Crafts). */
   craftProducts?: import("@/data/artisans").CraftProduct[];
+  /** Maker profiles on /artisans (Studio → Makers). */
+  craftMakers?: import("@/data/artisans").CraftMaker[];
+  /** Text + hero image for the makers pages (Studio → Makers → Page text). */
+  craftsPage?: Partial<import("@/data/artisans").CraftsPageCopy>;
 };
 
 export type JourneyDepartureSeat = {

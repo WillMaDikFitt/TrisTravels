@@ -327,6 +327,7 @@ export async function getSettings(): Promise<PlatformSettings> {
           craftProducts: data.craftProducts?.length
             ? data.craftProducts
             : DEFAULT_SETTINGS.craftProducts,
+          craftMakers: data.craftMakers?.length ? data.craftMakers : DEFAULT_SETTINGS.craftMakers,
         };
       }
     } catch (err) {

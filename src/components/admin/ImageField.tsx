@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, ImagePlus, Link2, Trash2, Upload } from "lucide-react";
 import { inputClass } from "./ui";
+import { compressImage } from "@/lib/compress-image";
 import { cn } from "@/lib/utils";
 
 function friendlyUploadError(raw: string) {
@@ -16,7 +17,9 @@ function friendlyUploadError(raw: string) {
   return "Couldn’t upload that image. Try another file.";
 }
 
-async function uploadImageFile(file: File, purpose?: string) {
+async function uploadImageFile(picked: File, purpose?: string) {
+  // Big phone photos are shrunk to under 2MB in the browser before they're sent.
+  const file = await compressImage(picked);
   const body = new FormData();
   body.append("file", file);
   if (purpose) body.append("purpose", purpose);
@@ -149,7 +152,7 @@ export function ImageField({
             </div>
             <div>
               <p className="text-sm font-medium text-[#26352b]">Add a cover image</p>
-              <p className="mt-1 text-xs text-[#4a5a50]">JPG, PNG, or WebP up to 8MB</p>
+              <p className="mt-1 text-xs text-[#4a5a50]">JPG, PNG, or WebP — large photos are compressed automatically</p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#364037] px-4 py-2 text-xs font-semibold text-white">

@@ -146,7 +146,11 @@ export function resolveExperienceVehicleRate(
   const id = vehicleId?.trim();
   if (!id) return fallback;
   const mapped = costing.transport?.vehicles?.[id];
-  if (mapped && Number.isFinite(mapped.cost) && Number.isFinite(mapped.capacity)) {
+  if (
+    mapped &&
+    Number.isFinite(mapped.cost) &&
+    Number.isFinite(mapped.capacity)
+  ) {
     return {
       vehicleId: id,
       cost: Math.max(0, Math.round(mapped.cost)),
@@ -163,16 +167,18 @@ export function normalizeExperienceCosting(
   const adult = Number(raw.adultOperationalCost);
   const child = Number(raw.childOperationalCost);
   const margin = Number(raw.marginPercent);
-  if (![adult, child, margin].every((n) => Number.isFinite(n))) return undefined;
+  if (![adult, child, margin].every((n) => Number.isFinite(n)))
+    return undefined;
 
   const components = Array.isArray(raw.capacityComponents)
-    ? raw.capacityComponents
+    ? (raw.capacityComponents
         .map((row, index) => {
           if (!row || typeof row !== "object") return null;
           const cost = Number(row.cost);
           const capacity = Number(row.capacity);
           if (!Number.isFinite(cost) || !Number.isFinite(capacity)) return null;
-          const name = String(row.name || "").trim() || `Component ${index + 1}`;
+          const name =
+            String(row.name || "").trim() || `Component ${index + 1}`;
           return {
             id: String(row.id || `comp-${index}`),
             name,
@@ -181,7 +187,7 @@ export function normalizeExperienceCosting(
             required: row.required !== false,
           } satisfies ExperienceCapacityComponent;
         })
-        .filter(Boolean) as ExperienceCapacityComponent[]
+        .filter(Boolean) as ExperienceCapacityComponent[])
     : [];
 
   const vehicleCost = Number(raw.transport?.vehicleCost);
@@ -202,7 +208,9 @@ export function normalizeExperienceCosting(
     childOperationalCost: Math.max(0, Math.round(child)),
     capacityComponents: components,
     transport: {
-      vehicleCost: Number.isFinite(vehicleCost) ? Math.max(0, Math.round(vehicleCost)) : 0,
+      vehicleCost: Number.isFinite(vehicleCost)
+        ? Math.max(0, Math.round(vehicleCost))
+        : 0,
       vehicleCapacity: Number.isFinite(vehicleCapacity)
         ? Math.max(1, Math.round(vehicleCapacity) || 1)
         : 6,
@@ -223,12 +231,20 @@ export function quoteExperienceCosting(
   const adults = Math.max(0, Math.round(input.adults));
   const children = Math.max(0, Math.round(input.children ?? 0));
   const totalGuests = adults + children;
-  const adultOperationalCost = Math.max(0, Math.round(costing.adultOperationalCost));
-  const childOperationalCost = Math.max(0, Math.round(costing.childOperationalCost));
+  const adultOperationalCost = Math.max(
+    0,
+    Math.round(costing.adultOperationalCost),
+  );
+  const childOperationalCost = Math.max(
+    0,
+    Math.round(costing.childOperationalCost),
+  );
   const perPersonOperationalCost =
     adultOperationalCost * adults + childOperationalCost * children;
 
-  const capacityLines: ExperienceCapacityLine[] = (costing.capacityComponents ?? []).map((comp) => {
+  const capacityLines: ExperienceCapacityLine[] = (
+    costing.capacityComponents ?? []
+  ).map((comp) => {
     const units = unitsForCapacity(totalGuests, comp.capacity);
     const unitCost = Math.max(0, Math.round(comp.cost));
     return {
@@ -239,7 +255,10 @@ export function quoteExperienceCosting(
       cost: units * unitCost,
     };
   });
-  const capacityComponentsCost = capacityLines.reduce((sum, line) => sum + line.cost, 0);
+  const capacityComponentsCost = capacityLines.reduce(
+    (sum, line) => sum + line.cost,
+    0,
+  );
 
   const trisTransport = Boolean(input.trisTransport);
   const rate = resolveExperienceVehicleRate(costing, input.vehicleId);
@@ -248,11 +267,15 @@ export function quoteExperienceCosting(
   const minVehicles = unitsForCapacity(totalGuests, vehicleCapacity);
   const requested = Math.max(0, Math.round(input.vehicleCount ?? 0));
   const vehicleCount = trisTransport
-    ? Math.max(minVehicles, requested > 0 ? Math.min(10, requested) : minVehicles)
+    ? Math.max(
+        minVehicles,
+        requested > 0 ? Math.min(10, requested) : minVehicles,
+      )
     : 0;
   const transportCost = vehicleCount * vehicleUnitCost;
 
-  const totalOperationalCost = perPersonOperationalCost + capacityComponentsCost + transportCost;
+  const totalOperationalCost =
+    perPersonOperationalCost + capacityComponentsCost + transportCost;
   const marginPercent = Math.max(0, costing.marginPercent);
   const marginAmount = Math.round((totalOperationalCost * marginPercent) / 100);
   const sellingPriceBeforeGst = totalOperationalCost + marginAmount;

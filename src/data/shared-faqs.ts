@@ -167,7 +167,9 @@ export function normalizeSharedFaqs(
       q: String(row.q || "").trim(),
       a: String(row.a || "").trim(),
       active: row.active !== false,
-      sortOrder: Number.isFinite(row.sortOrder) ? Number(row.sortOrder) : index + 1,
+      sortOrder: Number.isFinite(row.sortOrder)
+        ? Number(row.sortOrder)
+        : index + 1,
     }))
     .filter((row) => row.q && row.a)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
@@ -177,5 +179,7 @@ export function activeSharedFaqs(
   rows: SharedFaqItem[] | null | undefined,
   fallback: SharedFaqItem[],
 ): SharedFaqItem[] {
-  return normalizeSharedFaqs(rows, fallback).filter((row) => row.active !== false);
+  return normalizeSharedFaqs(rows, fallback).filter(
+    (row) => row.active !== false,
+  );
 }

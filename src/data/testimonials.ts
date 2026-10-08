@@ -101,7 +101,9 @@ export function normalizeTestimonials(
       place: String(row.place || "").trim(),
       image: String(row.image || "").trim(),
       active: row.active !== false,
-      sortOrder: Number.isFinite(row.sortOrder) ? Number(row.sortOrder) : index + 1,
+      sortOrder: Number.isFinite(row.sortOrder)
+        ? Number(row.sortOrder)
+        : index + 1,
     }))
     .filter((row) => row.quote && row.name)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
@@ -111,5 +113,7 @@ export function activeTestimonials(
   rows: Testimonial[] | null | undefined,
   fallback: Testimonial[],
 ): Testimonial[] {
-  return normalizeTestimonials(rows, fallback).filter((row) => row.active !== false);
+  return normalizeTestimonials(rows, fallback).filter(
+    (row) => row.active !== false,
+  );
 }
