@@ -38,7 +38,15 @@ export type CuratedPackagePricing = {
   vehicles?: Partial<Record<string, PackageVehicleRate>>;
   /** Room rate per stay style id (Studio → Stays). Legacy keys cover styles without one. */
   stays?: Partial<Record<string, PackageStayRate>>;
-  /** Activities & other cost per guest for the whole journey (C) */
+  /**
+   * C — total operational cost for the whole group and whole journey (activities,
+   * guides, permits…). A fixed amount: it does not change with group size.
+   */
+  operationalCostTotal?: number;
+  /**
+   * Legacy C — per-guest activity cost × guests. Only used while
+   * `operationalCostTotal` hasn't been entered for this journey.
+   */
   activityCostPerGuest?: number;
   /** TRIS services percent applied to (A+B+C) → D */
   trisServicePercent?: number;
@@ -191,6 +199,25 @@ export function resolveFleetPackageRates(
     vehicle,
     rate: packageVehicleRate(vehicle, override),
   }));
+}
+
+/**
+ * Curated journeys keep one vehicle price list — "A · Transport" (cost per day).
+ * The Enquire form shows each vehicle at cost per day × journey days, the same
+ * transport figure Book now uses for one vehicle.
+ */
+export function curatedEnquiryVehiclePrices(
+  days: number,
+  fleet?: FleetVehicle[] | null,
+  override?: CuratedPackagePricing["vehicles"],
+): Record<string, number> {
+  const tripDays = Math.max(1, Math.round(days) || 1);
+  return Object.fromEntries(
+    resolveFleetPackageRates(fleet, override).map(({ vehicle, rate }) => [
+      vehicle.id,
+      Math.round(rate.costPerDay * tripDays),
+    ]),
+  );
 }
 
 /** Which legacy rate key stands in for a stay style that has no rate of its own. */

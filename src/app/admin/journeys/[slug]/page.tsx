@@ -27,6 +27,7 @@ import {
   compactJourneyItinerary,
   ItineraryEditor,
 } from "@/components/admin/ItineraryEditor";
+import { CuratedPackageCosts } from "@/components/admin/CuratedPackageCosts";
 import { TransportPricingFields, transportEditorFromListing, transportFieldsFromEditor } from "@/components/admin/TransportPricingFields";
 import type { FleetVehicle } from "@/data/transport";
 import { fetchFleetVehicles, fetchStayStyles } from "@/lib/actions/content-read";
@@ -113,11 +114,16 @@ function readPackagePricing(
     }
   }
   const activity = Number(fd.get("pkgActivityCost") || "");
+  // Blank = not entered yet, so the legacy per-guest cost keeps pricing this journey.
+  const rawOperational = String(fd.get("pkgOperationalCost") ?? "").trim();
+  const operational = Number(rawOperational);
   const tris = Number(fd.get("pkgTrisPercent") || "");
   const gst = Number(fd.get("pkgGstPercent") || "");
   return {
     vehicles: Object.keys(vehicles).length ? vehicles : undefined,
     stays: Object.keys(stays).length ? stays : undefined,
+    operationalCostTotal:
+      rawOperational && Number.isFinite(operational) && operational >= 0 ? Math.round(operational) : undefined,
     activityCostPerGuest: Number.isFinite(activity) && activity >= 0 ? Math.round(activity) : undefined,
     trisServicePercent: Number.isFinite(tris) && tris >= 0 ? tris : DEFAULT_TRIS_SERVICE_PERCENT,
     gstPercent: Number.isFinite(gst) && gst >= 0 ? gst : DEFAULT_PACKAGE_GST_PERCENT,
@@ -405,6 +411,7 @@ export default function JourneyEditorPage() {
         <Panel>
           <TransportPricingFields
             variant="journey"
+            hidePrices={row.type === "curated"}
             value={transportEditorFromListing({
               variant: "journey",
               transportAvailable: row.transportAvailable,
@@ -486,128 +493,13 @@ export default function JourneyEditorPage() {
 
         {row.type === "curated" ? (
           <Panel>
-            <h3 className="font-display text-base text-[#26352b]">Book now package costs (A–E)</h3>
-            <p className="mt-1 text-sm text-[#4a5a50]">
-              Separate from enquire transfer prices. Vehicle day rates and capacity here are used when guests
-              book online. A = vehicle/day × vehicles × days · B = room × rooms + mattress × nights · C =
-              guests × activity · D = TRIS % of (A+B+C) · E = GST % of D
-            </p>
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              <Field label="C · Activity cost per guest (₹)">
-                <input
-                  name="pkgActivityCost"
-                  type="number"
-                  min="0"
-                  defaultValue={row.packagePricing?.activityCostPerGuest ?? ""}
-                  className={inputClass}
-                  placeholder="Per guest for whole journey"
-                />
-              </Field>
-              <Field label="D · TRIS services %">
-                <input
-                  name="pkgTrisPercent"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  defaultValue={row.packagePricing?.trisServicePercent ?? DEFAULT_TRIS_SERVICE_PERCENT}
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="E · GST % of D">
-                <input
-                  name="pkgGstPercent"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  defaultValue={row.packagePricing?.gstPercent ?? DEFAULT_PACKAGE_GST_PERCENT}
-                  className={inputClass}
-                />
-              </Field>
-            </div>
-            <h4 className="mt-5 text-sm font-semibold text-[#26352b]">A · Vehicle rates (₹ / day) & capacity</h4>
-            <p className="mt-1 text-xs text-[#4a5a50]">
-              Every vehicle in Studio → Vehicles. Tick which ones guests can pick in the
-              Transportation panel above; rates left untouched follow the standard rate for that size.
-            </p>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {packageRates.map(({ vehicle, rate }) => {
-                const id = vehicle.id;
-                const offered =
-                  !row.offeredVehicleIds?.length || row.offeredVehicleIds.includes(id);
-                return (
-                  <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                    <p className="text-sm font-medium text-[#26352b]">
-                      {vehicle.label}{" "}
-                      <span className="font-normal text-[#4a5a50]">
-                        · {vehicle.seats || `Max ${vehicle.maxGuests}`}
-                      </span>
-                    </p>
-                    {offered ? null : (
-                      <p className="text-[11px] font-semibold tracking-wide text-[#8a6a3a] uppercase">
-                        Not shown to guests
-                      </p>
-                    )}
-                    <Field label="Cost / day">
-                      <input
-                        name={`pkgVehicle_${id}_cost`}
-                        type="number"
-                        min="0"
-                        defaultValue={rate.costPerDay}
-                        className={inputClass}
-                      />
-                    </Field>
-                    <Field label="Capacity">
-                      <input
-                        name={`pkgVehicle_${id}_capacity`}
-                        type="number"
-                        min="1"
-                        defaultValue={rate.capacity}
-                        className={inputClass}
-                      />
-                    </Field>
-                  </div>
-                );
-              })}
-            </div>
-            <h4 className="mt-5 text-sm font-semibold text-[#26352b]">B · Stay preference costs</h4>
-            <p className="mt-1 text-xs text-[#4a5a50]">
-              Room cost is for the whole journey. Extra mattress is charged per person per night × nights.
-            </p>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {stayRates.map(({ style, rate }) => {
-                const id = style.id;
-                const offered =
-                  !row.offeredStayStyleIds?.length || row.offeredStayStyleIds.includes(id);
-                return (
-                  <div key={id} className="space-y-2 rounded-xl border border-[#c5cbb8] p-3">
-                    <p className="text-sm font-medium text-[#26352b]">{style.label}</p>
-                    {offered ? null : (
-                      <p className="text-[11px] font-semibold tracking-wide text-[#8a6a3a] uppercase">
-                        Not shown to guests
-                      </p>
-                    )}
-                    <Field label="Room cost (₹ / journey)">
-                      <input
-                        name={`pkgStay_${id}_room`}
-                        type="number"
-                        min="0"
-                        defaultValue={rate.roomCost}
-                        className={inputClass}
-                      />
-                    </Field>
-                    <Field label="Extra mattress (₹ / person / night)">
-                      <input
-                        name={`pkgStay_${id}_mattress`}
-                        type="number"
-                        min="0"
-                        defaultValue={rate.extraMattressPerPerson}
-                        className={inputClass}
-                      />
-                    </Field>
-                  </div>
-                );
-              })}
-            </div>
+            <CuratedPackageCosts
+              // Remount once Studio's vehicles and stays load, so every card gets its own field.
+              key={`${packageRates.map((r) => r.vehicle.id).join(",")}|${stayRates.map((r) => r.style.id).join(",")}`}
+              journey={row}
+              packageRates={packageRates}
+              stayRates={stayRates}
+            />
           </Panel>
         ) : null}
 

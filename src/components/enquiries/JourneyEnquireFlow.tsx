@@ -9,6 +9,7 @@ import { submitEnquiry } from "@/lib/actions/enquiries";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type { Journey } from "@/data/journeys";
 import { transportVehicleOptions, type FleetVehicle } from "@/data/transport";
+import { curatedEnquiryVehiclePrices } from "@/data/package-pricing";
 import { fetchFleetVehicles } from "@/lib/actions/content-read";
 import { formatINR, cn } from "@/lib/utils";
 import { GuestCompositionFields, TransportVehicleFields } from "@/components/booking/GuestTransportFields";
@@ -27,8 +28,25 @@ export function JourneyEnquireFlow({ journey }: { journey: Journey }) {
   const departureDates = journey.departureSeats?.map((d) => d.date) ?? journey.departures ?? [];
   const [fleet, setFleet] = useState<FleetVehicle[] | null>(null);
   const vehicles = useMemo(
-    () => transportVehicleOptions(journey.transportPrice ?? 3500, journey.transportVehicles, fleet, journey.offeredVehicleIds),
-    [journey.transportPrice, journey.transportVehicles, journey.offeredVehicleIds, fleet],
+    () =>
+      transportVehicleOptions(
+        journey.transportPrice ?? 3500,
+        // Curated journeys price vehicles only in Studio → Book now · A (cost per day × days).
+        journey.type === "curated"
+          ? curatedEnquiryVehiclePrices(journey.days, fleet, journey.packagePricing?.vehicles)
+          : journey.transportVehicles,
+        fleet,
+        journey.offeredVehicleIds,
+      ),
+    [
+      journey.type,
+      journey.days,
+      journey.packagePricing?.vehicles,
+      journey.transportPrice,
+      journey.transportVehicles,
+      journey.offeredVehicleIds,
+      fleet,
+    ],
   );
   const maxGuests = 12;
 

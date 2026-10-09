@@ -35,6 +35,11 @@ type Props = {
    */
   costingTransport?: ExperienceCosting["transport"];
   onCostingTransportChange?: (next: ExperienceCosting["transport"]) => void;
+  /**
+   * Hide the per-vehicle price boxes — curated journeys price vehicles only in the
+   * Book now calculator (A · Transport).
+   */
+  hidePrices?: boolean;
 };
 
 const MODE_OPTIONS = [
@@ -95,6 +100,7 @@ export function TransportPricingFields({
   onChange,
   costingTransport,
   onCostingTransportChange,
+  hidePrices = false,
 }: Props) {
   const [fleet, setFleet] = useState<FleetVehicle[]>(DEFAULT_FLEET_VEHICLES);
   const offered = variant === "experience" ? value.mode !== "none" : value.available !== false;
@@ -200,9 +206,11 @@ export function TransportPricingFields({
           <p className="mt-1 text-sm text-[#4a5a50]">
             {useCostingRates
               ? "Mode, which cars guests can pick, and each vehicle’s operational cost & capacity (feeds the costing engine)."
-              : variant === "experience"
-                ? "Decide if TRIS provides a vehicle, then set prices for this listing."
-                : "Prices shown on the journey enquire form when guests request a transfer."}
+              : hidePrices
+                ? "Whether guests can ask for a TRIS vehicle, and which vehicles they can pick. Prices come from A · Transport below."
+                : variant === "experience"
+                  ? "Decide if TRIS provides a vehicle, then set prices for this listing."
+                  : "Prices shown on the journey enquire form when guests request a transfer."}
           </p>
         </div>
         <Link
@@ -425,6 +433,12 @@ export function TransportPricingFields({
                 </div>
               </div>
             </>
+          ) : hidePrices ? (
+            <p className="rounded-2xl border border-[#c5cbb8] bg-[#f6f8f1] p-4 text-sm text-[#4a5a50]">
+              Vehicle prices for this journey are set once, in{" "}
+              <strong className="text-[#26352b]">Book now price calculator → A · Transport</strong> below.
+              The Enquire form shows each vehicle at cost per day × number of days.
+            </p>
           ) : (
             <>
               <div className="rounded-2xl border border-[#c5cbb8] bg-[#f6f8f1] p-4">
