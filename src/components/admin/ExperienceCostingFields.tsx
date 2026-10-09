@@ -122,40 +122,32 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
         </Notice>
       ) : (
         <>
-          <Step
-            n={1}
-            title="Cost per guest"
-            help="What TRIS spends on each person — entry tickets, food, equipment, local fees. Add it all up into one number."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Money label="Your cost for each adult">
-                <input
-                  type="number"
-                  min={0}
-                  value={costing.adultOperationalCost}
-                  onChange={(e) => onChange({ ...costing, adultOperationalCost: whole(e.target.value) })}
-                  className={bareInput}
-                />
-              </Money>
-              <Money label="Your cost for each child">
-                <input
-                  type="number"
-                  min={0}
-                  value={costing.childOperationalCost}
-                  onChange={(e) => onChange({ ...costing, childOperationalCost: whole(e.target.value) })}
-                  className={bareInput}
-                />
-              </Money>
+          {costing.adultOperationalCost > 0 || costing.childOperationalCost > 0 ? (
+            // "Cost per guest" was removed from the form; old amounts still count until cleared.
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e4c9a8] bg-[#fbf3e8] p-4 text-sm text-[#5a4630]">
+              <p className="max-w-2xl">
+                This experience still adds an old per-guest cost of{" "}
+                <strong>{formatINR(costing.adultOperationalCost)} per adult</strong> and{" "}
+                <strong>{formatINR(costing.childOperationalCost)} per child</strong> to the price. Clear it, then
+                save, to price only from the costs below.
+              </p>
+              <AdminButton
+                type="button"
+                variant="ghost"
+                onClick={() => onChange({ ...costing, adultOperationalCost: 0, childOperationalCost: 0 })}
+              >
+                Clear per-guest cost
+              </AdminButton>
             </div>
-          </Step>
+          ) : null}
 
           <Step
-            n={2}
-            title="Shared costs (per group)"
+            n={1}
+            title="Operational cost"
             help="Things one person or item covers for several guests — e.g. one guide for every 5 guests. More guests means more of them. Optional."
           >
             {costing.capacityComponents.length === 0 ? (
-              <p className="text-sm text-[#6a7a6c]">No shared costs yet.</p>
+              <p className="text-sm text-[#6a7a6c]">No operational costs yet.</p>
             ) : (
               <div className="space-y-3">
                 {costing.capacityComponents.map((comp, index) => {
@@ -193,7 +185,7 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
                         <AdminButton
                           type="button"
                           variant="ghost"
-                          aria-label={`Remove ${comp.name || "shared cost"}`}
+                          aria-label={`Remove ${comp.name || "operational cost"}`}
                           onClick={() =>
                             onChange({
                               ...costing,
@@ -230,12 +222,12 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
               }
             >
               <Plus size={14} className="mr-1 inline" />
-              Add shared cost
+              Add operational cost
             </AdminButton>
           </Step>
 
           <Step
-            n={3}
+            n={2}
             title="Transport"
             help={
               transportMode === "none"
@@ -250,7 +242,7 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
             </p>
           </Step>
 
-          <Step n={4} title="Your profit and tax" help="Your profit is added on top of all costs. GST is then added on top of that.">
+          <Step n={3} title="Your profit and tax" help="Your profit is added on top of all costs. GST is then added on top of that.">
             <div className="grid gap-4 sm:grid-cols-2">
               <Money label="Your profit" hint="% added on top of your total cost" unit="%" unitAfter>
                 <input
@@ -302,10 +294,10 @@ export function ExperienceCostingFields({ value, onChange, transportMode }: Prop
             </div>
 
             <dl className="mt-4 space-y-1.5 text-sm">
-              <Row label={`${preview.adults} adults × ${formatINR(preview.adultOperationalCost)}`} amount={preview.adults * preview.adultOperationalCost} />
-              <Row label={`${preview.children} children × ${formatINR(preview.childOperationalCost)}`} amount={preview.children * preview.childOperationalCost} />
+              {preview.adultOperationalCost > 0 && <Row label={`${preview.adults} adults × ${formatINR(preview.adultOperationalCost)}`} amount={preview.adults * preview.adultOperationalCost} />}
+              {preview.childOperationalCost > 0 && <Row label={`${preview.children} children × ${formatINR(preview.childOperationalCost)}`} amount={preview.children * preview.childOperationalCost} />}
               {preview.capacityLines.map((line) => (
-                <Row key={line.id} label={`${line.units} × ${line.name || "shared cost"} (${formatINR(line.unitCost)} each)`} amount={line.cost} />
+                <Row key={line.id} label={`${line.units} × ${line.name || "operational cost"} (${formatINR(line.unitCost)} each)`} amount={line.cost} />
               ))}
               {transportMode !== "none" ? (
                 <Row label={`${preview.vehicleCount} vehicle${preview.vehicleCount === 1 ? "" : "s"}`} amount={preview.transportCost} />

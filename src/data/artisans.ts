@@ -439,6 +439,9 @@ export type CraftsPageCopy = {
   /** "What makes their work special?" points on profiles (icons are fixed). */
   specialPoints: string[];
   connectCaption: string;
+  /** Shown instead of the makers pages while Studio → Crafts → "Coming soon" is on. */
+  comingSoonTitle: string;
+  comingSoonBody: string;
 };
 
 export const DEFAULT_CRAFTS_PAGE: CraftsPageCopy = {
@@ -473,6 +476,9 @@ export const DEFAULT_CRAFTS_PAGE: CraftsPageCopy = {
   ],
   connectCaption:
     "Chat, place an order, or discuss custom pieces directly with the maker.",
+  comingSoonTitle: "Something exciting is on its way",
+  comingSoonBody:
+    "We’re putting the finishing touches on a new home for Meghalaya’s makers — the people, stories and crafts behind what is made here. Check back soon.",
 };
 
 /** Fills blanks in stored page text from the defaults. */
@@ -500,6 +506,8 @@ export function normalizeCraftsPage(
       (p, i) => text(row?.specialPoints?.[i]) || p,
     ),
     connectCaption: pick("connectCaption"),
+    comingSoonTitle: pick("comingSoonTitle"),
+    comingSoonBody: pick("comingSoonBody"),
   };
 }
 

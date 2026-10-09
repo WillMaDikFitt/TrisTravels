@@ -89,12 +89,22 @@ export function PageTextTab() {
   return (
     <div className="space-y-6">
       <Panel className="space-y-4">
+        <h2 className="font-display text-xl text-[#26352b]">Coming soon page</h2>
+        <p className="text-sm text-[#4a5a50]">
+          Shown instead of the makers pages while “Coming soon” is on. It also uses the hero image and
+          title below.
+        </p>
+        {text("comingSoonTitle", "Headline")}
+        {text("comingSoonBody", "Message", { rows: 3 })}
+      </Panel>
+
+      <Panel className="space-y-4">
         <h2 className="font-display text-xl text-[#26352b]">Hero</h2>
         <ImageField
           key={`crafts-hero-${formKey}`}
           name="heroImage"
           label="Hero image"
-          hint="Wide landscape photo behind the title."
+          hint="Wide landscape photo behind the title — also used on the coming soon page."
           defaultValue={copy.heroImage}
           purpose="crafts"
           onChange={(url) => update({ heroImage: url })}

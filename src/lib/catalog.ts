@@ -62,6 +62,8 @@ export const DEFAULT_SETTINGS = {
   craftProducts: DEFAULT_CRAFT_PRODUCTS,
   craftMakers: DEFAULT_CRAFT_MAKERS,
   craftsPage: DEFAULT_CRAFTS_PAGE as Partial<CraftsPageCopy>,
+  // Hidden behind "coming soon" until the makers pages are ready (Studio → Crafts).
+  craftsComingSoon: true,
   aboutStory: DEFAULT_STORY_MOMENTS,
   impactImage: "",
   impact: [

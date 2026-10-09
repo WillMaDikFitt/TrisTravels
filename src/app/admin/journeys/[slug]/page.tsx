@@ -114,16 +114,33 @@ function readPackagePricing(
     }
   }
   const activity = Number(fd.get("pkgActivityCost") || "");
-  // Blank = not entered yet, so the legacy per-guest cost keeps pricing this journey.
-  const rawOperational = String(fd.get("pkgOperationalCost") ?? "").trim();
-  const operational = Number(rawOperational);
+  // C lines arrive as JSON from the calculator. None = not entered yet, so the legacy
+  // per-guest cost keeps pricing this journey.
+  let operationalCosts: NonNullable<Journey["packagePricing"]>["operationalCosts"] = [];
+  try {
+    const parsed = JSON.parse(String(fd.get("pkgOperationalCosts") || "[]"));
+    if (Array.isArray(parsed)) {
+      operationalCosts = parsed
+        .map((row, index) => ({
+          id: String(row?.id || `op-${index + 1}`),
+          name: String(row?.name ?? "").trim(),
+          cost: Math.max(0, Math.round(Number(row?.cost) || 0)),
+          capacity: Math.max(0, Math.round(Number(row?.capacity) || 0)),
+        }))
+        .filter((row) => row.name || row.cost > 0);
+    }
+  } catch {
+    operationalCosts = [];
+  }
   const tris = Number(fd.get("pkgTrisPercent") || "");
   const gst = Number(fd.get("pkgGstPercent") || "");
   return {
     vehicles: Object.keys(vehicles).length ? vehicles : undefined,
     stays: Object.keys(stays).length ? stays : undefined,
-    operationalCostTotal:
-      rawOperational && Number.isFinite(operational) && operational >= 0 ? Math.round(operational) : undefined,
+    // Saves merge into the stored journey, so write [] / null to really clear old values.
+    operationalCosts,
+    // Replaced by the lines above (the calculator turns an old total into the first line).
+    operationalCostTotal: null,
     activityCostPerGuest: Number.isFinite(activity) && activity >= 0 ? Math.round(activity) : undefined,
     trisServicePercent: Number.isFinite(tris) && tris >= 0 ? tris : DEFAULT_TRIS_SERVICE_PERCENT,
     gstPercent: Number.isFinite(gst) && gst >= 0 ? gst : DEFAULT_PACKAGE_GST_PERCENT,

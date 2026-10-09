@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import type { Journey } from "@/data/journeys";
 import {
   DEFAULT_PACKAGE_GST_PERCENT,
   DEFAULT_TRIS_SERVICE_PERCENT,
+  operationalCostLine,
+  type PackageOperationalCost,
   type PackageStayRate,
   type PackageVehicleRate,
   type StayPreferenceId,
@@ -122,7 +125,6 @@ export function CuratedPackageCosts({
   );
   const days = Math.max(1, journey.days);
   const nights = Math.max(0, journey.nights);
-  const mattressNights = Math.max(1, nights || days - 1 || 1);
   const offeredVehicle = (id: string) =>
     !journey.offeredVehicleIds?.length ||
     journey.offeredVehicleIds.includes(id);
@@ -149,9 +151,44 @@ export function CuratedPackageCosts({
       ]),
     ),
   );
-  const [operational, setOperational] = useState(
-    str(pricing.operationalCostTotal),
+  // C lines. A journey saved with the earlier single total starts with it as one line.
+  const [opCosts, setOpCosts] = useState<
+    { id: string; name: string; cost: string; capacity: string }[]
+  >(() => {
+    if (pricing.operationalCosts?.length) {
+      return pricing.operationalCosts.map((row) => ({
+        id: row.id,
+        name: row.name,
+        cost: String(row.cost),
+        capacity: row.capacity > 0 ? String(row.capacity) : "",
+      }));
+    }
+    if (pricing.operationalCostTotal != null) {
+      return [
+        {
+          id: "op-1",
+          name: "Operational cost",
+          cost: String(pricing.operationalCostTotal),
+          capacity: "",
+        },
+      ];
+    }
+    return [];
+  });
+  const opItems = useMemo<PackageOperationalCost[]>(
+    () =>
+      opCosts.map((row) => ({
+        id: row.id,
+        name: row.name.trim(),
+        cost: toNum(row.cost),
+        capacity: Math.round(toNum(row.capacity)),
+      })),
+    [opCosts],
   );
+  const setOp = (index: number, patch: Partial<(typeof opCosts)[number]>) =>
+    setOpCosts((rows) =>
+      rows.map((row, i) => (i === index ? { ...row, ...patch } : row)),
+    );
   const [tris, setTris] = useState(
     str(pricing.trisServicePercent ?? DEFAULT_TRIS_SERVICE_PERCENT),
   );
@@ -203,9 +240,8 @@ export function CuratedPackageCosts({
             },
           ]),
         ),
-        operationalCostTotal: operational.trim()
-          ? toNum(operational)
-          : undefined,
+        operationalCosts: opItems,
+        operationalCostTotal: null,
         trisServicePercent: toNum(tris),
         gstPercent: toNum(gst),
       },
@@ -219,7 +255,7 @@ export function CuratedPackageCosts({
       rooms: Math.max(1, ex.rooms),
       extraMattresses: ex.mattresses,
     });
-  }, [journey, pricing, vehicles, stays, operational, tris, gst, ex]);
+  }, [journey, pricing, vehicles, stays, opItems, tris, gst, ex]);
 
   const exVehicle = packageRates.find(
     ({ vehicle }) => vehicle.id === ex.vehicleId,
@@ -316,8 +352,8 @@ export function CuratedPackageCosts({
       <Step
         letter="B"
         title="Stay"
-        formula={`room cost × rooms + mattress cost per night × extra mattresses × ${mattressNights} night${mattressNights === 1 ? "" : "s"}`}
-        help="Room cost is for one room for the whole journey (all nights together). Extra mattress is per mattress, per night."
+        formula="room cost × rooms + extra mattress cost × extra mattresses"
+        help="Both are prices for the whole journey (all nights together): one room, and one extra mattress."
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {stayRates.map(({ style }) => {
@@ -351,7 +387,7 @@ export function CuratedPackageCosts({
                   }
                 />
                 <Num
-                  label="Extra mattress — per night"
+                  label="Extra mattress — whole journey"
                   name={`pkgStay_${id}_mattress`}
                   value={s.mattress}
                   onChange={(mattress) =>
@@ -367,27 +403,97 @@ export function CuratedPackageCosts({
       <Step
         letter="C"
         title="Operational cost"
-        formula="total operational cost (one fixed amount)"
-        help="Everything else for the whole group and the whole journey — activities, guides, entry fees, permits. It stays the same whatever the group size."
+        formula="sum of (cost of one × how many the group needs)"
+        help="Guides, activities, entry fees, permits — for the whole journey. Set how many guests one covers (e.g. one guide per 6 guests) and more are added for bigger groups. Leave it empty if one covers the whole group."
       >
-        <div className="max-w-sm">
-          <Num
-            label="Total operational cost"
-            name="pkgOperationalCost"
-            value={operational}
-            onChange={setOperational}
-          />
-        </div>
-        {!operational.trim() && legacyPerGuest ? (
+        {opCosts.length === 0 ? (
+          <p className="text-sm text-[#6a7a6c]">No operational costs yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {opCosts.map((row, index) => {
+              const line = operationalCostLine(
+                opItems[index],
+                quote.totalGuests,
+              );
+              return (
+                <div
+                  key={row.id}
+                  className="rounded-xl border border-[#d5dbc8] bg-white p-3.5"
+                >
+                  <div className="grid gap-3 sm:grid-cols-[1.3fr_1fr_1fr_auto] sm:items-end">
+                    <label className="block">
+                      <span className="block text-sm font-medium text-[#26352b]">
+                        What is it?
+                      </span>
+                      <input
+                        value={row.name}
+                        onChange={(e) => setOp(index, { name: e.target.value })}
+                        placeholder="e.g. Guide"
+                        className="mt-1.5 h-11 w-full rounded-xl border border-[#c5cbb8] bg-white px-3 text-sm text-[#26352b] outline-none focus:border-[#364037]"
+                      />
+                    </label>
+                    <Num
+                      label="Cost of one — whole journey"
+                      value={row.cost}
+                      onChange={(cost) => setOp(index, { cost })}
+                    />
+                    <Num
+                      label="One covers up to"
+                      unit="guests"
+                      after
+                      value={row.capacity}
+                      onChange={(capacity) => setOp(index, { capacity })}
+                    />
+                    <button
+                      type="button"
+                      aria-label={`Remove ${row.name || "operational cost"}`}
+                      onClick={() =>
+                        setOpCosts((rows) => rows.filter((_, i) => i !== index))
+                      }
+                      className="grid h-11 w-11 place-items-center rounded-full border border-[#c5cbb8] text-[#364037] hover:bg-[#eef1e6]"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                  <p className="mt-2.5 text-xs text-[#4a5a50]">
+                    {line.capacity > 0
+                      ? `For the example group of ${quote.totalGuests}: ${line.units} × ${row.name || "this"} = `
+                      : `One for the whole group: `}
+                    <strong>{formatINR(line.total)}</strong>
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() =>
+            setOpCosts((rows) => [
+              ...rows,
+              { id: `op-${Date.now()}`, name: "", cost: "", capacity: "" },
+            ])
+          }
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#c5cbb8] px-4 py-2 text-xs font-bold tracking-[0.1em] text-[#364037] uppercase hover:bg-[#eef1e6]"
+        >
+          <Plus size={14} />
+          Add operational cost
+        </button>
+        {opCosts.length === 0 && legacyPerGuest ? (
           <p className="mt-3 rounded-xl border border-[#e4c9a8] bg-[#fbf3e8] p-3 text-sm text-[#5a4630]">
-            Not entered yet — until you do, this journey still uses its old rate
-            of{" "}
+            Not entered yet — until you add one, this journey still uses its old
+            rate of{" "}
             <strong>
               {formatINR(legacyPerGuest)} per guest × number of guests
             </strong>
             .
           </p>
         ) : null}
+        <input
+          type="hidden"
+          name="pkgOperationalCosts"
+          value={JSON.stringify(opItems)}
+        />
         {/* Old per-guest rate, kept so un-migrated journeys keep pricing the same. */}
         <input
           type="hidden"
@@ -549,19 +655,32 @@ export function CuratedPackageCosts({
           <Row
             label={`B · ${formatINR(toNum(exStay?.room ?? "0"))} × ${quote.rooms} room${quote.rooms === 1 ? "" : "s"}${
               quote.extraMattresses
-                ? ` + ${formatINR(toNum(exStay?.mattress ?? "0"))} × ${quote.extraMattresses} mattress${quote.extraMattresses === 1 ? "" : "es"} × ${mattressNights} nights`
+                ? ` + ${formatINR(toNum(exStay?.mattress ?? "0"))} × ${quote.extraMattresses} mattress${quote.extraMattresses === 1 ? "" : "es"}`
                 : ""
             }`}
             amount={quote.roomCost}
           />
-          <Row
-            label={
-              operational.trim() || !legacyPerGuest
-                ? "C · Operational cost (fixed)"
-                : `C · ${formatINR(legacyPerGuest)} × ${quote.totalGuests} guests (old per-guest rate)`
-            }
-            amount={quote.activityCost}
-          />
+          {opItems.length ? (
+            opItems.map((item) => {
+              const line = operationalCostLine(item, quote.totalGuests);
+              return (
+                <Row
+                  key={item.id}
+                  label={`C · ${line.units} × ${item.name || "operational cost"} (${formatINR(line.unitCost)} each)`}
+                  amount={line.total}
+                />
+              );
+            })
+          ) : (
+            <Row
+              label={
+                legacyPerGuest
+                  ? `C · ${formatINR(legacyPerGuest)} × ${quote.totalGuests} guests (old per-guest rate)`
+                  : "C · Operational cost"
+              }
+              amount={quote.activityCost}
+            />
+          )}
           <Row label="A + B + C" amount={quote.subtotalABC} rule strong />
           <Row
             label={`D · TRIS service fee ${quote.trisServicePercent}% of A + B + C`}

@@ -26,6 +26,7 @@ import { FadeIn } from "@/components/motion/Motion";
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { PhotoPlaceholder } from "@/components/listings/PhotoPlaceholder";
 import { MakerGallery } from "@/components/listings/MakerGallery";
+import { CraftsComingSoon } from "../CraftsComingSoon";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -43,6 +44,8 @@ async function loadMaker(slug: string) {
       (m) => m.slug === slug,
     ),
     copy: normalizeCraftsPage(settings?.craftsPage),
+    // On until switched off in Studio → Crafts; also on if settings can't be read.
+    comingSoon: settings?.craftsComingSoon !== false,
   };
 }
 
@@ -51,7 +54,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { maker } = await loadMaker((await params).slug);
+  const { maker, comingSoon } = await loadMaker((await params).slug);
+  if (comingSoon) return { title: "Coming soon" };
   return { title: maker ? `${maker.name} · Makers` : "Maker" };
 }
 
@@ -84,7 +88,8 @@ type Channel = {
 };
 
 export default async function MakerPage({ params }: Props) {
-  const { maker, copy } = await loadMaker((await params).slug);
+  const { maker, copy, comingSoon } = await loadMaker((await params).slug);
+  if (comingSoon) return <CraftsComingSoon copy={copy} />;
   if (!maker) notFound();
 
   const pieceNames = maker.crafts.map((c) => c.name).join(", ");

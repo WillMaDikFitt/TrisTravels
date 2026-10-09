@@ -25,9 +25,26 @@ export type PackageVehicleRate = {
 export type PackageStayRate = {
   /** Cost for one room for the full journey stay (all nights) */
   roomCost: number;
-  /** Cost per extra mattress / person / night */
+  /** Cost of one extra mattress for the whole journey (all nights together) */
   extraMattressPerPerson: number;
 };
+
+export type PackageOperationalCost = {
+  id: string;
+  name: string;
+  /** Cost of one unit for the whole journey */
+  cost: number;
+  /** Guests one unit covers; 0 = one for the whole group */
+  capacity: number;
+};
+
+/** How many of an operational cost a group needs, and what they cost together. */
+export function operationalCostLine(item: PackageOperationalCost, guests: number) {
+  const capacity = Math.max(0, Math.round(item.capacity) || 0);
+  const units = capacity > 0 ? Math.ceil(Math.max(1, guests) / capacity) : 1;
+  const unitCost = Math.max(0, Math.round(item.cost) || 0);
+  return { ...item, capacity, units, unitCost, total: units * unitCost };
+}
 
 export type CuratedPackagePricing = {
   /**
@@ -39,10 +56,16 @@ export type CuratedPackagePricing = {
   /** Room rate per stay style id (Studio → Stays). Legacy keys cover styles without one. */
   stays?: Partial<Record<string, PackageStayRate>>;
   /**
-   * C — total operational cost for the whole group and whole journey (activities,
-   * guides, permits…). A fixed amount: it does not change with group size.
+   * C — operational costs for the whole journey (guides, activities, permits…).
+   * Each line is bought once per `capacity` guests (ceil(guests ÷ capacity));
+   * capacity 0 / missing = one for the whole group.
    */
-  operationalCostTotal?: number;
+  operationalCosts?: PackageOperationalCost[];
+  /**
+   * Earlier C — one fixed total. Used only when `operationalCosts` is empty;
+   * the editor turns it into the first line.
+   */
+  operationalCostTotal?: number | null;
   /**
    * Legacy C — per-guest activity cost × guests. Only used while
    * `operationalCostTotal` hasn't been entered for this journey.

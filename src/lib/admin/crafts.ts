@@ -87,3 +87,16 @@ export async function saveCraftsPage(
   const error = await patchSettings({ craftsPage: cleaned });
   return error ? { ok: false, error } : { ok: true, copy: cleaned };
 }
+
+/** Whether the makers pages are hidden behind "coming soon" (on until first switched off). */
+export async function loadCraftsComingSoon(): Promise<boolean> {
+  const settings = await fetchSettingsAdmin();
+  return settings.craftsComingSoon !== false;
+}
+
+export async function saveCraftsComingSoon(
+  on: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const error = await patchSettings({ craftsComingSoon: on });
+  return error ? { ok: false, error } : { ok: true };
+}

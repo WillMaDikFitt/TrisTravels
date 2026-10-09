@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AdminButton, PageHeader } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
+import { ComingSoonSwitch } from "./_components/ComingSoonSwitch";
 import { CraftsTab } from "./_components/CraftsTab";
 import { MakersTab } from "./_components/MakersTab";
 import { PageTextTab } from "./_components/PageTextTab";
@@ -49,6 +50,8 @@ function CraftsAdmin() {
           </Link>
         }
       />
+
+      <ComingSoonSwitch />
 
       <div className="mb-5 flex flex-wrap gap-2" role="tablist">
         {tabs.map((t) => (

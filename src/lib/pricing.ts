@@ -17,7 +17,7 @@ import {
   DEFAULT_TRIS_SERVICE_PERCENT,
   minVehiclesForGuests,
   packageStayRate,
-
+  operationalCostLine,
   resolvePackageVehicles,
   type StayPreferenceId,
 } from "@/data/package-pricing";
@@ -184,7 +184,7 @@ export type CuratedQuote = {
   extraMattresses: number;
   /** A — vehicle type × vehicles × days */
   vehicleCost: number;
-  /** B — (stay cost × rooms) + (extra mattress × per-person-per-night × nights) */
+  /** B — (room cost × rooms) + (extra mattress cost × extra mattresses), both for the whole journey */
   roomCost: number;
   /** C — total operational cost (fixed for the group; legacy: guests × per-guest cost) */
   activityCost: number;
@@ -207,7 +207,7 @@ export type CuratedQuote = {
 /**
  * Curated package quote:
  * A = vehicle/day × vehicles × days
- * B = (stay preference cost × rooms) + (extra mattresses × mattress/night × nights)
+ * B = (room cost × rooms) + (extra mattress cost × extra mattresses) — both whole-journey prices
  * C = total operational cost for the group (journeys not yet re-entered in Studio:
  *     guests × legacy activity cost per guest)
  * D = TRIS % of (A+B+C)
@@ -255,16 +255,20 @@ export function quoteCuratedPackage(journey: Journey, input: CuratedQuoteInput):
       ? Math.max(0, pricing.gstPercent)
       : DEFAULT_PACKAGE_GST_PERCENT;
 
-  const mattressNights = Math.max(1, nights || days - 1 || 1);
   const vehicleCost = Math.round(dayRate * vehicleCount * days);
   const roomCost = Math.round(
-    stay.roomCost * rooms + stay.extraMattressPerPerson * extraMattresses * mattressNights,
+    stay.roomCost * rooms + stay.extraMattressPerPerson * extraMattresses,
   );
   const operationalCostTotal =
     pricing.operationalCostTotal != null && Number.isFinite(pricing.operationalCostTotal)
       ? Math.max(0, Math.round(pricing.operationalCostTotal))
       : null;
-  const activityCost = operationalCostTotal ?? Math.round(activityCostPerGuest * totalGuests);
+  const operationalLines = (pricing.operationalCosts ?? []).map((item) =>
+    operationalCostLine(item, totalGuests),
+  );
+  const activityCost = operationalLines.length
+    ? operationalLines.reduce((sum, line) => sum + line.total, 0)
+    : (operationalCostTotal ?? Math.round(activityCostPerGuest * totalGuests));
   const subtotalABC = vehicleCost + roomCost + activityCost;
   const trisService = Math.round((subtotalABC * trisServicePercent) / 100);
   const gst = Math.round((trisService * gstPercent) / 100);

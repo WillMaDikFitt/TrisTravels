@@ -180,6 +180,8 @@ export type PlatformSettings = {
   craftMakers?: import("@/data/artisans").CraftMaker[];
   /** Text + hero image for the makers pages (Studio → Makers → Page text). */
   craftsPage?: Partial<import("@/data/artisans").CraftsPageCopy>;
+  /** Studio → Crafts switch: show a "coming soon" page instead of the makers pages. */
+  craftsComingSoon?: boolean;
 };
 
 export type JourneyDepartureSeat = {
