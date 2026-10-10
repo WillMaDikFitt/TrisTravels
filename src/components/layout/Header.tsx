@@ -43,7 +43,7 @@ const moreGroups = [
     label: "Discover",
     links: [
       { href: "/destinations", title: "Destinations", tag: "Places beyond the guidebook" },
-      { href: "/artisans", title: "Crafts", tag: "Hard-to-find work from local makers" },
+      { href: "/artisans", title: "Local Product", tag: "Treasures from the Hills" },
       { href: "/stories", title: "Stories", tag: "Notes from the hills" },
     ],
   },
