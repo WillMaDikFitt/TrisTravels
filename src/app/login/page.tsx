@@ -174,7 +174,7 @@ function LoginForm() {
                         ? `/forgot-password?email=${encodeURIComponent(email.trim())}`
                         : "/forgot-password"
                     }
-                    className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+                    className="text-sm font-semibold text-highlight underline-offset-2 transition hover:text-primary hover:underline"
                   >
                     Forgot password?
                   </Link>
