@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { PasswordField } from "@/components/ui/PasswordField";
 
 const fieldClass =
   "mt-2 min-h-12 w-full rounded-xl border border-outline-variant/45 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface shadow-[0_1px_0_rgba(42,46,31,0.03)] outline-none transition placeholder:text-on-surface-variant/45 hover:border-outline focus:border-primary focus:ring-4 focus:ring-primary/10";
@@ -65,6 +66,7 @@ export function FormInput({
 }) {
   const id = name;
   const locked = Boolean(readOnly || disabled);
+  const InputEl = type === "password" ? PasswordField : "input";
   return (
     <div className={cn("block", className)}>
       <FieldLabel htmlFor={id} hint={locked ? hint : required ? undefined : hint}>
@@ -77,7 +79,7 @@ export function FormInput({
       {hint && required && !locked ? (
         <p className="mt-1 text-xs text-on-surface-variant">{hint}</p>
       ) : null}
-      <input
+      <InputEl
         id={id}
         name={name}
         type={type}

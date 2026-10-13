@@ -12,6 +12,7 @@ import {
   createUserWithEmailAndPassword,
   getRedirectResult,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
@@ -32,6 +33,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   toggleWishlist: (slug: string) => Promise<void>;
   updateAccount: (data: { name: string; phone?: string }) => Promise<void>;
@@ -64,13 +66,32 @@ function authErrorMessage(err: unknown, fallback: string) {
     case "auth/unauthorized-domain":
       return "This website domain isn’t authorized for Google sign-in yet. In Firebase Console → Authentication → Settings → Authorized domains, add your live domain (e.g. trismeghalaya.com and www.trismeghalaya.com).";
     case "auth/operation-not-allowed":
-      return "Google sign-in isn’t enabled yet. In Firebase Console → Authentication → Sign-in method, enable Google.";
+      return "This sign-in method isn’t enabled yet. Please try another way to log in.";
     case "auth/account-exists-with-different-credential":
       return "An account already exists with this email using a different sign-in method. Try email login, or use the same method you used before.";
     case "auth/network-request-failed":
-      return "Network error during Google sign-in. Check your connection and try again.";
-    default:
-      return err instanceof Error && err.message ? err.message : fallback;
+      return "Network error. Check your connection and try again.";
+    case "auth/invalid-credential":
+    case "auth/invalid-login-credentials":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+      return "Incorrect email or password. If you signed up with Google, use “Continue with Google”.";
+    case "auth/invalid-email":
+      return "That email address doesn’t look right.";
+    case "auth/missing-password":
+      return "Please enter your password.";
+    case "auth/user-disabled":
+      return "This account has been disabled. Please contact us for help.";
+    case "auth/too-many-requests":
+      return "Too many attempts. Please wait a few minutes and try again.";
+    case "auth/email-already-in-use":
+      return "An account with this email already exists. Try logging in instead.";
+    case "auth/weak-password":
+      return "Password is too weak — use at least 6 characters.";
+    default: {
+      const msg = err instanceof Error ? err.message : "";
+      return msg && !msg.startsWith("Firebase:") ? msg : fallback;
+    }
   }
 }
 
@@ -238,6 +259,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return;
           }
           throw new Error(authErrorMessage(err, "Could not sign in with Google"));
+        }
+      },
+      async resetPassword(email) {
+        const auth = getClientAuth();
+        if (!auth) throw new Error("Accounts aren’t available right now");
+        try {
+          // Send them back to our login page after resetting, if the domain is authorized.
+          await sendPasswordResetEmail(auth, email, { url: `${window.location.origin}/login` });
+        } catch (err) {
+          const code =
+            err && typeof err === "object" && "code" in err ? String((err as { code: string }).code) : "";
+          if (code === "auth/unauthorized-continue-uri" || code === "auth/invalid-continue-uri") {
+            try {
+              await sendPasswordResetEmail(auth, email);
+              return;
+            } catch (retryErr) {
+              throw new Error(authErrorMessage(retryErr, "Could not send reset email"));
+            }
+          }
+          // Don't reveal whether an account exists for this email.
+          if (code === "auth/user-not-found") return;
+          throw new Error(authErrorMessage(err, "Could not send reset email"));
         }
       },
       async logout() {

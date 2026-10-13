@@ -49,7 +49,7 @@ function LoginForm() {
   const { signIn, signInGoogle, configured, user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{ at: "google" | "email"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   // After Google redirect / popup, leave login once the session is ready.
@@ -61,21 +61,30 @@ function LoginForm() {
     }
     if (typeof window !== "undefined" && sessionStorage.getItem("tris_google_redirect")) {
       sessionStorage.removeItem("tris_google_redirect");
-      setError(
-        "Google sign-in didn’t finish on this browser. Please try “Continue with Google” again (a popup works best).",
-      );
+      setError({
+        at: "google",
+        msg:
+          "Google sign-in didn’t finish on this browser. Please try “Continue with Google” again (a popup works best).",
+      });
     }
   }, [authLoading, user, dest, router]);
 
-  const run = async (fn: () => Promise<void>) => {
+  // Auto-dismiss errors after 4s.
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(null), 4000);
+    return () => clearTimeout(t);
+  }, [error]);
+
+  const run = async (at: "google" | "email", fn: () => Promise<void>) => {
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       await fn();
       // Redirect sign-in navigates away; popup path continues here once complete.
       if (getClientAuth()?.currentUser) router.push(dest);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not sign in");
+      setError({ at, msg: e instanceof Error ? e.message : "Could not sign in" });
     } finally {
       setBusy(false);
     }
@@ -119,9 +128,9 @@ function LoginForm() {
               <GoogleButton
                 disabled={!configured}
                 busy={busy}
-                onClick={() => run(() => signInGoogle())}
+                onClick={() => run("google", () => signInGoogle())}
               />
-              {error && <p className="mt-3 text-sm text-primary">{error}</p>}
+              {error?.at === "google" && <p className="mt-3 text-sm text-red-600" role="alert">{error.msg}</p>}
 
               <div className="my-5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-outline-variant/30" />
@@ -135,7 +144,7 @@ function LoginForm() {
                 className="space-y-4"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  run(() => signIn(email, password));
+                  run("email", () => signIn(email, password));
                 }}
               >
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -158,7 +167,19 @@ function LoginForm() {
                     autoComplete="current-password"
                   />
                 </div>
-                {error && <p className="text-sm text-primary">{error}</p>}
+                <div className="-mt-1 flex justify-end">
+                  <Link
+                    href={
+                      email.trim()
+                        ? `/forgot-password?email=${encodeURIComponent(email.trim())}`
+                        : "/forgot-password"
+                    }
+                    className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                {error?.at === "email" && <p className="text-sm text-red-600" role="alert">{error.msg}</p>}
                 <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm text-on-surface-variant">
                     New here?{" "}

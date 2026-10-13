@@ -49,7 +49,7 @@ function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{ at: "google" | "email"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -60,20 +60,29 @@ function SignupForm() {
     }
     if (typeof window !== "undefined" && sessionStorage.getItem("tris_google_redirect")) {
       sessionStorage.removeItem("tris_google_redirect");
-      setError(
-        "Google sign-in didn’t finish on this browser. Please try “Continue with Google” again (a popup works best).",
-      );
+      setError({
+        at: "google",
+        msg:
+          "Google sign-in didn’t finish on this browser. Please try “Continue with Google” again (a popup works best).",
+      });
     }
   }, [authLoading, user, dest, router]);
 
-  const run = async (fn: () => Promise<void>) => {
+  // Auto-dismiss errors after 4s.
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(null), 4000);
+    return () => clearTimeout(t);
+  }, [error]);
+
+  const run = async (at: "google" | "email", fn: () => Promise<void>) => {
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       await fn();
       if (getClientAuth()?.currentUser) router.push(dest);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not sign up");
+      setError({ at, msg: e instanceof Error ? e.message : "Could not sign up" });
     } finally {
       setBusy(false);
     }
@@ -119,9 +128,9 @@ function SignupForm() {
               <GoogleButton
                 disabled={!configured}
                 busy={busy}
-                onClick={() => run(() => signInGoogle())}
+                onClick={() => run("google", () => signInGoogle())}
               />
-              {error && <p className="mt-3 text-sm text-primary">{error}</p>}
+              {error?.at === "google" && <p className="mt-3 text-sm text-red-600" role="alert">{error.msg}</p>}
 
               <div className="my-5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-outline-variant/30" />
@@ -135,7 +144,7 @@ function SignupForm() {
                 className="space-y-4"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  run(() => signUp(name, email, password));
+                  run("email", () => signUp(name, email, password));
                 }}
               >
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -167,7 +176,7 @@ function SignupForm() {
                     autoComplete="new-password"
                   />
                 </div>
-                {error && <p className="text-sm text-primary">{error}</p>}
+                {error?.at === "email" && <p className="text-sm text-red-600" role="alert">{error.msg}</p>}
                 <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm text-on-surface-variant">
                     Already have an account?{" "}
