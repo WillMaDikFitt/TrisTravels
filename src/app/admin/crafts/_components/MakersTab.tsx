@@ -27,7 +27,7 @@ export function MakersTab() {
     normalizeCraftProducts(null, DEFAULT_CRAFT_PRODUCTS),
   );
   const [note, setNote] = useState("");
-  // Starts busy so Remove / Reset can't save over stored makers before they've loaded.
+  // Starts busy so Remove can't save over stored makers before they've loaded.
   const [busy, setBusy] = useState(true);
 
   useEffect(() => {
@@ -88,18 +88,6 @@ export function MakersTab() {
     );
   };
 
-  const reset = () => {
-    if (
-      !confirm(
-        "Replace every maker with the original default list? Your edits will be lost.",
-      )
-    )
-      return;
-    void persist(
-      DEFAULT_CRAFT_MAKERS.map((row) => ({ ...row })),
-      "Makers reset to the default list.",
-    );
-  };
 
   const craftImage = (slug: string) =>
     crafts.find((c) => c.slug === slug)?.image;
@@ -119,14 +107,6 @@ export function MakersTab() {
             with photos, story and contact details.
           </p>
           <div className="flex flex-wrap gap-2">
-            <AdminButton
-              type="button"
-              variant="ghost"
-              onClick={reset}
-              disabled={busy}
-            >
-              Reset to defaults
-            </AdminButton>
             <Link href="/admin/crafts/makers/new">
               <AdminButton>
                 <Plus size={14} className="mr-1 inline" />

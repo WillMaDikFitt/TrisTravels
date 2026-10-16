@@ -126,7 +126,6 @@ export function PageTextTab() {
           {text("makersTitle", "Heading")}
           {text("makersSubtitle", "Subheading")}
         </div>
-        {text("makersNote", "Note beside the heading", { rows: 2 })}
       </Panel>
 
       <Panel className="space-y-4">

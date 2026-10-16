@@ -8,7 +8,7 @@ import { getSettings } from "@/lib/data/repo";
 import { ArtisansPageClient } from "./ArtisansPageClient";
 import { CraftsComingSoon } from "./CraftsComingSoon";
 
-export const metadata = { title: "Meet Meghalaya’s Makers" };
+export const metadata = { title: "Treasures from the Hills" };
 
 /** Pick up Studio → Crafts edits without waiting for a full redeploy. */
 export const revalidate = 60;

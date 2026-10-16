@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import {
   activeCraftProducts,
-  DEFAULT_CRAFT_MAKERS,
   DEFAULT_CRAFT_PRODUCTS,
   makerCategoryLabels,
   normalizeCraftsPage,
@@ -47,10 +46,6 @@ async function loadMaker(slug: string) {
     // On until switched off in Studio → Crafts; also on if settings can't be read.
     comingSoon: settings?.craftsComingSoon !== false,
   };
-}
-
-export function generateStaticParams() {
-  return DEFAULT_CRAFT_MAKERS.map((m) => ({ slug: m.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -258,7 +253,7 @@ export default async function MakerPage({ params }: Props) {
             {maker.name}
           </h1>
           <p className="mt-3 flex items-center gap-2 text-on-surface">
-            <MapPin size={16} className="text-secondary" aria-hidden />
+            <MapPin size={16} className="text-red-600" aria-hidden />
             {maker.location}
           </p>
           <p className="mt-4 max-w-3xl leading-relaxed text-on-surface-variant md:text-lg">

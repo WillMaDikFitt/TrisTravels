@@ -22,128 +22,8 @@ export type CraftProduct = {
 };
 
 /** Seeded with the catalogue that used to be hard-coded on /artisans (Studio → Crafts). */
-export const DEFAULT_CRAFT_PRODUCTS: CraftProduct[] = [
-  {
-    slug: "besli-local-flute",
-    name: "Besli: Local flute of Meghalaya",
-    category: "Musical Instrument",
-    image: "",
-    blurb:
-      "A traditional Meghalaya flute — sound, craft, and place in one piece.",
-    makerNote: "Local instrument makers",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/musical-instrument",
-  },
-  {
-    slug: "fridge-magnet-living-root-bridge",
-    name: "Fridge Magnet: Living root bridge (2pc)",
-    category: "Souvenirs",
-    image: "",
-    blurb: "A classic Meghalaya memento celebrating the living root bridge.",
-    makerNote: "Local souvenir artisans",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/best-sellers",
-  },
-  {
-    slug: "paila",
-    name: "Paila",
-    category: "Traditional Jewellery",
-    image: "",
-    blurb: "Traditional jewellery from community makers in the Hub network.",
-    makerNote: "Jewellery artisans",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/traditional-jewellery",
-  },
-  {
-    slug: "resilience-jute-collection",
-    name: "Resilience Jute Collection",
-    category: "Arts & Crafts",
-    image: "",
-    blurb:
-      "Everyday jute pieces supporting women-led and community craft initiatives.",
-    makerNote: "Women-led jute collectives",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-  {
-    slug: "khasi-heritage-duo-by-tori",
-    name: "Khasi Heritage Duo By Tori",
-    category: "Arts & Crafts",
-    image: "",
-    blurb:
-      "A heritage duo celebrating Khasi craftsmanship — curated for mindful travellers.",
-    makerNote: "Tori · heritage craft",
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-  {
-    slug: "water-bottle-sling",
-    name: "Water Bottle Sling",
-    category: "Arts & Crafts",
-    image: "",
-    blurb: "Handy sling for trail days — practical craft for the journey.",
-    makerNote: "Local textile makers",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-  {
-    slug: "hands-free-glasses-holder",
-    name: "Hands-Free Glasses Holder",
-    category: "Arts & Crafts",
-    image: "",
-    blurb: "A small, useful piece from makers in the Hub network.",
-    makerNote: "Local craft makers",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/best-sellers",
-  },
-  {
-    slug: "keychain-bottle-opener",
-    name: "Key chain cum bottle opener (2pc)",
-    category: "Souvenirs",
-    image: "",
-    blurb: "Practical keepsakes — keychain and bottle opener in one.",
-    makerNote: "Local souvenir makers",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/best-sellers",
-  },
-  {
-    slug: "fridge-magnet-nohkalikai",
-    name: "Acrylic Fridge Magnet: Nohkalikai falls (2pc)",
-    category: "Souvenirs",
-    image: "",
-    blurb: "Nohkalikai Falls — a piece of Sohra’s drama for home.",
-    makerNote: "Local souvenir artisans",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/best-sellers",
-  },
-  {
-    slug: "sunflower-keychains",
-    name: "Sunflower Keychains (2pc)",
-    category: "Arts & Crafts",
-    image: "",
-    blurb: "Bright sunflower keychains — small gifts with a sunny finish.",
-    makerNote: "Local craft makers",
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-  {
-    slug: "crochet-flower-coaster-set",
-    name: "Crochet Flower Coaster Set with Pot",
-    category: "Arts & Crafts",
-    image: "",
-    blurb: "Handmade crochet set — soft colour and everyday table joy.",
-    makerNote: "Crochet artisans",
-    bestSeller: true,
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-  {
-    slug: "flower-crochet-charm",
-    name: "Flower Crochet Charm (2pc)",
-    category: "Arts & Crafts",
-    image: "",
-    blurb: "Pair of crochet flower charms — light keepsakes from local makers.",
-    makerNote: "Crochet artisans",
-    sourceUrl: "https://www.trismeghalaya.com/category/arts-crafts",
-  },
-];
+/** No built-in crafts — everything is added in Studio → Crafts. */
+export const DEFAULT_CRAFT_PRODUCTS: CraftProduct[] = [];
 
 export const craftCategories: CraftCategory[] = [
   "Arts & Crafts",
@@ -271,54 +151,8 @@ export type ResolvedCraftMaker = CraftMaker & {
   crafts: CraftProduct[];
 };
 
-const DEFAULT_JOURNEY =
-  "Rooted in tradition and shaped by years of practice, this work keeps local skills alive. Today the makers continue to create pieces that carry the stories, skills and cultural identity of Meghalaya.";
-
-const defaultStories: Record<string, string> = {
-  "local-instrument-makers":
-    "Keeping Meghalaya’s musical heritage alive by crafting traditional bamboo flutes — the sounds and stories of the hills, made by hand.",
-  "jewellery-artisans":
-    "Traditional jewellery shaped by community makers, carrying motifs and techniques passed down through generations.",
-  "women-led-jute-collectives":
-    "Women-led collectives turning jute into everyday pieces — each one supports community livelihoods across the region.",
-  "crochet-artisans":
-    "Patient, handmade crochet work in soft colour — coasters, charms and small pieces made stitch by stitch.",
-};
-
-/** Seed makers: the default crafts grouped by their "Maker note", with TRIS as the contact. */
-export const DEFAULT_CRAFT_MAKERS: CraftMaker[] = (() => {
-  const groups = new Map<string, CraftMaker>();
-  for (const p of DEFAULT_CRAFT_PRODUCTS) {
-    const name = p.makerNote?.trim() || p.name;
-    const slug = slugify(name) || p.slug;
-    const existing = groups.get(slug);
-    if (existing) {
-      existing.craftSlugs.push(p.slug);
-      continue;
-    }
-    const story = defaultStories[slug] ?? p.blurb;
-    groups.set(slug, {
-      slug,
-      name,
-      category: p.category,
-      location: "Meghalaya",
-      story,
-      about: `${story} Every piece is made by hand, carrying knowledge and techniques passed down within the community.`,
-      journey: DEFAULT_JOURNEY,
-      find: "",
-      portrait: "",
-      gallery: [],
-      whatsapp: "+91 70052 41197",
-      phone: "+91 70052 41197",
-      instagram: "@trisexperiences",
-      email: "trissimai03@gmail.com",
-      craftSlugs: [p.slug],
-      active: true,
-      sortOrder: groups.size + 1,
-    });
-  }
-  return [...groups.values()];
-})();
+/** No built-in makers — everything is added in Studio → Crafts → Makers. */
+export const DEFAULT_CRAFT_MAKERS: CraftMaker[] = [];
 
 export function blankCraftMaker(index = 0): CraftMaker {
   return {
@@ -431,7 +265,6 @@ export type CraftsPageCopy = {
   heroScript: string;
   makersTitle: string;
   makersSubtitle: string;
-  makersNote: string;
   connectorTitle: string;
   connectorBody: string;
   /** The three small notes beside the connector line (icons are fixed). */
@@ -445,18 +278,16 @@ export type CraftsPageCopy = {
 };
 
 export const DEFAULT_CRAFTS_PAGE: CraftsPageCopy = {
-  heroImage: "",
-  heroTitle: "Meet Meghalaya’s Makers",
+  heroImage: "/images/tris.jpeg",
+  heroTitle: "Treasures from the Hills",
   heroSubtitle:
-    "Discover the hands, stories and traditions behind what is made here.",
+    "Discover authentic local products, rooted in Meghalaya’s people, culture and landscapes.",
   heroBody:
-    "Explore a curated circle of local makers and sellers, discover their work, and connect with them directly during your stay in Meghalaya. Take home something meaningful, made by the people who make this place special.",
+    "From handwoven textiles and bamboo crafts to wild honey, Lakadong turmeric and unique handmade creations — meet the people behind them, hear their stories and take a piece of the hills with you.",
   heroScript:
     "Local people.\nReal stories.\nA piece of Meghalaya\nfor your journey",
   makersTitle: "Our Makers",
   makersSubtitle: "People, stories and creations from across Meghalaya.",
-  makersNote:
-    "Every maker featured here has been personally identified through our local network. We focus on people whose work, story or connection to Meghalaya is meaningful to us.",
   connectorTitle: "TRIS is the connector, not the seller.",
   connectorBody:
     "We introduce you to local makers and help you discover their work. Availability, pricing, payment and delivery arrangements are handled directly with the maker.",
@@ -495,7 +326,6 @@ export function normalizeCraftsPage(
     heroScript: pick("heroScript"),
     makersTitle: pick("makersTitle"),
     makersSubtitle: pick("makersSubtitle"),
-    makersNote: pick("makersNote"),
     connectorTitle: pick("connectorTitle"),
     connectorBody: pick("connectorBody"),
     connectorNotes: d.connectorNotes.map((n, i) => ({

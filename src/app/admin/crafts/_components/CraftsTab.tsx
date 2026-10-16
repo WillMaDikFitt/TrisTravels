@@ -16,7 +16,7 @@ export function CraftsTab() {
     normalizeCraftProducts(null, DEFAULT_CRAFT_PRODUCTS),
   );
   const [note, setNote] = useState("");
-  // Starts busy so Remove / Reset can't save over stored crafts before they've loaded.
+  // Starts busy so Remove can't save over stored crafts before they've loaded.
   const [busy, setBusy] = useState(true);
 
   useEffect(() => {
@@ -78,18 +78,6 @@ export function CraftsTab() {
     );
   };
 
-  const reset = () => {
-    if (
-      !confirm(
-        "Replace every craft with the original default list? Your edits will be lost.",
-      )
-    )
-      return;
-    void persist(
-      DEFAULT_CRAFT_PRODUCTS.map((row) => ({ ...row })),
-      "Crafts reset to the default list.",
-    );
-  };
 
   return (
     <div>
@@ -106,14 +94,6 @@ export function CraftsTab() {
             show as that maker’s thumbnails, tags and “Available pieces”.
           </p>
           <div className="flex flex-wrap gap-2">
-            <AdminButton
-              type="button"
-              variant="ghost"
-              onClick={reset}
-              disabled={busy}
-            >
-              Reset to defaults
-            </AdminButton>
             <Link href="/admin/crafts/new">
               <AdminButton>
                 <Plus size={14} className="mr-1 inline" />

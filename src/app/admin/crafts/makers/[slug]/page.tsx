@@ -284,7 +284,7 @@ export default function MakerEditorPage() {
             key={`maker-gallery-${formKey}`}
             name="gallery"
             label="Profile gallery"
-            hint="Any number of photos. The profile shows the main photo big with up to 4 beside it — the rest open in the photo viewer. The first 4 also appear as thumbnails on the makers page."
+            hint="Any number of photos. The profile shows the main photo big with up to 4 beside it — the rest open in the photo viewer. The first 3 also appear as thumbnails on the makers page card, with a “+N” badge when there are more."
             defaultValue={maker.gallery}
             purpose="crafts"
             onChange={(urls) => update({ gallery: urls })}
